@@ -2,7 +2,7 @@ import nextcord
 from nextcord import Interaction
 from nextcord.ext import commands
 from config import settings
-from core.locales import get_msg_from_locale_by_key, get_keys_of_command_in_locale, get_keys_value_in_locale
+from core.locales import get_msg_from_locale_by_key, get_keys_value_in_locale
 from core.embeds import construct_basic_embed, construct_long_embed
 
 
@@ -44,6 +44,28 @@ class Information(commands.Cog):
                                       f"```{guild.description}```",
                                       f"```{guild.premium_tier}```",
                                       f"```{guild.premium_subscription_count}```",
+                                      ])
+        await interaction.response.send_message(embed=embed)
+
+    @nextcord.slash_command(name="user", description="Sends all information about user, that can i found")
+    async def __user(self, interaction: Interaction, user: nextcord.Member):
+        if user is None:
+            return await interaction.response.send_message('no key value error 786')
+        requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
+        names_of_embed_fields = get_keys_value_in_locale(interaction.guild.id, interaction.application_command.name)
+        embed = construct_long_embed(f'{user.name}:', user.avatar, f"{requested} {interaction.user}",
+                                     interaction.user.display_avatar,
+                                     names_of_embed_fields,
+                                     [f"```{user.created_at.strftime('%a, %d %b %Y')}```",
+                                      f"```#{user.discriminator}```",
+                                      f"```{user.joined_at.strftime('%a, %d %b %Y')}```",
+                                      f"```{user.desktop_status}```",
+                                      f"```{user.web_status}```",
+                                      f"```{user.mobile_status}```",
+                                      f"```{user.id}```",
+                                      f"```{user.nick}```",
+                                      f"```{len(user.roles)}```",
+                                      f"{user.activity}"
                                       ])
         await interaction.response.send_message(embed=embed)
 

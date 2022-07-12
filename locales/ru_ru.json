@@ -1,25 +1,37 @@
 {
-  "ping": {
-    "msg": "Мой пинг:"
+    "ping": {
+      "msg": "Мой пинг:"
   },
-  "requested_by": {
-    "msg": "запросил"
+   "requested_by": {
+      "msg": "запросил"
   },
-  "server": {
-    "member_count": "Пользователей всего:",
-    "owner": "Владелец:",
-    "emojis": "Количество эмодзи:",
-    "created_at": "Дата создания:",
-    "guild_id": "ID Сервера",
-    "channels": "Каналов и категорий:",
-    "voice_channels": "Голосовых каналов:",
-    "text_channels": "Текстовых каналов:",
-    "categories": "Категорий:",
-    "roles": "Всего ролей:",
-    "shard_id": "ID звена:",
-    "explicit_content_filter": "Фильтр контента:",
-    "description": "Описание:",
-    "premium_tier": "Уровень нитро:",
-    "premium_subscribers": "Нитро бустеров:"
+    "server": {
+      "member_count": "Пользователей всего:",
+      "owner": "Владелец:",
+      "emojis": "Количество эмодзи:",
+      "created_at": "Дата создания:",
+      "guild_id": "ID Сервера",
+      "channels": "Каналов и категорий:",
+      "voice_channels": "Голосовых каналов:",
+      "text_channels": "Текстовых каналов:",
+      "categories": "Категорий:",
+      "roles": "Всего ролей:",
+      "shard_id": "ID звена:",
+      "explicit_content_filter": "Фильтр контента:",
+      "description": "Описание:",
+      "premium_tier": "Уровень нитро:",
+      "premium_subscribers": "Нитро бустеров:"
+  },
+    "user": {
+      "created_at": "Зарегистрирован",
+      "discriminator": "Дискриминатор:",
+      "joined_at": "Присоединился к серверу:",
+      "desktop_status": "Статус в ПК приложении",
+      "web_status": "Статус в браузере:",
+      "mobile_status": "Статус в мобильном приложении",
+      "id": "ID пользователя:",
+      "nick": "Никнейм пользователя:",
+      "roles": "Количество ролей:",
+      "activity": "Активность:"
   }
 }

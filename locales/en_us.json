@@ -1,25 +1,37 @@
 {
-  "ping": {
-    "msg": "My ping:"
+    "ping": {
+      "msg": "My ping:"
   },
-  "requested_by": {
-    "msg": "requested by"
+    "requested_by": {
+      "msg": "requested by"
   },
-  "server": {
-    "member_count": "Users count:",
-    "owner": "Owner:",
-    "emojis": "Emoji count:",
-    "created_at": "Created at:",
-    "guild_id": "Server's ID:",
-    "channels": "All channels count:",
-    "voice_channels": "Voice channels count:",
-    "text_channels": "Text Channels count:",
-    "categories": "Categories:",
-    "roles": "Role's count:",
-    "shard_id": "Shard ID:",
-    "explicit_content_filter": "Content filter:",
-    "description": "Description:",
-    "premium_tier": "Nitro boost level:",
-    "premium_subscribers": "Nitro boosters count:"
+    "server": {
+      "member_count": "Users count:",
+      "owner": "Owner:",
+      "emojis": "Emoji count:",
+      "created_at": "Created at:",
+      "guild_id": "Server's ID:",
+      "channels": "All channels count:",
+      "voice_channels": "Voice channels count:",
+      "text_channels": "Text Channels count:",
+      "categories": "Categories:",
+      "roles": "Role's count:",
+      "shard_id": "Shard ID:",
+      "explicit_content_filter": "Content filter:",
+      "description": "Description:",
+      "premium_tier": "Nitro boost level:",
+      "premium_subscribers": "Nitro boosters count:"
+  },
+    "user": {
+      "created_at": "Created at",
+      "discriminator": "Discriminator:",
+      "joined_at": "Joined at:",
+      "desktop_status": "Desktop Discord status",
+      "web_status": "Web Discord status:",
+      "mobile_status": "Mobile Discord status",
+      "id": "User's ID:",
+      "nick": "User's nick:",
+      "roles": "Roles count:",
+      "activity": "Activity:"
   }
 }
