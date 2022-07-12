@@ -44,7 +44,33 @@ class Moderation(commands.Cog):
                 embed=construct_error_forbidden_embed(
                     get_msg_from_locale_by_key(interaction.guild.id, 'forbidden_error'),
                     self.client.user.avatar.url)
-                )
+            )
+
+    @nextcord.slash_command(name="unmute", description="Unmute muted (timed out) discord user")
+    async def __unmute(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True)):
+        """
+        Parameters
+        ----------
+        interaction: Interaction
+            The interaction object
+        user: Optional[nextcord.Member]
+            The discord's user, tag someone with @
+        """
+        try:
+            requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
+            await user.edit(timeout=None)
+            message = get_msg_from_locale_by_key(interaction.guild.id, interaction.application_command.name)
+            await interaction.response.send_message(
+                embed=construct_basic_embed(interaction.application_command.name,
+                                            f"{message} {user.mention}",
+                                            f"{requested} {interaction.user}",
+                                            interaction.user.display_avatar))
+        except nextcord.Forbidden:
+            await interaction.response.send_message(
+                embed=construct_error_forbidden_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, 'forbidden_error'),
+                    self.client.user.avatar.url)
+            )
 
 
 def setup(client):
