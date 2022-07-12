@@ -3,7 +3,7 @@
       "msg": "My ping:"
   },
     "requested_by": {
-      "msg": "requested by"
+      "msg": "command requested by"
   },
     "server": {
       "member_count": "Users count:",
@@ -33,5 +33,11 @@
       "nick": "User's nick:",
       "roles": "Roles count:",
       "activity": "Activity:"
-  }
+  },
+    "forbidden_error": {
+      "msg": "Discord denied me in process of command execution due to __**lack of permissions**__  or action is __**forbidden/impossible**__.\nYour command failed to successfully complete."
+    },
+    "mute": {
+      "msg": "Given mute to"
+    }
 }

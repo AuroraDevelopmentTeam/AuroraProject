@@ -5,6 +5,11 @@ from config import settings
 DEFAULT_BOT_COLOR = settings["default_color"]
 
 
+def construct_error_embed(description: str) -> nextcord.Embed:
+    embed = nextcord.Embed(color=DEFAULT_BOT_COLOR, description=description)
+    return embed
+
+
 def construct_basic_embed(name: str, value: str, footer_text: str, footer_url: Asset) -> nextcord.Embed:
     name = name.capitalize()
     embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
@@ -22,6 +27,3 @@ def construct_long_embed(title: str, thumbnail_url: Asset, footer_text: str,
         for name, value in zip(name_list, value_list):
             embed.add_field(name=name, value=value, inline=True)
     return embed
-
-
-
