@@ -56,7 +56,7 @@ class Information(commands.Cog):
                                       f"```{guild.description}```",
                                       f"```{guild.premium_tier}```",
                                       f"```{guild.premium_subscription_count}```",
-                                      ])
+                                      ], True)
         await interaction.response.send_message(embed=embed)
 
     @nextcord.slash_command(name="user", description="Sends all information about user, that can i found")
@@ -86,7 +86,7 @@ class Information(commands.Cog):
                                       f"```{user.nick}```",
                                       f"```{len(user.roles)}```",
                                       f"{user.activity}"
-                                      ])
+                                      ], True)
         await interaction.response.send_message(embed=embed)
 
 

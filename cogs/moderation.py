@@ -5,6 +5,7 @@ import datetime
 from core.errors import construct_error_forbidden_embed
 from core.embeds import construct_basic_embed
 from core.locales import get_msg_from_locale_by_key
+from core.parsers import parse_timeouts
 import humanfriendly
 from typing import Optional
 
@@ -32,7 +33,8 @@ class Moderation(commands.Cog):
         try:
             time_in_seconds = humanfriendly.parse_timespan(time)
             requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
-            await user.edit(timeout=nextcord.utils.utcnow() + datetime.timedelta(seconds=time_in_seconds))
+            await user.edit(timeout=nextcord.utils.utcnow() + datetime.timedelta(seconds=time_in_seconds),
+                            reason=reason)
             message = get_msg_from_locale_by_key(interaction.guild.id, interaction.application_command.name)
             await interaction.response.send_message(
                 embed=construct_basic_embed(interaction.application_command.name,
@@ -71,6 +73,16 @@ class Moderation(commands.Cog):
                     get_msg_from_locale_by_key(interaction.guild.id, 'forbidden_error'),
                     self.client.user.avatar.url)
             )
+
+    @nextcord.slash_command(name="mutes", description="Show list of active mutes on this server")
+    async def __mutes(self, interaction: Interaction):
+        """
+        Parameters
+        ----------
+        interaction: Interaction
+            The interaction object
+        """
+        mutes = parse_timeouts(interaction.guild.members)
 
 
 def setup(client):

@@ -1,6 +1,7 @@
 import sqlite3
 from core.checkers import is_guild_id_in_table
 import json
+from config import settings
 
 
 def create_locales_table() -> None:
@@ -21,7 +22,7 @@ def write_in_locales_standart_values(guilds) -> None:
     for guild in guilds:
         if is_guild_id_in_table("locales", guild.id) is False:
             sql = "INSERT INTO locales(guild_id, locale) VALUES (?, ?)"
-            val = (guild.id, 'en_us')
+            val = (guild.id, settings['default_locale'])
             cursor.execute(sql, val)
             db.commit()
     cursor.close()

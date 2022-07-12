@@ -19,11 +19,15 @@ def construct_basic_embed(name: str, value: str, footer_text: str, footer_url: A
 
 
 def construct_long_embed(title: str, thumbnail_url: Asset, footer_text: str,
-                         footer_url: Asset, name_list: list, value_list: list) -> nextcord.Embed:
+                         footer_url: Asset, name_list: list, value_list: list, inline: bool) -> nextcord.Embed:
     embed = nextcord.Embed(color=DEFAULT_BOT_COLOR, title=title)
     embed.set_footer(text=footer_text, icon_url=footer_url)
     embed.set_thumbnail(url=thumbnail_url)
     if len(name_list) == len(value_list):
         for name, value in zip(name_list, value_list):
-            embed.add_field(name=name, value=value, inline=True)
+            embed.add_field(name=name, value=value, inline=inline)
     return embed
+
+
+def construct_top_embed():
+    pass
