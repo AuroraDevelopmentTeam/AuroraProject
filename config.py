@@ -1,0 +1,5 @@
+import nextcord
+
+settings = {
+    'PREFIX': '*'
+}
