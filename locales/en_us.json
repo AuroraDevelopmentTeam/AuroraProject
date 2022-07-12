@@ -1,0 +1,11 @@
+{
+  "ping": {
+    "msg": "My ping:"
+  },
+  "requested_by": {
+    "msg": "requested by"
+  },
+  "user": {
+
+  }
+}
