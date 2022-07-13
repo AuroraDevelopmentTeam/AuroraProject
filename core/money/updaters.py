@@ -23,3 +23,15 @@ def update_guild_starting_balance(guild_id: int, balance: int) -> None:
     cursor.close()
     db.close()
     return
+
+
+def update_guild_payday_amount(guild_id: int, payday_amount: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE money_config SET guild_payday_amount = ? WHERE guild_id = ?"
+    values = (payday_amount, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
