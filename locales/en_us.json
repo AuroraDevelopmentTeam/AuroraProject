@@ -42,5 +42,14 @@
     },
     "unmute": {
       "msg": "Removed mute from"
+    },
+    "http_exception": {
+      "msg": "In process of command execution raised exception that’s raised when an HTTP request operation fails.\nYour command failed to successfully complete."
+    },
+    "limit_break": {
+      "msg": "Too many arguments were specified to execute the command, reduce the query.\nYour command failed to successfully complete."
+    },
+    "clear": {
+      "msg": "Messages were successfully deleted in the command invoke channel.\nMessages were deleted:"
     }
 }

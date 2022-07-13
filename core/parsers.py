@@ -1,4 +1,5 @@
 import nextcord
+from datetime import datetime
 
 
 def parse_timeouts(guild_members) -> list:
@@ -6,5 +7,7 @@ def parse_timeouts(guild_members) -> list:
     counter = 1
     for member in guild_members:
         if member.timeout is not None:
-            mutes.append(f"**{counter}**.{member}: **{(member.timeout - nextcord.utils.utcnow()).strftime('%H:%M:%S')}**")
+            estimated_time = member.timeout - nextcord.utils.utcnow()
+            estimated_time = f'{estimated_time}'[: -7]
+            mutes.append([member.mention, estimated_time])
     return mutes
