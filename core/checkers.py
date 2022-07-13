@@ -20,3 +20,17 @@ def is_locale_valid(locale) -> bool:
         return True
     else:
         return False
+
+
+def is_user_in_table(table_name, guild_id, user_id):
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    if cursor.execute(f"SELECT user_id FROM {table_name} WHERE guild_id = {guild_id} "
+                      f"AND user_id = {user_id}").fetchone() is None:
+        cursor.close()
+        db.close()
+        return False
+    else:
+        cursor.close()
+        db.close()
+        return True

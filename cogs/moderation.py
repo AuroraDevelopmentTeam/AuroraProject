@@ -5,7 +5,7 @@ import datetime
 from core.errors import construct_error_forbidden_embed, construct_error_limit_break_embed, \
     construct_error_http_exception_embed
 from core.embeds import construct_basic_embed, construct_top_embed
-from core.locales import get_msg_from_locale_by_key
+from core.locales.getters import get_msg_from_locale_by_key
 from core.parsers import parse_timeouts
 import humanfriendly
 from typing import Optional
@@ -122,12 +122,12 @@ class Moderation(commands.Cog):
             after = nextcord.Object(id=after)
 
         try:
-            await interaction.channel.purge(limit=messages_to_delete, before=before, after=after)
+            were_deleted = await interaction.channel.purge(limit=messages_to_delete, before=before, after=after)
             requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
             message = get_msg_from_locale_by_key(interaction.guild.id, interaction.application_command.name)
             await interaction.response.send_message(
                 embed=construct_basic_embed(interaction.application_command.name,
-                                            f"{message} {user.mention}",
+                                            f"{message} {len(were_deleted)}",
                                             f"{requested} {interaction.user}",
                                             interaction.user.display_avatar))
         except nextcord.Forbidden:

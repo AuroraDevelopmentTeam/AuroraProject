@@ -6,5 +6,9 @@ white = Color.from_rgb(255, 255, 255)
 settings = {
     'PREFIX': '*',
     'default_color': white,
-    'default_locale': 'en_us'
+    'default_locale': 'en_us',
+    'default_payday_time': 3600,
+    'default_payday_amount': 200,
+    'default_currency': "<:flowerwhite:996685380948607017>",
+    'default_starting_balance': 100,
 }
