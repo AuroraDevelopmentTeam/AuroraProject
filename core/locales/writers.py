@@ -1,5 +1,6 @@
 import sqlite3
 from core.checkers import is_guild_id_in_table
+from config import settings
 
 
 def write_in_locales_standart_values(guilds) -> None:
