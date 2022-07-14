@@ -4,7 +4,7 @@ import nextcord
 from typing import Optional
 from core.money.updaters import update_guild_currency_symbol, update_guild_starting_balance, \
     update_guild_payday_amount, update_user_balance
-from core.money.getters import get_user_balance, get_guild_currency_symbol
+from core.money.getters import get_user_balance, get_guild_currency_symbol, get_guild_starting_balance
 from core.checkers import is_str_or_emoji
 from core.locales.getters import get_msg_from_locale_by_key
 from core.embeds import construct_basic_embed
@@ -98,8 +98,14 @@ class Economics(commands.Cog):
         pass
 
     @__reset.subcommand(name="money", description="Reset's a members balance to standart value")
-    async def ___money(self, interaction: Interaction):
-        await interaction.response.send_message('test')
+    async def ___money(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True)):
+        starting_balance = get_guild_starting_balance(interaction.guild.id)
+        update_user_balance(interaction.guild.id, user.id, starting_balance)
+
+    @__reset.subcommand(name="economics", description="Reset's server economics, "
+                                                      "all user balances to starting balances")
+    async def __economics(self, interaction: Interaction):
+        pass
 
 
 def setup(client):
