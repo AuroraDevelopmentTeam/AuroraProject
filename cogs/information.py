@@ -1,7 +1,8 @@
 import nextcord
 from nextcord import Interaction, SlashOption
 from nextcord.ext import commands
-from core.locales.getters import get_msg_from_locale_by_key, get_keys_value_in_locale
+from core.locales.getters import get_msg_from_locale_by_key, get_keys_value_in_locale, get_localized_description, \
+    get_localized_name
 from core.embeds import construct_basic_embed, construct_long_embed
 from typing import Optional
 
@@ -11,14 +12,10 @@ class Information(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @nextcord.slash_command(name="ping", description="Sends client's latency in miliseconds")
+    @nextcord.slash_command(name="ping", description="Shows client's ping",
+                            name_localizations=get_localized_name("ping"),
+                            description_localizations=get_localized_description("ping"))
     async def __ping(self, interaction: Interaction):
-        """
-        Parameters
-        ----------
-        interaction: Interaction
-            The interaction object
-        """
         message = get_msg_from_locale_by_key(interaction.guild.id, interaction.application_command.name)
         requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
         await interaction.response.send_message(
@@ -27,14 +24,10 @@ class Information(commands.Cog):
                                         f"{requested} {interaction.user}",
                                         interaction.user.display_avatar))
 
-    @nextcord.slash_command(name="server", description="Sends all information about server, that can i found")
+    @nextcord.slash_command(name="server", description="Sends all information about server, that can i found",
+                            name_localizations=get_localized_name("server"),
+                            description_localizations=get_localized_description("server"))
     async def __server(self, interaction: Interaction):
-        """
-        Parameters
-        ----------
-        interaction: Interaction
-            The interaction object
-        """
         guild = interaction.guild
         requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
         names_of_embed_fields = get_keys_value_in_locale(guild.id, interaction.application_command.name)
@@ -60,15 +53,11 @@ class Information(commands.Cog):
         await interaction.response.send_message(embed=embed)
 
     @nextcord.slash_command(name="user", description="Sends all information about user, that can i found")
-    async def __user(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True)):
-        """
-        Parameters
-        ----------
-        interaction: Interaction
-            The interaction object
-        user: Optional[nextcord.Member]
-            The discord's user, tag someone with @
-        """
+    async def __user(self, interaction: Interaction,
+                     user: Optional[nextcord.Member] = SlashOption(required=True, description="The discord's user, "
+                                                                                              "tag someone with @",
+                                                                   description_localizations={"ru": "Пользователь "
+                                                                                                    "дискорда"})):
         if user is None:
             return await interaction.response.send_message('no key value error 786')
         requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')

@@ -1,11 +1,15 @@
 {
     "ping": {
-      "msg": "My ping:"
+      "msg": "My ping:",
+      "name": "ping",
+      "description": "Show client ping"
   },
     "requested_by": {
       "msg": "command requested by"
   },
     "server": {
+      "name": "server",
+      "description": "Sends all information about server, that can i found",
       "member_count": "Users count:",
       "owner": "Owner:",
       "emojis": "Emoji count:",
@@ -18,7 +22,7 @@
       "roles": "Role's count:",
       "shard_id": "Shard ID:",
       "explicit_content_filter": "Content filter:",
-      "description": "Description:",
+      "description_server": "Description:",
       "premium_tier": "Nitro boost level:",
       "premium_subscribers": "Nitro boosters count:"
   },
@@ -51,5 +55,26 @@
     },
     "clear": {
       "msg": "Messages were successfully deleted in the command invoke channel.\nMessages were deleted:"
+    },
+    "set_locale": {
+      "msg": "Bot respond language has been changed on:"
+    },
+    "set_currency": {
+      "msg": "Server currency symbol has been changed on:"
+    },
+    "set_payday_amount": {
+      "msg": "Server payday amount has been changed on:"
+    },
+    "set_start_balance": {
+      "msg": "Server starting balance has been changed on:"
+    },
+    "add_money": {
+      "msg": "Added money to balance of user:"
+    },
+    "remove_money": {
+      "msg": "Removed money from balance of user:"
+    },
+    "money": {
+      "msg": "Balance is:"
     }
 }
