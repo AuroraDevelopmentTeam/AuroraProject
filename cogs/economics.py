@@ -99,13 +99,20 @@ class Economics(commands.Cog):
 
     @__reset.subcommand(name="money", description="Reset's a members balance to standart value")
     async def ___money(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True)):
-        starting_balance = get_guild_starting_balance(interaction.guild.id)
-        update_user_balance(interaction.guild.id, user.id, starting_balance)
+        if user.bot:
+            return await interaction.response.send_message('bot_user_error')
+        else:
+            starting_balance = get_guild_starting_balance(interaction.guild.id)
+            update_user_balance(interaction.guild.id, user.id, starting_balance)
+            await interaction.response.send_message('done')
 
     @__reset.subcommand(name="economics", description="Reset's server economics, "
                                                       "all user balances to starting balances")
     async def __economics(self, interaction: Interaction):
-        pass
+        for member in interaction.guild.members:
+            starting_balance = get_guild_starting_balance(interaction.guild.id)
+            update_user_balance(interaction.guild.id, member.id, starting_balance)
+        await interaction.response.send_message('done')
 
 
 def setup(client):
