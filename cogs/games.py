@@ -1,6 +1,7 @@
 import nextcord
 from nextcord.ext import commands
-from nextcord import Interaction
+from nextcord import Interaction, ButtonStyle, File
+from nextcord.ui import Button, View
 
 from core.games.blackjack import Hand, Deck, check_for_blackjack, show_blackjack_results, player_is_over
 
@@ -11,7 +12,6 @@ class Games(commands.Cog):
 
     @nextcord.slash_command(name="blackjack", description="play blackjack game")
     async def __blackjack(self, interaction: Interaction):
-        embed = nextcord.Embed()
         await interaction.response.defer()
         deck = Deck()
         deck.shuffle()
@@ -23,7 +23,14 @@ class Games(commands.Cog):
             player_hand.add_card(deck.deal())
             dealer_hand.add_card(deck.deal())
 
-        await interaction.channel.send(f'turn: {turn}\nplayer_hand: {player_hand.cards} value {player_hand.get_value()}\n dealer_hand: {dealer_hand.display()}')
+        hit = Button(label="click me", style=ButtonStyle.blurple)
+
+        async def hit_callback(interaction):
+            print('hit button pressed')
+
+        embed = nextcord.Embed(title=interaction.application_command.name,
+                               description=f'turn: {turn}\nplayer_hand: {player_hand.cards} value {player_hand.get_value()}\n dealer_hand: {dealer_hand.display()}')
+        msg = await interaction.followup.send(embed=embed)
 
         game_over = False
 
@@ -34,7 +41,11 @@ class Games(commands.Cog):
                     game_over = True
                     show_blackjack_results(
                         player_has_blackjack, dealer_has_blackjack)
-                    await interaction.followup.send(f'turn: {turn}\nblackjack!\ndealer_hand: {dealer_hand.cards} value {dealer_hand.get_value()}\nplayer_hand: {player_hand.cards} value {player_hand.get_value()}')
+                    description = f'turn: {turn}\nblackjack!\ndealer_hand: {dealer_hand.cards} value ' \
+                                  f'{dealer_hand.get_value()}\nplayer_hand: {player_hand.cards} value ' \
+                                  f'{player_hand.get_value()} '
+                    embed = nextcord.Embed(title=interaction.application_command.name, description=description)
+                    await msg.edit(embed=embed)
                     continue
             await interaction.channel.send('write h/s')
 
@@ -46,36 +57,38 @@ class Games(commands.Cog):
             if reply.content.casefold() == 'h':
                 turn += 1
                 player_hand.add_card(deck.deal())
-                await interaction.channel.send(f'turn: {turn}\nplayer_hand: {player_hand.cards}, dealer_hand: {dealer_hand.display()}')
+                description = f'turn: {turn}\nplayer_hand: {player_hand.cards}, dealer_hand: {dealer_hand.display()}'
+                embed = nextcord.Embed(title=interaction.application_command.name, description=description)
+                await msg.edit(embed=embed)
                 if player_is_over(player_hand):
-                    await interaction.followup.send(f'turn: {turn}\ndealer wins!\ndealer_hand: {dealer_hand.cards} value {dealer_hand.get_value()}\nplayer_hand: {player_hand.cards} value {player_hand.get_value()}')
-                    game_over = True
+                    description = f'turn: {turn}\ndealer wins!\ndealer_hand: {dealer_hand.cards} value {dealer_hand.get_value()}\nplayer_hand: {player_hand.cards} value {player_hand.get_value()}'
+                    embed = nextcord.Embed(title=interaction.application_command.name, description=description)
+                    await msg.edit(embed=embed)
 
             if reply.content.casefold() == 's':
                 turn += 1
                 while dealer_hand.get_value() < 17:
                     dealer_hand.add_card(deck.deal())
-                    print(dealer_hand.get_value(), dealer_hand.cards)
                     if player_is_over(dealer_hand):
-                        await interaction.followup.send(
-                            f'turn: {turn}\nplayer wins!\ndealer_hand: {dealer_hand.cards} value {dealer_hand.get_value()}\nplayer_hand: {player_hand.cards} value {player_hand.get_value()}')
-
+                        description = f'turn: {turn}\nplayer wins!\ndealer_hand: {dealer_hand.cards} value {dealer_hand.get_value()}\nplayer_hand: {player_hand.cards} value {player_hand.get_value()}'
+                        embed = nextcord.Embed(title=interaction.application_command.name, description=description)
+                        await msg.edit(embed=embed)
                 if not player_is_over(dealer_hand):
                     if dealer_hand.get_value() > player_hand.get_value():
-                        await interaction.followup.send(
-                            f'turn: {turn}\ndealer wins\ndealer_hand: {dealer_hand.cards} value {dealer_hand.get_value()}\nplayer_hand: {player_hand.cards} value {player_hand.get_value()}')
+                        description = f'turn: {turn}\ndealer wins\ndealer_hand: {dealer_hand.cards} value {dealer_hand.get_value()}\nplayer_hand: {player_hand.cards} value {player_hand.get_value()}'
+                        embed = nextcord.Embed(title=interaction.application_command.name, description=description)
+                        await msg.edit(embed=embed)
                         game_over = True
                     elif dealer_hand.get_value() == player_hand.get_value():
-                        await interaction.followup.send(
-                            f'turn: {turn}\ndraw!\ndealer_hand: {dealer_hand.cards} value {dealer_hand.get_value()}\nplayer_hand: {player_hand.cards} value {player_hand.get_value()}')
+                        description = f'turn: {turn}\ndraw!\ndealer_hand: {dealer_hand.cards} value {dealer_hand.get_value()}\nplayer_hand: {player_hand.cards} value {player_hand.get_value()}'
+                        embed = nextcord.Embed(title=interaction.application_command.name, description=description)
+                        await msg.edit(embed=embed)
                         game_over = True
                     else:
-                        await interaction.followup.send(
-                            f'turn: {turn}\nplayer wins!\ndealer_hand: {dealer_hand.cards} value {dealer_hand.get_value()}\nplayer_hand: {player_hand.cards} value {player_hand.get_value()}')
+                        description = f'turn: {turn}\nplayer wins!\ndealer_hand: {dealer_hand.cards} value {dealer_hand.get_value()}\nplayer_hand: {player_hand.cards} value {player_hand.get_value()}'
+                        embed = nextcord.Embed(title=interaction.application_command.name, description=description)
+                        await msg.edit(embed=embed)
                         game_over = True
-
-
-
 
 
 def setup(client):
