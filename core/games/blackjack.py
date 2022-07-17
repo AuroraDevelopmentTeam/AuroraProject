@@ -1,5 +1,14 @@
 import random
 
+import nextcord
+from nextcord.ui import View
+
+from core.ui.buttons import create_button
+
+maybe_blackjack_cards = ["10 of Hearts", "J of Hearts", "Q of Hearts", "K of Hearts", "A of Hearts",
+                         "10 of Spades", "J of Spades", "Q of Spades", "K of Spades", "A of Spades",
+                         "10 of Clubs", "J of Clubs", "Q of Clubs", "K of Clubs", "A of Spades",
+                         "10 of Diamonds", "J of Diamonds", "Q of Diamonds", "K of Diamonds", "A of Diamonds"]
 
 cards_emoji_representation = {
     "hidden": 998155897543082064,
@@ -58,15 +67,11 @@ cards_emoji_representation = {
 }
 
 
-def check_for_blackjack(player_hand, dealer_hand):
-    player = False
-    dealer = False
-    if player_hand.get_value() == 21:
-        player = True
-    if dealer_hand.get_value() == 21:
-        dealer = True
-
-    return player, dealer
+def check_for_blackjack(hand):
+    if hand.get_value() == 21:
+        return True
+    else:
+        return False
 
 
 def player_is_over(player_hand):
@@ -144,3 +149,68 @@ class Hand:
             for card in self.cards:
                 print(card)
             print(self.get_value())
+
+
+def create_deck() -> Deck:
+    deck = Deck()
+    deck.shuffle()
+    return deck
+
+
+def deal_starting_cards(player_hand: Hand, dealer_hand: Hand, deck: Deck) -> None:
+    for i in range(2):
+        player_hand.add_card(deck.deal())
+        dealer_hand.add_card(deck.deal())
+
+
+def get_hand_cards(client, hand: Hand):
+    field_value = ' '
+    for card in hand.cards:
+        card = str(card)
+        if card in cards_emoji_representation:
+            field_value += f'{client.get_emoji(cards_emoji_representation[card])} '
+        else:
+            field_value += f'{card} '
+    return field_value
+
+
+def get_hand_hidden_cards(client, hand: Hand):
+    field_value = ' '
+    for card in hand.display():
+        card = str(card)
+        if card in cards_emoji_representation:
+            field_value += f'{client.get_emoji(cards_emoji_representation[card])} '
+        else:
+            field_value += f'{card} '
+    return field_value
+
+
+def create_blackjack_embed(client, state_of_game: str, player_hand: Hand, dealer_hand: Hand) -> nextcord.Embed:
+    embed = nextcord.Embed(title='Blackjack', description=state_of_game)
+    player_hand_field_value = get_hand_cards(client, player_hand)
+    dealer_hand_field_value = get_hand_cards(client, dealer_hand)
+    embed.add_field(name='Player hand', value=f'{player_hand_field_value}\n'
+                                              f'value **{player_hand.get_value()}**', inline=True)
+    embed.add_field(name='Dealer hand', value=f'{dealer_hand_field_value}\n'
+                                              f'value **{dealer_hand.get_value()}**', inline=True)
+    return embed
+
+
+def create_game_start_blackjack_embed(client, state_of_game: str, player_hand: Hand,
+                                      dealer_hand: Hand) -> nextcord.Embed:
+    embed = nextcord.Embed(title='Blackjack', description=state_of_game)
+    player_hand_field_value = get_hand_cards(client, player_hand)
+    dealer_hand_field_value = get_hand_hidden_cards(client, dealer_hand)
+    embed.add_field(name='Player hand', value=f'{player_hand_field_value}\n'
+                                              f'value **{player_hand.get_value()}**', inline=True)
+    embed.add_field(name='Dealer hand', value=f'{dealer_hand_field_value}', inline=True)
+    return embed
+
+
+def create_final_view() -> View:
+    hit = create_button("hit", False, True)
+    stand = create_button("stand", False, True)
+    view = View()
+    view.add_item(hit)
+    view.add_item(stand)
+    return view

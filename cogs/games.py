@@ -4,79 +4,35 @@ from nextcord import Interaction, ButtonStyle, File
 from nextcord.ui import Button, View
 
 from core.games.blackjack import Hand, Deck, check_for_blackjack, show_blackjack_results, player_is_over, \
-    cards_emoji_representation
+    cards_emoji_representation, create_deck, deal_starting_cards, create_blackjack_embed, create_final_view, \
+    maybe_blackjack_cards, create_game_start_blackjack_embed
+from core.ui.buttons import create_button
 
 
 class Games(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @nextcord.slash_command(name="blackjack", description="play blackjack game")
+    @nextcord.slash_command(name='blackjack')
     async def __blackjack(self, interaction: Interaction):
         await interaction.response.defer()
-        deck = Deck()
-        deck.shuffle()
+        deck = create_deck()
         player_hand = Hand()
         dealer_hand = Hand(dealer=True)
+        deal_starting_cards(player_hand, dealer_hand, deck)
         global turn
         turn = 1
-
-        for i in range(2):
-            player_hand.add_card(deck.deal())
-            dealer_hand.add_card(deck.deal())
-
-        hit = Button(label="hit", style=ButtonStyle.blurple)
-        stand = Button(label="stand", style=ButtonStyle.blurple)
 
         async def hit_callback(interaction: Interaction):
             global turn
             turn += 1
             player_hand.add_card(deck.deal())
             if player_is_over(player_hand):
-                embed = nextcord.Embed(title='Blackjack', description='**Dealer** wins')
-                player_hand_field_value = ' '
-                dealer_hand_field_value = ' '
-                for card in player_hand.cards:
-                    card = str(card)
-                    if card in cards_emoji_representation:
-                        player_hand_field_value += f'{self.client.get_emoji(cards_emoji_representation[card])} '
-                    else:
-                        player_hand_field_value += f'{card} '
-                embed.add_field(name='Player hand',
-                                value=f'{player_hand_field_value}\nvalue **{player_hand.get_value()}**', inline=True)
-                for card in dealer_hand.cards:
-                    card = str(card)
-                    if card in cards_emoji_representation:
-                        dealer_hand_field_value += f'{self.client.get_emoji(cards_emoji_representation[card])} '
-                    else:
-                        dealer_hand_field_value += f'{card} '
-                embed.add_field(name='Dealer hand', value=f'{dealer_hand_field_value}\nvalue **{dealer_hand.get_value()}**', inline=True)
-                hit = Button(label="hit", style=ButtonStyle.blurple, disabled=True)
-                stand = Button(label="stand", style=ButtonStyle.blurple, disabled=True)
-                myview = View(timeout=180)
-                myview.add_item(hit)
-                myview.add_item(stand)
-                await interaction.message.edit(embed=embed, view=myview)
+                embed = create_blackjack_embed(self.client, "**Dealer** wins", player_hand, dealer_hand)
+                view = create_final_view()
+                await interaction.message.edit(embed=embed, view=view)
             else:
-                embed = nextcord.Embed(title='Blackjack', description=f'turn: {turn}')
-                player_hand_field_value = ' '
-                dealer_hand_field_value = ' '
-                for card in player_hand.cards:
-                    card = str(card)
-                    if card in cards_emoji_representation:
-                        player_hand_field_value += f'{self.client.get_emoji(cards_emoji_representation[card])} '
-                    else:
-                        player_hand_field_value += f'{card} '
-                embed.add_field(name='Player hand',
-                                value=f'{player_hand_field_value}\nvalue **{player_hand.get_value()}**', inline=True)
-                for card in dealer_hand.display():
-                    card = str(card)
-                    if card in cards_emoji_representation:
-                        dealer_hand_field_value += f'{self.client.get_emoji(cards_emoji_representation[card])} '
-                    else:
-                        dealer_hand_field_value += f'{card} '
-                embed.add_field(name='Dealer hand',
-                                value=f'{dealer_hand_field_value}', inline=True)
+                embed = create_game_start_blackjack_embed(self.client, f"turn {turn}", player_hand, dealer_hand)
                 await interaction.message.edit(embed=embed)
 
         async def stand_callback(interaction: Interaction):
@@ -85,144 +41,67 @@ class Games(commands.Cog):
             while dealer_hand.get_value() < 17:
                 dealer_hand.add_card(deck.deal())
                 if player_is_over(dealer_hand):
-                    embed = nextcord.Embed(title='Blackjack', description='**Player** wins')
-                    player_hand_field_value = ' '
-                    dealer_hand_field_value = ' '
-                    for card in player_hand.cards:
-                        card = str(card)
-                        if card in cards_emoji_representation:
-                            player_hand_field_value += f'{self.client.get_emoji(cards_emoji_representation[card])} '
-                        else:
-                            player_hand_field_value += f'{card} '
-                    embed.add_field(name='Player hand',
-                                    value=f'{player_hand_field_value}\nvalue **{player_hand.get_value()}**',
-                                    inline=True)
-                    for card in dealer_hand.cards:
-                        card = str(card)
-                        if card in cards_emoji_representation:
-                            dealer_hand_field_value += f'{self.client.get_emoji(cards_emoji_representation[card])} '
-                        else:
-                            dealer_hand_field_value += f'{card} '
-                    embed.add_field(name='Dealer hand',
-                                    value=f'{dealer_hand_field_value}\nvalue **{dealer_hand.get_value()}**', inline=True)
-                    hit = Button(label="hit", style=ButtonStyle.blurple, disabled=True)
-                    stand = Button(label="stand", style=ButtonStyle.blurple, disabled=True)
-                    myview = View(timeout=180)
-                    myview.add_item(hit)
-                    myview.add_item(stand)
-                    await interaction.message.edit(embed=embed, view=myview)
+                    embed = create_blackjack_embed(self.client, "**Player** wins", player_hand, dealer_hand)
+                    view = create_final_view()
+                    await interaction.message.edit(embed=embed, view=view)
             if 17 <= dealer_hand.get_value() <= 21:
                 if dealer_hand.get_value() > player_hand.get_value():
-                    embed = nextcord.Embed(title='Blackjack', description='**Dealer** wins')
-                    player_hand_field_value = ' '
-                    dealer_hand_field_value = ' '
-                    for card in player_hand.cards:
-                        card = str(card)
-                        if card in cards_emoji_representation:
-                            player_hand_field_value += f'{self.client.get_emoji(cards_emoji_representation[card])} '
-                        else:
-                            player_hand_field_value += f'{card} '
-                    embed.add_field(name='Player hand',
-                                    value=f'{player_hand_field_value}\nvalue **{player_hand.get_value()}**',
-                                    inline=True)
-                    for card in dealer_hand.cards:
-                        card = str(card)
-                        if card in cards_emoji_representation:
-                            dealer_hand_field_value += f'{self.client.get_emoji(cards_emoji_representation[card])} '
-                        else:
-                            dealer_hand_field_value += f'{card} '
-                    embed.add_field(name='Dealer hand',
-                                    value=f'{dealer_hand_field_value}\nvalue **{dealer_hand.get_value()}**', inline=True)
-                    hit = Button(label="hit", style=ButtonStyle.blurple, disabled=True)
-                    stand = Button(label="stand", style=ButtonStyle.blurple, disabled=True)
-                    myview = View(timeout=180)
-                    myview.add_item(hit)
-                    myview.add_item(stand)
-                    await interaction.message.edit(embed=embed, view=myview)
+                    embed = create_blackjack_embed(self.client, "**Dealer** wins", player_hand, dealer_hand)
+                    view = create_final_view()
+                    await interaction.message.edit(embed=embed, view=view)
                 elif dealer_hand.get_value() == player_hand.get_value():
-                    embed = nextcord.Embed(title='Blackjack', description='**Draw**')
-                    player_hand_field_value = ' '
-                    dealer_hand_field_value = ' '
-                    for card in player_hand.cards:
-                        card = str(card)
-                        if card in cards_emoji_representation:
-                            player_hand_field_value += f'{self.client.get_emoji(cards_emoji_representation[card])} '
-                        else:
-                            player_hand_field_value += f'{card} '
-                    embed.add_field(name='Player hand',
-                                    value=f'{player_hand_field_value}\nvalue **{player_hand.get_value()}**',
-                                    inline=True)
-                    for card in dealer_hand.cards:
-                        card = str(card)
-                        if card in cards_emoji_representation:
-                            dealer_hand_field_value += f'{self.client.get_emoji(cards_emoji_representation[card])} '
-                        else:
-                            dealer_hand_field_value += f'{card} '
-                    embed.add_field(name='Dealer hand',
-                                    value=f'{dealer_hand_field_value}\nvalue **{dealer_hand.get_value()}**', inline=True)
-                    hit = Button(label="hit", style=ButtonStyle.blurple, disabled=True)
-                    stand = Button(label="stand", style=ButtonStyle.blurple, disabled=True)
-                    myview = View(timeout=180)
-                    myview.add_item(hit)
-                    myview.add_item(stand)
-                    await interaction.message.edit(embed=embed, view=myview)
+                    embed = create_blackjack_embed(self.client, "**Draw**", player_hand, dealer_hand)
+                    view = create_final_view()
+                    await interaction.message.edit(embed=embed, view=view)
                 else:
-                    embed = nextcord.Embed(title='Blackjack', description='**Player** wins')
-                    player_hand_field_value = ' '
-                    dealer_hand_field_value = ' '
-                    for card in player_hand.cards:
-                        card = str(card)
-                        if card in cards_emoji_representation:
-                            player_hand_field_value += f'{self.client.get_emoji(cards_emoji_representation[card])} '
-                        else:
-                            player_hand_field_value += f'{card} '
-                    embed.add_field(name='Player hand',
-                                    value=f'{player_hand_field_value}\nvalue **{player_hand.get_value()}**',
-                                    inline=True)
-                    for card in dealer_hand.cards:
-                        card = str(card)
-                        if card in cards_emoji_representation:
-                            dealer_hand_field_value += f'{self.client.get_emoji(cards_emoji_representation[card])} '
-                        else:
-                            dealer_hand_field_value += f'{card} '
-                    embed.add_field(name='Dealer hand',
-                                    value=f'{dealer_hand_field_value}\nvalue **{dealer_hand.get_value()}**', inline=True)
-                    hit = Button(label="hit", style=ButtonStyle.blurple, disabled=True)
-                    stand = Button(label="stand", style=ButtonStyle.blurple, disabled=True)
-                    myview = View(timeout=180)
-                    myview.add_item(hit)
-                    myview.add_item(stand)
-                    await interaction.message.edit(embed=embed, view=myview)
+                    embed = create_blackjack_embed(self.client, "**Player** wins", player_hand, dealer_hand)
+                    view = create_final_view()
+                    await interaction.message.edit(embed=embed, view=view)
 
-        hit.callback = hit_callback
-        stand.callback = stand_callback
-
-        game_over = False
-
-        myview = View(timeout=180)
-        myview.add_item(hit)
-        myview.add_item(stand)
-
-        embed = nextcord.Embed(title='Blackjack', description=f'turn {turn}')
-        player_hand_field_value = ''
-        dealer_hand_field_value = ''
-        for card in player_hand.cards:
-            card = str(card)
-            if card in cards_emoji_representation:
-                player_hand_field_value += f'{self.client.get_emoji(cards_emoji_representation[card])} '
+        async def dealer_blackjack_callback(interaction: Interaction):
+            if check_for_blackjack(dealer_hand):
+                embed = create_blackjack_embed(self.client, "**Draw**", player_hand, dealer_hand)
+                view = create_final_view()
+                await interaction.message.edit(embed=embed, view=view)
             else:
-                player_hand_field_value += f'{card} '
-        embed.add_field(name='Player hand',
-                        value=f'{player_hand_field_value}\nvalue **{player_hand.get_value()}**', inline=True)
-        for card in dealer_hand.display():
-            card = str(card)
-            if card in cards_emoji_representation:
-                dealer_hand_field_value += f'{self.client.get_emoji(cards_emoji_representation[card])} '
+                embed = create_blackjack_embed(self.client, "**Player** wins", player_hand, dealer_hand)
+                view = create_final_view()
+                await interaction.message.edit(embed=embed, view=view)
+
+        async def one_to_one_callback(interaction: Interaction):
+            embed = create_blackjack_embed(self.client, "**Player** takes 1:1", player_hand, dealer_hand)
+            view = create_final_view()
+            await interaction.message.edit(embed=embed, view=view)
+
+        if check_for_blackjack(player_hand):
+            if str(dealer_hand.cards[1]) in maybe_blackjack_cards:
+                dealer_blackjack = create_button("Blackjack", dealer_blackjack_callback, False)
+                one_to_one = create_button("1:1", one_to_one_callback, False)
+                view = View(timeout=180)
+                view.add_item(dealer_blackjack)
+                view.add_item(one_to_one)
+
+                embed = create_game_start_blackjack_embed(self.client, f"turn {turn}", player_hand, dealer_hand)
+                await interaction.followup.send(embed=embed, view=view)
             else:
-                dealer_hand_field_value += f'{card} '
-        embed.add_field(name='Dealer hand',
-                        value=f'{dealer_hand_field_value}', inline=True)
-        msg = await interaction.followup.send(embed=embed, view=myview)
+                embed = create_blackjack_embed(self.client, "**Player** wins", player_hand, dealer_hand)
+                view = create_final_view()
+                await interaction.followup.send(embed=embed, view=view)
+        else:
+            if check_for_blackjack(dealer_hand):
+                embed = create_blackjack_embed(self.client, "**Dealer** wins", player_hand, dealer_hand)
+                view = create_final_view()
+                await interaction.followup.send(embed=embed, view=view)
+            else:
+                hit = create_button("hit", hit_callback, False)
+                stand = create_button("stand", stand_callback, False)
+                view = View(timeout=180)
+                view.add_item(hit)
+                view.add_item(stand)
+
+                embed = create_game_start_blackjack_embed(self.client, f"turn {turn}", player_hand, dealer_hand)
+                await interaction.followup.send(embed=embed, view=view)
+
 
 
 def setup(client):
