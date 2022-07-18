@@ -4,6 +4,7 @@ import nextcord
 from nextcord.ui import View
 
 from core.ui.buttons import create_button
+from core.embeds import DEFAULT_BOT_COLOR
 
 maybe_blackjack_cards = ["10 of Hearts", "J of Hearts", "Q of Hearts", "K of Hearts", "A of Hearts",
                          "10 of Spades", "J of Spades", "Q of Spades", "K of Spades", "A of Spades",
@@ -67,7 +68,7 @@ cards_emoji_representation = {
 }
 
 
-def check_for_blackjack(hand):
+def check_for_blackjack(hand) -> bool:
     if hand.get_value() == 21:
         return True
     else:
@@ -163,7 +164,7 @@ def deal_starting_cards(player_hand: Hand, dealer_hand: Hand, deck: Deck) -> Non
         dealer_hand.add_card(deck.deal())
 
 
-def get_hand_cards(client, hand: Hand):
+def get_hand_cards(client, hand: Hand) -> str:
     field_value = ' '
     for card in hand.cards:
         card = str(card)
@@ -174,7 +175,7 @@ def get_hand_cards(client, hand: Hand):
     return field_value
 
 
-def get_hand_hidden_cards(client, hand: Hand):
+def get_hand_hidden_cards(client, hand: Hand) -> str:
     field_value = ' '
     for card in hand.display():
         card = str(card)
@@ -186,7 +187,7 @@ def get_hand_hidden_cards(client, hand: Hand):
 
 
 def create_blackjack_embed(client, state_of_game: str, player_hand: Hand, dealer_hand: Hand) -> nextcord.Embed:
-    embed = nextcord.Embed(title='Blackjack', description=state_of_game)
+    embed = nextcord.Embed(title='Blackjack', description=state_of_game, color=DEFAULT_BOT_COLOR)
     player_hand_field_value = get_hand_cards(client, player_hand)
     dealer_hand_field_value = get_hand_cards(client, dealer_hand)
     embed.add_field(name='Player hand', value=f'{player_hand_field_value}\n'
@@ -198,7 +199,7 @@ def create_blackjack_embed(client, state_of_game: str, player_hand: Hand, dealer
 
 def create_game_start_blackjack_embed(client, state_of_game: str, player_hand: Hand,
                                       dealer_hand: Hand) -> nextcord.Embed:
-    embed = nextcord.Embed(title='Blackjack', description=state_of_game)
+    embed = nextcord.Embed(title='Blackjack', description=state_of_game, color=DEFAULT_BOT_COLOR)
     player_hand_field_value = get_hand_cards(client, player_hand)
     dealer_hand_field_value = get_hand_hidden_cards(client, dealer_hand)
     embed.add_field(name='Player hand', value=f'{player_hand_field_value}\n'

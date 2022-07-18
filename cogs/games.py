@@ -6,6 +6,7 @@ from nextcord.ui import Button, View
 from core.games.blackjack import Hand, Deck, check_for_blackjack, show_blackjack_results, player_is_over, \
     cards_emoji_representation, create_deck, deal_starting_cards, create_blackjack_embed, create_final_view, \
     maybe_blackjack_cards, create_game_start_blackjack_embed
+from core.games.slots import check_win_get_multiplier, spin_slots, create_slots_embed
 from core.ui.buttons import create_button
 
 
@@ -102,6 +103,24 @@ class Games(commands.Cog):
                 embed = create_game_start_blackjack_embed(self.client, f"turn {turn}", player_hand, dealer_hand)
                 await interaction.followup.send(embed=embed, view=view)
 
+    @nextcord.slash_command(name='slots')
+    async def __slots(self, interaction: Interaction):
+        player_got_row = spin_slots()
+        is_win, multiplier = check_win_get_multiplier(player_got_row)
+        if is_win is True:
+            game_state = '**win**'
+            embed = create_slots_embed(interaction.guild.id, interaction.user.id, interaction.user.display_avatar,
+                                       interaction.application_command.name, player_got_row, game_state)
+            await interaction.response.send_message(embed=embed)
+        else:
+            game_state = '**loose**'
+            embed = create_slots_embed(interaction.guild.id, interaction.user.id, interaction.user.display_avatar,
+                                       interaction.application_command.name, player_got_row, game_state)
+            await interaction.response.send_message(embed=embed)
+
+    @nextcord.slash_command(name='brick_knife_evidence_yandere_tentacles')
+    async def __brick_knife_evidence_yandere_tentacles(self, interaction: Interaction):
+        pass
 
 
 def setup(client):
