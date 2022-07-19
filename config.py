@@ -7,8 +7,10 @@ settings = {
     'PREFIX': '*',
     'default_color': white,
     'default_locale': 'en_us',
-    'default_payday_time': 3600,
     'default_payday_amount': 200,
     'default_currency': "<:flowerwhite:996685380948607017>",
     'default_starting_balance': 100,
+    'default_min_exp': 1,
+    'default_max_exp': 3,
+    'default_level_up_messages_state': True
 }

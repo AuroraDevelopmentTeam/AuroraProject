@@ -5,6 +5,8 @@ from core.locales.writers import write_in_locales_standart_values
 from core.checkers import is_guild_id_in_table
 from core.money.create import create_money_table, create_money_config_table
 from core.money.writers import write_in_money_standart_values, write_in_money_config_standart_values
+from core.levels.create import create_level_table, create_level_config_table
+from core.levels.writers import write_in_levels_standart_values, write_in_levels_config_standart_values
 
 
 class OnReadyListener(commands.Cog):
@@ -19,6 +21,10 @@ class OnReadyListener(commands.Cog):
         create_money_table()
         write_in_money_config_standart_values(self.client.guilds)
         write_in_money_standart_values(self.client.guilds)
+        create_level_config_table()
+        create_level_table()
+        write_in_levels_config_standart_values(self.client.guilds)
+        write_in_levels_standart_values(self.client.guilds)
 
 
 def setup(client):

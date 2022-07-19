@@ -6,10 +6,9 @@ from nextcord import Interaction, SlashOption
 import nextcord
 
 from core.money.updaters import update_guild_currency_symbol, update_guild_starting_balance, \
-    update_guild_payday_amount, update_user_balance
+    update_guild_payday_amount, update_user_balance, set_user_balance
 from core.money.getters import get_user_balance, get_guild_currency_symbol, get_guild_starting_balance, \
     get_guild_payday_amount
-from core.money.setters import set_user_balance
 from core.checkers import is_str_or_emoji
 from core.locales.getters import get_msg_from_locale_by_key
 from core.embeds import construct_basic_embed

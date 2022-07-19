@@ -1,6 +1,5 @@
 import sqlite3
 from core.checkers import is_guild_id_in_table, is_user_in_table
-import json
 
 
 def create_money_table() -> None:

@@ -9,9 +9,9 @@ def write_in_money_config_standart_values(guilds) -> None:
     cursor = db.cursor()
     for guild in guilds:
         if is_guild_id_in_table("money_config", guild.id) is False:
-            sql = "INSERT INTO money_config(guild_id, guild_currency, guild_payday_time, guild_payday_amount, " \
-                  "guild_starting_balance) VALUES (?, ?, ?, ?, ?)"
-            val = (guild.id, settings['default_currency'], settings['default_payday_time'],
+            sql = "INSERT INTO money_config(guild_id, guild_currency, guild_payday_amount, " \
+                  "guild_starting_balance) VALUES (?, ?, ?, ?)"
+            val = (guild.id, settings['default_currency'],
                    settings['default_payday_amount'], settings['default_starting_balance'])
             cursor.execute(sql, val)
             db.commit()

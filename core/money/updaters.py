@@ -39,11 +39,23 @@ def update_guild_payday_amount(guild_id: int, payday_amount: int) -> None:
 
 
 def update_user_balance(guild_id: int, user_id: int, money: int) -> None:
+    balance = get_user_balance(guild_id, user_id)
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
-    balance = get_user_balance(guild_id, user_id)
     sql = "UPDATE money SET balance = ? WHERE guild_id = ? AND user_id = ?"
     values = (balance + money, guild_id, user_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def set_user_balance(guild_id: int, user_id: int, money: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE money SET balance = ? WHERE guild_id = ? AND user_id = ?"
+    values = (money, guild_id, user_id)
     cursor.execute(sql, values)
     db.commit()
     cursor.close()
