@@ -82,5 +82,8 @@
     },
     "give": {
       "msg": "tranfered to:"
+    },
+    "level_up": {
+      "msg": "Level has been raised"
     }
 }

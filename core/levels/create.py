@@ -6,7 +6,7 @@ def create_level_table() -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     cursor.execute(f"""CREATE TABLE IF NOT EXISTS levels (
-        guild_id INTERGER, user_id INTERGER, level INTERGER, xp INTERGER
+        guild_id INTERGER, user_id INTERGER, level INTERGER, exp INTERGER
     )""")
     db.commit()
     cursor.close()

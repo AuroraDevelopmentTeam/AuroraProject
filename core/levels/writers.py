@@ -26,7 +26,7 @@ def write_in_levels_standart_values(guilds) -> None:
         for member in guild.members:
             if not member.bot:
                 if is_user_in_table("levels", guild.id, member.id) is False:
-                    sql = "INSERT INTO levels(guild_id, user_id, level, xp) VALUES (?, ?, ?, ?)"
+                    sql = "INSERT INTO levels(guild_id, user_id, level, exp) VALUES (?, ?, ?, ?)"
                     val = (guild.id, member.id, 1, 0)
                     cursor.execute(sql, val)
                     db.commit()

@@ -38,4 +38,4 @@ def get_guild_messages_state(guild_id: int) -> bool:
         cursor.execute(f"SELECT level_up_messages_state FROM levels_config WHERE guild_id = {guild_id}").fetchone()[0]
     cursor.close()
     db.close()
-    return messages_state
+    return bool(messages_state)

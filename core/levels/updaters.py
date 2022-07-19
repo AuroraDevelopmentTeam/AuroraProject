@@ -21,12 +21,24 @@ def update_user_exp(guild_id: int, user_id: int, min_exp: int, max_exp: int) -> 
     return
 
 
-def update_user_level(guild_id: int, user_id: int, levels_to_add: int):
+def update_user_level(guild_id: int, user_id: int, levels_to_add: int) -> None:
     level_now = get_user_level(guild_id, user_id)
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     sql = "UPDATE levels SET level = ? WHERE guild_id = ? AND user_id = ?"
-    values = (level_now+levels_to_add, guild_id, user_id)
+    values = (level_now + levels_to_add, guild_id, user_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def set_user_exp_to_zero(guild_id: int, user_id: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE levels SET exp = ? WHERE guild_id = ? AND user_id = ?"
+    values = (0, guild_id, user_id)
     cursor.execute(sql, values)
     db.commit()
     cursor.close()
