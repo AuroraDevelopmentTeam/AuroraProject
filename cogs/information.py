@@ -3,8 +3,9 @@ from nextcord import Interaction, SlashOption
 from nextcord.ext import commands
 from core.locales.getters import get_msg_from_locale_by_key, get_keys_value_in_locale, get_localized_description, \
     get_localized_name
-from core.embeds import construct_basic_embed, construct_long_embed
+from core.embeds import construct_basic_embed, construct_long_embed, DEFAULT_BOT_COLOR
 from typing import Optional
+import cooldowns
 
 
 class Information(commands.Cog):
@@ -12,9 +13,25 @@ class Information(commands.Cog):
     def __init__(self, client):
         self.client = client
 
+    @nextcord.slash_command(name="help", description="Shows help menu")
+    async def __help(self, interaction: Interaction):
+        embed = nextcord.Embed(color=DEFAULT_BOT_COLOR, title=interaction.application_command.name.capitalize())
+        embed.add_field(name='Info', value='`help` `ping` `server` `user @`', inline=False)
+        embed.add_field(name='Levels', value='None', inline=False)
+        embed.add_field(name='Moderation', value='`mute <@> <time> [reason]` `unmute <@>` `mutes` `clear <amount>`',
+                        inline=False)
+        embed.add_field(name='Economics', value='`add_money <@> <$>` `remove_money <@> <$>` `money` `reset money <@>` '
+                                                '`reset economics` `set currency <symbol>` `set start_balance <$>`'
+                                                ' `set timely_amount <$>`', inline=False)
+        embed.add_field(name='Games', value='`blackjack` `slots` `brick_knife_evidence_yandere`')
+        embed.add_field(name='Locales', value='`set locale <locale>`')
+        await interaction.response.send_message(embed=embed)
+
+    @commands.cooldown(1, 50, commands.BucketType.guild)
     @nextcord.slash_command(name="ping", description="Shows client's ping",
                             name_localizations=get_localized_name("ping"),
                             description_localizations=get_localized_description("ping"))
+    # @cooldowns.cooldown(1, 15, bucket=cooldowns.SlashBucket.author)
     async def __ping(self, interaction: Interaction):
         message = get_msg_from_locale_by_key(interaction.guild.id, interaction.application_command.name)
         requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')

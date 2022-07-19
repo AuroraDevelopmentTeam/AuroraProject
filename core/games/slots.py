@@ -7,7 +7,7 @@ from core.embeds import DEFAULT_BOT_COLOR
 
 slot_emojis = ['<:1388purincherry:998435904756645949>', '<:5471koifish:998435906233053315>',
                '<:1181bunnyhappy:998435907763982386>', '<:9810aestheticflower:998286492269023354>',
-               '<a:8293_Butterfly_White:998286778559627344>']
+               '<a:8293_Butterfly_White:998286778559627344>', '<a:whitecrown:998827454615519283>']
 
 
 def spin_slots() -> list:

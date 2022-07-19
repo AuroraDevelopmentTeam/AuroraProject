@@ -78,7 +78,7 @@ class Economics(commands.Cog):
     async def __money(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=False)):
         if user is None:
             user = interaction.user
-        elif user.bot:
+        if user.bot:
             return await interaction.response.send_message('bot_user_error')
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
         balance = get_user_balance(interaction.guild.id, user.id)

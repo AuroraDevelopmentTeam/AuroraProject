@@ -7,6 +7,7 @@ from core.games.blackjack import Hand, Deck, check_for_blackjack, show_blackjack
     cards_emoji_representation, create_deck, deal_starting_cards, create_blackjack_embed, create_final_view, \
     maybe_blackjack_cards, create_game_start_blackjack_embed
 from core.games.slots import check_win_get_multiplier, spin_slots, create_slots_embed
+from core.games.brick_knife_evidence_yandere_tentacles import create_starting_embed, create_starting_view
 from core.ui.buttons import create_button
 
 
@@ -118,9 +119,13 @@ class Games(commands.Cog):
                                        interaction.application_command.name, player_got_row, game_state)
             await interaction.response.send_message(embed=embed)
 
-    @nextcord.slash_command(name='brick_knife_evidence_yandere_tentacles')
+    @nextcord.slash_command(name='brick_knife_evidence_yandere')
     async def __brick_knife_evidence_yandere_tentacles(self, interaction: Interaction):
-        pass
+        await interaction.response.defer()
+        embed = create_starting_embed("Brick Knife Evidence Yandere Tentacles",
+                                      "Pick 1 of 5 options and see that's will happen")
+        view = create_starting_view()
+        await interaction.followup.send(embed=embed, view=view)
 
 
 def setup(client):

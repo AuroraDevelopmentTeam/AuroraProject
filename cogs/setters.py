@@ -96,8 +96,8 @@ class Setters(commands.Cog):
         else:
             await interaction.response.send_message('error')
 
-    @__set.subcommand(name="payday_amount", description="Set's server payday amount per time with /timely "
-                                                           "command")
+    @__set.subcommand(name="timely_amount", description="Set's server payday amount per time with /timely "
+                                                        "command")
     async def __payday_amount(self, interaction: Interaction,
                               payday_amount: Optional[int] = SlashOption(required=True)):
         """
