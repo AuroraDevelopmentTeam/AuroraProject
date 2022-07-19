@@ -22,7 +22,7 @@ class Levels(commands.Cog):
         if message.author.bot:
             return
         elif self.level_up(message.guild.id, message.author.id):
-            update_user_level(message.guild.id, message.author.id)
+            update_user_level(message.guild.id, message.author.id, 1)
         else:
             min_exp, max_exp = get_min_max_exp(message.guild.id)
             update_user_exp(message.guild.id, message.author.id, min_exp, max_exp)
