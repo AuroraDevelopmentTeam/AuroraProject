@@ -30,8 +30,8 @@ class Levels(commands.Cog):
             return
         elif self.level_up(message.guild.id, message.author.id):
             update_user_level(message.guild.id, message.author.id, 1)
+            set_user_exp_to_zero(message.guild.id, message.author.id)
             if get_guild_messages_state(message.guild.id) is True:
-                set_user_exp_to_zero(message.guild.id, message.author.id)
                 user_level = get_user_level(message.guild.id, message.author.id)
                 msg = get_msg_from_locale_by_key(message.guild.id, 'level_up')
                 embed = construct_basic_embed(f'{message.author}',

@@ -85,5 +85,8 @@
     },
     "level_up": {
       "msg": "Level has been raised"
+    },
+    "set_level_up_messages": {
+      "msg": "For leveling up messages have been set the following status:"
     }
 }

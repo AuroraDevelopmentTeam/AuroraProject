@@ -44,3 +44,15 @@ def set_user_exp_to_zero(guild_id: int, user_id: int) -> None:
     cursor.close()
     db.close()
     return
+
+
+def set_server_level_up_messages_state(guild_id: int, messages_state: bool) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE levels_config SET level_up_messages_state = ? WHERE guild_id = ?"
+    values = (messages_state, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return

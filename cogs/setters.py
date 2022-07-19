@@ -12,6 +12,7 @@ from core.money.updaters import update_guild_currency_symbol, update_guild_start
     update_guild_payday_amount, update_user_balance
 from core.locales.updaters import update_guild_locale
 from core.checkers import is_locale_valid, is_str_or_emoji
+from core.levels.updaters import set_server_level_up_messages_state
 
 
 class Setters(commands.Cog):
@@ -119,6 +120,25 @@ class Setters(commands.Cog):
                                             interaction.user.display_avatar))
         else:
             await interaction.response.send_message('error')
+
+    @__set.subcommand(name="level_up_messages", description="Turn on or turn off level up messages on your server")
+    async def __level_up_messages_state(self, interaction: Interaction, level_up_messages_state: int = SlashOption(
+        name="picker",
+        choices={"turn on": 1, "turn off": 0},
+        required=True
+    )):
+        set_server_level_up_messages_state(interaction.guild.id, bool(level_up_messages_state))
+        message = get_msg_from_locale_by_key(interaction.guild.id, f"set_{interaction.application_command.name}")
+        requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
+        if level_up_messages_state is True:
+            level_up_messages_state = "enabled"
+        else:
+            level_up_messages_state = "disabled"
+        await interaction.response.send_message(
+            embed=construct_basic_embed(interaction.application_command.name,
+                                        f"{message} **{level_up_messages_state}**",
+                                        f"{requested} {interaction.user}",
+                                        interaction.user.display_avatar))
 
 
 def setup(client):
