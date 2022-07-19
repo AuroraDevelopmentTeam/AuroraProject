@@ -76,5 +76,11 @@
     },
     "money": {
       "msg": "Balance is:"
+    },
+    "timely": {
+      "msg": "Money added on balance:"
+    },
+    "give": {
+      "msg": "tranfered to:"
     }
 }
