@@ -88,5 +88,23 @@
     },
     "set_level_up_messages": {
       "msg": "For leveling up messages have been set the following status:"
+    },
+    "set_level": {
+      "msg": "For user"
+    },
+    "set_level_2": {
+      "msg": "level has been set to:"
+    },
+    "default_welcome_message_title": {
+      "msg": "Welcome to our server!"
+    },
+    "default_welcome_message_description": {
+      "msg": "Hello {member.mention}!\n\nWe glad to see you on our server and hope you will like it!"
+    },
+    "set_welcome_channel": {
+      "msg": "The following channel has been set to welcome new users:"
+    },
+    "set_welcome_message_type": {
+      "msg": "The following message type has been set to welcome new users:"
     }
 }

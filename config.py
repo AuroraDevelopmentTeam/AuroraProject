@@ -12,5 +12,7 @@ settings = {
     'default_starting_balance': 100,
     'default_min_exp': 1,
     'default_max_exp': 3,
-    'default_level_up_messages_state': True
+    'default_level_up_messages_state': True,
+    'default_welcome_messages_state': True,
+    'default_welcome_messages_type': 'embed',
 }

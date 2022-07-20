@@ -34,6 +34,18 @@ def update_user_level(guild_id: int, user_id: int, levels_to_add: int) -> None:
     return
 
 
+def set_user_level(guild_id: int, user_id: int, level_to_set: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE levels SET level = ? WHERE guild_id = ? AND user_id = ?"
+    values = (level_to_set, guild_id, user_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
 def set_user_exp_to_zero(guild_id: int, user_id: int) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()

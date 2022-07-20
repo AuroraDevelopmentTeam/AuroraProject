@@ -7,7 +7,8 @@ from nextcord import Interaction, SlashOption
 
 from core.locales.getters import get_msg_from_locale_by_key
 from core.levels.getters import get_user_exp, get_user_level, get_min_max_exp, get_guild_messages_state
-from core.levels.updaters import update_user_exp, update_user_level, set_user_exp_to_zero
+from core.levels.updaters import update_user_exp, update_user_level, set_user_exp_to_zero, set_user_level
+from core.levels.create import create_card
 from core.embeds import construct_basic_embed
 
 
@@ -53,26 +54,7 @@ class Levels(commands.Cog):
         user_exp = get_user_exp(interaction.guild.id, user.id)
         user_level = get_user_level(interaction.guild.id, user.id)
         exp_to_next_level = round((7 * (user_level ** 3)))
-        percentage = int(((user_exp * 100) / exp_to_next_level))
-
-        background = Editor(Canvas((900, 300), color="#141414"))
-        profile_picture = await load_image_async(str(user.avatar.url))
-        profile = Editor(profile_picture).resize((150, 150)).circle_image()
-        larger_font = Font.montserrat(size=35)
-        font = Font.montserrat(size=30)
-
-        card_right_shape = [(650, 0), (750, 300), (900, 300), (900, 0)]
-
-        background.polygon(card_right_shape, color="#FFFFFF")
-        background.paste(profile, (30, 30))
-        background.bar((30, 220), max_width=650, height=40, percentage=100, color="#FFFFFF", radius=150)
-        if percentage > 1:
-            background.bar((30, 220), max_width=650, height=40, percentage=percentage, color="#5865F2", radius=150)
-        background.text((200, 40), str(user), font=larger_font, color="#FFFFFF")
-        background.rectangle((200, 100), width=350, height=2, fill="#FFFFFF")
-        background.text((200, 130), f"Level - {user_level} | XP - {user_exp}/{exp_to_next_level}",
-                        font=font, color="#FFFFFF")
-        file = nextcord.File(fp=background.image_bytes, filename="levelcard.png")
+        file = create_card(user, user_level, user_exp, exp_to_next_level)
         await interaction.response.send_message(file=file)
 
     @nextcord.slash_command(name='add_exp', description="add to @user some exp")
@@ -80,6 +62,13 @@ class Levels(commands.Cog):
                         exp_points: Optional[int] = SlashOption(required=True)):
         min_exp, max_exp = exp_points, exp_points
         update_user_exp(interaction.guild.id, user.id, min_exp, max_exp)
+        await interaction.response.send_message('done')
+
+    @nextcord.slash_command(name='remove_exp', description="remove from @user some exp")
+    async def __remove_exp(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True),
+                        exp_points: Optional[int] = SlashOption(required=True)):
+        min_exp, max_exp = exp_points, exp_points
+        update_user_exp(interaction.guild.id, user.id, -min_exp, -max_exp)
         await interaction.response.send_message('done')
 
 
