@@ -13,6 +13,18 @@ def set_welcome_channel(guild_id: int, welcome_channel_id: int) -> None:
     return
 
 
+def set_welcome_message_state(guild_id: int, welcome_message_enabled: bool) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE welcomers_config SET welcome_message_enabled = ? WHERE guild_id = ?"
+    values = (welcome_message_enabled, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
 def update_welcome_message_type(guild_id: int, welcome_message_type: str) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()

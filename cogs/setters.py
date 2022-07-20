@@ -14,7 +14,7 @@ from core.locales.updaters import update_guild_locale
 from core.checkers import is_locale_valid, is_str_or_emoji
 from core.levels.updaters import set_server_level_up_messages_state, set_user_level
 from core.welcomers.updaters import set_welcome_channel, update_welcome_message_description, \
-    update_welcome_message_title, update_welcome_message_url, update_welcome_message_type
+    update_welcome_message_title, update_welcome_message_url, update_welcome_message_type, set_welcome_message_state
 
 
 class EmbedModal(nextcord.ui.Modal):
@@ -235,6 +235,25 @@ class Setters(commands.Cog):
         await interaction.response.send_message(
             embed=construct_basic_embed(interaction.application_command.name,
                                         f"{message} **{welcome_message_type}**",
+                                        f"{requested} {interaction.user}",
+                                        interaction.user.display_avatar))
+
+    @__set.subcommand(name="welcome_message_state", description="Turn on or turn off welcome messages on your server")
+    async def __welcome_messages_state(self, interaction: Interaction, welcome_message_state: int = SlashOption(
+        name="picker",
+        choices={"turn on": 1, "turn off": 0},
+        required=True
+    )):
+        set_welcome_message_state(interaction.guild.id, bool(welcome_message_state))
+        message = get_msg_from_locale_by_key(interaction.guild.id, f"set_{interaction.application_command.name}")
+        requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
+        if welcome_message_state is True:
+            welcome_message_state = "enabled"
+        else:
+            welcome_message_state = "disabled"
+        await interaction.response.send_message(
+            embed=construct_basic_embed(interaction.application_command.name,
+                                        f"{message} **{welcome_message_state}**",
                                         f"{requested} {interaction.user}",
                                         interaction.user.display_avatar))
 
