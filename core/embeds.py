@@ -37,7 +37,7 @@ def construct_top_embed(title: str, top_list: list, footer_text: str, footer_url
     users = []
     for row in top_list:
         counter += 1
-        users.append(f"**{counter}**. {row[0]}\n{row[1]}")
+        users.append(f"**{counter}**.\n {row[0]}\n{row[1]}\n")
     if len(users) > 0:
         description = ' '.join([user for user in users])
     else:

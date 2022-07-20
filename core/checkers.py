@@ -15,6 +15,20 @@ def is_guild_id_in_table(table_name: str, guild_id: int) -> bool:
         return True
 
 
+def is_warn_id_in_table(table_name: str, warn_id: int, guild_id: int, user_id: int) -> bool:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    if cursor.execute(f"SELECT warn_id FROM {table_name} WHERE warn_id = {warn_id} "
+                      f"AND guild_id = {guild_id} AND user_id = {user_id}").fetchone() is None:
+        cursor.close()
+        db.close()
+        return False
+    else:
+        cursor.close()
+        db.close()
+        return True
+
+
 def is_locale_valid(locale: str) -> bool:
     locales = ["en_us", "ru_ru"]
     if locale in locales:

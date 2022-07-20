@@ -109,5 +109,11 @@
     },
     "set_welcome_message_state": {
       "msg": "For welcome messages have been set the following status:"
+    },
+    "warn": {
+      "msg": "Warned user:"
+    },
+    "unwarn": {
+      "msg": "Removed 1 warn with specified ID from user:"
     }
 }

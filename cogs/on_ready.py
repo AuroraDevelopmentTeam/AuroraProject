@@ -9,6 +9,7 @@ from core.levels.create import create_level_table, create_level_config_table
 from core.levels.writers import write_in_levels_standart_values, write_in_levels_config_standart_values
 from core.welcomers.create import create_welcomers_config
 from core.welcomers.writers import write_in_welcomers_config_standart_values
+from core.warns.create import create_warns_table
 
 
 class OnReadyListener(commands.Cog):
@@ -29,6 +30,7 @@ class OnReadyListener(commands.Cog):
         write_in_levels_standart_values(self.client.guilds)
         create_welcomers_config()
         write_in_welcomers_config_standart_values(self.client.guilds)
+        create_warns_table()
 
 
 def setup(client):

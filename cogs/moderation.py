@@ -1,14 +1,19 @@
+import datetime
+
+import humanfriendly
+from typing import Optional
 import nextcord
 from nextcord.ext import commands
 from nextcord import Interaction, SlashOption
-import datetime
+
 from core.errors import construct_error_forbidden_embed, construct_error_limit_break_embed, \
     construct_error_http_exception_embed
 from core.embeds import construct_basic_embed, construct_top_embed
 from core.locales.getters import get_msg_from_locale_by_key
-from core.parsers import parse_timeouts
-import humanfriendly
-from typing import Optional
+from core.parsers import parse_timeouts, parse_warns_of_user
+from core.warns.writers import write_new_warn
+from core.warns.updaters import remove_warn_from_table
+from core.checkers import is_warn_id_in_table
 
 
 class Moderation(commands.Cog):
@@ -42,7 +47,7 @@ class Moderation(commands.Cog):
             await interaction.response.send_message(
                 embed=construct_basic_embed(interaction.application_command.name,
                                             f"{message} {user.mention}",
-                                            f"{requested} {interaction.user}\n📝 {reason}. 🕔 {time}",
+                                            f"📝 {reason}. 🕔 {time}\n{requested} {interaction.user}",
                                             interaction.user.display_avatar))
         except nextcord.Forbidden:
             await interaction.response.send_message(
@@ -142,6 +147,49 @@ class Moderation(commands.Cog):
                     get_msg_from_locale_by_key(interaction.guild.id, 'http_exception'),
                     self.client.user.avatar.url)
             )
+
+    @nextcord.slash_command(name="warn", description="Warn's user on your server")
+    async def __warn(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True),
+                     reason: Optional[str] = SlashOption(required=False)):
+        if reason is None:
+            reason = ' — '
+        write_new_warn(interaction.guild.id, user.id, reason)
+        requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
+        message = get_msg_from_locale_by_key(interaction.guild.id, interaction.application_command.name)
+        await interaction.response.send_message(
+            embed=construct_basic_embed(interaction.application_command.name,
+                                        f"{message} {user.mention}",
+                                        f"📝 {reason}.\n{requested} {interaction.user}",
+                                        interaction.user.display_avatar))
+
+    @nextcord.slash_command(name="unwarn", description="Remove warn from user on your server")
+    async def __unwarn(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True),
+                       warn_id: Optional[int] = SlashOption(required=True)):
+        if is_warn_id_in_table("warns", warn_id, interaction.guild.id, user.id) is True:
+            remove_warn_from_table(warn_id, interaction.guild.id, user.id)
+            requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
+            message = get_msg_from_locale_by_key(interaction.guild.id, interaction.application_command.name)
+            await interaction.response.send_message(
+                embed=construct_basic_embed(interaction.application_command.name,
+                                            f"{message} {user.mention}",
+                                            f"ID#{warn_id}\n{requested} {interaction.user}",
+                                            interaction.user.display_avatar))
+        else:
+            await interaction.response.send_message('no value in db error')
+
+    @nextcord.slash_command(name="warns", description="View warns of @User on your server")
+    async def __warns(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True)):
+        """
+        Parameters
+        ----------
+        interaction: Interaction
+            The interaction object
+        """
+        requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
+        warns = parse_warns_of_user(interaction.guild.id, user.id)
+        await interaction.response.send_message(
+            embed=construct_top_embed(f"{interaction.application_command.name} - {user}", warns,
+                                      f"{requested} {interaction.user}", interaction.user.display_avatar))
 
 
 def setup(client):
