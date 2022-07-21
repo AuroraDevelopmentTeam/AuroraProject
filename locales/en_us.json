@@ -115,5 +115,14 @@
     },
     "unwarn": {
       "msg": "Removed 1 warn with specified ID from user:"
+    },
+    "enabled": {
+      "msg": "enabled"
+    },
+    "disabled": {
+      "msg": "disabled"
+    },
+    "set_autoroles_state": {
+      "msg": "State of autoroles on server now is:"
     }
 }

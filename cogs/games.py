@@ -1,6 +1,6 @@
 import nextcord
 from nextcord.ext import commands
-from nextcord import Interaction, ButtonStyle, File
+from nextcord import Interaction, ButtonStyle, File, Permissions
 from nextcord.ui import Button, View
 
 from core.games.blackjack import Hand, Deck, check_for_blackjack, show_blackjack_results, player_is_over, \
@@ -15,7 +15,8 @@ class Games(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @nextcord.slash_command(name='blackjack')
+    @nextcord.slash_command(name='blackjack',
+                            default_member_permissions=Permissions(send_messages=True))
     async def __blackjack(self, interaction: Interaction):
         await interaction.response.defer()
         deck = create_deck()
@@ -104,7 +105,8 @@ class Games(commands.Cog):
                 embed = create_game_start_blackjack_embed(self.client, f"turn {turn}", player_hand, dealer_hand)
                 await interaction.followup.send(embed=embed, view=view)
 
-    @nextcord.slash_command(name='slots')
+    @nextcord.slash_command(name='slots',
+                            default_member_permissions=Permissions(send_messages=True))
     async def __slots(self, interaction: Interaction):
         player_got_row = spin_slots()
         is_win, multiplier = check_win_get_multiplier(player_got_row)
@@ -119,7 +121,8 @@ class Games(commands.Cog):
                                        interaction.application_command.name, player_got_row, game_state)
             await interaction.response.send_message(embed=embed)
 
-    @nextcord.slash_command(name='brick_knife_evidence_yandere')
+    @nextcord.slash_command(name='brick_knife_evidence_yandere',
+                            default_member_permissions=Permissions(send_messages=True))
     async def __brick_knife_evidence_yandere_tentacles(self, interaction: Interaction):
         await interaction.response.defer()
         embed = create_starting_embed("Brick Knife Evidence Yandere Tentacles",

@@ -10,6 +10,8 @@ from core.levels.writers import write_in_levels_standart_values, write_in_levels
 from core.welcomers.create import create_welcomers_config
 from core.welcomers.writers import write_in_welcomers_config_standart_values
 from core.warns.create import create_warns_table
+from core.auto.roles.create import create_autoroles_table
+from core.auto.roles.writers import write_in_autoroles_standart_values
 
 
 class OnReadyListener(commands.Cog):
@@ -31,6 +33,8 @@ class OnReadyListener(commands.Cog):
         create_welcomers_config()
         write_in_welcomers_config_standart_values(self.client.guilds)
         create_warns_table()
+        create_autoroles_table()
+        write_in_autoroles_standart_values(self.client.guilds)
 
 
 def setup(client):

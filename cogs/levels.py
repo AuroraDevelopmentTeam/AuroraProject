@@ -3,7 +3,7 @@ from easy_pil import *
 
 import nextcord
 from nextcord.ext import commands
-from nextcord import Interaction, SlashOption
+from nextcord import Interaction, SlashOption, Permissions
 
 from core.locales.getters import get_msg_from_locale_by_key
 from core.levels.getters import get_user_exp, get_user_level, get_min_max_exp, get_guild_messages_state
@@ -47,7 +47,8 @@ class Levels(commands.Cog):
             min_exp, max_exp = get_min_max_exp(message.guild.id)
             update_user_exp(message.guild.id, message.author.id, min_exp, max_exp)
 
-    @nextcord.slash_command(name='level', description="shows information about user's level")
+    @nextcord.slash_command(name='level', description="shows information about user's level",
+                            default_member_permissions=Permissions(send_messages=True))
     async def __level(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=False)):
         if user is None:
             user = interaction.user
@@ -57,14 +58,16 @@ class Levels(commands.Cog):
         file = create_card(user, user_level, user_exp, exp_to_next_level)
         await interaction.response.send_message(file=file)
 
-    @nextcord.slash_command(name='add_exp', description="add to @user some exp")
+    @nextcord.slash_command(name='add_exp', description="add to @user some exp",
+                            default_member_permissions=Permissions(administrator=True))
     async def __add_exp(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True),
                         exp_points: Optional[int] = SlashOption(required=True)):
         min_exp, max_exp = exp_points, exp_points
         update_user_exp(interaction.guild.id, user.id, min_exp, max_exp)
         await interaction.response.send_message('done')
 
-    @nextcord.slash_command(name='remove_exp', description="remove from @user some exp")
+    @nextcord.slash_command(name='remove_exp', description="remove from @user some exp",
+                            default_member_permissions=Permissions(administrator=True))
     async def __remove_exp(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True),
                         exp_points: Optional[int] = SlashOption(required=True)):
         min_exp, max_exp = exp_points, exp_points

@@ -15,6 +15,7 @@ from core.checkers import is_locale_valid, is_str_or_emoji
 from core.levels.updaters import set_server_level_up_messages_state, set_user_level
 from core.welcomers.updaters import set_welcome_channel, update_welcome_message_description, \
     update_welcome_message_title, update_welcome_message_url, update_welcome_message_type, set_welcome_message_state
+from core.auto.roles.updaters import set_autoroles_state
 
 
 class EmbedModal(nextcord.ui.Modal):
@@ -51,10 +52,10 @@ class Setters(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @nextcord.slash_command(name="set")
+    @nextcord.slash_command(name="set", default_member_permissions=8)
     async def __set(self, interaction: Interaction):
         """
-        This is the set slash command that will be the prefix of economical set commands below.
+        This is the set slash command that will be the prefix of set commands below.
         """
         pass
 
@@ -159,13 +160,14 @@ class Setters(commands.Cog):
         choices={"turn on": 1, "turn off": 0},
         required=True
     )):
-        set_server_level_up_messages_state(interaction.guild.id, bool(level_up_messages_state))
+        level_up_messages_state = bool(level_up_messages_state)
+        set_server_level_up_messages_state(interaction.guild.id, level_up_messages_state)
         message = get_msg_from_locale_by_key(interaction.guild.id, f"set_{interaction.application_command.name}")
         requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
         if level_up_messages_state is True:
-            level_up_messages_state = "enabled"
+            level_up_messages_state = get_msg_from_locale_by_key(interaction.guild.id, 'enabled')
         else:
-            level_up_messages_state = "disabled"
+            level_up_messages_state = get_msg_from_locale_by_key(interaction.guild.id, 'disabled')
         await interaction.response.send_message(
             embed=construct_basic_embed(interaction.application_command.name,
                                         f"{message} **{level_up_messages_state}**",
@@ -239,21 +241,42 @@ class Setters(commands.Cog):
                                         interaction.user.display_avatar))
 
     @__set.subcommand(name="welcome_message_state", description="Turn on or turn off welcome messages on your server")
-    async def __welcome_messages_state(self, interaction: Interaction, welcome_message_state: int = SlashOption(
+    async def __welcome_messages_state_set(self, interaction: Interaction, welcome_message_state: int = SlashOption(
         name="picker",
         choices={"turn on": 1, "turn off": 0},
         required=True
     )):
-        set_welcome_message_state(interaction.guild.id, bool(welcome_message_state))
+        welcome_message_state = bool(welcome_message_state)
+        set_welcome_message_state(interaction.guild.id, welcome_message_state)
         message = get_msg_from_locale_by_key(interaction.guild.id, f"set_{interaction.application_command.name}")
         requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
         if welcome_message_state is True:
-            welcome_message_state = "enabled"
+            welcome_message_state = get_msg_from_locale_by_key(interaction.guild.id, 'enabled')
         else:
-            welcome_message_state = "disabled"
+            welcome_message_state = get_msg_from_locale_by_key(interaction.guild.id, 'disabled')
         await interaction.response.send_message(
             embed=construct_basic_embed(interaction.application_command.name,
                                         f"{message} **{welcome_message_state}**",
+                                        f"{requested} {interaction.user}",
+                                        interaction.user.display_avatar))
+
+    @__set.subcommand(name="autoroles_state", description="Turn on or turn off autoroles for new guests of server")
+    async def __autoroles_state_set(self, interaction: Interaction, autoroles_state: int = SlashOption(name="picker",
+                                                                                                       choices={
+                                                                                                           "turn on": 1,
+                                                                                                           "turn off": 0},
+                                                                                                       required=True)):
+        autoroles_state = bool(autoroles_state)
+        set_autoroles_state(interaction.guild.id, autoroles_state)
+        message = get_msg_from_locale_by_key(interaction.guild.id, f"set_{interaction.application_command.name}")
+        requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
+        if autoroles_state is True:
+            autoroles_state = get_msg_from_locale_by_key(interaction.guild.id, 'enabled')
+        else:
+            autoroles_state = get_msg_from_locale_by_key(interaction.guild.id, 'disabled')
+        await interaction.response.send_message(
+            embed=construct_basic_embed(interaction.application_command.name,
+                                        f"{message} **{autoroles_state}**",
                                         f"{requested} {interaction.user}",
                                         interaction.user.display_avatar))
 

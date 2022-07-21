@@ -3,6 +3,7 @@ import nextcord
 
 from easy_pil import *
 from core.embeds import DEFAULT_BOT_COLOR
+import re
 
 
 def create_welcomers_config() -> None:
@@ -17,19 +18,23 @@ def create_welcomers_config() -> None:
     return
 
 
-def create_server_welcome_embed(member, guild_id: int) -> nextcord.Embed:
+def create_server_welcome_embed(member, guild: nextcord.Guild) -> nextcord.Embed:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     welcome_message_title = \
-        cursor.execute(f"SELECT welcome_message_title FROM welcomers_config WHERE guild_id = {guild_id}").fetchone()[0]
+        cursor.execute(f"SELECT welcome_message_title FROM welcomers_config WHERE guild_id = {guild.id}").fetchone()[0]
     welcome_message_description = \
         cursor.execute(
-            f"SELECT welcome_message_description FROM welcomers_config WHERE guild_id = {guild_id}").fetchone()[0]
+            f"SELECT welcome_message_description FROM welcomers_config WHERE guild_id = {guild.id}").fetchone()[0]
     welcome_message_url = \
         cursor.execute(
-            f"SELECT welcome_message_url FROM welcomers_config WHERE guild_id = {guild_id}").fetchone()[0]
+            f"SELECT welcome_message_url FROM welcomers_config WHERE guild_id = {guild.id}").fetchone()[0]
     if "{member.mention}" in welcome_message_description:
         welcome_message_description = welcome_message_description.replace("{member.mention}", f"{member.mention}")
+    list_of_channels = re.findall(r'\b#\w+', welcome_message_description)
+    for channel in list_of_channels:
+        channel = channel[1:]
+
     db.commit()
     cursor.close()
     db.close()

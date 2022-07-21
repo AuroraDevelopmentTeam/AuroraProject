@@ -2,7 +2,7 @@ from typing import Optional
 import cooldowns
 
 from nextcord.ext import commands
-from nextcord import Interaction, SlashOption
+from nextcord import Interaction, SlashOption, Permissions
 import nextcord
 
 from core.money.updaters import update_guild_currency_symbol, update_guild_starting_balance, \
@@ -18,7 +18,8 @@ class Economics(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @nextcord.slash_command(name="add_money", description="Add to @User number of money on balance")
+    @nextcord.slash_command(name="add_money", description="Add to @User number of money on balance",
+                            default_member_permissions=Permissions(administrator=True))
     async def __add_money(self, interaction: Interaction,
                           user: Optional[nextcord.Member] = SlashOption(required=True),
                           money: Optional[int] = SlashOption(required=True)
@@ -48,7 +49,8 @@ class Economics(commands.Cog):
         else:
             return await interaction.response.send_message('negative value error')
 
-    @nextcord.slash_command(name="remove_money", description="Remove from @User's balance money")
+    @nextcord.slash_command(name="remove_money", description="Remove from @User's balance money",
+                            default_member_permissions=Permissions(administrator=True))
     async def __remove_money(self, interaction: Interaction,
                              user: Optional[nextcord.Member] = SlashOption(required=True),
                              money: Optional[int] = SlashOption(required=True)
@@ -78,7 +80,8 @@ class Economics(commands.Cog):
         else:
             return await interaction.response.send_message('negative value error')
 
-    @nextcord.slash_command(name="money", description="Show your or @User's balance")
+    @nextcord.slash_command(name="money", description="Show your or @User's balance",
+                            default_member_permissions=Permissions(send_messages=True))
     async def __money(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=False)):
         if user is None:
             user = interaction.user
@@ -94,7 +97,7 @@ class Economics(commands.Cog):
                                         f"{requested} {interaction.user}",
                                         user.display_avatar))
 
-    @nextcord.slash_command(name="reset")
+    @nextcord.slash_command(name="reset", default_member_permissions=Permissions(administrator=True))
     async def __reset(self, interaction: Interaction):
         """
         This is the reset slash command that will be the prefix of economical set commands below.
@@ -119,8 +122,9 @@ class Economics(commands.Cog):
                 set_user_balance(interaction.guild.id, member.id, starting_balance)
         await interaction.response.send_message('done')
 
-    @nextcord.slash_command(name="timely", description="Get money per time")
-    @cooldowns.cooldown(1, 7200, bucket=cooldowns.SlashBucket.author)
+    @nextcord.slash_command(name="timely", description="Get money per time",
+                            default_member_permissions=Permissions(send_messages=True))
+    @cooldowns.cooldown(1, 3600, bucket=cooldowns.SlashBucket.author)
     async def __timely(self, interaction: Interaction):
         payday_amount = get_guild_payday_amount(interaction.guild.id)
         update_user_balance(interaction.guild.id, interaction.user.id, payday_amount)
@@ -134,7 +138,8 @@ class Economics(commands.Cog):
                                         f"{requested} {interaction.user}",
                                         interaction.user.display_avatar))
 
-    @nextcord.slash_command(name="give", description="Transfer your money from balance to other user")
+    @nextcord.slash_command(name="give", description="Transfer your money from balance to other user",
+                            default_member_permissions=Permissions(send_messages=True))
     async def __give(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True),
                      money: Optional[int] = SlashOption(required=True)):
         """
