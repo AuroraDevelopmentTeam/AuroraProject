@@ -1,6 +1,7 @@
 import random
 
 import nextcord
+from nextcord import Asset
 from nextcord.ui import View
 
 from core.ui.buttons import create_button
@@ -103,6 +104,9 @@ class Deck:
     def __init__(self):
         self.cards = [Card(s, v) for s in ["Clubs", "Spades", "Hearts",
                                            "Diamonds"] for v in ["A", "2", "3", "4", "5", "6",
+                                                                 "7", "8", "9", "10", "J", "Q", "K", "A", "2", "3", "4", "5", "6",
+                                                                 "7", "8", "9", "10", "J", "Q", "K", "A", "2", "3", "4", "5", "6",
+                                                                 "7", "8", "9", "10", "J", "Q", "K", "A", "2", "3", "4", "5", "6",
                                                                  "7", "8", "9", "10", "J", "Q", "K"]]
 
     def shuffle(self):
@@ -186,7 +190,8 @@ def get_hand_hidden_cards(client, hand: Hand) -> str:
     return field_value
 
 
-def create_blackjack_embed(client, state_of_game: str, player_hand: Hand, dealer_hand: Hand) -> nextcord.Embed:
+def create_blackjack_embed(client, state_of_game: str, player_hand: Hand, dealer_hand: Hand,
+                           footer_text: str = None, footer_url: Asset = None) -> nextcord.Embed:
     embed = nextcord.Embed(title='Blackjack', description=state_of_game, color=DEFAULT_BOT_COLOR)
     player_hand_field_value = get_hand_cards(client, player_hand)
     dealer_hand_field_value = get_hand_cards(client, dealer_hand)
@@ -194,17 +199,28 @@ def create_blackjack_embed(client, state_of_game: str, player_hand: Hand, dealer
                                               f'value **{player_hand.get_value()}**', inline=True)
     embed.add_field(name='Dealer hand', value=f'{dealer_hand_field_value}\n'
                                               f'value **{dealer_hand.get_value()}**', inline=True)
+    if footer_text is not None and footer_url is not None:
+        embed.set_footer(text=footer_text, icon_url=footer_url)
     return embed
 
 
-def create_game_start_blackjack_embed(client, state_of_game: str, player_hand: Hand,
-                                      dealer_hand: Hand) -> nextcord.Embed:
+def create_game_start_blackjack_embed(client, state_of_game: str, player_hand: Hand, dealer_hand: Hand,
+                                      footer_text: str = None, footer_url: Asset = None) -> nextcord.Embed:
     embed = nextcord.Embed(title='Blackjack', description=state_of_game, color=DEFAULT_BOT_COLOR)
     player_hand_field_value = get_hand_cards(client, player_hand)
     dealer_hand_field_value = get_hand_hidden_cards(client, dealer_hand)
     embed.add_field(name='Player hand', value=f'{player_hand_field_value}\n'
                                               f'value **{player_hand.get_value()}**', inline=True)
-    embed.add_field(name='Dealer hand', value=f'{dealer_hand_field_value}', inline=True)
+    second_dealer_card = dealer_hand.cards[1]
+    if second_dealer_card.value in ['J', 'K', 'Q']:
+        second_dealer_card = 10
+    elif second_dealer_card.value == 'A':
+        second_dealer_card = 11
+    else:
+        second_dealer_card = second_dealer_card.value
+    embed.add_field(name='Dealer hand', value=f'{dealer_hand_field_value}\nvalue **{second_dealer_card}**', inline=True)
+    if footer_text is not None and footer_url is not None:
+        embed.set_footer(text=footer_text, icon_url=footer_url)
     return embed
 
 

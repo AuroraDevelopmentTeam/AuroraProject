@@ -22,7 +22,7 @@ class Welcoming(commands.Cog):
         welcome_channel = self.client.get_channel(welcome_channel_id)
         message_type = get_server_welcome_message_type(member.guild.id)
         if message_type == "embed":
-            embed = create_server_welcome_embed(member, member.guild.id)
+            embed = create_server_welcome_embed(member, member.guild)
             await welcome_channel.send(embed=embed)
         elif message_type == "card":
             file = create_welcome_card(member)

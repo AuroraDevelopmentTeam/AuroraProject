@@ -124,5 +124,11 @@
     },
     "set_autoroles_state": {
       "msg": "State of autoroles on server now is:"
+    },
+    "on_balance": {
+      "msg": "Balance now:"
+    },
+    "set_autorole": {
+      "msg": "Now this role will be given on server enter:"
     }
 }

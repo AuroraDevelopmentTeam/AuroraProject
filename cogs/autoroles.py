@@ -8,14 +8,15 @@ class Autorole(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-
     @commands.Cog.listener()
     async def on_member_join(self, member):
         if get_server_autorole_state(member.guild.id) is False:
             return
         autorole_id = get_server_autorole_id(member.guild.id)
-        if welcome_channel_id == 0:
+        if autorole_id == 0:
             return
+        role = nextcord.utils.get(member.guild.roles, id=autorole_id)
+        await member.add_roles(role)
 
 
 def setup(client):

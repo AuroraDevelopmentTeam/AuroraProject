@@ -15,7 +15,7 @@ from core.checkers import is_locale_valid, is_str_or_emoji
 from core.levels.updaters import set_server_level_up_messages_state, set_user_level
 from core.welcomers.updaters import set_welcome_channel, update_welcome_message_description, \
     update_welcome_message_title, update_welcome_message_url, update_welcome_message_type, set_welcome_message_state
-from core.auto.roles.updaters import set_autoroles_state
+from core.auto.roles.updaters import set_autoroles_state, update_autorole
 
 
 class EmbedModal(nextcord.ui.Modal):
@@ -277,6 +277,18 @@ class Setters(commands.Cog):
         await interaction.response.send_message(
             embed=construct_basic_embed(interaction.application_command.name,
                                         f"{message} **{autoroles_state}**",
+                                        f"{requested} {interaction.user}",
+                                        interaction.user.display_avatar))
+
+    @__set.subcommand(name="autorole", description="Turn on or turn off autoroles for new guests of server")
+    async def __autorole_set(self, interaction: Interaction,
+                             role: Optional[nextcord.Role] = SlashOption(required=True)):
+        update_autorole(interaction.guild.id, role.id)
+        message = get_msg_from_locale_by_key(interaction.guild.id, f"set_{interaction.application_command.name}")
+        requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
+        await interaction.response.send_message(
+            embed=construct_basic_embed(interaction.application_command.name,
+                                        f"{message} **{role.mention}**",
                                         f"{requested} {interaction.user}",
                                         interaction.user.display_avatar))
 

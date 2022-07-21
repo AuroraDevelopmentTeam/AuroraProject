@@ -31,10 +31,10 @@ def create_server_welcome_embed(member, guild: nextcord.Guild) -> nextcord.Embed
             f"SELECT welcome_message_url FROM welcomers_config WHERE guild_id = {guild.id}").fetchone()[0]
     if "{member.mention}" in welcome_message_description:
         welcome_message_description = welcome_message_description.replace("{member.mention}", f"{member.mention}")
-    list_of_channels = re.findall(r'\b#\w+', welcome_message_description)
+    list_of_channels = [t for t in welcome_message_description.split() if t.startswith('#')]
     for channel in list_of_channels:
-        channel = channel[1:]
-
+        really_channel = nextcord.utils.get(guild.text_channels, name=channel[1:])
+        welcome_message_description = welcome_message_description.replace(channel, really_channel.mention)
     db.commit()
     cursor.close()
     db.close()
