@@ -59,7 +59,7 @@ class Levels(commands.Cog):
         avatar = BytesIO()
         await user.display_avatar.with_format("png").save(avatar)
         profile_picture = Image.open(avatar)
-        profile = Editor(profile_picture).resize((150, 150)).circle_image()
+        profile = Editor(profile_picture).resize((150, 150)).rounded_corners()
         larger_font = Font.montserrat(size=35)
         font = Font.montserrat(size=30)
 

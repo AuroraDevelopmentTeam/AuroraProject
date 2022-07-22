@@ -130,5 +130,38 @@
     },
     "set_autorole": {
       "msg": "Теперь эта роль будет выдаваться при входе на сервер:"
+    },
+    "emotion_kiss": {
+      "msg": "Поцелуй"
+    },
+    "emotion_hug": {
+      "msg": "Обнимашки"
+    },
+    "emotion_punch": {
+      "msg": "Удар"
+    },
+    "emotion_idk": {
+      "msg": "Не знаю"
+    },
+    "emotion_f": {
+      "msg": "PRESS F TO PAY RESPECTS"
+    },
+    "emotion_cry": {
+      "msg": "Плачет"
+    },
+    "emotion_bite": {
+      "msg": "Кусь!"
+    },
+    "emotion_spank": {
+      "msg": "Порка"
+    },
+    "emotion_highfive": {
+      "msg": "Пятюня"
+    },
+    "emotion_pat": {
+      "msg": "Поглаживание"
+    },
+    "emotion_lick": {
+      "msg": "Облизывание"
     }
 }

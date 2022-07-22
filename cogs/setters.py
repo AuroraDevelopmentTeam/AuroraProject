@@ -55,7 +55,7 @@ class Setters(commands.Cog):
     @nextcord.slash_command(name="set", default_member_permissions=8)
     async def __set(self, interaction: Interaction):
         """
-        This is the set slash command that will be the prefix of set commands below.
+        This is the set slash command that will be the prefix of set commands.
         """
         pass
 

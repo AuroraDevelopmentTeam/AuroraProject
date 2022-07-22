@@ -4,10 +4,10 @@ import nextcord
 from nextcord.ext import commands
 from nextcord import Interaction, ButtonStyle, File, Permissions, SlashOption
 from nextcord.ui import Button, View
-
 from core.games.blackjack import Hand, Deck, check_for_blackjack, show_blackjack_results, player_is_over, \
     cards_emoji_representation, create_deck, deal_starting_cards, create_blackjack_embed, create_final_view, \
     maybe_blackjack_cards, create_game_start_blackjack_embed
+
 from core.games.slots import check_win_get_multiplier, spin_slots, create_slots_embed
 from core.games.brick_knife_evidence_yandere_tentacles import create_starting_embed, create_starting_view
 from core.ui.buttons import create_button, ViewAuthorCheck

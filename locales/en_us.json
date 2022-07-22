@@ -130,5 +130,38 @@
     },
     "set_autorole": {
       "msg": "Now this role will be given on server enter:"
+    },
+    "emotion_kiss": {
+      "msg": "Kiss"
+    },
+    "emotion_hug": {
+      "msg": "Hugs"
+    },
+    "emotion_punch": {
+      "msg": "Punch"
+    },
+    "emotion_idk": {
+      "msg": "I dont know"
+    },
+    "emotion_f": {
+      "msg": "PRESS F TO PAY RESPECTS"
+    },
+    "emotion_cry": {
+      "msg": "Crying"
+    },
+    "emotion_bite": {
+      "msg": "Bite"
+    },
+    "emotion_spank": {
+      "msg": "Spanking"
+    },
+    "emotion_highfive": {
+      "msg": "Highfive"
+    },
+    "emotion_pat": {
+      "msg": "Patting"
+    },
+    "emotion_lick": {
+      "msg": "Licking"
     }
 }
