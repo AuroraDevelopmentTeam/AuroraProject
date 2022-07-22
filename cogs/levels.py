@@ -53,6 +53,8 @@ class Levels(commands.Cog):
     async def __level(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=False)):
         if user is None:
             user = interaction.user
+        if user.bot:
+            return await interaction.response.send_message('bot_user_error')
         user_exp = get_user_exp(interaction.guild.id, user.id)
         user_level = get_user_level(interaction.guild.id, user.id)
         exp_to_next_level = round((7 * (user_level ** 3)))
@@ -83,6 +85,10 @@ class Levels(commands.Cog):
                             default_member_permissions=Permissions(administrator=True))
     async def __add_exp(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True),
                         exp_points: Optional[int] = SlashOption(required=True)):
+        if user.bot:
+            return await interaction.response.send_message('bot_user_error')
+        if exp_points <= 0:
+            return await interaction.response.send_message('negative_value_error')
         min_exp, max_exp = exp_points, exp_points
         update_user_exp(interaction.guild.id, user.id, min_exp, max_exp)
         await interaction.response.send_message('done')
@@ -90,9 +96,22 @@ class Levels(commands.Cog):
     @nextcord.slash_command(name='remove_exp', description="remove from @user some exp",
                             default_member_permissions=Permissions(administrator=True))
     async def __remove_exp(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True),
-                        exp_points: Optional[int] = SlashOption(required=True)):
+                           exp_points: Optional[int] = SlashOption(required=True)):
+        if user.bot:
+            return await interaction.response.send_message('bot_user_error')
+        if exp_points <= 0:
+            return await interaction.response.send_message('negative_value_error')
         min_exp, max_exp = exp_points, exp_points
         update_user_exp(interaction.guild.id, user.id, -min_exp, -max_exp)
+        await interaction.response.send_message('done')
+
+    @nextcord.slash_command(name='reset_level', description='Reset level of @User to 1st level 0 exp')
+    async def __reset_level(self, interaction: Interaction,
+                            user: Optional[nextcord.Member] = SlashOption(required=True)):
+        if user.bot:
+            return await interaction.response.send_message('bot_user_error')
+        set_user_exp_to_zero(interaction.guild.id, user.id)
+        set_user_level(interaction.guild.id, user.id, 1)
         await interaction.response.send_message('done')
 
 
