@@ -157,16 +157,19 @@ class Games(commands.Cog):
 
     @nextcord.slash_command(name='slots',
                             default_member_permissions=Permissions(send_messages=True))
-    async def __slots(self, interaction: Interaction):
+    async def __slots(self, interaction: Interaction, bet: Optional[int] = SlashOption(required=True)):
         player_got_row = spin_slots()
         is_win, multiplier = check_win_get_multiplier(player_got_row)
         if is_win is True:
             game_state = '**win**'
+            bet *= multiplier
+            update_user_balance(interaction.guild.id, interaction.user.id, int(bet))
             embed = create_slots_embed(interaction.guild.id, interaction.user.id, interaction.user.display_avatar,
                                        interaction.application_command.name, player_got_row, game_state)
             await interaction.response.send_message(embed=embed)
         else:
             game_state = '**loose**'
+            update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
             embed = create_slots_embed(interaction.guild.id, interaction.user.id, interaction.user.display_avatar,
                                        interaction.application_command.name, player_got_row, game_state)
             await interaction.response.send_message(embed=embed)
