@@ -50,7 +50,9 @@ class Levels(commands.Cog):
 
     @nextcord.slash_command(name='level', description="shows information about user's level",
                             default_member_permissions=Permissions(send_messages=True))
-    async def __level(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True)):
+    async def __level(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=False)):
+        if user is None:
+            user = interaction.user
         user_exp = get_user_exp(interaction.guild.id, user.id)
         user_level = get_user_level(interaction.guild.id, user.id)
         exp_to_next_level = round((7 * (user_level ** 3)))

@@ -4,12 +4,13 @@ import nextcord
 from nextcord.ext import commands
 from nextcord import Interaction, ButtonStyle, File, Permissions, SlashOption
 from nextcord.ui import Button, View
+
 from core.games.blackjack import Hand, Deck, check_for_blackjack, show_blackjack_results, player_is_over, \
     cards_emoji_representation, create_deck, deal_starting_cards, create_blackjack_embed, create_final_view, \
     maybe_blackjack_cards, create_game_start_blackjack_embed
-
 from core.games.slots import check_win_get_multiplier, spin_slots, create_slots_embed
 from core.games.brick_knife_evidence_yandere_tentacles import create_starting_embed, create_starting_view
+from core.games.gamble import perform_strikes, compare_strikes, create_gamble_embed, approximate_bet, get_game_state
 from core.ui.buttons import create_button, ViewAuthorCheck
 from core.locales.getters import get_msg_from_locale_by_key
 from core.money.updaters import update_user_balance
@@ -178,6 +179,27 @@ class Games(commands.Cog):
                                       "Pick 1 of 5 options and see that's will happen")
         view = create_starting_view()
         await interaction.followup.send(embed=embed, view=view)
+
+    @nextcord.slash_command(name='gamble', default_member_permissions=Permissions(send_messages=True))
+    async def __gamble(self, interaction: Interaction, bet: Optional[int] = SlashOption(required=True)):
+        if bet <= 0:
+            return await interaction.response.send_message('negative_value_error')
+        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if balance < bet:
+            return await interaction.response.send_message('not_enough_money_error')
+        user_strikes, bot_strikes = perform_strikes()
+        is_win = compare_strikes(user_strikes, bot_strikes)
+        percentage, bet = approximate_bet(bet, is_win)
+        if is_win is True:
+            update_user_balance(interaction.guild.id, interaction.user.id, int(bet))
+        if is_win is False:
+            update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
+        msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        game_state = get_game_state(is_win)
+        embed = create_gamble_embed(is_win, game_state, percentage, user_strikes, bot_strikes, f'{msg} {balance}',
+                                    interaction.user.display_avatar)
+        await interaction.response.send_message(embed=embed)
 
 
 def setup(client):
