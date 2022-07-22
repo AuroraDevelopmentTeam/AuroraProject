@@ -29,7 +29,13 @@ class Information(commands.Cog):
         embed.add_field(name='Locales', value='`set locale <locale>`', inline=False)
         embed.add_field(name='Welcome messages', value='`set welcome_channel <#channel>`'
                                                        ' `set welcome_message_type <card/embed>` `set welcome_embed`'
-                                                       ' `welcome_message_state <on/of>`', inline=False)
+                                                       ' `welcome_message_state <on/off>`', inline=False)
+        embed.add_field(name='Autoroles', value='`set autoroles_state <on/off>` `set autorole <role>`')
+        embed.add_field(name='Emotions', value='`emotion cry [msg]` `emotion idk [msg]` `emotion f [msg]` '
+                                               '`emotion kiss <@> [msg]` `emotion highfive <@> [msg]` '
+                                               '`emotion lick <@> [msg]` `emotion punch <@> [msg]` '
+                                               '`emotion hug <@> [msg]` `emotion spank <@> [msg]` '
+                                               '`emotion pat <@> [msg]` `emotion bite <@> [msg]`', inline=False)
         await interaction.response.send_message(embed=embed)
 
     @commands.cooldown(1, 50, commands.BucketType.guild)
