@@ -199,5 +199,8 @@
     },
     "gift": {
       "msg": "was gifted to"
+    },
+    "lovedeposit": {
+      "msg": "were deposited in family bank"
     }
 }

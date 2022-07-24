@@ -54,8 +54,7 @@ def get_divorce_counter(guild_id: int, user_id: int) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     divorce_counter = \
-        cursor.execute(f"SELECT divorces FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}").fetchone()[
-            0]
+        cursor.execute(f"SELECT divorces FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}").fetchone()[0]
     cursor.close()
     db.close()
     return divorce_counter
@@ -65,8 +64,7 @@ def get_user_pair_id(guild_id: int, user_id: int) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     pair_id = \
-        cursor.execute(f"SELECT pair_id FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}").fetchone()[
-            0]
+        cursor.execute(f"SELECT pair_id FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}").fetchone()[0]
     cursor.close()
     db.close()
     return pair_id
@@ -97,8 +95,7 @@ def get_family_money(guild_id: int, user_id: int) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     family_money = \
-        cursor.execute(
-            f"SELECT family_money FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}").fetchone()[0]
+        cursor.execute(f"SELECT family_money FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}").fetchone()[0]
     cursor.close()
     db.close()
     return family_money
@@ -108,8 +105,7 @@ def get_user_like_id(guild_id: int, user_id: int) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     like_id = \
-        cursor.execute(
-            f"SELECT like_id FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}").fetchone()[0]
+        cursor.execute(f"SELECT like_id FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}").fetchone()[0]
     cursor.close()
     db.close()
     return like_id
@@ -119,8 +115,7 @@ def get_user_gifts_price(guild_id: int, user_id: int) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     gift_price = \
-        cursor.execute(
-            f"SELECT gift_price FROM gifts WHERE guild_id = {guild_id} AND user_id = {user_id}").fetchone()[0]
+        cursor.execute(f"SELECT gift_price FROM gifts WHERE guild_id = {guild_id} AND user_id = {user_id}").fetchone()[0]
     cursor.close()
     db.close()
     return gift_price
@@ -130,8 +125,7 @@ def get_user_gift_counter(guild_id: int, user_id: int, gift: str) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     gift_count = \
-        cursor.execute(
-            f"SELECT {gift} FROM gifts WHERE guild_id = {guild_id} AND user_id = {user_id}").fetchone()[0]
+        cursor.execute(f"SELECT {gift} FROM gifts WHERE guild_id = {guild_id} AND user_id = {user_id}").fetchone()[0]
     cursor.close()
     db.close()
     return gift_count

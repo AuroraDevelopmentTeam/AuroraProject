@@ -18,7 +18,8 @@ from core.marriage.create import create_marry_embed, create_marry_yes_embed, cre
     create_love_profile_embed
 from core.marriage.getters import get_user_love_description, get_user_marry_date, get_user_pair_id, get_user_like_id, \
     get_user_gifts_price, get_divorce_counter, GIFT_NAMES, GIFT_EMOJIS, GIFT_PRICES
-from core.marriage.update import update_user_like, update_user_gift_count, update_user_gift_price
+from core.marriage.update import update_user_like, update_user_gift_count, update_user_gift_price, \
+    update_user_love_description, update_couple_family_money
 from core.embeds import construct_basic_embed
 from core.ui.buttons import create_button, ViewAuthorCheck, View
 from core.locales.getters import get_msg_from_locale_by_key, get_guild_locale
@@ -268,6 +269,39 @@ class Marriage(commands.Cog):
                                         f"**{amount}** {GIFT_EMOJIS[gift]} {message} {user.mention}",
                                         f"{requested} {interaction.user}\n{msg} {balance}",
                                         interaction.user.display_avatar))
+
+    @nextcord.slash_command(name="lovedescription", description="set your couple description")
+    async def __lovedescription(self, interaction: Interaction,
+                                description: Optional[str] = SlashOption(required=True)):
+        if is_married(interaction.guild.id, interaction.user.id) is False:
+            return await interaction.response.send_message('not married error')
+        update_user_love_description(interaction.guild.id, interaction.user.id, description)
+        await interaction.response.send_message('done')
+
+    @nextcord.slash_command(name="lovedeposit", description="deposit money in your family bank")
+    async def __lovedeposit(self, interaction: Interaction,
+                                amount: Optional[int] = SlashOption(required=True)):
+        if is_married(interaction.guild.id, interaction.user.id) is False:
+            return await interaction.response.send_message('not married error')
+        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if amount <= 0:
+            return await interaction.response.send_message('negative_value_error')
+        if balance < amount:
+            return await interaction.response.send_message('not_enough_money_error')
+        pair = get_user_pair_id(interaction.guild.id, interaction.user.id)
+        update_user_balance(interaction.guild.id, interaction.user.id, -amount)
+        update_couple_family_money(interaction.guild.id, interaction.user.id, pair, amount)
+        message = get_msg_from_locale_by_key(interaction.guild.id, interaction.application_command.name)
+        requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        await interaction.response.send_message(
+            embed=construct_basic_embed(interaction.application_command.name,
+                                        f"__**{amount}**__ {currency_symbol} {message}",
+                                        f"{requested} {interaction.user}\n{msg} {balance}",
+                                        interaction.user.display_avatar))
+
 
 def setup(client):
     client.add_cog(Marriage(client))
