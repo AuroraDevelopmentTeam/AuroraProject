@@ -124,3 +124,14 @@ def get_user_gifts_price(guild_id: int, user_id: int) -> int:
     cursor.close()
     db.close()
     return gift_price
+
+
+def get_user_gift_counter(guild_id: int, user_id: int, gift: str) -> int:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    gift_count = \
+        cursor.execute(
+            f"SELECT {gift} FROM gifts WHERE guild_id = {guild_id} AND user_id = {user_id}").fetchone()[0]
+    cursor.close()
+    db.close()
+    return gift_count

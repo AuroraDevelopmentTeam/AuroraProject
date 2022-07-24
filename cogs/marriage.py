@@ -18,11 +18,39 @@ from core.marriage.create import create_marry_embed, create_marry_yes_embed, cre
     create_love_profile_embed
 from core.marriage.getters import get_user_love_description, get_user_marry_date, get_user_pair_id, get_user_like_id, \
     get_user_gifts_price, get_divorce_counter, GIFT_NAMES, GIFT_EMOJIS, GIFT_PRICES
-from core.marriage.update import update_user_like
+from core.marriage.update import update_user_like, update_user_gift_count, update_user_gift_price
 from core.embeds import construct_basic_embed
 from core.ui.buttons import create_button, ViewAuthorCheck, View
 from core.locales.getters import get_msg_from_locale_by_key, get_guild_locale
 from core.parsers import parse_likes, parse_user_gifts
+from core.embeds import DEFAULT_BOT_COLOR
+
+
+class Dropdown(nextcord.ui.Select):
+    def __init__(self):
+        select_options = [
+            nextcord.SelectOption(label=f"Carrot", description=f"150", emoji=f"{GIFT_EMOJIS['gift_1']}"),
+            nextcord.SelectOption(label=f"Teddy bear", description=f"1000", emoji=f"{GIFT_EMOJIS['gift_2']}"),
+            nextcord.SelectOption(label=f"Cookie", description=f"250", emoji=f"{GIFT_EMOJIS['gift_3']}"),
+            nextcord.SelectOption(label=f"Lolipop", description=f"500", emoji=f"{GIFT_EMOJIS['gift_4']}"),
+            nextcord.SelectOption(label=f"Flower", description=f"750", emoji=f"{GIFT_EMOJIS['gift_5']}"),
+            nextcord.SelectOption(label=f"Scarf", description=f"2500", emoji=f"{GIFT_EMOJIS['gift_6']}"),
+            nextcord.SelectOption(label=f"Cake", description=f"5000", emoji=f"{GIFT_EMOJIS['gift_7']}"),
+            nextcord.SelectOption(label=f"Panda", description=f"10500", emoji=f"{GIFT_EMOJIS['gift_8']}"),
+            nextcord.SelectOption(label=f"Duck", description=f"12000", emoji=f"{GIFT_EMOJIS['gift_9']}"),
+            nextcord.SelectOption(label=f"Cat", description=f"15000", emoji=f"{GIFT_EMOJIS['gift_10']}"),
+
+        ]
+        super().__init__(placeholder="Select your gift", min_values=1, max_values=1, options=select_options)
+
+    async def callback(self, interaction: Interaction):
+        await interaction.response.send_message(f'you chose {self.values[0]}')
+
+
+class DropdownView(nextcord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(Dropdown())
 
 
 class Marriage(commands.Cog):
@@ -139,7 +167,7 @@ class Marriage(commands.Cog):
         divorces = get_divorce_counter(interaction.guild.id, user.id)
         likes_counter = parse_likes(interaction.guild.id, user.id)
         gifts = parse_user_gifts(interaction.guild.id, user.id)
-        embed = nextcord.Embed()
+        embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
         if pair_id == 0:
             parther = "-"
         else:
@@ -188,16 +216,57 @@ class Marriage(commands.Cog):
         guild_locale = get_guild_locale(interaction.guild.id)
         counter = 1
         requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
-        embed = nextcord.Embed()
+        embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
         embed.set_author(name=f"{interaction.application_command.name.capitalize()}")
         for i in range(10):
             gift_now = f"gift_{str(counter)}"
-            embed.add_field(name=f"{GIFT_EMOJIS[gift_now]} {GIFT_NAMES[guild_locale][gift_now]}",
+            embed.add_field(name=f"**{counter}**. {GIFT_EMOJIS[gift_now]} {GIFT_NAMES[guild_locale][gift_now]}",
                             value=f"> __**{GIFT_PRICES[gift_now]}**__ {currency_symbol}", inline=True)
             counter += 1
-        embed.set_image(url="https://64.media.tumblr.com/6b9d5fbcc7d6ebe2c3636ed25a550787/f02e19988b551a66-43/s1280x1920/311bc898f00d0bea349351a7a36333f9f659f645.gifv")
+        embed.set_image(
+            url="https://64.media.tumblr.com/6b9d5fbcc7d6ebe2c3636ed25a550787/f02e19988b551a66-43/s1280x1920/311bc898f00d0bea349351a7a36333f9f659f645.gifv")
         embed.set_footer(text=f"{requested} {interaction.user}", icon_url=interaction.user.display_avatar)
         await interaction.response.send_message(embed=embed)
+
+    @nextcord.slash_command(name="gift", description="gift to @User gifts from shop!")
+    async def __gift(self, interaction: Interaction,
+                     user: Optional[nextcord.Member] = SlashOption(required=True),
+                     gift: str = SlashOption(
+                         name="picker",
+                         choices={f"1. Carrot 🥕": "gift_1",
+                                  f"2. Teddy Bear 🧸": "gift_2",
+                                  f"3. Cookie 🍪": "gift_3",
+                                  f"4. Lolipop 🍭": "gift_4",
+                                  f"5. Flower 🌸": "gift_5",
+                                  f"6. Scarf 🧣": "gift_6",
+                                  f"7. Cake 🎂": "gift_7",
+                                  f"8. Panda 🐼": "gift_8",
+                                  f"9. Duck 🦆": "gift_9",
+                                  f"10. Cat 🐱": "gift_10"
+                                  },
+                         required=True), amount: Optional[int] = SlashOption(required=True)):
+        if amount < 1:
+            return await interaction.response.send_message('negative_value_error')
+        if user.bot:
+            return await interaction.response.send_message('bot_user_error')
+        if user == interaction.user:
+            return await interaction.response.send_message('self choose error')
+        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        price = GIFT_PRICES[gift] * amount
+        if balance < price:
+            return await interaction.response.send_message('not_enough_money_error')
+        update_user_balance(interaction.guild.id, interaction.user.id, -price)
+        update_user_gift_count(interaction.guild.id, user.id, gift, amount)
+        update_user_gift_price(interaction.guild.id, user.id, price)
+        message = get_msg_from_locale_by_key(interaction.guild.id, interaction.application_command.name)
+        requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
+        msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        await interaction.response.send_message(
+            embed=construct_basic_embed(interaction.application_command.name,
+                                        f"**{amount}** {GIFT_EMOJIS[gift]} {message} {user.mention}",
+                                        f"{requested} {interaction.user}\n{msg} {balance}",
+                                        interaction.user.display_avatar))
 
 
 def setup(client):

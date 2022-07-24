@@ -1,7 +1,7 @@
 import nextcord
 from datetime import datetime
 import sqlite3
-from core.marriage.getters import GIFT_NAMES, GIFT_EMOJIS
+from core.marriage.getters import GIFT_NAMES, GIFT_EMOJIS, get_user_gift_counter
 
 
 def parse_timeouts(guild_members) -> list:
@@ -46,8 +46,7 @@ def parse_user_gifts(guild_id: int, user_id: int) -> str:
     gifts_description = ""
     for i in range(10):
         gift_now = f"gift_{str(i+1)}"
-        gift_counter = cursor.execute(
-            f"SELECT {gift_now} FROM gifts WHERE guild_id = {guild_id} AND user_id = {user_id}").fetchone()[0]
+        gift_counter = get_user_gift_counter(guild_id, user_id, gift_now)
         if gift_counter > 0:
             gifts_description += f"__**{gift_counter}**__ {GIFT_EMOJIS[gift_now]}⠀⠀"
             gifts_in_field += 1

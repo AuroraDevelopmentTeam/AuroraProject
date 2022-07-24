@@ -1,7 +1,7 @@
 import sqlite3
 
 from core.locales.getters import get_msg_from_locale_by_key
-from core.marriage.getters import get_divorce_counter
+from core.marriage.getters import get_divorce_counter, get_user_gifts_price, get_user_gift_counter
 
 
 def update_user_pair(guild_id, user_id, pair_id) -> None:
@@ -13,6 +13,7 @@ def update_user_pair(guild_id, user_id, pair_id) -> None:
     db.commit()
     cursor.close()
     db.close()
+    return
 
 
 def update_user_like(guild_id: int, user_id: int, like_id: int) -> None:
@@ -24,6 +25,7 @@ def update_user_like(guild_id: int, user_id: int, like_id: int) -> None:
     db.commit()
     cursor.close()
     db.close()
+    return
 
 
 def update_user_marriage_date(guild_id: int, user_id: int, date) -> None:
@@ -35,6 +37,7 @@ def update_user_marriage_date(guild_id: int, user_id: int, date) -> None:
     db.commit()
     cursor.close()
     db.close()
+    return
 
 
 def marry_users(guild_id: int, user_id: int, pair_id: int, date):
@@ -49,6 +52,7 @@ def marry_users(guild_id: int, user_id: int, pair_id: int, date):
     update_user_marriage_date(guild_id, pair_id, date)
     cursor.close()
     db.close()
+    return
 
 
 def divorce_users(guild_id: int, user_id: int, pair_id: int) -> None:
@@ -64,9 +68,10 @@ def divorce_users(guild_id: int, user_id: int, pair_id: int) -> None:
     update_user_marriage_date(guild_id, pair_id, "0")
     cursor.close()
     db.close()
+    return
 
 
-def increment_user_divorces(guild_id: int, user_id: int):
+def increment_user_divorces(guild_id: int, user_id: int) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     user_divorces = get_divorce_counter(guild_id, user_id)
@@ -76,9 +81,10 @@ def increment_user_divorces(guild_id: int, user_id: int):
     db.commit()
     cursor.close()
     db.close()
+    return
 
 
-def update_user_love_description(guild_id: int, user_id: int, description: str):
+def update_user_love_description(guild_id: int, user_id: int, description: str) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     sql = "UPDATE marriage SET love_description = ? WHERE guild_id = ? AND user_id = ?"
@@ -87,3 +93,30 @@ def update_user_love_description(guild_id: int, user_id: int, description: str):
     db.commit()
     cursor.close()
     db.close()
+    return
+
+
+def update_user_gift_count(guild_id: int, user_id: int, gift: str, amount: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    gift_counter = get_user_gift_counter(guild_id, user_id, gift)
+    sql = f"UPDATE gifts SET {gift} = ? WHERE guild_id = ? AND user_id = ?"
+    values = (gift_counter + amount, guild_id, user_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_user_gift_price(guild_id: int, user_id: int, price: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    gift_price = get_user_gifts_price(guild_id, user_id)
+    sql = f"UPDATE gifts SET gift_price = ? WHERE guild_id = ? AND user_id = ?"
+    values = (gift_price + price, guild_id, user_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
