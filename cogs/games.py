@@ -1,4 +1,5 @@
 from typing import Optional
+import random
 
 import nextcord
 from nextcord.ext import commands
@@ -16,6 +17,10 @@ from core.locales.getters import get_msg_from_locale_by_key
 from core.money.updaters import update_user_balance
 from core.money.getters import get_user_balance, get_guild_currency_symbol
 
+MULTIPLIERS_FOR_TWO_ROWS = [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]
+
+MULTIPLIERS_FOR_THREE_ROWS = [2.0, 2.1, 2.2, 2.3, 2.4, 2.5]
+
 
 class Games(commands.Cog):
     def __init__(self, client):
@@ -24,14 +29,14 @@ class Games(commands.Cog):
     @nextcord.slash_command(name='blackjack',
                             default_member_permissions=Permissions(send_messages=True))
     async def __blackjack(self, interaction: Interaction, bet: Optional[int] = SlashOption(required=True)):
+        await interaction.response.defer()
         if bet <= 0:
-            return await interaction.response.send_message('negative_value_error')
+            return await interaction.followup.send('negative_value_error')
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
-            return await interaction.response.send_message('not_enough_money_error')
+            return await interaction.followup.send('not_enough_money_error')
         global player
         player = interaction.user
-        await interaction.response.defer()
         deck = create_deck()
         player_hand = Hand()
         dealer_hand = Hand(dealer=True)

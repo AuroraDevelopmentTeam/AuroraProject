@@ -11,6 +11,10 @@ slot_emojis = ['<:1388purincherry:998435904756645949>', '<:5471koifish:998435906
                '<a:8293_Butterfly_White:998286778559627344>', '<a:whitecrown:998827454615519283>',
                '<a:8243blackbat:999977356468965457>']
 
+MULTIPLIERS_FOR_TWO_ROWS = [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]
+
+MULTIPLIERS_FOR_THREE_ROWS = [2.0, 2.1, 2.2, 2.3, 2.4, 2.5]
+
 
 def spin_slots() -> list:
     result_row = []
@@ -21,9 +25,9 @@ def spin_slots() -> list:
 
 def check_win_get_multiplier(row: list):
     if row[0] == row[1] and row[1] == row[2]:
-        return True, 2
+        return True, random.choice(MULTIPLIERS_FOR_THREE_ROWS)
     elif row[0] == row[1] or row[1] == row[2] or row[2] == row[0]:
-        return True, 1
+        return True, random.choice(MULTIPLIERS_FOR_TWO_ROWS)
     else:
         return False, 0
 

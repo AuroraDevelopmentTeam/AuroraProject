@@ -62,7 +62,7 @@
     "set_currency": {
       "msg": "Server currency symbol has been changed on:"
     },
-    "set_payday_amount": {
+    "set_timely_amount": {
       "msg": "Server payday amount has been changed on:"
     },
     "set_start_balance": {
@@ -163,5 +163,38 @@
     },
     "emotion_lick": {
       "msg": "Licking"
+    },
+    "default_love_description": {
+      "msg": "Write here about your feelings"
+    },
+    "marry": {
+      "msg": "offers you his hand and heart forever"
+    },
+    "marry_answer": {
+      "msg": "\n\n**What will be your answer?**\nYou have a whole minute to make a decision. **10,000** will be charged from the account of the person who offered wedding if wedding will be succesful"
+    },
+    "marry_yes": {
+      "msg": "Successful wedding"
+    },
+    "marry_yes_answer": {
+      "msg": "got married"
+    },
+    "marry_no": {
+      "msg": "Unsuccessful wedding"
+    },
+    "marry_no_answer": {
+      "msg": "The time has expired or the user has refused wedding offer"
+    },
+    "love_description": {
+      "msg": "Description:"
+    },
+    "love_money": {
+      "msg": "Family money:"
+    },
+    "love_date": {
+      "msg": "Together since:"
+    },
+    "divorce": {
+      "msg": "divorced with"
     }
 }

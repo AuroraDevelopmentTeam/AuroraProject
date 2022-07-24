@@ -1,6 +1,8 @@
 from typing import Optional
-import cooldowns
+from io import BytesIO
 
+from PIL import Image
+import cooldowns
 from nextcord.ext import commands
 from nextcord import Interaction, SlashOption, Permissions
 import nextcord
@@ -9,6 +11,7 @@ from core.money.updaters import update_guild_currency_symbol, update_guild_start
     update_guild_payday_amount, update_user_balance, set_user_balance
 from core.money.getters import get_user_balance, get_guild_currency_symbol, get_guild_starting_balance, \
     get_guild_payday_amount
+from core.money.create import create_user_money_card
 from core.checkers import is_str_or_emoji
 from core.locales.getters import get_msg_from_locale_by_key
 from core.embeds import construct_basic_embed
@@ -87,15 +90,12 @@ class Economics(commands.Cog):
             user = interaction.user
         if user.bot:
             return await interaction.response.send_message('bot_user_error')
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
-        balance = get_user_balance(interaction.guild.id, user.id)
-        message = get_msg_from_locale_by_key(interaction.guild.id, f"{interaction.application_command.name}")
-        requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
-        await interaction.response.send_message(
-            embed=construct_basic_embed(f'{interaction.application_command.name} - {user}',
-                                        f"{message} __**{balance}**__ {currency_symbol}",
-                                        f"{requested} {interaction.user}",
-                                        user.display_avatar))
+        avatar = BytesIO()
+        await user.display_avatar.with_format("png").save(avatar)
+        profile_picture = Image.open(avatar)
+        file, embed = create_user_money_card(interaction.application_command.name.capitalize(),
+                                             interaction.user, user, profile_picture, interaction.guild.id)
+        await interaction.response.send_message(embed=embed, file=file)
 
     @nextcord.slash_command(name="reset", default_member_permissions=Permissions(administrator=True))
     async def __reset(self, interaction: Interaction):
