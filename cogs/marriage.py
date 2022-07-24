@@ -121,8 +121,9 @@ class Marriage(commands.Cog):
     @nextcord.slash_command(name="loveprofile", description="sends your couple love card in chat with some "
                                                             "information about couple!")
     async def __loveprofile(self, interaction: Interaction):
+        await interaction.response.defer()
         if is_married(interaction.guild.id, interaction.user.id) is False:
-            return await interaction.response.send_message('not married error')
+            return await interaction.followup.send('not married error')
         pair = await self.client.fetch_user(get_user_pair_id(interaction.guild.id, interaction.user.id))
         avatar = BytesIO()
         await interaction.user.display_avatar.with_format("png").save(avatar)
@@ -133,7 +134,7 @@ class Marriage(commands.Cog):
         file = create_love_card(user_profile_picture, pair_profile_picture)
         embed = create_love_profile_embed(interaction.application_command.name, interaction.guild.id,
                                           interaction.user, pair)
-        await interaction.response.send_message(embed=embed, file=file)
+        await interaction.followup.send(embed=embed, file=file)
 
     @nextcord.slash_command(name="divorce", description="divorce you with your partner")
     async def __divorce(self, interaction: Interaction):
@@ -267,7 +268,6 @@ class Marriage(commands.Cog):
                                         f"**{amount}** {GIFT_EMOJIS[gift]} {message} {user.mention}",
                                         f"{requested} {interaction.user}\n{msg} {balance}",
                                         interaction.user.display_avatar))
-
 
 def setup(client):
     client.add_cog(Marriage(client))
