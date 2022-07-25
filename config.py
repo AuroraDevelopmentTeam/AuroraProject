@@ -14,5 +14,7 @@ settings = {
     'default_max_exp': 3,
     'default_level_up_messages_state': True,
     'default_welcome_messages_state': True,
-    'default_welcome_messages_type': 'embed',
+    'default_welcome_messages_type': 'card',
+    'default_goodbye_messages_state': True,
+    'default_goodbye_messages_type': 'card',
 }

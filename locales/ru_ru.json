@@ -214,5 +214,11 @@
     },
     "shop": {
       "msg": "Вы купили следующую роль:"
+    },
+    "default_goodbye_message_title": {
+      "msg": "Удачи!"
+    },
+    "default_goodbye_message_description": {
+      "msg": "Пока пока {member.mention}!\n\nНадеемся увидеть тебя снова!"
     }
 }

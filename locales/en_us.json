@@ -214,5 +214,11 @@
     },
     "shop": {
       "msg": "You bought this role:"
+    },
+    "default_goodbye_message_title": {
+      "msg": "Goodbye!"
+    },
+    "default_goodbye_message_description": {
+      "msg": "Bye bye {member.mention}!\n\nHope to see you soon again!"
     }
 }

@@ -15,7 +15,7 @@ from core.money.getters import get_user_balance, get_guild_currency_symbol, get_
 from core.money.create import create_user_money_card
 from core.checkers import is_str_or_emoji, is_role_in_shop
 from core.locales.getters import get_msg_from_locale_by_key
-from core.embeds import construct_basic_embed, construct_top_embed
+from core.embeds import construct_basic_embed, construct_top_embed, DEFAULT_BOT_COLOR
 from core.shop.writers import write_role_in_shop, delete_role_from_shop
 from core.parsers import parse_server_roles
 
@@ -31,7 +31,7 @@ class Dropdown(nextcord.ui.Select):
             for i in range(len(roles)):
                 self.price.append(roles[i][1])
                 self.role_list.append(roles[i][0])
-                sel_opt.append(nextcord.SelectOption(label=f'{i+1}',
+                sel_opt.append(nextcord.SelectOption(label=f'{i + 1}',
                                                      description=f'{roles[i][0].name} {roles[i][1]}'))
             super().__init__(placeholder="Select role from shop", min_values=1, max_values=1, options=sel_opt,
                              disabled=disabled)
@@ -41,11 +41,23 @@ class Dropdown(nextcord.ui.Select):
                              disabled=disabled)
 
     async def callback(self, interaction: Interaction):
-        embed = nextcord.Embed()
+        embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
         msg = get_msg_from_locale_by_key(self.guild.id, "shop")
         if self.values[0] != '...':
-            embed.add_field(name='Shop', value=f'{msg} {self.role_list[int(self.values[0])-1].mention}')
-            update_user_balance(interaction.guild.id, interaction.user.id, -(self.price[int(self.values[0])-1]))
+            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+            if balance < (self.price[int(self.values[0]) - 1]):
+                embed.add_field(name='error', value='not_enough_money_error')
+                return await interaction.message.edit(embed=embed,
+                                                      view=DropdownView(interaction.guild, interaction.user,
+                                                                        disabled=True))
+            if self.role_list[int(self.values[0]) - 1] in interaction.user.roles:
+                embed.add_field(name='error', value='already have role')
+                return await interaction.message.edit(embed=embed,
+                                                      view=DropdownView(interaction.guild, interaction.user,
+                                                                        disabled=True))
+            await interaction.user.add_roles(self.role_list[int(self.values[0]) - 1])
+            embed.add_field(name='Shop', value=f'{msg} {self.role_list[int(self.values[0]) - 1].mention}')
+            update_user_balance(interaction.guild.id, interaction.user.id, -(self.price[int(self.values[0]) - 1]))
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             embed.set_footer(text=f"{msg} {balance}", icon_url=interaction.user.display_avatar)

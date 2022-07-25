@@ -16,6 +16,8 @@ from core.levels.updaters import set_server_level_up_messages_state, set_user_le
 from core.welcomers.updaters import set_welcome_channel, update_welcome_message_description, \
     update_welcome_message_title, update_welcome_message_url, update_welcome_message_type, set_welcome_message_state
 from core.auto.roles.updaters import set_autoroles_state, update_autorole
+from core.goodbyes.updaters import set_goodbye_channel, update_goodbye_message_description, \
+    update_goodbye_message_title, update_goodbye_message_url, update_goodbye_message_type, set_goodbye_message_state
 
 
 class EmbedModal(nextcord.ui.Modal):
@@ -289,6 +291,79 @@ class Setters(commands.Cog):
         await interaction.response.send_message(
             embed=construct_basic_embed(interaction.application_command.name,
                                         f"{message} **{role.mention}**",
+                                        f"{requested} {interaction.user}",
+                                        interaction.user.display_avatar))
+
+    @__set.subcommand(name="goodbye_channel", description="Setting server's goodbye channel to send goodbye messages")
+    async def goodbye_channel_set(self, interaction: Interaction, channel: Optional[str] = SlashOption(required=True)):
+        """
+        Parameters
+        ----------
+        interaction: Interaction
+            The interaction object
+        channel: str
+            Channel to
+        """
+        channel = int(channel[2:-1])
+        channel = (nextcord.utils.get(interaction.guild.text_channels, id=channel))
+        if isinstance(channel, nextcord.TextChannel):
+            set_goodbye_channel(interaction.guild.id, channel.id)
+            message = get_msg_from_locale_by_key(interaction.guild.id, f"set_{interaction.application_command.name}")
+            requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
+            await interaction.response.send_message(
+                embed=construct_basic_embed(interaction.application_command.name,
+                                            f"{message} __**{channel}**__",
+                                            f"{requested} {interaction.user}",
+                                            interaction.user.display_avatar))
+        else:
+            await interaction.response.send_message('error')
+
+    @__set.subcommand(name="goodbye_embed", description="Setting server's welcoming message embed")
+    async def goodbye_embed_set(self, interaction: Interaction):
+        modal = EmbedModal()
+        await interaction.response.send_modal(modal)
+
+    @__set.subcommand(name='goodbye_message_type', description="Choose bot's goodbye message type on your server!")
+    async def __goodbye_message_type_set(self, interaction: Interaction, goodbye_message_type: str = SlashOption(
+        name="picker",
+        choices={"goodbye message type: photo card": "card",
+                 "goodbye message type: embed message": "embed"},
+        required=True
+    )):
+        """
+        Parameters
+        ----------
+        interaction: Interaction
+            The interaction object
+        goodbye_message_type: Optional[str]
+            Avialable types of goodbye message are card and embed
+        """
+        update_goodbye_message_type(interaction.guild.id, goodbye_message_type)
+        message = get_msg_from_locale_by_key(interaction.guild.id, f"set_{interaction.application_command.name}")
+        requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
+        await interaction.response.send_message(
+            embed=construct_basic_embed(interaction.application_command.name,
+                                        f"{message} **{goodbye_message_type}**",
+                                        f"{requested} {interaction.user}",
+                                        interaction.user.display_avatar))
+
+    @__set.subcommand(name="goodbye_message_state", description="Turn on or turn off goodbye messages on your server")
+    async def __goodbye_messages_state_set(self, interaction: Interaction, goodbye_message_state: int = SlashOption(
+        name="picker",
+        choices={"turn on": 1, "turn off": 0},
+        required=True
+    )):
+        goodbye_message_state = bool(goodbye_message_state)
+        set_goodbye_message_state(interaction.guild.id, goodbye_message_state)
+        message = get_msg_from_locale_by_key(interaction.guild.id, f"set_{interaction.application_command.name}")
+        requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
+        if goodbye_message_state is True:
+            goodbye_message_state = get_msg_from_locale_by_key(interaction.guild.id, 'enabled')
+        else:
+            goodbye_message_state = get_msg_from_locale_by_key(interaction.guild.id, 'disabled')
+        await interaction.response.send_message(
+            embed=construct_basic_embed(interaction.application_command.name,
+                                        f"{message} **{goodbye_message_state}**",
                                         f"{requested} {interaction.user}",
                                         interaction.user.display_avatar))
 
