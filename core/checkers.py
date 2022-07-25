@@ -66,3 +66,13 @@ def is_married(guild_id, user_id) -> bool:
         return False
     else:
         return True
+
+
+def is_role_in_shop(guild_id, role_id) -> bool:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    if cursor.execute(f"SELECT role_id FROM shop WHERE guild_id = {guild_id} "
+                      f"AND role_id = {role_id}").fetchone() is None:
+        return False
+    else:
+        return True

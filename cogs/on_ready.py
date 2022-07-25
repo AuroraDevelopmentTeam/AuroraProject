@@ -14,6 +14,7 @@ from core.auto.roles.create import create_autoroles_table
 from core.auto.roles.writers import write_in_autoroles_standart_values
 from core.marriage.create import create_marriage_table, create_gifts_table
 from core.marriage.writers import write_in_marriage_standart_values, write_in_gifts_standart_values
+from core.shop.create import create_shop_table
 
 
 class OnReadyListener(commands.Cog):
@@ -41,6 +42,7 @@ class OnReadyListener(commands.Cog):
         write_in_marriage_standart_values(self.client.guilds)
         create_gifts_table()
         write_in_gifts_standart_values(self.client.guilds)
+        create_shop_table()
 
 
 def setup(client):

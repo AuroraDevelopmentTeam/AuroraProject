@@ -45,7 +45,7 @@ def parse_user_gifts(guild_id: int, user_id: int) -> str:
     cursor = db.cursor()
     gifts_description = ""
     for i in range(10):
-        gift_now = f"gift_{str(i+1)}"
+        gift_now = f"gift_{str(i + 1)}"
         gift_counter = get_user_gift_counter(guild_id, user_id, gift_now)
         if gift_counter > 0:
             gifts_description += f"__**{gift_counter}**__ {GIFT_EMOJIS[gift_now]}⠀⠀"
@@ -57,3 +57,20 @@ def parse_user_gifts(guild_id: int, user_id: int) -> str:
     if len(gifts_description) == 0:
         gifts_description = "-"
     return gifts_description
+
+
+def parse_server_roles(guild: nextcord.Guild, mention=True) -> list:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    roles = []
+    for row in cursor.execute(f"SELECT role_id, cost FROM shop WHERE guild_id = {guild.id}"):
+        role = guild.get_role(row[0])
+        cost = row[1]
+        if role is not None:
+            if mention is True:
+                roles.append([role.mention, cost])
+            else:
+                roles.append([role, cost])
+    cursor.close()
+    db.close()
+    return roles

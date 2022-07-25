@@ -27,33 +27,6 @@ from core.parsers import parse_likes, parse_user_gifts
 from core.embeds import DEFAULT_BOT_COLOR
 
 
-class Dropdown(nextcord.ui.Select):
-    def __init__(self):
-        select_options = [
-            nextcord.SelectOption(label=f"Carrot", description=f"150", emoji=f"{GIFT_EMOJIS['gift_1']}"),
-            nextcord.SelectOption(label=f"Teddy bear", description=f"1000", emoji=f"{GIFT_EMOJIS['gift_2']}"),
-            nextcord.SelectOption(label=f"Cookie", description=f"250", emoji=f"{GIFT_EMOJIS['gift_3']}"),
-            nextcord.SelectOption(label=f"Lolipop", description=f"500", emoji=f"{GIFT_EMOJIS['gift_4']}"),
-            nextcord.SelectOption(label=f"Flower", description=f"750", emoji=f"{GIFT_EMOJIS['gift_5']}"),
-            nextcord.SelectOption(label=f"Scarf", description=f"2500", emoji=f"{GIFT_EMOJIS['gift_6']}"),
-            nextcord.SelectOption(label=f"Cake", description=f"5000", emoji=f"{GIFT_EMOJIS['gift_7']}"),
-            nextcord.SelectOption(label=f"Panda", description=f"10500", emoji=f"{GIFT_EMOJIS['gift_8']}"),
-            nextcord.SelectOption(label=f"Duck", description=f"12000", emoji=f"{GIFT_EMOJIS['gift_9']}"),
-            nextcord.SelectOption(label=f"Cat", description=f"15000", emoji=f"{GIFT_EMOJIS['gift_10']}"),
-
-        ]
-        super().__init__(placeholder="Select your gift", min_values=1, max_values=1, options=select_options)
-
-    async def callback(self, interaction: Interaction):
-        await interaction.response.send_message(f'you chose {self.values[0]}')
-
-
-class DropdownView(nextcord.ui.View):
-    def __init__(self):
-        super().__init__()
-        self.add_item(Dropdown())
-
-
 class Marriage(commands.Cog):
     def __init__(self, client):
         self.client = client

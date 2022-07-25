@@ -202,5 +202,17 @@
     },
     "lovedeposit": {
       "msg": "were deposited in family bank"
+    },
+    "add-shop": {
+      "msg": "was added to shop"
+    },
+    "remove-shop": {
+      "msg": "was removed from shop"
+    },
+    "price": {
+      "msg": "Price:"
+    },
+    "shop": {
+      "msg": "You bought this role:"
     }
 }
