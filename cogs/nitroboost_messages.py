@@ -9,26 +9,11 @@ class NitroBoostAnnouncement(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @nextcord.slash_command(name="menutest", description="oh shit i'm sorry")
-    async def __menutest(self, interaction: Interaction):
-        fields = [
-            ("Black", "#000000"),
-            ("Blue", "#0000FF"),
-            ("Brown", "#A52A2A"),
-            ("Green", "#00FF00"),
-            ("Grey", "#808080"),
-            ("Orange", "#FFA500"),
-            ("Pink", "#FFC0CB"),
-            ("Purple", "#800080"),
-            ("Red", "#FF0000"),
-            ("White", "#FFFFFF"),
-            ("Yellow", "#FFFF00"),
-        ]
-        pages = menus.ButtonMenuPages(
-            source=MyEmbedFieldPageSource(fields),
-            clear_buttons_after=True,
-        )
-        await pages.start(interaction=interaction)
+    @commands.Cog.listener()
+    async def on_member_update(self, before, after):
+        if before.premium_since is None and after.premium_since is not None:
+            print('boosted server')
+            print(after.guild.id)
 
 
 def setup(client):

@@ -4,11 +4,11 @@ from config import settings
 from core.locales.getters import get_msg_from_locale_by_key
 
 
-def write_in_welcomers_config_standart_values(guilds) -> None:
+def write_in_on_nitro_config_standart_values(guilds) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     for guild in guilds:
-        if is_guild_id_in_table("welcomers_config", guild.id) is False:
+        if is_guild_id_in_table("on_nitro_config", guild.id) is False:
             default_welcome_message_title = get_msg_from_locale_by_key(guild.id, 'default_welcome_message_title')
             default_welcome_message_description = get_msg_from_locale_by_key(guild.id,
                                                                              'default_welcome_message_description')

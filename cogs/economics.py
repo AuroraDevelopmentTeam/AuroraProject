@@ -21,67 +21,6 @@ from core.parsers import parse_server_roles
 from core.ui.paginator import MyEmbedFieldPageSource, MyEmbedDescriptionPageSource, SelectButtonMenuPages
 
 
-class Dropdown(nextcord.ui.Select):
-    def __init__(self, guild: nextcord.Guild, disabled: bool):
-        self.guild = guild
-        self.price = []
-        self.role_list = []
-        roles = parse_server_roles(guild, False)
-        sel_opt = []
-        if len(roles) > 0:
-            for i in range(len(roles)):
-                self.price.append(roles[i][1])
-                self.role_list.append(roles[i][0])
-                sel_opt.append(nextcord.SelectOption(label=f'{i + 1}',
-                                                     description=f'{roles[i][0].name} {roles[i][1]}'))
-            super().__init__(placeholder="Select role from shop", min_values=1, max_values=1, options=sel_opt,
-                             disabled=disabled)
-        else:
-            sel_opt = [nextcord.SelectOption(label=f'...', description='...')]
-            super().__init__(placeholder="Select role from shop", min_values=1, max_values=1, options=sel_opt,
-                             disabled=disabled)
-
-    async def callback(self, interaction: Interaction):
-        embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
-        msg = get_msg_from_locale_by_key(self.guild.id, "shop")
-        if self.values[0] != '...':
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
-            if balance < (self.price[int(self.values[0]) - 1]):
-                embed.add_field(name='error', value='not_enough_money_error')
-                return await interaction.message.edit(embed=embed,
-                                                      view=DropdownView(interaction.guild, interaction.user,
-                                                                        disabled=True))
-            if self.role_list[int(self.values[0]) - 1] in interaction.user.roles:
-                embed.add_field(name='error', value='already have role')
-                return await interaction.message.edit(embed=embed,
-                                                      view=DropdownView(interaction.guild, interaction.user,
-                                                                        disabled=True))
-            await interaction.user.add_roles(self.role_list[int(self.values[0]) - 1])
-            embed.add_field(name='Shop', value=f'{msg} {self.role_list[int(self.values[0]) - 1].mention}')
-            update_user_balance(interaction.guild.id, interaction.user.id, -(self.price[int(self.values[0]) - 1]))
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
-            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
-            embed.set_footer(text=f"{msg} {balance}", icon_url=interaction.user.display_avatar)
-        else:
-            embed.add_field(name='Shop', value=f'ヾ( ￣O￣)ツ	')
-        await interaction.message.edit(embed=embed,
-                                       view=DropdownView(interaction.guild, interaction.user, disabled=True))
-
-
-class DropdownView(nextcord.ui.View):
-    def __init__(self, guild: nextcord.Guild, author: Union[nextcord.Member, nextcord.User], disabled: bool):
-        self.guild = guild
-        self.author = author
-        self.disabled = disabled
-        super().__init__()
-        self.add_item(Dropdown(guild=self.guild, disabled=disabled))
-
-    async def interaction_check(self, interaction: Interaction) -> bool:
-        if interaction.user != self.author:
-            return False
-        return True
-
-
 class Economics(commands.Cog):
     def __init__(self, client):
         self.client = client
