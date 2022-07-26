@@ -31,7 +31,6 @@ def create_server_goodbye_embed(member: typing.Union[nextcord.Member, nextcord.U
     goodbye_message_url = \
         cursor.execute(
             f"SELECT goodbye_message_url FROM goodbye_config WHERE guild_id = {guild.id}").fetchone()[0]
-    print(goodbye_message_title, goodbye_message_description, goodbye_message_url)
     if "{member.mention}" in goodbye_message_title:
         goodbye_message_title = goodbye_message_title.replace("{member.mention}", f"{member.mention}")
     if "{member.tag}" in goodbye_message_title:
