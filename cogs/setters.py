@@ -21,7 +21,8 @@ from core.goodbyes.updaters import set_goodbye_channel, update_goodbye_message_d
 
 
 class EmbedModal(nextcord.ui.Modal):
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         super().__init__(
             "Embed maker",
         )
@@ -40,11 +41,16 @@ class EmbedModal(nextcord.ui.Modal):
 
     async def callback(self, interaction: Interaction) -> None:
         title = self.embedTitle.value
-        update_welcome_message_title(interaction.guild.id, title)
         description = self.embedDescription.value
-        update_welcome_message_description(interaction.guild.id, description)
         url = self.embedURL.value
-        update_welcome_message_url(interaction.guild.id, url)
+        if self.name == "welcome":
+            update_welcome_message_title(interaction.guild.id, title)
+            update_welcome_message_description(interaction.guild.id, description)
+            update_welcome_message_url(interaction.guild.id, url)
+        else:
+            update_goodbye_message_title(interaction.guild.id, title)
+            update_goodbye_message_description(interaction.guild.id, description)
+            update_goodbye_message_url(interaction.guild.id, url)
         embed = nextcord.Embed(title=title, description=description)
         embed.set_image(url=url)
         return await interaction.response.send_message(embed=embed)
@@ -215,7 +221,7 @@ class Setters(commands.Cog):
 
     @__set.subcommand(name="welcome_embed", description="Setting server's welcoming message embed")
     async def welcome_embed_set(self, interaction: Interaction):
-        modal = EmbedModal()
+        modal = EmbedModal("welcome")
         await interaction.response.send_modal(modal)
 
     @__set.subcommand(name='welcome_message_type', description="Choose bot's welcome message type on your server!")
@@ -320,7 +326,7 @@ class Setters(commands.Cog):
 
     @__set.subcommand(name="goodbye_embed", description="Setting server's welcoming message embed")
     async def goodbye_embed_set(self, interaction: Interaction):
-        modal = EmbedModal()
+        modal = EmbedModal("goodbye")
         await interaction.response.send_modal(modal)
 
     @__set.subcommand(name='goodbye_message_type', description="Choose bot's goodbye message type on your server!")

@@ -24,18 +24,19 @@ def create_server_goodbye_embed(member: typing.Union[nextcord.Member, nextcord.U
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     goodbye_message_title = \
-        cursor.execute(f"SELECT goodbye_message_title FROM wegoodbye_config WHERE guild_id = {guild.id}").fetchone()[0]
+        cursor.execute(f"SELECT goodbye_message_title FROM goodbye_config WHERE guild_id = {guild.id}").fetchone()[0]
     goodbye_message_description = \
         cursor.execute(
-            f"SELECT goodbye_message_description FROM wegoodbye_config WHERE guild_id = {guild.id}").fetchone()[0]
+            f"SELECT goodbye_message_description FROM goodbye_config WHERE guild_id = {guild.id}").fetchone()[0]
     goodbye_message_url = \
         cursor.execute(
-            f"SELECT goodbye_message_url FROM wegoodbye_config WHERE guild_id = {guild.id}").fetchone()[0]
+            f"SELECT goodbye_message_url FROM goodbye_config WHERE guild_id = {guild.id}").fetchone()[0]
+    print(goodbye_message_title, goodbye_message_description, goodbye_message_url)
     if "{member.mention}" in goodbye_message_title:
         goodbye_message_title = goodbye_message_title.replace("{member.mention}", f"{member.mention}")
     if "{member.tag}" in goodbye_message_title:
-        goodbye_message_title = wgoodbyemessage_title.replace("{member.tag}", f"{member.tag}")
-    if "{member.created_at}" in wwelcome_message_title:
+        goodbye_message_title = goodbye_message_title.replace("{member.tag}", f"{member.tag}")
+    if "{member.created_at}" in goodbye_message_title:
         goodbye_message_title = goodbye_message_title.replace("{member.created_at}", f"{member.created_at}")
     if "{member.name}" in goodbye_message_title:
         goodbye_message_title = goodbye_message_title.replace("{member.name}", f"{member.name}")
@@ -71,22 +72,22 @@ def create_server_goodbye_embed(member: typing.Union[nextcord.Member, nextcord.U
     for channel in list_of_channels:
         if channel.isdigit() is True:
             really_channel = nextcord.utils.get(guild.text_channels, id=channel[1:])
-            welcome_message_description = welcome_message_description.replace(channel, really_channel.mention)
+            goodbye_message_description = goodbye_message_description.replace(channel, really_channel.mention)
         else:
             really_channel = nextcord.utils.get(guild.text_channels, name=channel[1:])
-            welcome_message_description = welcome_message_description.replace(channel, really_channel.mention)
+            goodbye_message_description = goodbye_message_description.replace(channel, really_channel.mention)
     db.commit()
     cursor.close()
     db.close()
-    embed = nextcord.Embed(color=DEFAULT_BOT_COLOR, title=f"{welcome_message_title}",
-                           description=f"{welcome_message_description}")
+    embed = nextcord.Embed(color=DEFAULT_BOT_COLOR, title=f"{goodbye_message_title}",
+                           description=f"{goodbye_message_description}")
     embed.set_footer(text=f'{guild.name}', icon_url=guild.icon)
     embed.set_thumbnail(url=member.display_avatar)
-    embed.set_image(url=welcome_message_url)
+    embed.set_image(url=goodbye_message_url)
     return embed
 
 
-def create_welcome_card(member) -> nextcord.File:
+def create_goodbye_card(member) -> nextcord.File:
     background = Editor(Canvas((900, 300), color="#141414"))
     profile_picture = load_image(str(member.avatar.url))
     profile = Editor(profile_picture).resize((150, 150)).circle_image()

@@ -34,7 +34,7 @@ def create_server_welcome_embed(member: typing.Union[nextcord.Member, nextcord.U
         welcome_message_title = welcome_message_title.replace("{member.mention}", f"{member.mention}")
     if "{member.tag}" in welcome_message_title:
         welcome_message_title = welcome_message_title.replace("{member.tag}", f"{member.tag}")
-    if "{member.created_at}" in wwelcome_message_title:
+    if "{member.created_at}" in welcome_message_title:
         welcome_message_title = welcome_message_title.replace("{member.created_at}", f"{member.created_at}")
     if "{member.name}" in welcome_message_title:
         welcome_message_title = welcome_message_title.replace("{member.name}", f"{member.name}")

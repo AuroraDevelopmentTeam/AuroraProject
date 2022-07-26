@@ -220,5 +220,14 @@
     },
     "default_goodbye_message_description": {
       "msg": "Bye bye {member.mention}!\n\nHope to see you soon again!"
+    },
+    "set_goodbye_channel": {
+      "msg": "The following channel has been set to say goodbye:"
+    },
+    "set_goodbye_message_type": {
+      "msg": "The following message type has been set to say goodbye:"
+    },
+    "set_goodbye_message_state": {
+      "msg": "For goodbye messages have been set the following status:"
     }
 }
