@@ -2,6 +2,8 @@ import nextcord
 from datetime import datetime
 import sqlite3
 from core.marriage.getters import GIFT_NAMES, GIFT_EMOJIS, get_user_gift_counter
+from core.locales.getters import get_msg_from_locale_by_key
+from core.money.getters import get_guild_currency_symbol
 
 
 def parse_timeouts(guild_members) -> list:
@@ -63,12 +65,16 @@ def parse_server_roles(guild: nextcord.Guild, mention=True) -> list:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     roles = []
+    price = get_msg_from_locale_by_key(guild.id, f"price")
+    currency_symbol = get_guild_currency_symbol(guild.id)
+    counter = 1
     for row in cursor.execute(f"SELECT role_id, cost FROM shop WHERE guild_id = {guild.id}"):
         role = guild.get_role(row[0])
         cost = row[1]
         if role is not None:
             if mention is True:
-                roles.append([role.mention, cost])
+                roles.append(f'**{counter}** • {role.mention}\n{price} **{cost}** {currency_symbol}')
+                counter += 1
             else:
                 roles.append([role, cost])
     cursor.close()

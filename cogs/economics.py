@@ -4,7 +4,7 @@ import sqlite3
 
 from PIL import Image
 import cooldowns
-from nextcord.ext import commands
+from nextcord.ext import commands, menus
 from nextcord import Interaction, SlashOption, Permissions
 import nextcord
 
@@ -18,6 +18,7 @@ from core.locales.getters import get_msg_from_locale_by_key
 from core.embeds import construct_basic_embed, construct_top_embed, DEFAULT_BOT_COLOR
 from core.shop.writers import write_role_in_shop, delete_role_from_shop
 from core.parsers import parse_server_roles
+from core.ui.paginator import MyEmbedFieldPageSource, MyEmbedDescriptionPageSource, SelectButtonMenuPages
 
 
 class Dropdown(nextcord.ui.Select):
@@ -269,13 +270,13 @@ class Economics(commands.Cog):
     @nextcord.slash_command(name="shop", description="show role shop menu")
     async def __shop(self, interaction: Interaction):
         guild_roles = parse_server_roles(interaction.guild)
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
         requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
-        await interaction.response.send_message(
-            embed=construct_top_embed(interaction.application_command.name, guild_roles,
-                                      f"{requested} {interaction.user}", interaction.user.display_avatar,
-                                      currency_symbol, interaction.guild),
-            view=DropdownView(interaction.guild, interaction.user, False))
+        pages = SelectButtonMenuPages(
+            source=MyEmbedDescriptionPageSource(guild_roles),
+            guild=interaction.guild,
+            disabled=False
+        )
+        await pages.start(interaction=interaction)
 
 
 def setup(client):
