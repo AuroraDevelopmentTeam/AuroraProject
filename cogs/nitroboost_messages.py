@@ -4,7 +4,7 @@ from nextcord import Interaction
 from nextcord.ext import menus
 
 from core.nitro.getters import get_server_nitro_channel_id, get_server_nitro_state
-from core.nitro.create import create_server_welcome_embed
+from core.nitro.create import create_server_nitro_embed
 
 
 class NitroBoostAnnouncement(commands.Cog):
@@ -21,7 +21,7 @@ class NitroBoostAnnouncement(commands.Cog):
             if nitro_boost_channel_id == 0:
                 return
             nitro_boost_channel = self.client.get_channel(nitro_boost_channel_id)
-            embed = create_server_welcome_embed(after, after.guild)
+            embed = create_server_nitro_embed(after, after.guild)
             await nitro_boost_channel.send(embed=embed)
 
 

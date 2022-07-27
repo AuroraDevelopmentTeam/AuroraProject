@@ -19,7 +19,7 @@ def create_on_nitro_config() -> None:
     return
 
 
-def create_server_welcome_embed(member: typing.Union[nextcord.Member, nextcord.User], guild: nextcord.Guild) -> nextcord.Embed:
+def create_server_nitro_embed(member: typing.Union[nextcord.Member, nextcord.User], guild: nextcord.Guild) -> nextcord.Embed:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     welcome_message_title = \
