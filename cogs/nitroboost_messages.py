@@ -2,7 +2,9 @@ import nextcord
 from nextcord.ext import commands
 from nextcord import Interaction
 from nextcord.ext import menus
-from core.ui.paginator import MyEmbedFieldPageSource
+
+from core.nitro.getters import get_server_nitro_channel_id, get_server_nitro_state
+from core.nitro.create import create_server_welcome_embed
 
 
 class NitroBoostAnnouncement(commands.Cog):
@@ -13,7 +15,14 @@ class NitroBoostAnnouncement(commands.Cog):
     async def on_member_update(self, before, after):
         if before.premium_since is None and after.premium_since is not None:
             print('boosted server')
-            print(after.guild.id)
+            if get_server_nitro_state(after.guild.id) is False:
+                return
+            nitro_boost_channel_id = get_server_nitro_channel_id(after.guild.id)
+            if nitro_boost_channel_id == 0:
+                return
+            nitro_boost_channel = self.client.get_channel(nitro_boost_channel_id)
+            embed = create_server_welcome_embed(after, after.guild)
+            await nitro_boost_channel.send(embed=embed)
 
 
 def setup(client):

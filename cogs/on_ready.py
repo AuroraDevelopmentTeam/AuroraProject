@@ -17,6 +17,8 @@ from core.marriage.writers import write_in_marriage_standart_values, write_in_gi
 from core.shop.create import create_shop_table
 from core.goodbyes.create import create_goodbye_config
 from core.goodbyes.writers import write_in_goodbye_config_standart_values
+from core.nitro.create import create_on_nitro_config
+from core.nitro.writers import write_in_on_nitro_config_standart_values
 
 
 class OnReadyListener(commands.Cog):
@@ -47,6 +49,8 @@ class OnReadyListener(commands.Cog):
         create_shop_table()
         create_goodbye_config()
         write_in_goodbye_config_standart_values(self.client.guilds)
+        create_on_nitro_config()
+        write_in_on_nitro_config_standart_values(self.client.guilds)
 
 
 def setup(client):

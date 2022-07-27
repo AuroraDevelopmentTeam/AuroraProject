@@ -229,5 +229,17 @@
     },
     "set_goodbye_message_state": {
       "msg": "For goodbye messages have been set the following status:"
+    },
+    "default_nitro_message_title": {
+      "msg": "{member}"
+    },
+    "default_nitro_message_description": {
+      "msg": "**Boosted server!**\n\n\nThank you very much for helping our server!"
+    },
+    "set_nitro_channel": {
+      "msg": "The following channel has been set to thank users for nitro boost:"
+    },
+    "set_nitro_message_state": {
+      "msg": "For on nitro boost messages have been set the following status:"
     }
 }

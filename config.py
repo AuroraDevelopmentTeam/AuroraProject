@@ -17,4 +17,5 @@ settings = {
     'default_welcome_messages_type': 'card',
     'default_goodbye_messages_state': True,
     'default_goodbye_messages_type': 'card',
+    'default_nitro_messages_state': True,
 }

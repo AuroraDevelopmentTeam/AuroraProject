@@ -18,6 +18,8 @@ from core.welcomers.updaters import set_welcome_channel, update_welcome_message_
 from core.auto.roles.updaters import set_autoroles_state, update_autorole
 from core.goodbyes.updaters import set_goodbye_channel, update_goodbye_message_description, \
     update_goodbye_message_title, update_goodbye_message_url, update_goodbye_message_type, set_goodbye_message_state
+from core.nitro.updaters import set_nitro_channel, set_nitro_message_state, update_nitro_message_url, \
+    update_nitro_message_description, update_nitro_message_title
 
 
 class EmbedModal(nextcord.ui.Modal):
@@ -47,6 +49,10 @@ class EmbedModal(nextcord.ui.Modal):
             update_welcome_message_title(interaction.guild.id, title)
             update_welcome_message_description(interaction.guild.id, description)
             update_welcome_message_url(interaction.guild.id, url)
+        elif self.name == "nitro":
+            update_nitro_message_title(interaction.guild.id, title)
+            update_nitro_message_description(interaction.guild.id, description)
+            update_nitro_message_url(interaction.guild.id, url)
         else:
             update_goodbye_message_title(interaction.guild.id, title)
             update_goodbye_message_description(interaction.guild.id, description)
@@ -370,6 +376,56 @@ class Setters(commands.Cog):
         await interaction.response.send_message(
             embed=construct_basic_embed(interaction.application_command.name,
                                         f"{message} **{goodbye_message_state}**",
+                                        f"{requested} {interaction.user}",
+                                        interaction.user.display_avatar))
+
+    @__set.subcommand(name="nitro_channel", description="Setting server's message channel on nitro boost")
+    async def __nitro_channel_set(self, interaction: Interaction, channel: Optional[str] = SlashOption(required=True)):
+        """
+        Parameters
+        ----------
+        interaction: Interaction
+            The interaction object
+        channel: str
+            Channel to
+        """
+        channel = int(channel[2:-1])
+        channel = (nextcord.utils.get(interaction.guild.text_channels, id=channel))
+        if isinstance(channel, nextcord.TextChannel):
+            set_nitro_channel(interaction.guild.id, channel.id)
+            message = get_msg_from_locale_by_key(interaction.guild.id, f"set_{interaction.application_command.name}")
+            requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
+            await interaction.response.send_message(
+                embed=construct_basic_embed(interaction.application_command.name,
+                                            f"{message} __**{channel}**__",
+                                            f"{requested} {interaction.user}",
+                                            interaction.user.display_avatar))
+        else:
+            await interaction.response.send_message('error')
+
+    @__set.subcommand(name="nitro_embed", description="Setting server's on nitro boost message embed")
+    async def __nitro_embed_set(self, interaction: Interaction):
+        modal = EmbedModal("nitro")
+        await interaction.response.send_modal(modal)
+
+    @__set.subcommand(name="nitro_message_state", description="Turn on or turn off on nitro boost messages on your "
+                                                              "server")
+    async def __nitro_messages_state_set(self, interaction: Interaction, nitro_message_state: int = SlashOption(
+        name="picker",
+        choices={"turn on": 1, "turn off": 0},
+        required=True
+    )):
+        nitro_message_state = bool(nitro_message_state)
+        set_nitro_message_state(interaction.guild.id, nitro_message_state)
+        message = get_msg_from_locale_by_key(interaction.guild.id, f"set_{interaction.application_command.name}")
+        requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
+        if nitro_message_state is True:
+            nitro_message_state = get_msg_from_locale_by_key(interaction.guild.id, 'enabled')
+        else:
+            nitro_message_state = get_msg_from_locale_by_key(interaction.guild.id, 'disabled')
+        await interaction.response.send_message(
+            embed=construct_basic_embed(interaction.application_command.name,
+                                        f"{message} **{nitro_message_state}**",
                                         f"{requested} {interaction.user}",
                                         interaction.user.display_avatar))
 
