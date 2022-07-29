@@ -19,3 +19,16 @@ def get_user_honor_level(user_id: int) -> int:
     cursor.close()
     db.close()
     return honor_level
+
+
+def get_rome_symbol(number: int) -> str:
+    if number > 5:
+        number = 5
+    rome_number = {
+        1: "I",
+        2: "II",
+        3: "III",
+        4: "IV",
+        5: "V"
+    }
+    return rome_number[number]

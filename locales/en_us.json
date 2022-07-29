@@ -241,5 +241,8 @@
     },
     "set_nitro_message_state": {
       "msg": "For on nitro boost messages have been set the following status:"
+    },
+    "default_profile_description": {
+      "msg": "Write here something about you"
     }
 }
