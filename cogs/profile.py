@@ -107,10 +107,10 @@ class UserProfiles(commands.Cog):
         background.text(coordinates, honor_level, font=larger_font, color="#FFFFFF")
         balance = get_user_balance(interaction.guild.id, user.id)
         if balance > 1000000:
-            balance = f'{(balance/1000000):10.2f}KK'
+            balance = f'{(balance / 1000000):10.2f}KK'
             coordinates = (90, 20)
         elif balance > 10000:
-            balance = f'{(balance/10000):10.2f}K'
+            balance = f'{(balance / 10000):10.2f}K'
             coordinates = (90, 20)
         else:
             coordinates = (130, 20)
@@ -120,7 +120,7 @@ class UserProfiles(commands.Cog):
         y_text = 380
         for line in lines:
             width, height = font.getsize(line)
-            background.text(((1160 - width)/2, y_text), line, font=font, color="#FFFFFF")
+            background.text(((1160 - width) / 2, y_text), line, font=font, color="#FFFFFF")
             y_text += height
         file = nextcord.File(fp=background.image_bytes, filename="profile_card.png")
         await interaction.followup.send(file=file)
