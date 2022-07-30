@@ -21,6 +21,8 @@ from core.nitro.create import create_on_nitro_config
 from core.nitro.writers import write_in_on_nitro_config_standart_values
 from core.honor.create import create_honor_table
 from core.honor.writers import write_in_honor_standart_values
+from core.profiles.create import create_profiles_table
+from core.profiles.writers import write_in_profiles_standart_values
 
 
 class OnReadyListener(commands.Cog):
@@ -55,6 +57,8 @@ class OnReadyListener(commands.Cog):
         write_in_on_nitro_config_standart_values(self.client.guilds)
         create_honor_table()
         write_in_honor_standart_values(self.client.guilds)
+        create_profiles_table()
+        write_in_profiles_standart_values(self.client.guilds)
 
 
 def setup(client):
