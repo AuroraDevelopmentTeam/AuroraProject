@@ -14,7 +14,7 @@ class TicketSettings(nextcord.ui.View):
         label="Close ticket", style=nextcord.ButtonStyle.red, custom_id="ticket_settings:red"
     )
     async def close_ticket(self, button: nextcord.ui.Button, interaction: Interaction):
-        await interaction.response.send_message('Ticket closed')
+        pass
 
 
 class CreateTicket(nextcord.ui.View):
@@ -25,26 +25,44 @@ class CreateTicket(nextcord.ui.View):
         label="Create ticket", style=nextcord.ButtonStyle.blurple, custom_id="create_ticket:blurple"
     )
     async def create_ticket(self, button: nextcord.ui.Button, interaction: Interaction):
-        msg = await interaction.response.send_message('a ticket created', ephemeral=True)
-        overwrites = {
-            interaction.guild.default_role: nextcord.PermissionOverwrite(read_messages=False),
-            interaction.guild.me: nextcord.PermissionOverwrite(read_messages=True),
-        }
-        channel = await interaction.guild.create_text_channel(f"{interaction.user.name}-ticket", overwrites=overwrites)
-        embed = nextcord.Embed(title="Ticket", description=f"f{interaction.user.mention} created a ticket!")
-        await channel.send(embed=embed, view=TicketSettings())
+        pass
 
 
 class Tickets(commands.Cog):
     def __init__(self, client):
         self.client = client
         super().__init__()
-        self.persistent_views_added = False
+        self.persistent_views_added = True
 
     async def on_ready(self):
         if not self.persistent_views_added:
             self.add_view(CreateTicket())
             self.persistent_views_added = True
+
+    @commands.Cog.listener()
+    async def on_interaction(self, interaction: Interaction):
+        try:
+            custom_id = (interaction.data['custom_id'])
+            if custom_id == 'create_ticket:blurple':
+                embed = nextcord.Embed(title="Ticket", description=f"Your ticket is creating...")
+                msg = await interaction.response.send_message(embed=embed, ephemeral=True)
+                overwrites = {
+                    interaction.guild.default_role: nextcord.PermissionOverwrite(read_messages=False),
+                    interaction.guild.me: nextcord.PermissionOverwrite(read_messages=True),
+                }
+                channel = await interaction.guild.create_text_channel(f"{interaction.user.name}-ticket",
+                                                                      overwrites=overwrites)
+                embed = nextcord.Embed(title="Ticket",
+                                       description=f"Your ticket created! Click here: {channel.mention}")
+                await msg.edit(embed=embed)
+                embed = nextcord.Embed(title="Ticket", description=f"{interaction.user.mention} created a ticket!")
+                await channel.send(embed=embed, view=TicketSettings())
+            if custom_id == 'ticket_settings:red':
+                await interaction.channel.send('Closing this ticket...')
+                await interaction.channel.delete()
+                await interaction.user.send(f'Ticket closed!')
+        except KeyError:
+            pass
 
     @nextcord.slash_command(name="ticket")
     async def __ticket(self, interaction: Interaction):
