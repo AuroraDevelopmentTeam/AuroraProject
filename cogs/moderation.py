@@ -39,6 +39,8 @@ class Moderation(commands.Cog):
         reason: Optional[str]
             This parameter is optional, reason of mute
         """
+        if user.bot:
+            return await interaction.response.send_message('bot_user_error')
         try:
             time_in_seconds = humanfriendly.parse_timespan(time)
             requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
@@ -71,6 +73,8 @@ class Moderation(commands.Cog):
         user: Optional[nextcord.Member]
             The discord's user, tag someone with @
         """
+        if user.bot:
+            return await interaction.response.send_message('bot_user_error')
         try:
             requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
             await user.edit(timeout=None)
@@ -161,6 +165,8 @@ class Moderation(commands.Cog):
     @application_checks.has_permissions(manage_messages=True)
     async def __warn(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True),
                      reason: Optional[str] = SlashOption(required=False)):
+        if user.bot:
+            return await interaction.response.send_message('bot_user_error')
         if reason is None:
             reason = ' — '
         write_new_warn(interaction.guild.id, user.id, reason)
@@ -177,6 +183,8 @@ class Moderation(commands.Cog):
     @application_checks.has_permissions(manage_messages=True)
     async def __unwarn(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True),
                        warn_id: Optional[int] = SlashOption(required=True)):
+        if user.bot:
+            return await interaction.response.send_message('bot_user_error')
         if is_warn_id_in_table("warns", warn_id, interaction.guild.id, user.id) is True:
             remove_warn_from_table(warn_id, interaction.guild.id, user.id)
             requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
@@ -198,6 +206,8 @@ class Moderation(commands.Cog):
         interaction: Interaction
             The interaction object
         """
+        if user.bot:
+            return await interaction.response.send_message('bot_user_error')
         requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')
         warns = parse_warns_of_user(interaction.guild.id, user.id)
         await interaction.response.send_message(
@@ -212,6 +222,20 @@ class Moderation(commands.Cog):
         if check_warn(interaction.guild.id, warn_id) is False:
             return await interaction.response.send_message('no warn in table')
         update_warn_reason(interaction.guild.id, warn_id, new_warn_reason)
+        await interaction.response.send_message('done')
+
+    @nextcord.slash_command(name="purge_warns", description="remove all warns from user",
+                            default_member_permissions=Permissions(manage_messages=True))
+    @application_checks.has_permissions(manage_messages=True)
+    async def __purge_warns(self, interaction: Interaction, user: Optional[nextcord.Member]):
+        if user.bot:
+            return await interaction.response.send_message('bot_user_error')
+        warns = parse_warns_of_user(interaction.guild.id, user.id)
+        if len(warns) == 0:
+            return await interaction.response.send_message('no warns')
+        for warn in warns:
+            warn_id = warn[0]
+            remove_warn_from_table(warn_id, interaction.guild.id, user.id)
         await interaction.response.send_message('done')
 
 
