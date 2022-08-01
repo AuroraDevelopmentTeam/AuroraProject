@@ -5,7 +5,7 @@ from io import BytesIO
 import textwrap
 
 import nextcord
-from nextcord.ext import commands
+from nextcord.ext import commands, application_checks
 from nextcord import Permissions, Interaction, SlashOption
 
 from core.profiles.updaters import update_profile_description, update_avatar_form

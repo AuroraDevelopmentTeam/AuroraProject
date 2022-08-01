@@ -4,7 +4,7 @@ from PIL import Image
 from io import BytesIO
 
 import nextcord
-from nextcord.ext import commands
+from nextcord.ext import commands, application_checks
 from nextcord import Interaction, SlashOption, Permissions
 
 from core.locales.getters import get_msg_from_locale_by_key
@@ -83,6 +83,7 @@ class Levels(commands.Cog):
 
     @nextcord.slash_command(name='add_exp', description="add to @user some exp",
                             default_member_permissions=Permissions(administrator=True))
+    @application_checks.has_permissions(manage_guild=True)
     async def __add_exp(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True),
                         exp_points: Optional[int] = SlashOption(required=True)):
         if user.bot:
@@ -95,6 +96,7 @@ class Levels(commands.Cog):
 
     @nextcord.slash_command(name='remove_exp', description="remove from @user some exp",
                             default_member_permissions=Permissions(administrator=True))
+    @application_checks.has_permissions(manage_guild=True)
     async def __remove_exp(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True),
                            exp_points: Optional[int] = SlashOption(required=True)):
         if user.bot:
@@ -106,6 +108,7 @@ class Levels(commands.Cog):
         await interaction.response.send_message('done')
 
     @nextcord.slash_command(name='reset_level', description='Reset level of @User to 1st level 0 exp')
+    @application_checks.has_permissions(manage_guild=True)
     async def __reset_level(self, interaction: Interaction,
                             user: Optional[nextcord.Member] = SlashOption(required=True)):
         if user.bot:

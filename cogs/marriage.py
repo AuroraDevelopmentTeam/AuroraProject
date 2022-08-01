@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 from easy_pil import *
 import nextcord
-from nextcord import Interaction, SlashOption
+from nextcord import Interaction, SlashOption, Permissions
 from nextcord.ext import commands
 from nextcord.utils import get
 
@@ -33,7 +33,8 @@ class Marriage(commands.Cog):
 
     @nextcord.slash_command(name="marry",
                             description="send marriage request to @User, "
-                                        "if marriage will be success you will pay 10000 currency on server")
+                                        "if marriage will be success you will pay 10000 currency on server",
+                            default_member_permissions=Permissions(send_messages=True))
     async def __marry(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True)):
         if user.bot:
             return await interaction.response.send_message('bot_user_error')
@@ -93,7 +94,8 @@ class Marriage(commands.Cog):
         await interaction.response.send_message(embed=embed, view=view)
 
     @nextcord.slash_command(name="loveprofile", description="sends your couple love card in chat with some "
-                                                            "information about couple!")
+                                                            "information about couple!",
+                            default_member_permissions=Permissions(send_messages=True))
     async def __loveprofile(self, interaction: Interaction):
         await interaction.response.defer()
         if is_married(interaction.guild.id, interaction.user.id) is False:
@@ -110,7 +112,8 @@ class Marriage(commands.Cog):
                                           interaction.user, pair)
         await interaction.followup.send(embed=embed, file=file)
 
-    @nextcord.slash_command(name="divorce", description="divorce you with your partner")
+    @nextcord.slash_command(name="divorce", description="divorce you with your partner",
+                            default_member_permissions=Permissions(send_messages=True))
     async def __divorce(self, interaction: Interaction):
         if is_married(interaction.guild.id, interaction.user.id) is False:
             return await interaction.response.send_message('not married error')
@@ -129,7 +132,8 @@ class Marriage(commands.Cog):
                                         f"{requested} {interaction.user}",
                                         interaction.user.display_avatar))
 
-    @nextcord.slash_command(name="waifu", description="Sends your profile waifu description")
+    @nextcord.slash_command(name="waifu", description="Sends your profile waifu description",
+                            default_member_permissions=Permissions(send_messages=True))
     async def __waifu(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=False)):
         if user is None:
             user = interaction.user
@@ -171,7 +175,8 @@ class Marriage(commands.Cog):
         embed.set_footer(text=f"{requested} {interaction.user}", icon_url=interaction.user.display_avatar)
         await interaction.response.send_message(embed=embed)
 
-    @nextcord.slash_command(name="like", description="Choose user you like and he will appear in /waifu command!")
+    @nextcord.slash_command(name="like", description="Choose user you like and he will appear in /waifu command!",
+                            default_member_permissions=Permissions(send_messages=True))
     async def __like(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True)):
         if user.bot:
             return await interaction.response.send_message('bot_user_error')
@@ -180,12 +185,14 @@ class Marriage(commands.Cog):
         update_user_like(interaction.guild.id, interaction.user.id, user.id)
         await interaction.response.send_message('done')
 
-    @nextcord.slash_command(name="unlike", description="change person that you like to noone")
+    @nextcord.slash_command(name="unlike", description="change person that you like to noone",
+                            default_member_permissions=Permissions(send_messages=True))
     async def __unlike(self, interaction: Interaction):
         update_user_like(interaction.guild.id, interaction.user.id, 0)
         await interaction.response.send_message('done')
 
-    @nextcord.slash_command(name="gifts", description="shows gift shop menu")
+    @nextcord.slash_command(name="gifts", description="shows gift shop menu",
+                            default_member_permissions=Permissions(send_messages=True))
     async def __gifts(self, interaction: Interaction):
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
         guild_locale = get_guild_locale(interaction.guild.id)
@@ -203,7 +210,8 @@ class Marriage(commands.Cog):
         embed.set_footer(text=f"{requested} {interaction.user}", icon_url=interaction.user.display_avatar)
         await interaction.response.send_message(embed=embed)
 
-    @nextcord.slash_command(name="gift", description="gift to @User gifts from shop!")
+    @nextcord.slash_command(name="gift", description="gift to @User gifts from shop!",
+                            default_member_permissions=Permissions(send_messages=True))
     async def __gift(self, interaction: Interaction,
                      user: Optional[nextcord.Member] = SlashOption(required=True),
                      gift: str = SlashOption(
@@ -243,7 +251,8 @@ class Marriage(commands.Cog):
                                         f"{requested} {interaction.user}\n{msg} {balance}",
                                         interaction.user.display_avatar))
 
-    @nextcord.slash_command(name="lovedescription", description="set your couple description")
+    @nextcord.slash_command(name="lovedescription", description="set your couple description",
+                            default_member_permissions=Permissions(send_messages=True))
     async def __lovedescription(self, interaction: Interaction,
                                 description: Optional[str] = SlashOption(required=True)):
         if is_married(interaction.guild.id, interaction.user.id) is False:
@@ -251,7 +260,8 @@ class Marriage(commands.Cog):
         update_user_love_description(interaction.guild.id, interaction.user.id, description)
         await interaction.response.send_message('done')
 
-    @nextcord.slash_command(name="lovedeposit", description="deposit money in your family bank")
+    @nextcord.slash_command(name="lovedeposit", description="deposit money in your family bank",
+                            default_member_permissions=Permissions(send_messages=True))
     async def __lovedeposit(self, interaction: Interaction,
                                 amount: Optional[int] = SlashOption(required=True)):
         if is_married(interaction.guild.id, interaction.user.id) is False:

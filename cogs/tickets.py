@@ -1,5 +1,5 @@
 import nextcord
-from nextcord.ext import commands
+from nextcord.ext import commands, application_checks
 from nextcord import Interaction, Permissions
 from core.embeds import construct_top_embed
 from core.money.getters import get_guild_currency_symbol
@@ -64,7 +64,8 @@ class Tickets(commands.Cog):
         except KeyError:
             pass
 
-    @nextcord.slash_command(name="ticket")
+    @nextcord.slash_command(name="setup_tickets", default_member_permissions=Permissions(administrator=True))
+    @application_checks.has_permissions(manage_guild=True)
     async def __ticket(self, interaction: Interaction):
         embed = nextcord.Embed(title="Create a ticket",
                                description="Click `create ticket` button below to create a ticket. "

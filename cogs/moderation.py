@@ -3,7 +3,7 @@ import datetime
 import humanfriendly
 from typing import Optional
 import nextcord
-from nextcord.ext import commands
+from nextcord.ext import commands, application_checks
 from nextcord import Interaction, SlashOption, Permissions
 
 from core.errors import construct_error_forbidden_embed, construct_error_limit_break_embed, \
@@ -22,6 +22,7 @@ class Moderation(commands.Cog):
 
     @nextcord.slash_command(name="mute", description="Mute with timeout discord's user",
                             default_member_permissions=Permissions(moderate_members=True))
+    @application_checks.has_permissions(moderate_members=True)
     async def __mute(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True),
                      time: Optional[str] = SlashOption(required=True), *,
                      reason: Optional[str] = SlashOption(required=False)):
@@ -59,6 +60,7 @@ class Moderation(commands.Cog):
 
     @nextcord.slash_command(name="unmute", description="Unmute muted (timed out) discord user",
                             default_member_permissions=Permissions(moderate_members=True))
+    @application_checks.has_permissions(moderate_members=True)
     async def __unmute(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True)):
         """
         Parameters
@@ -101,6 +103,7 @@ class Moderation(commands.Cog):
 
     @nextcord.slash_command(name="clear", description="Deletes messages in channel, where command was used",
                             default_member_permissions=Permissions(administrator=True))
+    @application_checks.has_permissions(manage_guild=True)
     async def __clear(self, interaction: Interaction,
                       messages_to_delete: Optional[int] = SlashOption(required=True),
                       *, before=None, after=None):
@@ -154,6 +157,7 @@ class Moderation(commands.Cog):
 
     @nextcord.slash_command(name="warn", description="Warn's user on your server",
                             default_member_permissions=Permissions(manage_messages=True))
+    @application_checks.has_permissions(manage_messages=True)
     async def __warn(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True),
                      reason: Optional[str] = SlashOption(required=False)):
         if reason is None:
@@ -169,6 +173,7 @@ class Moderation(commands.Cog):
 
     @nextcord.slash_command(name="unwarn", description="Remove warn from user on your server",
                             default_member_permissions=Permissions(manage_messages=True))
+    @application_checks.has_permissions(manage_messages=True)
     async def __unwarn(self, interaction: Interaction, user: Optional[nextcord.Member] = SlashOption(required=True),
                        warn_id: Optional[int] = SlashOption(required=True)):
         if is_warn_id_in_table("warns", warn_id, interaction.guild.id, user.id) is True:

@@ -4,7 +4,7 @@ import sqlite3
 
 from PIL import Image
 import cooldowns
-from nextcord.ext import commands, menus
+from nextcord.ext import commands, menus, application_checks
 from nextcord import Interaction, SlashOption, Permissions
 import nextcord
 
@@ -27,6 +27,7 @@ class Economics(commands.Cog):
 
     @nextcord.slash_command(name="add_money", description="Add to @User number of money on balance",
                             default_member_permissions=Permissions(administrator=True))
+    @application_checks.has_permissions(manage_guild=True)
     async def __add_money(self, interaction: Interaction,
                           user: Optional[nextcord.Member] = SlashOption(required=True),
                           money: Optional[int] = SlashOption(required=True)
@@ -58,6 +59,7 @@ class Economics(commands.Cog):
 
     @nextcord.slash_command(name="remove_money", description="Remove from @User's balance money",
                             default_member_permissions=Permissions(administrator=True))
+    @application_checks.has_permissions(manage_guild=True)
     async def __remove_money(self, interaction: Interaction,
                              user: Optional[nextcord.Member] = SlashOption(required=True),
                              money: Optional[int] = SlashOption(required=True)
@@ -102,6 +104,7 @@ class Economics(commands.Cog):
         await interaction.response.send_message(embed=embed, file=file)
 
     @nextcord.slash_command(name="reset", default_member_permissions=Permissions(administrator=True))
+    @application_checks.has_permissions(manage_guild=True)
     async def __reset(self, interaction: Interaction):
         """
         This is the reset slash command that will be the prefix of economical set commands below.
@@ -178,7 +181,9 @@ class Economics(commands.Cog):
         else:
             return await interaction.response.send_message('negative_value_error')
 
-    @nextcord.slash_command(name="add-shop", description="Add role to shop")
+    @nextcord.slash_command(name="add-shop", description="Add role to shop",
+                            default_member_permissions=Permissions(administrator=True))
+    @application_checks.has_permissions(manage_guild=True)
     async def __add_shop(self, interaction: Interaction, role: Optional[nextcord.Role] = SlashOption(required=True),
                          cost: Optional[int] = SlashOption(required=True)):
         if cost < 0:
@@ -194,7 +199,9 @@ class Economics(commands.Cog):
                                         f"{requested} {interaction.user}",
                                         interaction.user.display_avatar))
 
-    @nextcord.slash_command(name="remove-shop", description="Remove role from shop")
+    @nextcord.slash_command(name="remove-shop", description="Remove role from shop",
+                            default_member_permissions=Permissions(administrator=True))
+    @application_checks.has_permissions(manage_guild=True)
     async def __remove_shop(self, interaction: Interaction, role: Optional[nextcord.Role] = SlashOption(required=True)):
         if is_role_in_shop(interaction.guild.id, role.id) is False:
             return await interaction.response.send_message('not in shop')
@@ -206,7 +213,8 @@ class Economics(commands.Cog):
                                         f"{requested} {interaction.user}",
                                         interaction.user.display_avatar))
 
-    @nextcord.slash_command(name="shop", description="show role shop menu")
+    @nextcord.slash_command(name="shop", description="show role shop menu",
+                            default_member_permissions=Permissions(send_messages=True))
     async def __shop(self, interaction: Interaction):
         guild_roles = parse_server_roles(interaction.guild)
         requested = get_msg_from_locale_by_key(interaction.guild.id, 'requested_by')

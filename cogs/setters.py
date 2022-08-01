@@ -1,6 +1,6 @@
 import nextcord
-from nextcord import Interaction, SlashOption
-from nextcord.ext import commands
+from nextcord import Interaction, SlashOption, Permissions
+from nextcord.ext import commands, application_checks
 
 from typing import Optional
 from config import settings
@@ -66,7 +66,8 @@ class Setters(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @nextcord.slash_command(name="set", default_member_permissions=8)
+    @nextcord.slash_command(name="set", default_member_permissions=Permissions(administrator=True))
+    @application_checks.has_permissions(manage_guild=True)
     async def __set(self, interaction: Interaction):
         """
         This is the set slash command that will be the prefix of set commands.
