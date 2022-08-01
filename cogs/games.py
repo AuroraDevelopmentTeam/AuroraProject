@@ -12,6 +12,7 @@ from core.games.blackjack import Hand, Deck, check_for_blackjack, show_blackjack
 from core.games.slots import check_win_get_multiplier, spin_slots, create_slots_embed
 from core.games.brick_knife_evidence_yandere_tentacles import create_starting_embed, create_starting_view
 from core.games.gamble import perform_strikes, compare_strikes, create_gamble_embed, approximate_bet, get_game_state
+from core.games.wheel import get_multiplier, construct_wheel_embed, spin_wheel, initialize_multipliers, get_direction
 from core.ui.buttons import create_button, ViewAuthorCheck
 from core.locales.getters import get_msg_from_locale_by_key
 from core.money.updaters import update_user_balance
@@ -103,7 +104,7 @@ class Games(commands.Cog):
                 view = create_final_view()
                 await interaction.message.edit(embed=embed, view=view)
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, int(bet*1.5))
+                update_user_balance(interaction.guild.id, interaction.user.id, int(bet * 1.5))
                 balance = get_user_balance(interaction.guild.id, interaction.user.id)
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 embed = create_blackjack_embed(self.client, f"**{interaction.user.mention}** wins",
@@ -133,7 +134,7 @@ class Games(commands.Cog):
                 embed = create_game_start_blackjack_embed(self.client, f"turn {turn}", player_hand, dealer_hand)
                 await interaction.followup.send(embed=embed, view=view)
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, int(bet*1.5))
+                update_user_balance(interaction.guild.id, interaction.user.id, int(bet * 1.5))
                 balance = get_user_balance(interaction.guild.id, interaction.user.id)
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 embed = create_blackjack_embed(self.client, f"**{interaction.user.mention}** wins",
@@ -208,6 +209,25 @@ class Games(commands.Cog):
         embed = create_gamble_embed(is_win, game_state, percentage, user_strikes, bot_strikes, f'{msg} {balance}',
                                     interaction.user.display_avatar)
         await interaction.response.send_message(embed=embed)
+
+    @nextcord.slash_command(name="wheel", default_member_permissions=Permissions(send_messages=True))
+    async def __wheel(self, interaction: Interaction, bet: Optional[int] = SlashOption(required=True)):
+        if bet <= 0:
+            return await interaction.response.send_message('negative_value_error')
+        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if balance < bet:
+            return await interaction.response.send_message('not_enough_money_error')
+        update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
+        multipliers = initialize_multipliers()
+        wheel_number = spin_wheel()
+        bet_multiplier = get_multiplier(multipliers, wheel_number)
+        update_user_balance(interaction.guild.id, interaction.user.id, (int(bet*bet_multiplier)))
+        msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        await interaction.response.send_message(
+            embed=construct_wheel_embed(interaction.application_command.name.capitalize(), multipliers,
+                                        get_direction(wheel_number), f'{msg} {balance}',
+                                        interaction.user.display_avatar))
 
 
 def setup(client):
