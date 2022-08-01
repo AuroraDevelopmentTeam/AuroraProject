@@ -12,7 +12,8 @@ from core.embeds import construct_basic_embed, construct_top_embed
 from core.locales.getters import get_msg_from_locale_by_key
 from core.parsers import parse_timeouts, parse_warns_of_user
 from core.warns.writers import write_new_warn
-from core.warns.updaters import remove_warn_from_table
+from core.warns.updaters import remove_warn_from_table, update_warn_reason
+from core.warns.getters import check_warn
 from core.checkers import is_warn_id_in_table
 
 
@@ -202,6 +203,16 @@ class Moderation(commands.Cog):
         await interaction.response.send_message(
             embed=construct_top_embed(f"{interaction.application_command.name} - {user}", warns,
                                       f"{requested} {interaction.user}", interaction.user.display_avatar))
+
+    @nextcord.slash_command(name="edit_warn", description="Edit warn with this id on your server",
+                            default_member_permissions=Permissions(manage_messages=True))
+    @application_checks.has_permissions(manage_messages=True)
+    async def __edit_warn(self, interaction: Interaction, warn_id: Optional[int] = SlashOption(required=True),
+                          new_warn_reason: Optional[str] = SlashOption(required=True)):
+        if check_warn(interaction.guild.id, warn_id) is False:
+            return await interaction.response.send_message('no warn in table')
+        update_warn_reason(interaction.guild.id, warn_id, new_warn_reason)
+        await interaction.response.send_message('done')
 
 
 def setup(client):
