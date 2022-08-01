@@ -107,7 +107,8 @@ class Levels(commands.Cog):
         update_user_exp(interaction.guild.id, user.id, -min_exp, -max_exp)
         await interaction.response.send_message('done')
 
-    @nextcord.slash_command(name='reset_level', description='Reset level of @User to 1st level 0 exp')
+    @nextcord.slash_command(name='reset_level', description='Reset level of @User to 1st level 0 exp',
+                            default_member_permissions=Permissions(administrator=True))
     @application_checks.has_permissions(manage_guild=True)
     async def __reset_level(self, interaction: Interaction,
                             user: Optional[nextcord.Member] = SlashOption(required=True)):
