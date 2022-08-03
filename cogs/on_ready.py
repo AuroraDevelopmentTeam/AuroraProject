@@ -23,6 +23,10 @@ from core.honor.create import create_honor_table
 from core.honor.writers import write_in_honor_standart_values
 from core.profiles.create import create_profiles_table
 from core.profiles.writers import write_in_profiles_standart_values
+from core.stats.create import create_stats_table
+from core.stats.writers import write_in_stats_standart_values
+from core.badges.create import create_badges_table
+from core.badges.writers import write_in_badges_standart_values
 
 
 class OnReadyListener(commands.Cog):
@@ -31,34 +35,39 @@ class OnReadyListener(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        guilds = self.client.guilds
         create_locales_table()
-        write_in_locales_standart_values(self.client.guilds)
+        write_in_locales_standart_values(guilds)
         create_money_config_table()
         create_money_table()
-        write_in_money_config_standart_values(self.client.guilds)
-        write_in_money_standart_values(self.client.guilds)
+        write_in_money_config_standart_values(guilds)
+        write_in_money_standart_values(guilds)
         create_level_config_table()
         create_level_table()
-        write_in_levels_config_standart_values(self.client.guilds)
-        write_in_levels_standart_values(self.client.guilds)
+        write_in_levels_config_standart_values(guilds)
+        write_in_levels_standart_values(guilds)
         create_welcomers_config()
-        write_in_welcomers_config_standart_values(self.client.guilds)
+        write_in_welcomers_config_standart_values(guilds)
         create_warns_table()
         create_autoroles_table()
-        write_in_autoroles_standart_values(self.client.guilds)
+        write_in_autoroles_standart_values(guilds)
         create_marriage_table()
-        write_in_marriage_standart_values(self.client.guilds)
+        write_in_marriage_standart_values(guilds)
         create_gifts_table()
-        write_in_gifts_standart_values(self.client.guilds)
+        write_in_gifts_standart_values(guilds)
         create_shop_table()
         create_goodbye_config()
-        write_in_goodbye_config_standart_values(self.client.guilds)
+        write_in_goodbye_config_standart_values(guilds)
         create_on_nitro_config()
-        write_in_on_nitro_config_standart_values(self.client.guilds)
+        write_in_on_nitro_config_standart_values(guilds)
         create_honor_table()
-        write_in_honor_standart_values(self.client.guilds)
+        write_in_honor_standart_values(guilds)
         create_profiles_table()
-        write_in_profiles_standart_values(self.client.guilds)
+        write_in_profiles_standart_values(guilds)
+        create_stats_table()
+        write_in_stats_standart_values(guilds)
+        create_badges_table()
+        write_in_badges_standart_values(guilds)
 
 
 def setup(client):
