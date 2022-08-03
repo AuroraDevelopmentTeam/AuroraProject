@@ -86,9 +86,13 @@
       "msg": "Balance is:"
     },
     "timely": {
+      "name": "timely",
+      "description": "Get money per time",
       "msg": "Money added on balance:"
     },
     "give": {
+      "name": "give",
+      "description": "Transfer your money from balance to other user",
       "msg": "tranfered to:"
     },
     "level_up": {

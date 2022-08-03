@@ -236,7 +236,9 @@ class Economics(commands.Cog):
     @nextcord.slash_command(
         name="timely",
         description="Get money per time",
-        default_member_permissions=Permissions(send_messages=True),
+        name_localizations=get_localized_name("timely"),
+        description_localizations=get_localized_description("timely"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     @cooldowns.cooldown(1, 3600, bucket=cooldowns.SlashBucket.author)
     async def __timely(self, interaction: Interaction):
@@ -259,24 +261,24 @@ class Economics(commands.Cog):
     @nextcord.slash_command(
         name="give",
         description="Transfer your money from balance to other user",
-        default_member_permissions=Permissions(send_messages=True),
+        name_localizations=get_localized_name("give"),
+        description_localizations=get_localized_description("give"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __give(
         self,
         interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(required=True),
-        money: Optional[int] = SlashOption(required=True),
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"}
+        ),
+        money: Optional[int] = SlashOption(
+            required=True,
+            description="Number of money you want to give @User",
+            description_localizations={"ru": "Количество денег, которое вы хотите передать @Пользователю"},
+        )
     ):
-        """
-        Parameters
-        ----------
-        interaction: Interaction
-            The interaction object
-        user: Optional[nextcord.Member]
-            Tag discords member with @
-        money: Optional[int]
-            Number of money you will tranfer to @User
-        """
         if user.bot:
             return await interaction.response.send_message("bot_user_error")
         elif user == interaction.user:
