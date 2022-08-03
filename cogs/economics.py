@@ -311,7 +311,9 @@ class Economics(commands.Cog):
     @nextcord.slash_command(
         name="add-shop",
         description="Add role to shop",
-        default_member_permissions=Permissions(administrator=True),
+        name_localizations=get_localized_name("add-shop"),
+        description_localizations=get_localized_description("add-shop"),
+        default_member_permissions=Permissions(administrator=True)
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __add_shop(
@@ -341,7 +343,9 @@ class Economics(commands.Cog):
     @nextcord.slash_command(
         name="remove-shop",
         description="Remove role from shop",
-        default_member_permissions=Permissions(administrator=True),
+        name_localizations=get_localized_name("remove-shop"),
+        description_localizations=get_localized_description("remove-shop"),
+        default_member_permissions=Permissions(administrator=True)
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __remove_shop(
@@ -367,11 +371,12 @@ class Economics(commands.Cog):
     @nextcord.slash_command(
         name="shop",
         description="show role shop menu",
-        default_member_permissions=Permissions(send_messages=True),
+        name_localizations=get_localized_name("shop"),
+        description_localizations=get_localized_description("shop"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __shop(self, interaction: Interaction):
         guild_roles = parse_server_roles(interaction.guild)
-        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         pages = SelectButtonMenuPages(
             source=MyEmbedDescriptionPageSource(guild_roles),
             guild=interaction.guild,

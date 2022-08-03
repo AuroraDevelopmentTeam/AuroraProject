@@ -216,15 +216,21 @@
       "msg": "were deposited in family bank"
     },
     "add-shop": {
+      "name": "add-shop",
+      "description": "Add role to shop",
       "msg": "was added to shop"
     },
     "remove-shop": {
+      "name": "remove-shop",
+      "description": "Remove role from shop",
       "msg": "was removed from shop"
     },
     "price": {
       "msg": "Price:"
     },
     "shop": {
+      "name": "shop",
+      "description": "Show role shop menu",
       "msg": "You bought this role:"
     },
     "default_goodbye_message_title": {
