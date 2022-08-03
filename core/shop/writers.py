@@ -21,5 +21,3 @@ def delete_role_from_shop(guild_id: int, role: nextcord.Role) -> None:
     db.commit()
     cursor.close()
     db.close()
-
-

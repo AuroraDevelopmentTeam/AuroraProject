@@ -1,7 +1,12 @@
 import sqlite3
 
 from core.locales.getters import get_msg_from_locale_by_key
-from core.marriage.getters import get_divorce_counter, get_user_gifts_price, get_user_gift_counter, get_family_money
+from core.marriage.getters import (
+    get_divorce_counter,
+    get_user_gifts_price,
+    get_user_gift_counter,
+    get_family_money,
+)
 from core.money.updaters import update_user_balance
 
 
@@ -42,7 +47,9 @@ def update_user_marriage_date(guild_id: int, user_id: int, date) -> None:
 
 
 def marry_users(guild_id: int, user_id: int, pair_id: int, date):
-    default_love_description = get_msg_from_locale_by_key(guild_id, "default_love_description")
+    default_love_description = get_msg_from_locale_by_key(
+        guild_id, "default_love_description"
+    )
     update_user_pair(guild_id, user_id, pair_id)
     update_user_pair(guild_id, pair_id, user_id)
     update_user_love_description(guild_id, user_id, default_love_description)
@@ -63,8 +70,8 @@ def divorce_users(guild_id: int, user_id: int, pair_id: int) -> None:
     update_user_marriage_date(guild_id, user_id, "0")
     update_user_marriage_date(guild_id, pair_id, "0")
     family_money = get_family_money(guild_id, user_id)
-    update_user_balance(guild_id, user_id, int(family_money/2))
-    update_user_balance(guild_id, pair_id, int(family_money/2))
+    update_user_balance(guild_id, user_id, int(family_money / 2))
+    update_user_balance(guild_id, pair_id, int(family_money / 2))
     update_couple_family_money(guild_id, user_id, pair_id, 0)
     return
 
@@ -133,7 +140,9 @@ def update_user_family_money(guild_id: int, user_id: int, amount: int) -> None:
     return
 
 
-def update_couple_family_money(guild_id: int, user_id: int, pair_id: int, amount: int) -> None:
+def update_couple_family_money(
+    guild_id: int, user_id: int, pair_id: int, amount: int
+) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     update_user_family_money(guild_id, user_id, amount)

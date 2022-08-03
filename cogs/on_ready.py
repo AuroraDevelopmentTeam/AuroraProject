@@ -4,16 +4,25 @@ from core.locales.create import create_locales_table
 from core.locales.writers import write_in_locales_standart_values
 from core.checkers import is_guild_id_in_table
 from core.money.create import create_money_table, create_money_config_table
-from core.money.writers import write_in_money_standart_values, write_in_money_config_standart_values
+from core.money.writers import (
+    write_in_money_standart_values,
+    write_in_money_config_standart_values,
+)
 from core.levels.create import create_level_table, create_level_config_table
-from core.levels.writers import write_in_levels_standart_values, write_in_levels_config_standart_values
+from core.levels.writers import (
+    write_in_levels_standart_values,
+    write_in_levels_config_standart_values,
+)
 from core.welcomers.create import create_welcomers_config
 from core.welcomers.writers import write_in_welcomers_config_standart_values
 from core.warns.create import create_warns_table
 from core.auto.roles.create import create_autoroles_table
 from core.auto.roles.writers import write_in_autoroles_standart_values
 from core.marriage.create import create_marriage_table, create_gifts_table
-from core.marriage.writers import write_in_marriage_standart_values, write_in_gifts_standart_values
+from core.marriage.writers import (
+    write_in_marriage_standart_values,
+    write_in_gifts_standart_values,
+)
 from core.shop.create import create_shop_table
 from core.goodbyes.create import create_goodbye_config
 from core.goodbyes.writers import write_in_goodbye_config_standart_values

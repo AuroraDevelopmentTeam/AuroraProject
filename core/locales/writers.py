@@ -9,7 +9,7 @@ def write_in_locales_standart_values(guilds) -> None:
     for guild in guilds:
         if is_guild_id_in_table("locales", guild.id) is False:
             sql = "INSERT INTO locales(guild_id, locale) VALUES (?, ?)"
-            val = (guild.id, settings['default_locale'])
+            val = (guild.id, settings["default_locale"])
             cursor.execute(sql, val)
             db.commit()
     cursor.close()

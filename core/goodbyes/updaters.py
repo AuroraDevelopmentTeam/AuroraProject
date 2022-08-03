@@ -49,7 +49,9 @@ def update_goodbye_message_title(guild_id: int, goodbye_message_title: str) -> N
     return
 
 
-def update_goodbye_message_description(guild_id: int, goodbye_message_description: str) -> None:
+def update_goodbye_message_description(
+    guild_id: int, goodbye_message_description: str
+) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     sql = "UPDATE goodbye_config SET goodbye_message_description = ? WHERE guild_id = ?"

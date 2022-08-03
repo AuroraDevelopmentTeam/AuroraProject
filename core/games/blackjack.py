@@ -7,10 +7,28 @@ from nextcord.ui import View
 from core.ui.buttons import create_button
 from core.embeds import DEFAULT_BOT_COLOR
 
-maybe_blackjack_cards = ["10 of Hearts", "J of Hearts", "Q of Hearts", "K of Hearts", "A of Hearts",
-                         "10 of Spades", "J of Spades", "Q of Spades", "K of Spades", "A of Spades",
-                         "10 of Clubs", "J of Clubs", "Q of Clubs", "K of Clubs", "A of Spades",
-                         "10 of Diamonds", "J of Diamonds", "Q of Diamonds", "K of Diamonds", "A of Diamonds"]
+maybe_blackjack_cards = [
+    "10 of Hearts",
+    "J of Hearts",
+    "Q of Hearts",
+    "K of Hearts",
+    "A of Hearts",
+    "10 of Spades",
+    "J of Spades",
+    "Q of Spades",
+    "K of Spades",
+    "A of Spades",
+    "10 of Clubs",
+    "J of Clubs",
+    "Q of Clubs",
+    "K of Clubs",
+    "A of Spades",
+    "10 of Diamonds",
+    "J of Diamonds",
+    "Q of Diamonds",
+    "K of Diamonds",
+    "A of Diamonds",
+]
 
 cards_emoji_representation = {
     "hidden": 998155897543082064,
@@ -65,7 +83,7 @@ cards_emoji_representation = {
     "10 of Hearts": 998173496117043251,
     "J of Hearts": 998173486981857450,
     "Q of Hearts": 998173489037066353,
-    "K of Hearts": 998173490345680978
+    "K of Hearts": 998173490345680978,
 }
 
 
@@ -102,12 +120,64 @@ class Card:
 
 class Deck:
     def __init__(self):
-        self.cards = [Card(s, v) for s in ["Clubs", "Spades", "Hearts",
-                                           "Diamonds"] for v in ["A", "2", "3", "4", "5", "6",
-                                                                 "7", "8", "9", "10", "J", "Q", "K", "A", "2", "3", "4", "5", "6",
-                                                                 "7", "8", "9", "10", "J", "Q", "K", "A", "2", "3", "4", "5", "6",
-                                                                 "7", "8", "9", "10", "J", "Q", "K", "A", "2", "3", "4", "5", "6",
-                                                                 "7", "8", "9", "10", "J", "Q", "K"]]
+        self.cards = [
+            Card(s, v)
+            for s in ["Clubs", "Spades", "Hearts", "Diamonds"]
+            for v in [
+                "A",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "J",
+                "Q",
+                "K",
+                "A",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "J",
+                "Q",
+                "K",
+                "A",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "J",
+                "Q",
+                "K",
+                "A",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "J",
+                "Q",
+                "K",
+            ]
+        ]
 
     def shuffle(self):
         if len(self.cards) > 1:
@@ -169,56 +239,85 @@ def deal_starting_cards(player_hand: Hand, dealer_hand: Hand, deck: Deck) -> Non
 
 
 def get_hand_cards(client, hand: Hand) -> str:
-    field_value = ' '
+    field_value = " "
     for card in hand.cards:
         card = str(card)
         if card in cards_emoji_representation:
-            field_value += f'{client.get_emoji(cards_emoji_representation[card])} '
+            field_value += f"{client.get_emoji(cards_emoji_representation[card])} "
         else:
-            field_value += f'{card} '
+            field_value += f"{card} "
     return field_value
 
 
 def get_hand_hidden_cards(client, hand: Hand) -> str:
-    field_value = ' '
+    field_value = " "
     for card in hand.display():
         card = str(card)
         if card in cards_emoji_representation:
-            field_value += f'{client.get_emoji(cards_emoji_representation[card])} '
+            field_value += f"{client.get_emoji(cards_emoji_representation[card])} "
         else:
-            field_value += f'{card} '
+            field_value += f"{card} "
     return field_value
 
 
-def create_blackjack_embed(client, state_of_game: str, player_hand: Hand, dealer_hand: Hand,
-                           footer_text: str = None, footer_url: Asset = None) -> nextcord.Embed:
-    embed = nextcord.Embed(title='Blackjack', description=state_of_game, color=DEFAULT_BOT_COLOR)
+def create_blackjack_embed(
+    client,
+    state_of_game: str,
+    player_hand: Hand,
+    dealer_hand: Hand,
+    footer_text: str = None,
+    footer_url: Asset = None,
+) -> nextcord.Embed:
+    embed = nextcord.Embed(
+        title="Blackjack", description=state_of_game, color=DEFAULT_BOT_COLOR
+    )
     player_hand_field_value = get_hand_cards(client, player_hand)
     dealer_hand_field_value = get_hand_cards(client, dealer_hand)
-    embed.add_field(name='Player hand', value=f'{player_hand_field_value}\n'
-                                              f'value **{player_hand.get_value()}**', inline=True)
-    embed.add_field(name='Dealer hand', value=f'{dealer_hand_field_value}\n'
-                                              f'value **{dealer_hand.get_value()}**', inline=True)
+    embed.add_field(
+        name="Player hand",
+        value=f"{player_hand_field_value}\n" f"value **{player_hand.get_value()}**",
+        inline=True,
+    )
+    embed.add_field(
+        name="Dealer hand",
+        value=f"{dealer_hand_field_value}\n" f"value **{dealer_hand.get_value()}**",
+        inline=True,
+    )
     if footer_text is not None and footer_url is not None:
         embed.set_footer(text=footer_text, icon_url=footer_url)
     return embed
 
 
-def create_game_start_blackjack_embed(client, state_of_game: str, player_hand: Hand, dealer_hand: Hand,
-                                      footer_text: str = None, footer_url: Asset = None) -> nextcord.Embed:
-    embed = nextcord.Embed(title='Blackjack', description=state_of_game, color=DEFAULT_BOT_COLOR)
+def create_game_start_blackjack_embed(
+    client,
+    state_of_game: str,
+    player_hand: Hand,
+    dealer_hand: Hand,
+    footer_text: str = None,
+    footer_url: Asset = None,
+) -> nextcord.Embed:
+    embed = nextcord.Embed(
+        title="Blackjack", description=state_of_game, color=DEFAULT_BOT_COLOR
+    )
     player_hand_field_value = get_hand_cards(client, player_hand)
     dealer_hand_field_value = get_hand_hidden_cards(client, dealer_hand)
-    embed.add_field(name='Player hand', value=f'{player_hand_field_value}\n'
-                                              f'value **{player_hand.get_value()}**', inline=True)
+    embed.add_field(
+        name="Player hand",
+        value=f"{player_hand_field_value}\n" f"value **{player_hand.get_value()}**",
+        inline=True,
+    )
     second_dealer_card = dealer_hand.cards[1]
-    if second_dealer_card.value in ['J', 'K', 'Q']:
+    if second_dealer_card.value in ["J", "K", "Q"]:
         second_dealer_card = 10
-    elif second_dealer_card.value == 'A':
+    elif second_dealer_card.value == "A":
         second_dealer_card = 11
     else:
         second_dealer_card = second_dealer_card.value
-    embed.add_field(name='Dealer hand', value=f'{dealer_hand_field_value}\nvalue **{second_dealer_card}**', inline=True)
+    embed.add_field(
+        name="Dealer hand",
+        value=f"{dealer_hand_field_value}\nvalue **{second_dealer_card}**",
+        inline=True,
+    )
     if footer_text is not None and footer_url is not None:
         embed.set_footer(text=footer_text, icon_url=footer_url)
     return embed

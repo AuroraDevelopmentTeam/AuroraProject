@@ -8,10 +8,16 @@ def write_in_levels_config_standart_values(guilds) -> None:
     cursor = db.cursor()
     for guild in guilds:
         if is_guild_id_in_table("levels_config", guild.id) is False:
-            sql = "INSERT INTO levels_config(guild_id, min_exp_per_message, max_exp_per_message, " \
-                  "level_up_messages_state) VALUES (?, ?, ?, ?)"
-            val = (guild.id, settings['default_min_exp'], settings['default_max_exp'],
-                   settings['default_level_up_messages_state'])
+            sql = (
+                "INSERT INTO levels_config(guild_id, min_exp_per_message, max_exp_per_message, "
+                "level_up_messages_state) VALUES (?, ?, ?, ?)"
+            )
+            val = (
+                guild.id,
+                settings["default_min_exp"],
+                settings["default_max_exp"],
+                settings["default_level_up_messages_state"],
+            )
             cursor.execute(sql, val)
             db.commit()
     cursor.close()

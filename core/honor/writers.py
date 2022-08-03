@@ -9,7 +9,12 @@ def write_in_honor_standart_values(guilds) -> None:
     for guild in guilds:
         for member in guild.members:
             if not member.bot:
-                if cursor.execute(f"SELECT user_id FROM honor WHERE user_id = {member.id}").fetchone() is None:
+                if (
+                    cursor.execute(
+                        f"SELECT user_id FROM honor WHERE user_id = {member.id}"
+                    ).fetchone()
+                    is None
+                ):
                     sql = "INSERT INTO honor(user_id, honor_level, honor_points) VALUES (?, ?, ?)"
                     val = (member.id, 2, 0)
                     cursor.execute(sql, val)

@@ -3,7 +3,9 @@ import sqlite3
 from core.stats.getters import get_user_time_in_voice, get_user_messages_counter
 
 
-def update_user_messages_counter(guild_id: int, user_id: int, messages_to_add: int) -> None:
+def update_user_messages_counter(
+    guild_id: int, user_id: int, messages_to_add: int
+) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     messages_counter = get_user_messages_counter(guild_id, user_id)

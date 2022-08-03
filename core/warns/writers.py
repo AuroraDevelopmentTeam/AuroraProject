@@ -11,8 +11,10 @@ def write_new_warn(guild_id, user_id, reason) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     if is_warn_id_in_table("warns", warn_id, guild_id, user_id) is False:
-        sql = "INSERT INTO warns(warn_id, guild_id, user_id, " \
-                  "warn_reason) VALUES (?, ?, ?, ?)"
+        sql = (
+            "INSERT INTO warns(warn_id, guild_id, user_id, "
+            "warn_reason) VALUES (?, ?, ?, ?)"
+        )
         val = (warn_id, guild_id, user_id, reason)
         cursor.execute(sql, val)
         db.commit()

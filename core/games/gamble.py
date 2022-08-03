@@ -43,12 +43,27 @@ def get_game_state(state) -> str:
         return "**Bot** win"
 
 
-def create_gamble_embed(state, game_state: str, percentage: int, user_strikes: int, bot_strikes: int, footer_text: str,
-                        footer_url: Asset) -> nextcord.Embed:
-    embed = nextcord.Embed(title='Gamble', color=DEFAULT_BOT_COLOR, description=game_state)
-    embed.add_field(name='User strikes', value=f'value **{user_strikes}/18**', inline=True)
-    embed.add_field(name='Bot strikes', value=f'value **{bot_strikes}/18**', inline=True)
+def create_gamble_embed(
+    state,
+    game_state: str,
+    percentage: int,
+    user_strikes: int,
+    bot_strikes: int,
+    footer_text: str,
+    footer_url: Asset,
+) -> nextcord.Embed:
+    embed = nextcord.Embed(
+        title="Gamble", color=DEFAULT_BOT_COLOR, description=game_state
+    )
+    embed.add_field(
+        name="User strikes", value=f"value **{user_strikes}/18**", inline=True
+    )
+    embed.add_field(
+        name="Bot strikes", value=f"value **{bot_strikes}/18**", inline=True
+    )
     if state is not None:
-        embed.add_field(name='Percentage', value=f'```{percentage*100}%```', inline=False)
+        embed.add_field(
+            name="Percentage", value=f"```{percentage*100}%```", inline=False
+        )
     embed.set_footer(text=footer_text, icon_url=footer_url)
     return embed

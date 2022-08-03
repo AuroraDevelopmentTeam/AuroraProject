@@ -20,9 +20,7 @@ class ErrorHandler(commands.Cog):
             )
 
         elif isinstance(error, ApplicationMissingPermissions):
-            return await interaction.send(
-                f"ApplicationMissingPermissions\n`{error}`"
-            )
+            return await interaction.send(f"ApplicationMissingPermissions\n`{error}`")
         else:
             raise error
 

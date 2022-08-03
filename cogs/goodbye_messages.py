@@ -1,8 +1,11 @@
 import nextcord
 from nextcord.ext import commands
 
-from core.goodbyes.getters import get_server_goodbye_channel_id, get_server_goodbye_state, \
-    get_server_goodbye_message_type
+from core.goodbyes.getters import (
+    get_server_goodbye_channel_id,
+    get_server_goodbye_state,
+    get_server_goodbye_message_type,
+)
 from core.goodbyes.create import create_server_goodbye_embed, create_goodbye_card
 
 
