@@ -100,7 +100,7 @@ def construct_log(
     if message_channel is not None:
         embed.add_field(
             name="Channel",
-            value=f"{channel.mention}\nID: **{channel.id}**",
+            value=f"{message_channel.mention}\nID: **{message_channel.id}**",
             inline=False,
         )
     if user is not None:

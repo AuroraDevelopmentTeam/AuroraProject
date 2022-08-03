@@ -62,7 +62,7 @@ def get_localized_description(key: str) -> dict:
 
         descs.append(locales_file[key]["description"])
 
-    return {"ru": descs[0], "en-US": descs[1]}
+    return {"ru": descs[0], "en-US": descs[1], "en-GB": descs[1]}
 
 
 def get_localized_name(key: str) -> dict:
@@ -73,4 +73,4 @@ def get_localized_name(key: str) -> dict:
 
         names.append(locales_file[key]["name"])
 
-    return {"ru": names[0], "en-US": names[1]}
+    return {"ru": names[0], "en-US": names[1], "en-GB": names[1]}

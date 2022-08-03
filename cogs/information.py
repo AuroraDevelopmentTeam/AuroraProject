@@ -141,6 +141,8 @@ class Information(commands.Cog):
     @nextcord.slash_command(
         name="user",
         description="Sends all information about user, that can i found",
+        name_localizations=get_localized_name("server"),
+        description_localizations=get_localized_description("server"),
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __user(
@@ -148,8 +150,8 @@ class Information(commands.Cog):
         interaction: Interaction,
         user: Optional[nextcord.Member] = SlashOption(
             required=True,
-            description="The discord's user, " "tag someone with @",
-            description_localizations={"ru": "Пользователь " "дискорда"},
+            description="The discord's user, tag someone with @",
+            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"},
         ),
     ):
         if user is None:

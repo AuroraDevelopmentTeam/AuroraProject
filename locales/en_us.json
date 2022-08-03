@@ -27,6 +27,8 @@
       "premium_subscribers": "Nitro boosters count:"
   },
     "user": {
+      "name": "user",
+      "description": "Sends all information about user, that can i found",
       "created_at": "Created at",
       "discriminator": "Discriminator:",
       "joined_at": "Joined at:",
@@ -69,12 +71,18 @@
       "msg": "Server starting balance has been changed on:"
     },
     "add_money": {
+      "name": "add_money",
+      "description": "Administrator's command to add the money on the balance of @User",
       "msg": "Added money to balance of user:"
     },
     "remove_money": {
+      "name": "remove_money",
+      "description": "Administrator's command to remove money from balance of @User",
       "msg": "Removed money from balance of user:"
     },
-    "money": {
+    "balance": {
+      "name": "balance",
+      "description": "Show @User's money balance",
       "msg": "Balance is:"
     },
     "timely": {
@@ -244,5 +252,22 @@
     },
     "default_profile_description": {
       "msg": "Write here something about you"
+    },
+    "reset_balance": {
+      "msg": "Balance of",
+      "name": "balance",
+      "description": "Administrator's command to reset balance of @User"
+    },
+    "reset_balance_2": {
+      "msg": "were reset to standart value: "
+    },
+    "reset_economics": {
+      "msg": "Balance of all users on server reset to standart value:",
+      "name": "economics",
+      "description": "Administrator's command to reset economics on server"
+    },
+    "reset": {
+      "name": "reset",
+      "description": "This is the reset slash command that will be the prefix of economical reset commands"
     }
 }
