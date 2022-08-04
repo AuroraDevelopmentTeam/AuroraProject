@@ -319,8 +319,16 @@ class Economics(commands.Cog):
     async def __add_shop(
         self,
         interaction: Interaction,
-        role: Optional[nextcord.Role] = SlashOption(required=True),
-        cost: Optional[int] = SlashOption(required=True),
+        role: Optional[nextcord.Role] = SlashOption(
+            required=True,
+            description="Discord role on your server",
+            description_localizations={"ru": "Дискордовская роль на вашем сервере"},
+        ),
+        cost: Optional[int] = SlashOption(
+            required=True,
+            description="Number of money role will cost",
+            description_localizations={"ru": "Количество денег, которое должна стоить роль"},
+        )
     ):
         if cost < 0:
             return await interaction.response.send_message("negative value error")
@@ -351,7 +359,11 @@ class Economics(commands.Cog):
     async def __remove_shop(
         self,
         interaction: Interaction,
-        role: Optional[nextcord.Role] = SlashOption(required=True),
+        role: Optional[nextcord.Role] = SlashOption(
+            required=True,
+            description="Discord role on your server",
+            description_localizations={"ru": "Дискордовская роль на вашем сервере"},
+        )
     ):
         if is_role_in_shop(interaction.guild.id, role.id) is False:
             return await interaction.response.send_message("not in shop")

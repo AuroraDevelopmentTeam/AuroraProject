@@ -143,37 +143,63 @@
     "set_autorole": {
       "msg": "Now this role will be given on server enter:"
     },
+  "emotion": {
+      "name": "emotion",
+      "description": "Emotion commands"
+    },
     "emotion_kiss": {
+      "name": "kiss",
+      "description": "Emotion command, send kissing emotion mentioning @User",
       "msg": "Kiss"
     },
     "emotion_hug": {
+      "name": "hug",
+      "description": "Emotion command, send hugging emotion mentioning @User",
       "msg": "Hugs"
     },
     "emotion_punch": {
+      "name": "punch",
+      "description": "Emotion command, send punching emotion mentioning @User",
       "msg": "Punch"
     },
     "emotion_idk": {
+      "name": "idk",
+      "description": "Emotion command, send i dont know emotion",
       "msg": "I dont know"
     },
     "emotion_f": {
+      "name": "f",
+      "description": "Emotion command, send F emotion",
       "msg": "PRESS F TO PAY RESPECTS"
     },
     "emotion_cry": {
+      "name": "cry",
+      "description": "Emotion command, send crying emotion",
       "msg": "Crying"
     },
     "emotion_bite": {
+      "name": "bite",
+      "description": "Emotion command, send bite emotion mentioning @User",
       "msg": "Bite"
     },
     "emotion_spank": {
+      "name": "spank",
+      "description": "Emotion command, send spanking emotion mentioning @User",
       "msg": "Spanking"
     },
     "emotion_highfive": {
+      "name": "дать_пять",
+      "description": "Emotion command, send highfive emotion mentioning @User",
       "msg": "Highfive"
     },
     "emotion_pat": {
+      "name": "pat",
+      "description": "Emotion command, send patting emotion mentioning @User",
       "msg": "Patting"
     },
     "emotion_lick": {
+      "name": "lick",
+      "description": "Emotion command, send licking emotion mentioning @User",
       "msg": "Licking"
     },
     "default_love_description": {
