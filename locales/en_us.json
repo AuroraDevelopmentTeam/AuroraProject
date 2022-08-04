@@ -305,5 +305,48 @@
     "reset": {
       "name": "reset",
       "description": "This is the reset slash command that will be the prefix of economical reset commands"
+    },
+    "turn": {
+      "msg": "Turn"
+    },
+    "win": {
+      "msg": "win"
+    },
+    "lost": {
+      "msg": "lost"
+    },
+    "draw": {
+      "msg": "Draw"
+    },
+    "one_to_one": {
+      "msg": "takes 1:1"
+    },
+    "hit": {
+      "msg": "Hit"
+    },
+    "stand": {
+      "msg": "Stand"
+    },
+    "value": {
+      "msg": "Value"
+    },
+    "player_hand": {
+      "msg": "Player hand"
+    },
+    "dealer_hand": {
+      "msg": "Dealer hand"
+    },
+    "blackjack": {
+      "msg": "Blackjack",
+      "name": "blackjack",
+      "description": "Play blackjack casino game"
+    },
+    "slots": {
+      "name": "slots",
+      "description": "Play slots casino game"
+    },
+    "gamble": {
+      "name": "gamble",
+      "description": "Play gamble casino game"
     }
 }

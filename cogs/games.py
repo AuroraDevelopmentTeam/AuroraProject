@@ -6,6 +6,7 @@ from nextcord.ext import commands
 from nextcord import Interaction, ButtonStyle, File, Permissions, SlashOption
 from nextcord.ui import Button, View
 
+from core.locales.getters import get_localized_name, get_localized_description, get_msg_from_locale_by_key
 from core.games.blackjack import (
     Hand,
     Deck,
@@ -54,10 +55,19 @@ class Games(commands.Cog):
         self.client = client
 
     @nextcord.slash_command(
-        name="blackjack", default_member_permissions=Permissions(send_messages=True)
+        name="blackjack",
+        description="Play blackjack casino game",
+        name_localizations=get_localized_name("blackjack"),
+        description_localizations=get_localized_description("blackjack"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __blackjack(
-        self, interaction: Interaction, bet: Optional[int] = SlashOption(required=True)
+            self, interaction: Interaction,
+            bet: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money you bet in game",
+                description_localizations={"ru": "Количество денег, которое вы хотите поставить в качестве ставки"},
+            )
     ):
         await interaction.response.defer()
         if bet <= 0:
@@ -82,19 +92,23 @@ class Games(commands.Cog):
                 update_user_balance(interaction.guild.id, interaction.user.id, -bet)
                 balance = get_user_balance(interaction.guild.id, interaction.user.id)
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+                win = get_msg_from_locale_by_key(interaction.guild.id, "win")
+                lost = get_msg_from_locale_by_key(interaction.guild.id, "lost")
                 embed = create_blackjack_embed(
                     self.client,
-                    "**Dealer** wins",
+                    f"{self.client.user.mention} {win}",
                     player_hand,
                     dealer_hand,
                     f"{msg} {balance}",
                     interaction.user.display_avatar,
+                    guild_id=interaction.guild.id
                 )
-                view = create_final_view()
+                view = create_final_view(interaction.guild.id)
                 await interaction.message.edit(embed=embed, view=view)
             else:
+                turn_msg = get_msg_from_locale_by_key(interaction.guild.id, "turn")
                 embed = create_game_start_blackjack_embed(
-                    self.client, f"turn {turn}", player_hand, dealer_hand
+                    self.client, f"{turn_msg} {turn}", player_hand, dealer_hand, guild_id=interaction.guild.id
                 )
                 await interaction.message.edit(embed=embed)
 
@@ -109,15 +123,17 @@ class Games(commands.Cog):
                         interaction.guild.id, interaction.user.id
                     )
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+                    win = get_msg_from_locale_by_key(interaction.guild.id, "win")
                     embed = create_blackjack_embed(
                         self.client,
-                        f"**{interaction.user.mention}** wins",
+                        f"**{interaction.user.mention}** {win}",
                         player_hand,
                         dealer_hand,
                         f"{msg} {balance}",
                         interaction.user.display_avatar,
+                        guild_id=interaction.guild.id
                     )
-                    view = create_final_view()
+                    view = create_final_view(interaction.guild.id)
                     await interaction.message.edit(embed=embed, view=view)
             if 17 <= dealer_hand.get_value() <= 21:
                 if dealer_hand.get_value() > player_hand.get_value():
@@ -126,21 +142,25 @@ class Games(commands.Cog):
                         interaction.guild.id, interaction.user.id
                     )
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+                    win = get_msg_from_locale_by_key(interaction.guild.id, "win")
+                    lost = get_msg_from_locale_by_key(interaction.guild.id, "lost")
                     embed = create_blackjack_embed(
                         self.client,
-                        "**Dealer** wins",
+                        f"{self.client.user.mention} {win}",
                         player_hand,
                         dealer_hand,
                         f"{msg} {balance}",
                         interaction.user.display_avatar,
+                        guild_id=interaction.guild.id
                     )
-                    view = create_final_view()
+                    view = create_final_view(interaction.guild.id)
                     await interaction.message.edit(embed=embed, view=view)
                 elif dealer_hand.get_value() == player_hand.get_value():
+                    draw = get_msg_from_locale_by_key(interaction.guild.id, "draw")
                     embed = create_blackjack_embed(
-                        self.client, "**Draw**", player_hand, dealer_hand
+                        self.client, f"**{draw}**", player_hand, dealer_hand, guild_id=interaction.guild.id
                     )
-                    view = create_final_view()
+                    view = create_final_view(interaction.guild.id)
                     await interaction.message.edit(embed=embed, view=view)
                 else:
                     update_user_balance(interaction.guild.id, interaction.user.id, bet)
@@ -148,23 +168,27 @@ class Games(commands.Cog):
                         interaction.guild.id, interaction.user.id
                     )
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+                    win = get_msg_from_locale_by_key(interaction.guild.id, "win")
+                    lost = get_msg_from_locale_by_key(interaction.guild.id, "lost")
                     embed = create_blackjack_embed(
                         self.client,
-                        f"**{interaction.user.mention}** wins",
+                        f"**{interaction.user.mention}** {win}",
                         player_hand,
                         dealer_hand,
                         f"{msg} {balance}",
                         interaction.user.display_avatar,
+                        guild_id=interaction.guild.id
                     )
-                    view = create_final_view()
+                    view = create_final_view(interaction.guild.id)
                     await interaction.message.edit(embed=embed, view=view)
 
         async def dealer_blackjack_callback(interaction: Interaction):
             if check_for_blackjack(dealer_hand):
+                draw = get_msg_from_locale_by_key(interaction.guild.id, "draw")
                 embed = create_blackjack_embed(
-                    self.client, "**Draw**", player_hand, dealer_hand
+                    self.client, f"**{draw}**", player_hand, dealer_hand, guild_id=interaction.guild.id
                 )
-                view = create_final_view()
+                view = create_final_view(interaction.guild.id)
                 await interaction.message.edit(embed=embed, view=view)
             else:
                 update_user_balance(
@@ -172,30 +196,35 @@ class Games(commands.Cog):
                 )
                 balance = get_user_balance(interaction.guild.id, interaction.user.id)
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+                win = get_msg_from_locale_by_key(interaction.guild.id, "win")
+                lost = get_msg_from_locale_by_key(interaction.guild.id, "lost")
                 embed = create_blackjack_embed(
                     self.client,
-                    f"**{interaction.user.mention}** wins",
+                    f"**{interaction.user.mention}** {win}",
                     player_hand,
                     dealer_hand,
                     f"{msg} {balance}",
                     interaction.user.display_avatar,
+                    guild_id=interaction.guild.id
                 )
-                view = create_final_view()
+                view = create_final_view(interaction.guild.id)
                 await interaction.message.edit(embed=embed, view=view)
 
         async def one_to_one_callback(interaction: Interaction):
             update_user_balance(interaction.guild.id, interaction.user.id, bet)
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            one_to_one_msg = get_msg_from_locale_by_key(interaction.guild.id, "one_to_one")
             embed = create_blackjack_embed(
                 self.client,
-                f"**{interaction.user.mention}** takes 1:1",
+                f"**{interaction.user.mention}** {one_to_one_msg}",
                 player_hand,
                 dealer_hand,
                 f"{msg} {balance}",
                 interaction.user.display_avatar,
+                guild_id=interaction.guild.id
             )
-            view = create_final_view()
+            view = create_final_view(interaction.guild.id)
             await interaction.message.edit(embed=embed, view=view)
 
         if check_for_blackjack(player_hand):
@@ -207,9 +236,9 @@ class Games(commands.Cog):
                 view = ViewAuthorCheck(interaction.user)
                 view.add_item(dealer_blackjack)
                 view.add_item(one_to_one)
-
+                turn_msg = get_msg_from_locale_by_key(interaction.guild.id, "turn")
                 embed = create_game_start_blackjack_embed(
-                    self.client, f"turn {turn}", player_hand, dealer_hand
+                    self.client, f"{turn_msg} {turn}", player_hand, dealer_hand, guild_id=interaction.guild.id
                 )
                 await interaction.followup.send(embed=embed, view=view)
             else:
@@ -218,53 +247,71 @@ class Games(commands.Cog):
                 )
                 balance = get_user_balance(interaction.guild.id, interaction.user.id)
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+                win = get_msg_from_locale_by_key(interaction.guild.id, "win")
+                lost = get_msg_from_locale_by_key(interaction.guild.id, "lost")
                 embed = create_blackjack_embed(
                     self.client,
-                    f"**{interaction.user.mention}** wins",
+                    f"**{interaction.user.mention}** {win}",
                     player_hand,
                     dealer_hand,
                     f"{msg} {balance}",
                     interaction.user.display_avatar,
+                    guild_id=interaction.guild.id
                 )
-                view = create_final_view()
+                view = create_final_view(interaction.guild.id)
                 await interaction.followup.send(embed=embed, view=view)
         else:
             if check_for_blackjack(dealer_hand):
                 update_user_balance(interaction.guild.id, interaction.user.id, -bet)
                 balance = get_user_balance(interaction.guild.id, interaction.user.id)
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+                win = get_msg_from_locale_by_key(interaction.guild.id, "win")
+                lost = get_msg_from_locale_by_key(interaction.guild.id, "lost")
                 embed = create_blackjack_embed(
                     self.client,
-                    "**Dealer** wins",
+                    f"{self.client.user.mention} {win}",
                     player_hand,
                     dealer_hand,
                     f"{msg} {balance}",
                     interaction.user.display_avatar,
+                    guild_id=interaction.guild.id
                 )
-                view = create_final_view()
+                view = create_final_view(interaction.guild.id)
                 await interaction.followup.send(embed=embed, view=view)
             else:
-                hit = create_button("hit", hit_callback, False)
-                stand = create_button("stand", stand_callback, False)
+                hit_msg = get_msg_from_locale_by_key(interaction.guild.id, "hit")
+                stand_msg = get_msg_from_locale_by_key(interaction.guild.id, "stand")
+                hit = create_button(hit_msg, hit_callback, False)
+                stand = create_button(stand_msg, stand_callback, False)
                 view = ViewAuthorCheck(interaction.user)
                 view.add_item(hit)
                 view.add_item(stand)
-
+                turn_msg = get_msg_from_locale_by_key(interaction.guild.id, "turn")
                 embed = create_game_start_blackjack_embed(
-                    self.client, f"turn {turn}", player_hand, dealer_hand
+                    self.client, f"{turn_msg} {turn}", player_hand, dealer_hand, guild_id=interaction.guild.id
                 )
                 await interaction.followup.send(embed=embed, view=view)
 
     @nextcord.slash_command(
-        name="slots", default_member_permissions=Permissions(send_messages=True)
+        name="slots",
+        description="Play slots casino game",
+        name_localizations=get_localized_name("slots"),
+        description_localizations=get_localized_description("slots"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __slots(
-        self, interaction: Interaction, bet: Optional[int] = SlashOption(required=True)
+            self, interaction: Interaction,
+            bet: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money you bet in game",
+                description_localizations={"ru": "Количество денег, которое вы хотите поставить в качестве ставки"},
+            )
     ):
         player_got_row = spin_slots()
         is_win, multiplier = check_win_get_multiplier(player_got_row)
         if is_win is True:
-            game_state = "**win**"
+            win = get_msg_from_locale_by_key(interaction.guild.id, "win")
+            game_state = f'{interaction.user.mention} **{win}**'
             bet *= multiplier
             update_user_balance(interaction.guild.id, interaction.user.id, int(bet))
             embed = create_slots_embed(
@@ -277,7 +324,8 @@ class Games(commands.Cog):
             )
             await interaction.response.send_message(embed=embed)
         else:
-            game_state = "**loose**"
+            lost = get_msg_from_locale_by_key(interaction.guild.id, "lost")
+            game_state = f"{interaction.user.mention} **{lost}**"
             update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
             embed = create_slots_embed(
                 interaction.guild.id,
@@ -303,10 +351,19 @@ class Games(commands.Cog):
         await interaction.followup.send(embed=embed, view=view)
 
     @nextcord.slash_command(
-        name="gamble", default_member_permissions=Permissions(send_messages=True)
+        name="gamble",
+        description="Play gamble casino game",
+        name_localizations=get_localized_name("gamble"),
+        description_localizations=get_localized_description("gamble"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __gamble(
-        self, interaction: Interaction, bet: Optional[int] = SlashOption(required=True)
+            self, interaction: Interaction,
+            bet: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money you bet in game",
+                description_localizations={"ru": "Количество денег, которое вы хотите поставить в качестве ставки"},
+            )
     ):
         if bet <= 0:
             return await interaction.response.send_message("negative_value_error")
@@ -338,7 +395,12 @@ class Games(commands.Cog):
         name="wheel", default_member_permissions=Permissions(send_messages=True)
     )
     async def __wheel(
-        self, interaction: Interaction, bet: Optional[int] = SlashOption(required=True)
+            self, interaction: Interaction,
+            bet: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money you bet in game",
+                description_localizations={"ru": "Количество денег, которое вы хотите поставить в качестве ставки"},
+            )
     ):
         if bet <= 0:
             return await interaction.response.send_message("negative_value_error")

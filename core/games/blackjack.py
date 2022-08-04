@@ -6,6 +6,7 @@ from nextcord.ui import View
 
 from core.ui.buttons import create_button
 from core.embeds import DEFAULT_BOT_COLOR
+from core.locales.getters import get_msg_from_locale_by_key
 
 maybe_blackjack_cards = [
     "10 of Hearts",
@@ -267,20 +268,25 @@ def create_blackjack_embed(
     dealer_hand: Hand,
     footer_text: str = None,
     footer_url: Asset = None,
+    guild_id: int = None
 ) -> nextcord.Embed:
+    player_hand_msg = get_msg_from_locale_by_key(guild_id, "player_hand")
+    dealer_hand_msg = get_msg_from_locale_by_key(guild_id, "dealer_hand")
+    value_msg = get_msg_from_locale_by_key(guild_id, "value")
+    title = get_msg_from_locale_by_key(guild_id, "blackjack")
     embed = nextcord.Embed(
-        title="Blackjack", description=state_of_game, color=DEFAULT_BOT_COLOR
+        title=title, description=state_of_game, color=DEFAULT_BOT_COLOR
     )
     player_hand_field_value = get_hand_cards(client, player_hand)
     dealer_hand_field_value = get_hand_cards(client, dealer_hand)
     embed.add_field(
-        name="Player hand",
-        value=f"{player_hand_field_value}\n" f"value **{player_hand.get_value()}**",
+        name=f"{player_hand_msg}",
+        value=f"{player_hand_field_value}\n" f"{value_msg} **{player_hand.get_value()}**",
         inline=True,
     )
     embed.add_field(
-        name="Dealer hand",
-        value=f"{dealer_hand_field_value}\n" f"value **{dealer_hand.get_value()}**",
+        name=f"{dealer_hand_msg}",
+        value=f"{dealer_hand_field_value}\n" f"{value_msg} **{dealer_hand.get_value()}**",
         inline=True,
     )
     if footer_text is not None and footer_url is not None:
@@ -295,15 +301,20 @@ def create_game_start_blackjack_embed(
     dealer_hand: Hand,
     footer_text: str = None,
     footer_url: Asset = None,
+    guild_id: int = None,
 ) -> nextcord.Embed:
+    player_hand_msg = get_msg_from_locale_by_key(guild_id, "player_hand")
+    dealer_hand_msg = get_msg_from_locale_by_key(guild_id, "dealer_hand")
+    value_msg = get_msg_from_locale_by_key(guild_id, "value")
+    title = get_msg_from_locale_by_key(guild_id, "blackjack")
     embed = nextcord.Embed(
-        title="Blackjack", description=state_of_game, color=DEFAULT_BOT_COLOR
+        title=title, description=state_of_game, color=DEFAULT_BOT_COLOR
     )
     player_hand_field_value = get_hand_cards(client, player_hand)
     dealer_hand_field_value = get_hand_hidden_cards(client, dealer_hand)
     embed.add_field(
-        name="Player hand",
-        value=f"{player_hand_field_value}\n" f"value **{player_hand.get_value()}**",
+        name=f"{player_hand_msg}",
+        value=f"{player_hand_field_value}\n" f"{value_msg} **{player_hand.get_value()}**",
         inline=True,
     )
     second_dealer_card = dealer_hand.cards[1]
@@ -314,8 +325,8 @@ def create_game_start_blackjack_embed(
     else:
         second_dealer_card = second_dealer_card.value
     embed.add_field(
-        name="Dealer hand",
-        value=f"{dealer_hand_field_value}\nvalue **{second_dealer_card}**",
+        name=f"{dealer_hand_msg}",
+        value=f"{dealer_hand_field_value}\n{value_msg} **{second_dealer_card}**",
         inline=True,
     )
     if footer_text is not None and footer_url is not None:
@@ -323,9 +334,11 @@ def create_game_start_blackjack_embed(
     return embed
 
 
-def create_final_view() -> View:
-    hit = create_button("hit", False, True)
-    stand = create_button("stand", False, True)
+def create_final_view(guild_id: int) -> View:
+    hit_msg = get_msg_from_locale_by_key(guild_id, "hit")
+    stand_msg = get_msg_from_locale_by_key(guild_id, "stand")
+    hit = create_button(hit_msg, False, True)
+    stand = create_button(stand_msg, False, True)
     view = View()
     view.add_item(hit)
     view.add_item(stand)
