@@ -206,6 +206,8 @@
       "msg": "Write here about your feelings"
     },
     "marry": {
+      "name": "marry",
+      "description": "Send marriage request to @User, if marriage will be success you will pay 10000 currency on server",
       "msg": "offers you his hand and heart forever"
     },
     "marry_answer": {
@@ -233,12 +235,18 @@
       "msg": "Together since:"
     },
     "divorce": {
+      "name": "divorce",
+      "description": "Divorce you with your partner",
       "msg": "divorced with"
     },
     "gift": {
+      "name": "gift",
+      "description": "Gift to @User gifts from shop!",
       "msg": "was gifted to"
     },
     "lovedeposit": {
+      "name": "lovedeposit",
+      "description": "Deposit money in your family bank",
       "msg": "were deposited in family bank"
     },
     "add-shop": {
@@ -346,7 +354,106 @@
       "description": "Play slots casino game"
     },
     "gamble": {
+      "msg": "Gamble",
       "name": "gamble",
       "description": "Play gamble casino game"
+    },
+    "bot_strikes": {
+      "msg": "Aurora strikes"
+    },
+    "user_strikes": {
+      "msg": "User strikes"
+    },
+    "percentage": {
+      "msg": "Win/Lose bet percentage"
+    },
+    "wheel": {
+      "name": "wheel",
+      "description": "Spin wheel casino game"
+    },
+    "leaderboard": {
+      "name": "leaderboard",
+      "description": "leaderboard commands"
+    },
+    "leaderboard_level": {
+      "name": "level",
+      "description": "Level leaderboard of users on your server"
+    },
+    "leaderboard_money": {
+      "name": "money",
+      "description": "Money leaderboard of users on your server"
+    },
+    "leaderboard_waifu": {
+      "name": "waifu",
+      "description": "Waifu(gifts total price) leaderboard of users on your server"
+    },
+    "level": {
+      "msg": "Level",
+      "name": "level",
+      "description": "Shows information about user's level"
+    },
+    "add_exp": {
+      "msg": "Added to: ",
+      "name": "add_exp",
+      "description": "Add to @user some exp"
+    },
+    "add_exp_2": {
+      "msg": "exp points"
+    },
+    "remove_exp": {
+      "msg": "Removed from: ",
+      "name": "remove_exp",
+      "description": "Remove from @user some exp"
+    },
+    "remove_exp_2": {
+      "msg": "exp points"
+    },
+    "reset_level": {
+      "msg": "Reset level and exp to starting value of user: ",
+      "name": "reset_level",
+      "description": "Reset level of @User to 1st level 0 exp"
+    },
+    "loveprofile": {
+      "name": "loveprofile",
+      "description": "Sends your couple love card in chat with some information about couple!"
+    },
+    "unknown_user": {
+      "msg": "unknown user"
+    },
+    "waifu": {
+      "name": "waifu",
+      "description": "Sends your profile waifu description"
+    },
+    "likes": {
+      "msg": "Likes"
+    },
+    "divorces": {
+      "msg": "Divorces"
+    },
+    "gifts": {
+      "name": "gifts",
+      "description": "Shows gift shop menu",
+      "msg": "Gifts"
+    },
+    "ilike": {
+      "msg": "Like"
+    },
+    "partner": {
+      "msg": "Love"
+    },
+    "like": {
+      "name": "like",
+      "description": "Choose user you like and he will appear in /waifu command!",
+      "msg": "Now you like this user:"
+    },
+    "unlike": {
+      "name": "like",
+      "description": "Change person that you like to noone",
+      "msg": "Now there are no any person you like"
+    },
+    "lovedescription": {
+      "name": "lovedescription",
+      "description": "Set your couple description",
+      "msg": "Description in your love profile card changed to:\n"
     }
 }

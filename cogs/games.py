@@ -379,7 +379,7 @@ class Games(commands.Cog):
             update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
         msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
-        game_state = get_game_state(is_win)
+        game_state = get_game_state(is_win, interaction.user, self.client, interaction.guild.id)
         embed = create_gamble_embed(
             is_win,
             game_state,
@@ -388,11 +388,16 @@ class Games(commands.Cog):
             bot_strikes,
             f"{msg} {balance}",
             interaction.user.display_avatar,
+            interaction.guild.id
         )
         await interaction.response.send_message(embed=embed)
 
     @nextcord.slash_command(
-        name="wheel", default_member_permissions=Permissions(send_messages=True)
+        name="wheel",
+        description="Spin wheel casino game",
+        name_localizations=get_localized_name("wheel"),
+        description_localizations=get_localized_description("wheel"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __wheel(
             self, interaction: Interaction,

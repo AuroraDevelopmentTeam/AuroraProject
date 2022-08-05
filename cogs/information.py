@@ -152,7 +152,7 @@ class Information(commands.Cog):
             required=True,
             description="The discord's user, tag someone with @",
             description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"},
-        ),
+        )
     ):
         if user is None:
             return await interaction.response.send_message("no key value error 786")

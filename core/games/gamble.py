@@ -4,6 +4,7 @@ import nextcord
 from nextcord import Asset
 
 from core.embeds import DEFAULT_BOT_COLOR
+from core.locales.getters import get_msg_from_locale_by_key
 
 
 def perform_strikes() -> tuple:
@@ -34,13 +35,13 @@ def approximate_bet(bet, state) -> tuple:
         return percentage, bet
 
 
-def get_game_state(state) -> str:
+def get_game_state(state, user: nextcord.Member, client, guild_id: int) -> str:
     if state is True:
-        return "**Player** win"
+        return f'{user.mention} **{get_msg_from_locale_by_key(guild_id, "win")}**'
     if state is None:
-        return "**Draw**"
+        return f'**{get_msg_from_locale_by_key(guild_id, "draw")}**'
     if state is False:
-        return "**Bot** win"
+        return f'{client.user.mention} **{get_msg_from_locale_by_key(guild_id, "win")}**'
 
 
 def create_gamble_embed(
@@ -51,19 +52,25 @@ def create_gamble_embed(
     bot_strikes: int,
     footer_text: str,
     footer_url: Asset,
+    guild_id: int
 ) -> nextcord.Embed:
+    title = get_msg_from_locale_by_key(guild_id, "gamble")
+    bot_strikes_msg = get_msg_from_locale_by_key(guild_id, "bot_strikes")
+    user_strikes_msg = get_msg_from_locale_by_key(guild_id, "user_strikes")
+    percentage_msg = get_msg_from_locale_by_key(guild_id, "percentage")
+    value_msg = get_msg_from_locale_by_key(guild_id, "value")
     embed = nextcord.Embed(
-        title="Gamble", color=DEFAULT_BOT_COLOR, description=game_state
+        title=title, color=DEFAULT_BOT_COLOR, description=game_state
     )
     embed.add_field(
-        name="User strikes", value=f"value **{user_strikes}/18**", inline=True
+        name=user_strikes_msg, value=f"{value_msg} **{user_strikes}/18**", inline=True
     )
     embed.add_field(
-        name="Bot strikes", value=f"value **{bot_strikes}/18**", inline=True
+        name=bot_strikes_msg, value=f"{value_msg} **{bot_strikes}/18**", inline=True
     )
     if state is not None:
         embed.add_field(
-            name="Percentage", value=f"```{percentage*100}%```", inline=False
+            name=percentage_msg, value=f"```{percentage*100}%```", inline=False
         )
     embed.set_footer(text=footer_text, icon_url=footer_url)
     return embed

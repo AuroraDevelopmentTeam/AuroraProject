@@ -7,7 +7,7 @@ import nextcord
 from nextcord.ext import commands, application_checks
 from nextcord import Interaction, SlashOption, Permissions
 
-from core.locales.getters import get_msg_from_locale_by_key
+from core.locales.getters import get_msg_from_locale_by_key, get_localized_description, get_localized_name
 from core.levels.getters import (
     get_user_exp,
     get_user_level,
@@ -62,7 +62,9 @@ class Levels(commands.Cog):
     @nextcord.slash_command(
         name="level",
         description="shows information about user's level",
-        default_member_permissions=Permissions(send_messages=True),
+        name_localizations=get_localized_name("level"),
+        description_localizations=get_localized_description("level"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __level(
         self,
@@ -108,9 +110,10 @@ class Levels(commands.Cog):
             )
         background.text((200, 40), str(user), font=larger_font, color="#FFFFFF")
         background.rectangle((200, 100), width=350, height=2, fill="#FFFFFF")
+        lvl_text = get_msg_from_locale_by_key(interaction.guild.id, interaction.application_command.name)
         background.text(
             (200, 130),
-            f"Level - {user_level} | XP - {user_exp}/{exp_to_next_level}",
+            f"{lvl_text} - {user_level} | XP - {user_exp}/{exp_to_next_level}",
             font=font,
             color="#FFFFFF",
         )
@@ -119,15 +122,25 @@ class Levels(commands.Cog):
 
     @nextcord.slash_command(
         name="add_exp",
-        description="add to @user some exp",
-        default_member_permissions=Permissions(administrator=True),
+        description="Add to @user some exp",
+        name_localizations=get_localized_name("add_exp"),
+        description_localizations=get_localized_description("add_exp"),
+        default_member_permissions=Permissions(administrator=True)
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __add_exp(
         self,
         interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(required=True),
-        exp_points: Optional[int] = SlashOption(required=True),
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"},
+        ),
+        exp_points: Optional[int] = SlashOption(
+            required=True,
+            description="Number of experience points to add",
+            description_localizations={"ru": "Количество очков опыта, которые необходимо добавить"},
+        )
     ):
         if user.bot:
             return await interaction.response.send_message("bot_user_error")
@@ -135,19 +148,39 @@ class Levels(commands.Cog):
             return await interaction.response.send_message("negative_value_error")
         min_exp, max_exp = exp_points, exp_points
         update_user_exp(interaction.guild.id, user.id, min_exp, max_exp)
-        await interaction.response.send_message("done")
+        msg = get_msg_from_locale_by_key(interaction.guild.id, interaction.application_command.name)
+        msg_2 = get_msg_from_locale_by_key(interaction.guild.id, f'{interaction.application_command.name}_2')
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{msg} {user.mention} **{exp_points}** {msg_2}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
 
     @nextcord.slash_command(
         name="remove_exp",
         description="remove from @user some exp",
+        name_localizations=get_localized_name("remove_exp"),
+        description_localizations=get_localized_description("remove_exp"),
         default_member_permissions=Permissions(administrator=True),
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __remove_exp(
         self,
         interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(required=True),
-        exp_points: Optional[int] = SlashOption(required=True),
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"},
+        ),
+        exp_points: Optional[int] = SlashOption(
+            required=True,
+            description="Number of experience points to add",
+            description_localizations={"ru": "Количество очков опыта, которые необходимо добавить"},
+        )
     ):
         if user.bot:
             return await interaction.response.send_message("bot_user_error")
@@ -155,24 +188,49 @@ class Levels(commands.Cog):
             return await interaction.response.send_message("negative_value_error")
         min_exp, max_exp = exp_points, exp_points
         update_user_exp(interaction.guild.id, user.id, -min_exp, -max_exp)
-        await interaction.response.send_message("done")
+        msg = get_msg_from_locale_by_key(interaction.guild.id, interaction.application_command.name)
+        msg_2 = get_msg_from_locale_by_key(interaction.guild.id, f'{interaction.application_command.name}_2')
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{msg} {user.mention} **{exp_points}** {msg_2}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
 
     @nextcord.slash_command(
         name="reset_level",
         description="Reset level of @User to 1st level 0 exp",
-        default_member_permissions=Permissions(administrator=True),
+        name_localizations=get_localized_name("reset_level"),
+        description_localizations=get_localized_description("reset_level"),
+        default_member_permissions=Permissions(administrator=True)
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __reset_level(
         self,
         interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(required=True),
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"},
+        )
     ):
         if user.bot:
             return await interaction.response.send_message("bot_user_error")
         set_user_exp_to_zero(interaction.guild.id, user.id)
         set_user_level(interaction.guild.id, user.id, 1)
-        await interaction.response.send_message("done")
+        msg = get_msg_from_locale_by_key(interaction.guild.id, interaction.application_command.name)
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{msg} {user.mention}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
 
 
 def setup(client):

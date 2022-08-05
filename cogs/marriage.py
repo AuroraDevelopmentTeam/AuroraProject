@@ -10,6 +10,7 @@ from nextcord import Interaction, SlashOption, Permissions
 from nextcord.ext import commands
 from nextcord.utils import get
 
+from core.locales.getters import get_localized_name, get_localized_description
 from core.checkers import is_married
 from core.money.updaters import update_user_balance
 from core.money.getters import get_user_balance, get_guild_currency_symbol
@@ -54,12 +55,18 @@ class Marriage(commands.Cog):
         name="marry",
         description="send marriage request to @User, "
         "if marriage will be success you will pay 10000 currency on server",
-        default_member_permissions=Permissions(send_messages=True),
+        name_localizations=get_localized_name("marry"),
+        description_localizations=get_localized_description("marry"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __marry(
         self,
         interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(required=True),
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"},
+        )
     ):
         if user.bot:
             return await interaction.response.send_message("bot_user_error")
@@ -126,6 +133,8 @@ class Marriage(commands.Cog):
         name="loveprofile",
         description="sends your couple love card in chat with some "
         "information about couple!",
+        name_localizations=get_localized_name("loveprofile"),
+        description_localizations=get_localized_description("loveprofile"),
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __loveprofile(self, interaction: Interaction):
@@ -153,7 +162,9 @@ class Marriage(commands.Cog):
     @nextcord.slash_command(
         name="divorce",
         description="divorce you with your partner",
-        default_member_permissions=Permissions(send_messages=True),
+        name_localizations=get_localized_name("divorce"),
+        description_localizations=get_localized_description("divorce"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __divorce(self, interaction: Interaction):
         if is_married(interaction.guild.id, interaction.user.id) is False:
@@ -161,7 +172,7 @@ class Marriage(commands.Cog):
         pair_id = get_user_pair_id(interaction.guild.id, interaction.user.id)
         pair = await self.client.fetch_user(pair_id)
         if pair is None:
-            pair = "кто-то мне неизвестный"
+            pair = get_msg_from_locale_by_key(interaction.guild.id, "unknown_user")
         else:
             pair = pair.mention
         divorce_users(interaction.guild.id, interaction.user.id, pair_id)
@@ -181,12 +192,18 @@ class Marriage(commands.Cog):
     @nextcord.slash_command(
         name="waifu",
         description="Sends your profile waifu description",
-        default_member_permissions=Permissions(send_messages=True),
+        name_localizations=get_localized_name("waifu"),
+        description_localizations=get_localized_description("waifu"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __waifu(
         self,
         interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(required=False),
+        user: Optional[nextcord.Member] = SlashOption(
+            required=False,
+            description="The discord's user, tag someone with @",
+            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"},
+        )
     ):
         if user is None:
             user = interaction.user
@@ -205,14 +222,15 @@ class Marriage(commands.Cog):
         else:
             parther = await self.client.fetch_user(pair_id)
             if parther is None:
-                parther = "кто-то мне неизвестный"
+                parther = get_msg_from_locale_by_key(interaction.guild.id, "unknown_user")
             else:
                 parther = f"{parther.mention}"
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         embed.set_author(
             name=f"{interaction.application_command.name.capitalize()} - {user}"
         )
-        embed.add_field(name="Партнёр", value=parther, inline=True)
+        partner_msg = get_msg_from_locale_by_key(interaction.guild.id, "partner")
+        embed.add_field(name=partner_msg, value=parther, inline=True)
         if like_id == 0:
             parther = "-"
         else:
@@ -221,13 +239,18 @@ class Marriage(commands.Cog):
                 parther = "кто-то мне неизвестный"
             else:
                 parther = f"{parther.mention}"
-        embed.add_field(name="Нравится", value=parther, inline=True)
+        like_msg = get_msg_from_locale_by_key(interaction.guild.id, "ilike")
+        price_msg = get_msg_from_locale_by_key(interaction.guild.id, "price")
+        embed.add_field(name=like_msg, value=parther, inline=True)
         embed.add_field(
-            name="Цена", value=f"__**{gift_price}**__ {currency_symbol}", inline=True
+            name=f"{price_msg}", value=f"__**{gift_price}**__ {currency_symbol}", inline=True
         )
-        embed.add_field(name="Разводы", value=divorces, inline=True)
-        embed.add_field(name="Симпатии", value=likes_counter, inline=True)
-        embed.add_field(name="Подарки", value=gifts, inline=False)
+        divorces_msg = get_msg_from_locale_by_key(interaction.guild.id, "divorces")
+        likes_msg = get_msg_from_locale_by_key(interaction.guild.id, "likes")
+        gifts_msg = get_msg_from_locale_by_key(interaction.guild.id, "gifts")
+        embed.add_field(name=divorces_msg, value=divorces, inline=True)
+        embed.add_field(name=likes_msg, value=likes_counter, inline=True)
+        embed.add_field(name=gifts_msg, value=gifts, inline=False)
         embed.set_thumbnail(url=user.display_avatar)
         embed.set_footer(
             text=f"{requested} {interaction.user}",
@@ -238,33 +261,63 @@ class Marriage(commands.Cog):
     @nextcord.slash_command(
         name="like",
         description="Choose user you like and he will appear in /waifu command!",
-        default_member_permissions=Permissions(send_messages=True),
+        name_localizations=get_localized_name("like"),
+        description_localizations=get_localized_description("like"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __like(
         self,
         interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(required=True),
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"},
+        )
     ):
-        if user.bot:
-            return await interaction.response.send_message("bot_user_error")
         if user == interaction.user:
             return await interaction.response.send_message("self choose error")
         update_user_like(interaction.guild.id, interaction.user.id, user.id)
-        await interaction.response.send_message("done")
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, interaction.application_command.name
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} {user.mention}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
 
     @nextcord.slash_command(
         name="unlike",
         description="change person that you like to noone",
-        default_member_permissions=Permissions(send_messages=True),
+        name_localizations=get_localized_name("unlike"),
+        description_localizations=get_localized_description("unlike"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __unlike(self, interaction: Interaction):
         update_user_like(interaction.guild.id, interaction.user.id, 0)
-        await interaction.response.send_message("done")
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, interaction.application_command.name
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
 
     @nextcord.slash_command(
         name="gifts",
         description="shows gift shop menu",
-        default_member_permissions=Permissions(send_messages=True),
+        name_localizations=get_localized_name("gifts"),
+        description_localizations=get_localized_description("gifts"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __gifts(self, interaction: Interaction):
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
@@ -292,13 +345,19 @@ class Marriage(commands.Cog):
 
     @nextcord.slash_command(
         name="gift",
-        description="gift to @User gifts from shop!",
-        default_member_permissions=Permissions(send_messages=True),
+        description="Gift to @User gifts from shop!",
+        name_localizations=get_localized_name("gift"),
+        description_localizations=get_localized_description("gift"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __gift(
         self,
         interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(required=True),
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"},
+        ),
         gift: str = SlashOption(
             name="picker",
             choices={
@@ -347,8 +406,10 @@ class Marriage(commands.Cog):
 
     @nextcord.slash_command(
         name="lovedescription",
-        description="set your couple description",
-        default_member_permissions=Permissions(send_messages=True),
+        description="Set your couple description",
+        name_localizations=get_localized_name("lovedescription"),
+        description_localizations=get_localized_description("lovedescription"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __lovedescription(
         self,
@@ -360,12 +421,25 @@ class Marriage(commands.Cog):
         update_user_love_description(
             interaction.guild.id, interaction.user.id, description
         )
-        await interaction.response.send_message("done")
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, interaction.application_command.name
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} {description}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
 
     @nextcord.slash_command(
         name="lovedeposit",
-        description="deposit money in your family bank",
-        default_member_permissions=Permissions(send_messages=True),
+        description="Deposit money in your family bank",
+        name_localizations=get_localized_name("lovedeposit"),
+        description_localizations=get_localized_description("lovedeposit"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __lovedeposit(
         self,

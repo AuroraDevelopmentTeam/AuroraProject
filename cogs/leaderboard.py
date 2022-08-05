@@ -5,7 +5,7 @@ from nextcord.ext import commands
 from nextcord import Interaction, Permissions
 from core.embeds import construct_top_embed
 from core.money.getters import get_guild_currency_symbol
-from core.locales.getters import get_msg_from_locale_by_key
+from core.locales.getters import get_msg_from_locale_by_key, get_localized_name, get_localized_description
 
 
 class Leaderboard(commands.Cog):
@@ -13,7 +13,11 @@ class Leaderboard(commands.Cog):
         self.client = client
 
     @nextcord.slash_command(
-        name="leaderboard", default_member_permissions=Permissions(send_messages=True)
+        name="leaderboard",
+        description="Leaderboard slash command that will be the prefix of leaderboard commands.",
+        name_localizations=get_localized_name("leaderboard"),
+        description_localizations=get_localized_description("leaderboard"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __leaderboard(self, interaction: Interaction):
         """
@@ -22,7 +26,9 @@ class Leaderboard(commands.Cog):
         pass
 
     @__leaderboard.subcommand(
-        name="money", description="money leaderboard on your guild"
+        name="money", description="money leaderboard on your guild",
+        name_localizations=get_localized_name("leaderboard_money"),
+        description_localizations=get_localized_description("leaderboard_money")
     )
     async def __money_leaderboard(self, interaction: Interaction):
         await interaction.response.defer()
@@ -30,7 +36,7 @@ class Leaderboard(commands.Cog):
         cursor = db.cursor()
         money = []
         for row in cursor.execute(
-            f"SELECT user_id, balance FROM money WHERE guild_id = {interaction.guild.id} ORDER BY balance DESC LIMIT 18"
+                f"SELECT user_id, balance FROM money WHERE guild_id = {interaction.guild.id} ORDER BY balance DESC LIMIT 18"
         ):
             user = await self.client.fetch_user(row[0])
             money.append([user.mention, row[1]])
@@ -51,7 +57,9 @@ class Leaderboard(commands.Cog):
         await interaction.followup.send(embed=embed)
 
     @__leaderboard.subcommand(
-        name="level", description="level leaderboard on your guild"
+        name="level", description="level leaderboard on your guild",
+        name_localizations=get_localized_name("leaderboard_level"),
+        description_localizations=get_localized_description("leaderboard_level")
     )
     async def __level_leaderboard(self, interaction: Interaction):
         await interaction.response.defer()
@@ -59,7 +67,7 @@ class Leaderboard(commands.Cog):
         cursor = db.cursor()
         levels = []
         for row in cursor.execute(
-            f"SELECT user_id, level FROM levels WHERE guild_id = {interaction.guild.id} ORDER BY level DESC LIMIT 18"
+                f"SELECT user_id, level FROM levels WHERE guild_id = {interaction.guild.id} ORDER BY level DESC LIMIT 18"
         ):
             user = await self.client.fetch_user(row[0])
             levels.append([user.mention, row[1]])
@@ -77,14 +85,16 @@ class Leaderboard(commands.Cog):
         )
         await interaction.followup.send(embed=embed)
 
-    @__leaderboard.subcommand(name="waifu", description="waifu leaderboard")
+    @__leaderboard.subcommand(name="waifu", description="waifu leaderboard",
+                              name_localizations=get_localized_name("leaderboard_waifu"),
+                              description_localizations=get_localized_description("leaderboard_waifu"))
     async def __waifu_leaderboard(self, interaction: Interaction):
         await interaction.response.defer()
         db = sqlite3.connect("./databases/main.sqlite")
         cursor = db.cursor()
         levels = []
         for row in cursor.execute(
-            f"SELECT user_id, gift_price FROM gifts WHERE guild_id = {interaction.guild.id} ORDER BY gift_price DESC LIMIT 18"
+                f"SELECT user_id, gift_price FROM gifts WHERE guild_id = {interaction.guild.id} ORDER BY gift_price DESC LIMIT 18"
         ):
             user = await self.client.fetch_user(row[0])
             levels.append([user.mention, row[1]])

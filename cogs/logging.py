@@ -86,6 +86,12 @@ class EventsLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_role_update(self, before, after):
+        if isinstance(before, nextcord.Role):
+            if before.position == after.position:
+                if before.name == after.name:
+                    if before.permissions.value == after.permissions.value:
+                        if before.color == after.color:
+                            return
         logging_channel = LOGGING_CHANNEL_TESTING_ID
         logging_channel = self.client.get_channel(logging_channel)
         await logging_channel.send(
@@ -123,7 +129,7 @@ class EventsLogging(commands.Cog):
         logging_channel = LOGGING_CHANNEL_TESTING_ID
         logging_channel = self.client.get_channel(logging_channel)
         await logging_channel.send(
-            embed=construct_log("Channel create", channel.guild, channel=channel)
+            embed=construct_log("Channel delete", channel.guild, channel=channel)
         )
 
     @commands.Cog.listener()
@@ -132,7 +138,7 @@ class EventsLogging(commands.Cog):
         logging_channel = self.client.get_channel(logging_channel)
         await logging_channel.send(
             embed=construct_log(
-                "Channel create",
+                "Channel update",
                 after.guild,
                 channel_before=before,
                 channel_after=after,
