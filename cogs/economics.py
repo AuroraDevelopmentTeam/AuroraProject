@@ -240,7 +240,7 @@ class Economics(commands.Cog):
         description_localizations=get_localized_description("timely"),
         default_member_permissions=Permissions(send_messages=True)
     )
-    @cooldowns.cooldown(1, 3600, bucket=cooldowns.SlashBucket.author)
+    @cooldowns.cooldown(1, 10800, bucket=cooldowns.SlashBucket.author)
     async def __timely(self, interaction: Interaction):
         payday_amount = get_guild_payday_amount(interaction.guild.id)
         update_user_balance(interaction.guild.id, interaction.user.id, payday_amount)
