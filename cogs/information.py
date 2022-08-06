@@ -141,8 +141,8 @@ class Information(commands.Cog):
     @nextcord.slash_command(
         name="user",
         description="Sends all information about user, that can i found",
-        name_localizations=get_localized_name("server"),
-        description_localizations=get_localized_description("server"),
+        name_localizations=get_localized_name("user"),
+        description_localizations=get_localized_description("user"),
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __user(
