@@ -455,5 +455,11 @@
       "name": "lovedescription",
       "description": "Set your couple description",
       "msg": "Description in your love profile card changed to:\n"
+    },
+    "set_logging_channel": {
+      "msg": "The following channel has been set to log events:"
+    },
+    "set_logging_state": {
+      "msg": "For logging have been set the following status:"
     }
 }

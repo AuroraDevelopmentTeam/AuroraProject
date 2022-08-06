@@ -36,6 +36,8 @@ from core.stats.create import create_stats_table
 from core.stats.writers import write_in_stats_standart_values
 from core.badges.create import create_badges_table
 from core.badges.writers import write_in_badges_standart_values
+from core.loggers.create import create_loggers_table
+from core.loggers.writers import write_in_loggers_standart_values
 
 
 class OnReadyListener(commands.Cog):
@@ -75,8 +77,8 @@ class OnReadyListener(commands.Cog):
         write_in_profiles_standart_values(guilds)
         create_stats_table()
         write_in_stats_standart_values(guilds)
-        create_badges_table()
-        write_in_badges_standart_values(guilds)
+        create_loggers_table()
+        write_in_loggers_standart_values(guilds)
 
 
 def setup(client):

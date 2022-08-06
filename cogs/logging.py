@@ -2,6 +2,7 @@ import nextcord
 from nextcord.ext import commands
 
 from core.embeds import construct_log
+from core.loggers.getters import get_logging_channel, get_logging_state
 
 LOGGING_CHANNEL_TESTING_ID = 999598199444607016
 
@@ -13,6 +14,10 @@ class EventsLogging(commands.Cog):
     @commands.Cog.listener()
     async def on_message_delete(self, message):
         if message.author.bot:
+            return
+        if get_logging_channel(message.guild.id) == 0:
+            return
+        if get_logging_state(message.guild.id) is False:
             return
         logging_channel = LOGGING_CHANNEL_TESTING_ID
         logging_channel = self.client.get_channel(logging_channel)
@@ -30,7 +35,11 @@ class EventsLogging(commands.Cog):
     async def on_message_edit(self, before, after):
         if after.author.bot:
             return
-        logging_channel = LOGGING_CHANNEL_TESTING_ID
+        if get_logging_channel(before.guild.id) == 0:
+            return
+        if get_logging_state(before.guild.id) is False:
+            return
+        logging_channel = get_logging_channel(before.guild.id)
         logging_channel = self.client.get_channel(logging_channel)
         await logging_channel.send(
             embed=construct_log(
@@ -50,6 +59,10 @@ class EventsLogging(commands.Cog):
     async def on_member_join(self, member):
         if member.bot:
             return
+        if get_logging_channel(member.guild.id) == 0:
+            return
+        if get_logging_state(member.guild.id) is False:
+            return
         logging_channel = LOGGING_CHANNEL_TESTING_ID
         logging_channel = self.client.get_channel(logging_channel)
         await logging_channel.send(
@@ -59,6 +72,10 @@ class EventsLogging(commands.Cog):
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         if member.bot:
+            return
+        if get_logging_channel(member.guild.id) == 0:
+            return
+        if get_logging_state(member.guild.id) is False:
             return
         logging_channel = LOGGING_CHANNEL_TESTING_ID
         logging_channel = self.client.get_channel(logging_channel)
@@ -70,6 +87,10 @@ class EventsLogging(commands.Cog):
     async def on_member_ban(self, guild, user):
         if user.bot:
             return
+        if get_logging_channel(guild.id) == 0:
+            return
+        if get_logging_state(guild.id) is False:
+            return
         logging_channel = LOGGING_CHANNEL_TESTING_ID
         logging_channel = self.client.get_channel(logging_channel)
         await logging_channel.send(embed=construct_log("Member ban", guild, user=user))
@@ -77,6 +98,10 @@ class EventsLogging(commands.Cog):
     @commands.Cog.listener()
     async def on_member_unban(self, guild, user):
         if user.bot:
+            return
+        if get_logging_channel(guild.id) == 0:
+            return
+        if get_logging_state(guild.id) is False:
             return
         logging_channel = LOGGING_CHANNEL_TESTING_ID
         logging_channel = self.client.get_channel(logging_channel)
@@ -86,6 +111,10 @@ class EventsLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_role_update(self, before, after):
+        if get_logging_channel(before.guild.id) == 0:
+            return
+        if get_logging_state(before.guild.id) is False:
+            return
         if isinstance(before, nextcord.Role):
             if before.position == after.position:
                 if before.name == after.name:
@@ -102,6 +131,10 @@ class EventsLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_role_create(self, role):
+        if get_logging_channel(role.guild.id) == 0:
+            return
+        if get_logging_state(role.guild.id) is False:
+            return
         logging_channel = LOGGING_CHANNEL_TESTING_ID
         logging_channel = self.client.get_channel(logging_channel)
         await logging_channel.send(
@@ -110,6 +143,10 @@ class EventsLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_role_delete(self, role):
+        if get_logging_channel(role.guild.id) == 0:
+            return
+        if get_logging_state(role.guild.id) is False:
+            return
         logging_channel = LOGGING_CHANNEL_TESTING_ID
         logging_channel = self.client.get_channel(logging_channel)
         await logging_channel.send(
@@ -118,6 +155,10 @@ class EventsLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_channel_create(self, channel):
+        if get_logging_channel(channel.guild.id) == 0:
+            return
+        if get_logging_state(channel.guild.id) is False:
+            return
         logging_channel = LOGGING_CHANNEL_TESTING_ID
         logging_channel = self.client.get_channel(logging_channel)
         await logging_channel.send(
@@ -126,6 +167,10 @@ class EventsLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel):
+        if get_logging_channel(channel.guild.id) == 0:
+            return
+        if get_logging_state(channel.guild.id) is False:
+            return
         logging_channel = LOGGING_CHANNEL_TESTING_ID
         logging_channel = self.client.get_channel(logging_channel)
         await logging_channel.send(
@@ -134,6 +179,10 @@ class EventsLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_channel_update(self, before, after):
+        if get_logging_channel(before.guild.id) == 0:
+            return
+        if get_logging_state(before.guild.id) is False:
+            return
         logging_channel = LOGGING_CHANNEL_TESTING_ID
         logging_channel = self.client.get_channel(logging_channel)
         await logging_channel.send(

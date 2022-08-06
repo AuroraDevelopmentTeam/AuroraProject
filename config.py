@@ -19,4 +19,5 @@ settings = {
     "default_goodbye_messages_type": "card",
     "default_nitro_messages_state": True,
     "default_profile_avatar_form": "circle",
+    "default_logs_enabled": True
 }
