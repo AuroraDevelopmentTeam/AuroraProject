@@ -68,3 +68,19 @@ def set_server_level_up_messages_state(guild_id: int, messages_state: bool) -> N
     cursor.close()
     db.close()
     return
+
+
+def update_min_max_exp(guild_id: int, min: int, max: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE levels_config SET min_exp_per_message = ? WHERE guild_id = ?"
+    values = (min, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    sql = "UPDATE levels_config SET max_exp_per_message = ? WHERE guild_id = ?"
+    values = (max, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return

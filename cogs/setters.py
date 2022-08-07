@@ -16,7 +16,7 @@ from core.money.updaters import (
 )
 from core.locales.updaters import update_guild_locale
 from core.checkers import is_locale_valid, is_str_or_emoji
-from core.levels.updaters import set_server_level_up_messages_state, set_user_level
+from core.levels.updaters import set_server_level_up_messages_state, set_user_level, update_min_max_exp
 from core.welcomers.updaters import (
     set_welcome_channel,
     update_welcome_message_description,
@@ -296,6 +296,8 @@ class Setters(commands.Cog):
             user: Optional[nextcord.Member] = SlashOption(required=True),
             level: Optional[int] = SlashOption(required=True),
     ):
+        if level <= 0:
+            return await interaction.response.send_message("negative_value_error")
         set_user_level(interaction.guild.id, user.id, level)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"set_{interaction.application_command.name}"
@@ -308,6 +310,33 @@ class Setters(commands.Cog):
             embed=construct_basic_embed(
                 interaction.application_command.name,
                 f"{message} {user.mention} {message_2} __**{level}**__",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
+
+    @__set.subcommand(
+        name="min_max_exp", description="Setting server's min and max exp per writed message"
+    )
+    async def __min_max_exp_set(
+            self,
+            interaction: Interaction,
+            min: Optional[int] = SlashOption(required=True),
+            max: Optional[int] = SlashOption(required=True)
+    ):
+        if min < 0:
+            return await interaction.response.send_message("negative_value_error")
+        if max < 0:
+            return await interaction.response.send_message("negative_value_error")
+        update_min_max_exp(interaction.guild.id, min, max)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"set_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} **{min}** - **{max}**",
                 f"{requested} {interaction.user}",
                 interaction.user.display_avatar,
             )

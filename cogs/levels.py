@@ -30,7 +30,7 @@ class Levels(commands.Cog):
     def level_up(self, guild_id, user_id):
         user_exp = get_user_exp(guild_id, user_id)
         user_level = get_user_level(guild_id, user_id)
-        leveling_formula = round((7 * (user_level**3)))
+        leveling_formula = round((7 * (user_level**2)) + 58)
         if user_exp >= leveling_formula:
             return True
         else:
@@ -49,7 +49,7 @@ class Levels(commands.Cog):
                 embed = construct_basic_embed(
                     f"{message.author}",
                     f"{msg}",
-                    f"{user_level}:" f"0/{round((7 * (user_level ** 3)))}",
+                    f"{user_level}:" f"0/{round((7 * (user_level**2)) + 58)}",
                     message.author.display_avatar,
                 )
                 await message.channel.send(embed=embed)
@@ -77,7 +77,7 @@ class Levels(commands.Cog):
             return await interaction.response.send_message("bot_user_error")
         user_exp = get_user_exp(interaction.guild.id, user.id)
         user_level = get_user_level(interaction.guild.id, user.id)
-        exp_to_next_level = round((7 * (user_level**3)))
+        exp_to_next_level = round((7 * (user_level**2)) + 58)
         percentage = int(((user_exp * 100) / exp_to_next_level))
         background = Editor(Canvas((900, 300), color="#141414"))
         avatar = BytesIO()

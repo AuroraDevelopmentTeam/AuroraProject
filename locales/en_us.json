@@ -461,5 +461,8 @@
     },
     "set_logging_state": {
       "msg": "For logging have been set the following status:"
+    },
+    "set_min_max_exp": {
+      "msg": "Now experience will be given in this range:"
     }
 }
