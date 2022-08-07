@@ -1,9 +1,12 @@
 import nextcord
 from nextcord.ext import commands, application_checks
 from nextcord import Interaction, Permissions
+
 from core.embeds import construct_top_embed
 from core.money.getters import get_guild_currency_symbol
 from core.locales.getters import get_msg_from_locale_by_key
+from core.tickets.getters import get_ticket_archive, get_ticket_category, get_ticket_support
+from core.tickets.updaters import update_ticket_archive, update_ticket_category
 
 
 class TicketDisabled(nextcord.ui.View):
@@ -64,13 +67,15 @@ class Tickets(commands.Cog):
             custom_id = interaction.data["custom_id"]
             if custom_id == "create_ticket:blurple":
                 await interaction.response.defer()
+                if get_ticket_category(interaction.guild.id) == 0:
+                    return
                 embed = nextcord.Embed(
                     title="Ticket", description=f"Your ticket is creating..."
                 )
                 msg = await interaction.followup.send(
                     embed=embed, ephemeral=True
                 )
-                support_role = nextcord.utils.get(interaction.guild.roles, name="ticket_support")
+                support_role = nextcord.utils.get(interaction.guild.roles, id=get_ticket_support(interaction.guild.id))
                 overwrites = {
                     interaction.guild.default_role: nextcord.PermissionOverwrite(
                         read_messages=False
@@ -82,7 +87,8 @@ class Tickets(commands.Cog):
                         read_messages=True
                     )
                 }
-                category_channel = nextcord.utils.get(interaction.guild.categories, name="Aurora-Tickets")
+                tickets_category = get_ticket_category(interaction.guild.id)
+                category_channel = nextcord.utils.get(interaction.guild.categories, id=tickets_category)
                 channel = await category_channel.create_text_channel(
                     f"{interaction.user.name}-ticket", overwrites=overwrites
                 )
@@ -97,8 +103,11 @@ class Tickets(commands.Cog):
                 )
                 await channel.send(embed=embed, view=TicketSettings())
             if custom_id == "ticket_settings:red":
+                if get_ticket_archive(interaction.guild.id) == 0:
+                    return
                 await interaction.channel.send("Closing this ticket...")
-                category_channel = nextcord.utils.get(interaction.guild.categories, name="Aurora-Archive")
+                archive_channel = get_ticket_archive(interaction.guild.id)
+                category_channel = nextcord.utils.get(interaction.guild.categories, id=archive_channel)
                 overwrites = {
                     interaction.guild.default_role: nextcord.PermissionOverwrite(
                         read_messages=False
@@ -115,7 +124,7 @@ class Tickets(commands.Cog):
         name="setup_tickets", default_member_permissions=Permissions(administrator=True)
     )
     @application_checks.has_permissions(manage_guild=True)
-    async def __ticket(self, interaction: Interaction):
+    async def __setup_tickets(self, interaction: Interaction):
         embed = nextcord.Embed(
             title="Create a ticket",
             description="Click `create ticket` button below to create a ticket. "
@@ -130,7 +139,9 @@ class Tickets(commands.Cog):
             ),
         }
         tickets_category = await interaction.guild.create_category(name=f"Aurora-Tickets", overwrites=overwrites)
+        update_ticket_category(interaction.guild.id, tickets_category.id)
         archive_category = await interaction.guild.create_category(name="Aurora-Archive", overwrites=overwrites)
+        update_ticket_archive(interaction.guild.id, archive_category.id)
         await interaction.response.send_message(embed=embed, view=CreateTicket())
 
 

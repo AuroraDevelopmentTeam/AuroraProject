@@ -38,6 +38,8 @@ from core.badges.create import create_badges_table
 from core.badges.writers import write_in_badges_standart_values
 from core.loggers.create import create_loggers_table
 from core.loggers.writers import write_in_loggers_standart_values
+from core.tickets.create import create_tickets_config_table
+from core.tickets.writers import write_in_tickets_config_standart_values
 
 
 class OnReadyListener(commands.Cog):
@@ -79,6 +81,8 @@ class OnReadyListener(commands.Cog):
         write_in_stats_standart_values(guilds)
         create_loggers_table()
         write_in_loggers_standart_values(guilds)
+        create_tickets_config_table()
+        write_in_tickets_config_standart_values(guilds)
 
 
 def setup(client):

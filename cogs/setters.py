@@ -42,6 +42,7 @@ from core.nitro.updaters import (
     update_nitro_message_title,
 )
 from core.loggers.updaters import update_logging_channel_id, update_logging_guild_state
+from core.tickets.updaters import update_ticket_archive, update_ticket_category, update_ticket_support
 
 
 class EmbedModal(nextcord.ui.Modal):
@@ -754,6 +755,34 @@ class Setters(commands.Cog):
                 interaction.user.display_avatar,
             )
         )
+
+    @__set.subcommand(name="ticket_category", description="set tickets category")
+    async def __ticket_category_set(self, interaction: Interaction, ticket_category_id=SlashOption(required=True)):
+        if not isinstance(ticket_category_id, int):
+            return await interaction.response.send_message("negative_value_error")
+        try:
+            category = nextcord.utils.get(interaction.guild.categories, id=ticket_category_id)
+            update_ticket_category(interaction.guild.id, category.id)
+            await interaction.response.send_message('done')
+        except:
+            return
+
+    @__set.subcommand(name="ticket_archive", description="set tickets archive category")
+    async def __ticket_archive_set(self, interaction: Interaction, ticket_category_id=SlashOption(required=True)):
+        if not isinstance(ticket_category_id, int):
+            return await interaction.response.send_message("negative_value_error")
+        try:
+            category = nextcord.utils.get(interaction.guild.categories, id=ticket_category_id)
+            update_ticket_archive(interaction.guild.id, category.id)
+            await interaction.response.send_message('done')
+        except:
+            return
+
+    @__set.subcommand(name="ticket_support", description="set tickets archive category")
+    async def __ticket_archive_set(self, interaction: Interaction,
+                                   ticket_support: Optional[nextcord.Role] = SlashOption(required=True)):
+        update_ticket_support(interaction.guild.id, ticket_support.id)
+        await interaction.response.send_message('done')
 
 
 def setup(client):
