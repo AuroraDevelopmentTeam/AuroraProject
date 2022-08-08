@@ -473,5 +473,11 @@
     },
     "set_ticket_support": {
       "msg": "Now this users with this role will be auto added to created tickets:"
+    },
+    "online": {
+      "msg": "spent time in voice channels:"
+    },
+    "messages_counter": {
+      "msg": "wrote messages total:"
     }
 }

@@ -729,7 +729,7 @@ class Setters(commands.Cog):
         )
 
     @__set.subcommand(name="logging_state", description="Setting server's logs channel")
-    async def __logging_channel_set(self, interaction: Interaction,
+    async def __logging_state_set(self, interaction: Interaction,
                                     logging_state: int = SlashOption(
                                         name="picker", choices={"turn on": 1, "turn off": 0}, required=True
                                     )):
