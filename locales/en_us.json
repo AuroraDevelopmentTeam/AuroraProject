@@ -464,5 +464,14 @@
     },
     "set_min_max_exp": {
       "msg": "Now experience will be given in this range:"
+    },
+    "set_ticket_category": {
+      "msg": "Now this category is category for new created tickets:"
+    },
+    "set_ticket_archive": {
+      "msg": "Now this category is category to store closed tickets:"
+    },
+    "set_ticket_support": {
+      "msg": "Now this users with this role will be auto added to created tickets:"
     }
 }

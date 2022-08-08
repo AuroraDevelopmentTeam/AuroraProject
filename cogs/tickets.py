@@ -1,6 +1,6 @@
 import nextcord
 from nextcord.ext import commands, application_checks
-from nextcord import Interaction, Permissions
+from nextcord import Interaction, Permissions, SlashOption
 
 from core.embeds import construct_top_embed
 from core.money.getters import get_guild_currency_symbol
@@ -124,24 +124,28 @@ class Tickets(commands.Cog):
         name="setup_tickets", default_member_permissions=Permissions(administrator=True)
     )
     @application_checks.has_permissions(manage_guild=True)
-    async def __setup_tickets(self, interaction: Interaction):
+    async def __setup_tickets(self, interaction: Interaction,
+                              create_mode: str = SlashOption(
+                                  name="picker", choices={"auto": "auto", "self": "self"}, required=True
+                              )):
         embed = nextcord.Embed(
             title="Create a ticket",
             description="Click `create ticket` button below to create a ticket. "
                         "The server's staff will be notified and solve your problem.",
         )
-        overwrites = {
-            interaction.guild.default_role: nextcord.PermissionOverwrite(
-                read_messages=False
-            ),
-            interaction.guild.me: nextcord.PermissionOverwrite(
-                read_messages=True
-            ),
-        }
-        tickets_category = await interaction.guild.create_category(name=f"Aurora-Tickets", overwrites=overwrites)
-        update_ticket_category(interaction.guild.id, tickets_category.id)
-        archive_category = await interaction.guild.create_category(name="Aurora-Archive", overwrites=overwrites)
-        update_ticket_archive(interaction.guild.id, archive_category.id)
+        if create_mode == "auto":
+            overwrites = {
+                interaction.guild.default_role: nextcord.PermissionOverwrite(
+                    read_messages=False
+                ),
+                interaction.guild.me: nextcord.PermissionOverwrite(
+                    read_messages=True
+                ),
+            }
+            tickets_category = await interaction.guild.create_category(name=f"Aurora-Tickets", overwrites=overwrites)
+            update_ticket_category(interaction.guild.id, tickets_category.id)
+            archive_category = await interaction.guild.create_category(name="Aurora-Archive", overwrites=overwrites)
+            update_ticket_archive(interaction.guild.id, archive_category.id)
         await interaction.response.send_message(embed=embed, view=CreateTicket())
 
 

@@ -757,32 +757,75 @@ class Setters(commands.Cog):
         )
 
     @__set.subcommand(name="ticket_category", description="set tickets category")
-    async def __ticket_category_set(self, interaction: Interaction, ticket_category_id=SlashOption(required=True)):
+    async def __ticket_category_set(self, interaction: Interaction,
+                                    ticket_category_id: Optional[str] = SlashOption(required=True)):
+        try:
+            ticket_category_id = int(ticket_category_id)
+        except ValueError:
+            return await interaction.response.send_message("negative_value_error")
         if not isinstance(ticket_category_id, int):
             return await interaction.response.send_message("negative_value_error")
         try:
             category = nextcord.utils.get(interaction.guild.categories, id=ticket_category_id)
             update_ticket_category(interaction.guild.id, category.id)
-            await interaction.response.send_message('done')
+            message = get_msg_from_locale_by_key(
+                interaction.guild.id, f"set_{interaction.application_command.name}"
+            )
+            requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+            await interaction.response.send_message(
+                embed=construct_basic_embed(
+                    interaction.application_command.name,
+                    f"{message} {category.mention}",
+                    f"{requested} {interaction.user}",
+                    interaction.user.display_avatar,
+                )
+            )
         except:
             return
 
     @__set.subcommand(name="ticket_archive", description="set tickets archive category")
-    async def __ticket_archive_set(self, interaction: Interaction, ticket_category_id=SlashOption(required=True)):
+    async def __ticket_archive_set(self, interaction: Interaction,
+                                   ticket_category_id: Optional[str] = SlashOption(required=True)):
+        try:
+            ticket_category_id = int(ticket_category_id)
+        except ValueError:
+            return await interaction.response.send_message("negative_value_error")
         if not isinstance(ticket_category_id, int):
             return await interaction.response.send_message("negative_value_error")
         try:
             category = nextcord.utils.get(interaction.guild.categories, id=ticket_category_id)
             update_ticket_archive(interaction.guild.id, category.id)
-            await interaction.response.send_message('done')
+            message = get_msg_from_locale_by_key(
+                interaction.guild.id, f"set_{interaction.application_command.name}"
+            )
+            requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+            await interaction.response.send_message(
+                embed=construct_basic_embed(
+                    interaction.application_command.name,
+                    f"{message} {category.mention}",
+                    f"{requested} {interaction.user}",
+                    interaction.user.display_avatar,
+                )
+            )
         except:
             return
 
     @__set.subcommand(name="ticket_support", description="set tickets archive category")
-    async def __ticket_archive_set(self, interaction: Interaction,
+    async def __ticket_support_set(self, interaction: Interaction,
                                    ticket_support: Optional[nextcord.Role] = SlashOption(required=True)):
         update_ticket_support(interaction.guild.id, ticket_support.id)
-        await interaction.response.send_message('done')
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"set_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} {ticket_support.mention}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
 
 
 def setup(client):
