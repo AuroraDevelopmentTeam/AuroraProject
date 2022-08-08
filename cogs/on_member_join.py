@@ -42,7 +42,7 @@ from core.tickets.create import create_tickets_config_table
 from core.tickets.writers import write_in_tickets_config_standart_values
 
 
-class OnReadyListener(commands.Cog):
+class OnMemberListener(commands.Cog):
     def __init__(self, client):
         self.client = client
 
@@ -59,4 +59,4 @@ class OnReadyListener(commands.Cog):
 
 
 def setup(client):
-    client.add_cog(OnReadyListener(client))
+    client.add_cog(OnMemberListener(client))
