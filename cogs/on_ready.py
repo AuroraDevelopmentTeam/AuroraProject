@@ -1,5 +1,7 @@
 from nextcord.ext import commands
 import sqlite3
+import nextcord
+
 from core.locales.create import create_locales_table
 from core.locales.writers import write_in_locales_standart_values
 from core.checkers import is_guild_id_in_table
@@ -83,6 +85,15 @@ class OnReadyListener(commands.Cog):
         write_in_loggers_standart_values(guilds)
         create_tickets_config_table()
         write_in_tickets_config_standart_values(guilds)
+        print(len(self.client.guilds))
+        members = 0
+        for guild in self.client.guilds:
+            print(len(guild.members))
+            members += len(guild.members)
+            print(guild.name)
+        print(members)
+        await self.client.change_presence(activity=nextcord.Game(name=f"/help - Ты милый!\n"
+                                                                      f"Пользователи: {members}\n Сервера: {len(self.client.guilds)}"))
 
 
 def setup(client):
