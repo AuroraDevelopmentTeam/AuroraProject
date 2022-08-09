@@ -125,7 +125,7 @@ class UserProfiles(commands.Cog):
             balance = f"{(balance / 1000000):10.2f}KK"
             coordinates = (90, 20)
         elif balance > 10000:
-            balance = f"{(balance / 10000):10.2f}K"
+            balance = f"{(balance / 1000):10.2f}K"
             coordinates = (90, 20)
         else:
             coordinates = (130, 20)

@@ -16,65 +16,6 @@ class Information(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @nextcord.slash_command(
-        name="help",
-        description="Shows help menu",
-        default_member_permissions=Permissions(send_messages=True),
-    )
-    async def __help(self, interaction: Interaction):
-        embed = nextcord.Embed(
-            color=DEFAULT_BOT_COLOR,
-            title=interaction.application_command.name.capitalize(),
-        )
-        embed.add_field(
-            name="Info", value="`help` `ping` `server` `user @`", inline=False
-        )
-        embed.add_field(
-            name="Levels",
-            value="`level [@]` `set level <@> <number>` `set level_up_messages <on/off>`",
-            inline=False,
-        )
-        embed.add_field(
-            name="Moderation",
-            value="`mute <@> <time> [reason]` `unmute <@>` `mutes` `clear <amount>` "
-            "`warn <@> [reason]` `unwarn @ <warn_id>` `warns <@>`",
-            inline=False,
-        )
-        embed.add_field(
-            name="Economics",
-            value="`add_money <@> <$>` `remove_money <@> <$>` `money` `reset money <@>` "
-            "`reset economics` `set currency <symbol>` `set start_balance <$>`"
-            " `set timely_amount <$>` `give <@> <$>` `timely` ",
-            inline=False,
-        )
-        embed.add_field(
-            name="Games",
-            value="`blackjack` `slots` `brick_knife_evidence_yandere`",
-            inline=False,
-        )
-        embed.add_field(name="Locales", value="`set locale <locale>`", inline=False)
-        embed.add_field(
-            name="Welcome messages",
-            value="`set welcome_channel <#channel>`"
-            " `set welcome_message_type <card/embed>` `set welcome_embed`"
-            " `welcome_message_state <on/off>`",
-            inline=False,
-        )
-        embed.add_field(
-            name="Autoroles",
-            value="`set autoroles_state <on/off>` `set autorole <role>`",
-        )
-        embed.add_field(
-            name="Emotions",
-            value="`emotion cry [msg]` `emotion idk [msg]` `emotion f [msg]` "
-            "`emotion kiss <@> [msg]` `emotion highfive <@> [msg]` "
-            "`emotion lick <@> [msg]` `emotion punch <@> [msg]` "
-            "`emotion hug <@> [msg]` `emotion spank <@> [msg]` "
-            "`emotion pat <@> [msg]` `emotion bite <@> [msg]`",
-            inline=False,
-        )
-        await interaction.response.send_message(embed=embed)
-
     @commands.cooldown(1, 50, commands.BucketType.guild)
     @nextcord.slash_command(
         name="ping",
