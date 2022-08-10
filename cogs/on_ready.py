@@ -88,12 +88,15 @@ class OnReadyListener(commands.Cog):
         print(len(self.client.guilds))
         members = 0
         for guild in self.client.guilds:
-            print(len(guild.members))
             members += len(guild.members)
-            print(guild.name)
+            print(f"{guild.name} - {(len(guild.members))}")
         print(members)
-        await self.client.change_presence(activity=nextcord.Game(name=f"/help - Ты милый!\n"
-                                                                      f"Пользователи: {members}\n Сервера: {len(self.client.guilds)}"))
+        await self.client.change_presence(
+            activity=nextcord.Game(
+                name=f"/help - Ты милый!\n"
+                f"Пользователи: {members}\n Сервера: {len(self.client.guilds)}"
+            )
+        )
 
 
 def setup(client):

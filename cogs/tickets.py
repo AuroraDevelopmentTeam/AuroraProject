@@ -5,7 +5,11 @@ from nextcord import Interaction, Permissions, SlashOption
 from core.embeds import construct_top_embed
 from core.money.getters import get_guild_currency_symbol
 from core.locales.getters import get_msg_from_locale_by_key
-from core.tickets.getters import get_ticket_archive, get_ticket_category, get_ticket_support
+from core.tickets.getters import (
+    get_ticket_archive,
+    get_ticket_category,
+    get_ticket_support,
+)
 from core.tickets.updaters import update_ticket_archive, update_ticket_category
 
 
@@ -14,10 +18,10 @@ class TicketDisabled(nextcord.ui.View):
         super().__init__(timeout=None)
 
     @nextcord.ui.button(
-        label="Close ticket",
+        label="Закрыть тикет",
         style=nextcord.ButtonStyle.red,
         custom_id="ticket_settings:red",
-        disabled=True
+        disabled=True,
     )
     async def close_ticket(self, button: nextcord.ui.Button, interaction: Interaction):
         pass
@@ -28,10 +32,10 @@ class TicketSettings(nextcord.ui.View):
         super().__init__(timeout=None)
 
     @nextcord.ui.button(
-        label="Close ticket",
+        label="Закрыть тикет",
         style=nextcord.ButtonStyle.red,
         custom_id="ticket_settings:red",
-        disabled=False
+        disabled=False,
     )
     async def close_ticket(self, button: nextcord.ui.Button, interaction: Interaction):
         pass
@@ -42,7 +46,7 @@ class CreateTicket(nextcord.ui.View):
         super().__init__(timeout=None)
 
     @nextcord.ui.button(
-        label="Create ticket",
+        label="Создать тикет",
         style=nextcord.ButtonStyle.blurple,
         custom_id="create_ticket:blurple",
     )
@@ -69,54 +73,56 @@ class Tickets(commands.Cog):
                 await interaction.response.defer()
                 if get_ticket_category(interaction.guild.id) == 0:
                     return
-                embed = nextcord.Embed(
-                    title="Ticket", description=f"Your ticket is creating..."
+                embed = nextcord.Embed(title="Тикет", description=f"Тикет создаётся...")
+                msg = await interaction.followup.send(embed=embed, ephemeral=True)
+                support_role = nextcord.utils.get(
+                    interaction.guild.roles, id=get_ticket_support(interaction.guild.id)
                 )
-                msg = await interaction.followup.send(
-                    embed=embed, ephemeral=True
-                )
-                support_role = nextcord.utils.get(interaction.guild.roles, id=get_ticket_support(interaction.guild.id))
                 overwrites = {
                     interaction.guild.default_role: nextcord.PermissionOverwrite(
                         read_messages=False
                     ),
-                    interaction.user: nextcord.PermissionOverwrite(
-                        read_messages=True
-                    ),
-                    support_role: nextcord.PermissionOverwrite(
-                        read_messages=True
-                    )
+                    interaction.user: nextcord.PermissionOverwrite(read_messages=True),
+                    support_role: nextcord.PermissionOverwrite(read_messages=True),
                 }
                 tickets_category = get_ticket_category(interaction.guild.id)
-                category_channel = nextcord.utils.get(interaction.guild.categories, id=tickets_category)
+                category_channel = nextcord.utils.get(
+                    interaction.guild.categories, id=tickets_category
+                )
                 channel = await category_channel.create_text_channel(
                     f"{interaction.user.name}-ticket", overwrites=overwrites
                 )
                 embed = nextcord.Embed(
                     title="Ticket",
-                    description=f"Your ticket created! Click here: {channel.mention}",
+                    description=f"Ваш тикет был создан! Кликните сюда: {channel.mention}",
                 )
                 await msg.edit(embed=embed)
                 embed = nextcord.Embed(
-                    title="Ticket",
-                    description=f"{interaction.user.mention} created a ticket!",
+                    title="Тикет",
+                    description=f"{interaction.user.mention} создал тикет!",
                 )
                 await channel.send(embed=embed, view=TicketSettings())
             if custom_id == "ticket_settings:red":
                 if get_ticket_archive(interaction.guild.id) == 0:
                     return
-                await interaction.channel.send("Closing this ticket...")
+                await interaction.channel.send("Закрываю тикет...")
                 archive_channel = get_ticket_archive(interaction.guild.id)
-                category_channel = nextcord.utils.get(interaction.guild.categories, id=archive_channel)
+                category_channel = nextcord.utils.get(
+                    interaction.guild.categories, id=archive_channel
+                )
                 overwrites = {
                     interaction.guild.default_role: nextcord.PermissionOverwrite(
                         read_messages=False
                     )
                 }
-                await interaction.user.send(f"Ticket closed!")
+                await interaction.user.send(f"Тикет закрыт!")
                 await interaction.message.edit(view=TicketDisabled())
-                await interaction.channel.send(f"Ticket closed!")
-                await interaction.channel.edit(category=category_channel, overwrites=overwrites, sync_permissions=True)
+                await interaction.channel.send(f"Тикет закрыт!")
+                await interaction.channel.edit(
+                    category=category_channel,
+                    overwrites=overwrites,
+                    sync_permissions=True,
+                )
         except KeyError:
             pass
 
@@ -124,27 +130,33 @@ class Tickets(commands.Cog):
         name="setup_tickets", default_member_permissions=Permissions(administrator=True)
     )
     @application_checks.has_permissions(manage_guild=True)
-    async def __setup_tickets(self, interaction: Interaction,
-                              create_mode: str = SlashOption(
-                                  name="picker", choices={"auto": "auto", "self": "self"}, required=True
-                              )):
+    async def __setup_tickets(
+        self,
+        interaction: Interaction,
+        create_mode: str = SlashOption(
+            name="picker", choices={"auto": "auto", "self": "self"}, required=True
+        ),
+    ):
         embed = nextcord.Embed(
-            title="Create a ticket",
-            description="Click `create ticket` button below to create a ticket. "
-                        "The server's staff will be notified and solve your problem.",
+            title="Создание тикетов",
+            description="Нажмите `создать тикет` кнопку, чтобы создать тикет. "
+            "Стафф сервера получит уведомление и постарается решить вашу проблему/рассмотреть идею, "
+            "предложение сразу, как сможет.",
         )
         if create_mode == "auto":
             overwrites = {
                 interaction.guild.default_role: nextcord.PermissionOverwrite(
                     read_messages=False
                 ),
-                interaction.guild.me: nextcord.PermissionOverwrite(
-                    read_messages=True
-                ),
+                interaction.guild.me: nextcord.PermissionOverwrite(read_messages=True),
             }
-            tickets_category = await interaction.guild.create_category(name=f"Aurora-Tickets", overwrites=overwrites)
+            tickets_category = await interaction.guild.create_category(
+                name=f"Aurora-Tickets", overwrites=overwrites
+            )
             update_ticket_category(interaction.guild.id, tickets_category.id)
-            archive_category = await interaction.guild.create_category(name="Aurora-Archive", overwrites=overwrites)
+            archive_category = await interaction.guild.create_category(
+                name="Aurora-Archive", overwrites=overwrites
+            )
             update_ticket_archive(interaction.guild.id, archive_category.id)
         await interaction.response.send_message(embed=embed, view=CreateTicket())
 

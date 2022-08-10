@@ -24,7 +24,10 @@ from core.money.getters import (
 from core.money.create import create_user_money_card
 from core.checkers import is_str_or_emoji, is_role_in_shop
 from core.locales.getters import (
-    get_msg_from_locale_by_key, get_localized_description, get_localized_name)
+    get_msg_from_locale_by_key,
+    get_localized_description,
+    get_localized_name,
+)
 from core.embeds import construct_basic_embed, construct_top_embed, DEFAULT_BOT_COLOR
 from core.shop.writers import write_role_in_shop, delete_role_from_shop
 from core.parsers import parse_server_roles
@@ -32,6 +35,12 @@ from core.ui.paginator import (
     MyEmbedFieldPageSource,
     MyEmbedDescriptionPageSource,
     SelectButtonMenuPages,
+)
+from core.errors import (
+    construct_error_negative_value_embed,
+    construct_error_bot_user_embed,
+    construct_error_self_choose_embed,
+    construct_error_not_enough_embed,
 )
 
 
@@ -53,16 +62,25 @@ class Economics(commands.Cog):
         user: Optional[nextcord.Member] = SlashOption(
             required=True,
             description="The discord's user, tag someone with @",
-            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"},
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
         ),
         money: Optional[int] = SlashOption(
             required=True,
             description="Number of money the bot should send to user",
-            description_localizations={"ru": "Количество денег, которое бот должен отправить"},
+            description_localizations={
+                "ru": "Количество денег, которое бот должен отправить"
+            },
         ),
     ):
         if user.bot:
-            return await interaction.response.send_message("bot_user_error")
+            return await interaction.response.send_message(
+                embed=construct_error_bot_user_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
+                    self.client.user.avatar.url,
+                )
+            )
         elif money >= 0 and isinstance(money, int):
             currency_symbol = get_guild_currency_symbol(interaction.guild.id)
             update_user_balance(interaction.guild.id, user.id, money)
@@ -79,7 +97,15 @@ class Economics(commands.Cog):
                 )
             )
         else:
-            return await interaction.response.send_message("negative value error")
+            return await interaction.response.send_message(
+                construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
 
     @nextcord.slash_command(
         name="remove_money",
@@ -95,16 +121,25 @@ class Economics(commands.Cog):
         user: Optional[nextcord.Member] = SlashOption(
             required=True,
             description="The discord's user, tag someone with @",
-            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"},
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
         ),
         money: Optional[int] = SlashOption(
             required=True,
             description="Number of money the bot should take from user",
-            description_localizations={"ru": "Количество денег, которое бот должен забрать"},
+            description_localizations={
+                "ru": "Количество денег, которое бот должен забрать"
+            },
         ),
     ):
         if user.bot:
-            return await interaction.response.send_message("bot_user_error")
+            return await interaction.response.send_message(
+                embed=construct_error_bot_user_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
+                    self.client.user.avatar.url,
+                )
+            )
         elif money >= 0 and isinstance(money, int):
             currency_symbol = get_guild_currency_symbol(interaction.guild.id)
             update_user_balance(interaction.guild.id, user.id, -money)
@@ -121,7 +156,15 @@ class Economics(commands.Cog):
                 )
             )
         else:
-            return await interaction.response.send_message("negative value error")
+            return await interaction.response.send_message(
+                construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
 
     @nextcord.slash_command(
         name="balance",
@@ -133,16 +176,23 @@ class Economics(commands.Cog):
     async def __money(
         self,
         interaction: Interaction,
-            user: Optional[nextcord.Member] = SlashOption(
-                required=False,
-                description="The discord's user, tag someone with @",
-                description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"},
-            ),
+        user: Optional[nextcord.Member] = SlashOption(
+            required=False,
+            description="The discord's user, tag someone with @",
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
+        ),
     ):
         if user is None:
             user = interaction.user
         if user.bot:
-            return await interaction.response.send_message("bot_user_error")
+            return await interaction.response.send_message(
+                embed=construct_error_bot_user_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
+                    self.client.user.avatar.url,
+                )
+            )
         avatar = BytesIO()
         await user.display_avatar.with_format("png").save(avatar)
         profile_picture = Image.open(avatar)
@@ -158,10 +208,10 @@ class Economics(commands.Cog):
     @nextcord.slash_command(
         name="reset",
         description="Reset's server economics, "
-                    "all user balances to starting balances",
+        "all user balances to starting balances",
         name_localizations=get_localized_name("reset"),
         description_localizations=get_localized_description("reset"),
-        default_member_permissions=Permissions(administrator=True)
+        default_member_permissions=Permissions(administrator=True),
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __reset(self, interaction: Interaction):
@@ -182,11 +232,18 @@ class Economics(commands.Cog):
         user: Optional[nextcord.Member] = SlashOption(
             required=True,
             description="The discord's user, tag someone with @",
-            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"}
-        )
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
+        ),
     ):
         if user.bot:
-            return await interaction.response.send_message("bot_user_error")
+            return await interaction.response.send_message(
+                embed=construct_error_bot_user_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
+                    self.client.user.avatar.url,
+                )
+            )
         else:
             starting_balance = get_guild_starting_balance(interaction.guild.id)
             set_user_balance(interaction.guild.id, user.id, starting_balance)
@@ -212,7 +269,7 @@ class Economics(commands.Cog):
         description="Reset's server economics, "
         "all user balances to starting balances",
         name_localizations=get_localized_name("reset_economics"),
-        description_localizations=get_localized_description("reset_economics")
+        description_localizations=get_localized_description("reset_economics"),
     )
     async def __economics(self, interaction: Interaction):
         starting_balance = get_guild_starting_balance(interaction.guild.id)
@@ -238,7 +295,7 @@ class Economics(commands.Cog):
         description="Get money per time",
         name_localizations=get_localized_name("timely"),
         description_localizations=get_localized_description("timely"),
-        default_member_permissions=Permissions(send_messages=True)
+        default_member_permissions=Permissions(send_messages=True),
     )
     @cooldowns.cooldown(1, 10800, bucket=cooldowns.SlashBucket.author)
     async def __timely(self, interaction: Interaction):
@@ -263,7 +320,7 @@ class Economics(commands.Cog):
         description="Transfer your money from balance to other user",
         name_localizations=get_localized_name("give"),
         description_localizations=get_localized_description("give"),
-        default_member_permissions=Permissions(send_messages=True)
+        default_member_permissions=Permissions(send_messages=True),
     )
     async def __give(
         self,
@@ -271,22 +328,47 @@ class Economics(commands.Cog):
         user: Optional[nextcord.Member] = SlashOption(
             required=True,
             description="The discord's user, tag someone with @",
-            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"}
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
         ),
         money: Optional[int] = SlashOption(
             required=True,
             description="Number of money you want to give @User",
-            description_localizations={"ru": "Количество денег, которое вы хотите передать @Пользователю"},
-        )
+            description_localizations={
+                "ru": "Количество денег, которое вы хотите передать @Пользователю"
+            },
+        ),
     ):
         if user.bot:
-            return await interaction.response.send_message("bot_user_error")
+            return await interaction.response.send_message(
+                embed=construct_error_bot_user_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
+                    self.client.user.avatar.url,
+                )
+            )
         elif user == interaction.user:
-            return await interaction.response.send_message("self choose error")
+            return await interaction.response.send_message(
+                construct_error_self_choose_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "self_choose_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         elif money >= 0 and isinstance(money, int):
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < money:
-                return await interaction.response.send_message("not_enough_money_error")
+                msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+                return await interaction.response.send_message(
+                    embed=construct_error_not_enough_embed(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "not_enough_money_error"
+                        ),
+                        interaction.user.display_avatar,
+                        f"{msg} {balance}",
+                    )
+                )
             else:
                 update_user_balance(interaction.guild.id, interaction.user.id, -money)
                 update_user_balance(interaction.guild.id, user.id, money)
@@ -306,14 +388,22 @@ class Economics(commands.Cog):
                     )
                 )
         else:
-            return await interaction.response.send_message("negative_value_error")
+            return await interaction.response.send_message(
+                construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
 
     @nextcord.slash_command(
         name="add-shop",
         description="Add role to shop",
         name_localizations=get_localized_name("add-shop"),
         description_localizations=get_localized_description("add-shop"),
-        default_member_permissions=Permissions(administrator=True)
+        default_member_permissions=Permissions(administrator=True),
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __add_shop(
@@ -327,13 +417,29 @@ class Economics(commands.Cog):
         cost: Optional[int] = SlashOption(
             required=True,
             description="Number of money role will cost",
-            description_localizations={"ru": "Количество денег, которое должна стоить роль"},
-        )
+            description_localizations={
+                "ru": "Количество денег, которое должна стоить роль"
+            },
+        ),
     ):
         if cost < 0:
-            return await interaction.response.send_message("negative value error")
+            return await interaction.response.send_message(
+                construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    cost,
+                )
+            )
         if is_role_in_shop(interaction.guild.id, role.id) is True:
-            return await interaction.response.send_message("already in shop")
+            embed = nextcord.Embed(
+                title="error",
+                description=get_msg_from_locale_by_key(
+                    interaction.guild.id, "already_in_shop"
+                ),
+            )
+            return await interaction.response.send_message(embed=embed)
         write_role_in_shop(interaction.guild.id, role, cost)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"{interaction.application_command.name}"
@@ -353,7 +459,7 @@ class Economics(commands.Cog):
         description="Remove role from shop",
         name_localizations=get_localized_name("remove-shop"),
         description_localizations=get_localized_description("remove-shop"),
-        default_member_permissions=Permissions(administrator=True)
+        default_member_permissions=Permissions(administrator=True),
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __remove_shop(
@@ -363,10 +469,16 @@ class Economics(commands.Cog):
             required=True,
             description="Discord role on your server",
             description_localizations={"ru": "Дискордовская роль на вашем сервере"},
-        )
+        ),
     ):
         if is_role_in_shop(interaction.guild.id, role.id) is False:
-            return await interaction.response.send_message("not in shop")
+            embed = nextcord.Embed(
+                title="error",
+                description=get_msg_from_locale_by_key(
+                    interaction.guild.id, "not_in_shop"
+                ),
+            )
+            return await interaction.response.send_message(embed=embed)
         delete_role_from_shop(interaction.guild.id, role)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"{interaction.application_command.name}"
@@ -385,16 +497,24 @@ class Economics(commands.Cog):
         description="show role shop menu",
         name_localizations=get_localized_name("shop"),
         description_localizations=get_localized_description("shop"),
-        default_member_permissions=Permissions(send_messages=True)
+        default_member_permissions=Permissions(send_messages=True),
     )
     async def __shop(self, interaction: Interaction):
-        guild_roles = parse_server_roles(interaction.guild)
-        pages = SelectButtonMenuPages(
-            source=MyEmbedDescriptionPageSource(guild_roles),
-            guild=interaction.guild,
-            disabled=False,
-        )
-        await pages.start(interaction=interaction)
+        try:
+            guild_roles = parse_server_roles(interaction.guild)
+            pages = SelectButtonMenuPages(
+                source=MyEmbedDescriptionPageSource(guild_roles),
+                guild=interaction.guild,
+                disabled=False,
+            )
+            await pages.start(interaction=interaction)
+        except nextcord.Forbidden:
+            await interaction.response.send_message(
+                embed=construct_error_forbidden_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "forbidden_error"),
+                    self.client.user.avatar.url,
+                )
+            )
 
 
 def setup(client):

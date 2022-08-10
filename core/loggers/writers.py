@@ -13,11 +13,7 @@ def write_in_loggers_standart_values(guilds) -> None:
                 "INSERT INTO loggers(guild_id, log_channel_id, "
                 "logs_enabled) VALUES (?, ?, ?)"
             )
-            val = (
-                guild.id,
-                0,
-                settings['default_logs_enabled']
-            )
+            val = (guild.id, 0, settings["default_logs_enabled"])
             cursor.execute(sql, val)
             db.commit()
     cursor.close()

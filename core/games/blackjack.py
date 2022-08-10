@@ -268,7 +268,7 @@ def create_blackjack_embed(
     dealer_hand: Hand,
     footer_text: str = None,
     footer_url: Asset = None,
-    guild_id: int = None
+    guild_id: int = None,
 ) -> nextcord.Embed:
     player_hand_msg = get_msg_from_locale_by_key(guild_id, "player_hand")
     dealer_hand_msg = get_msg_from_locale_by_key(guild_id, "dealer_hand")
@@ -281,12 +281,14 @@ def create_blackjack_embed(
     dealer_hand_field_value = get_hand_cards(client, dealer_hand)
     embed.add_field(
         name=f"{player_hand_msg}",
-        value=f"{player_hand_field_value}\n" f"{value_msg} **{player_hand.get_value()}**",
+        value=f"{player_hand_field_value}\n"
+        f"{value_msg} **{player_hand.get_value()}**",
         inline=True,
     )
     embed.add_field(
         name=f"{dealer_hand_msg}",
-        value=f"{dealer_hand_field_value}\n" f"{value_msg} **{dealer_hand.get_value()}**",
+        value=f"{dealer_hand_field_value}\n"
+        f"{value_msg} **{dealer_hand.get_value()}**",
         inline=True,
     )
     if footer_text is not None and footer_url is not None:
@@ -314,7 +316,8 @@ def create_game_start_blackjack_embed(
     dealer_hand_field_value = get_hand_hidden_cards(client, dealer_hand)
     embed.add_field(
         name=f"{player_hand_msg}",
-        value=f"{player_hand_field_value}\n" f"{value_msg} **{player_hand.get_value()}**",
+        value=f"{player_hand_field_value}\n"
+        f"{value_msg} **{player_hand.get_value()}**",
         inline=True,
     )
     second_dealer_card = dealer_hand.cards[1]

@@ -41,7 +41,9 @@ def get_game_state(state, user: nextcord.Member, client, guild_id: int) -> str:
     if state is None:
         return f'**{get_msg_from_locale_by_key(guild_id, "draw")}**'
     if state is False:
-        return f'{client.user.mention} **{get_msg_from_locale_by_key(guild_id, "win")}**'
+        return (
+            f'{client.user.mention} **{get_msg_from_locale_by_key(guild_id, "win")}**'
+        )
 
 
 def create_gamble_embed(
@@ -52,16 +54,14 @@ def create_gamble_embed(
     bot_strikes: int,
     footer_text: str,
     footer_url: Asset,
-    guild_id: int
+    guild_id: int,
 ) -> nextcord.Embed:
     title = get_msg_from_locale_by_key(guild_id, "gamble")
     bot_strikes_msg = get_msg_from_locale_by_key(guild_id, "bot_strikes")
     user_strikes_msg = get_msg_from_locale_by_key(guild_id, "user_strikes")
     percentage_msg = get_msg_from_locale_by_key(guild_id, "percentage")
     value_msg = get_msg_from_locale_by_key(guild_id, "value")
-    embed = nextcord.Embed(
-        title=title, color=DEFAULT_BOT_COLOR, description=game_state
-    )
+    embed = nextcord.Embed(title=title, color=DEFAULT_BOT_COLOR, description=game_state)
     embed.add_field(
         name=user_strikes_msg, value=f"{value_msg} **{user_strikes}/18**", inline=True
     )

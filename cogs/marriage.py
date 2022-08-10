@@ -45,6 +45,12 @@ from core.ui.buttons import create_button, ViewAuthorCheck, View
 from core.locales.getters import get_msg_from_locale_by_key, get_guild_locale
 from core.parsers import parse_likes, parse_user_gifts
 from core.embeds import DEFAULT_BOT_COLOR
+from core.errors import (
+    construct_error_negative_value_embed,
+    construct_error_bot_user_embed,
+    construct_error_self_choose_embed,
+    construct_error_not_enough_embed,
+)
 
 
 class Marriage(commands.Cog):
@@ -57,7 +63,7 @@ class Marriage(commands.Cog):
         "if marriage will be success you will pay 10000 currency on server",
         name_localizations=get_localized_name("marry"),
         description_localizations=get_localized_description("marry"),
-        default_member_permissions=Permissions(send_messages=True)
+        default_member_permissions=Permissions(send_messages=True),
     )
     async def __marry(
         self,
@@ -65,20 +71,43 @@ class Marriage(commands.Cog):
         user: Optional[nextcord.Member] = SlashOption(
             required=True,
             description="The discord's user, tag someone with @",
-            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"},
-        )
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
+        ),
     ):
         if user.bot:
-            return await interaction.response.send_message("bot_user_error")
+            return await interaction.response.send_message(
+                embed=construct_error_bot_user_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
+                    self.client.user.avatar.url,
+                )
+            )
         if user == interaction.user:
-            return await interaction.response.send_message("self choose error")
+            return await interaction.response.send_message(
+                construct_error_self_choose_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "self_choose_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         if is_married(interaction.guild.id, interaction.user.id) is True:
             return await interaction.response.send_message("already_married error")
         if is_married(interaction.guild.id, user.id) is True:
             return await interaction.response.send_message("already_married error")
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < 10000:
-            return await interaction.response.send_message("not_enough_money_error")
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            return await interaction.response.send_message(
+                embed=construct_error_not_enough_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_enough_money_error"
+                    ),
+                    interaction.user.display_avatar,
+                    f"{msg} {balance}",
+                )
+            )
         author = interaction.user
         pair = user
 
@@ -164,7 +193,7 @@ class Marriage(commands.Cog):
         description="divorce you with your partner",
         name_localizations=get_localized_name("divorce"),
         description_localizations=get_localized_description("divorce"),
-        default_member_permissions=Permissions(send_messages=True)
+        default_member_permissions=Permissions(send_messages=True),
     )
     async def __divorce(self, interaction: Interaction):
         if is_married(interaction.guild.id, interaction.user.id) is False:
@@ -194,7 +223,7 @@ class Marriage(commands.Cog):
         description="Sends your profile waifu description",
         name_localizations=get_localized_name("waifu"),
         description_localizations=get_localized_description("waifu"),
-        default_member_permissions=Permissions(send_messages=True)
+        default_member_permissions=Permissions(send_messages=True),
     )
     async def __waifu(
         self,
@@ -202,8 +231,10 @@ class Marriage(commands.Cog):
         user: Optional[nextcord.Member] = SlashOption(
             required=False,
             description="The discord's user, tag someone with @",
-            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"},
-        )
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
+        ),
     ):
         if user is None:
             user = interaction.user
@@ -222,7 +253,9 @@ class Marriage(commands.Cog):
         else:
             parther = await self.client.fetch_user(pair_id)
             if parther is None:
-                parther = get_msg_from_locale_by_key(interaction.guild.id, "unknown_user")
+                parther = get_msg_from_locale_by_key(
+                    interaction.guild.id, "unknown_user"
+                )
             else:
                 parther = f"{parther.mention}"
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
@@ -243,7 +276,9 @@ class Marriage(commands.Cog):
         price_msg = get_msg_from_locale_by_key(interaction.guild.id, "price")
         embed.add_field(name=like_msg, value=parther, inline=True)
         embed.add_field(
-            name=f"{price_msg}", value=f"__**{gift_price}**__ {currency_symbol}", inline=True
+            name=f"{price_msg}",
+            value=f"__**{gift_price}**__ {currency_symbol}",
+            inline=True,
         )
         divorces_msg = get_msg_from_locale_by_key(interaction.guild.id, "divorces")
         likes_msg = get_msg_from_locale_by_key(interaction.guild.id, "likes")
@@ -256,7 +291,9 @@ class Marriage(commands.Cog):
             text=f"{requested} {interaction.user}",
             icon_url=interaction.user.display_avatar,
         )
-        embed.set_image(url="https://sun4-10.userapi.com/c240331/u352908625/docs/d10/140a7b79b61a/Aduare-artist-Pixel-Art-Pixel-Gif-6507066.gif?extra=SrdBHJb8jfuKrjJ_8df_2p7sFUkiP3wBcu4Gv8HLrpVQZaqnSSwWUK7d4Almxpt3QiM2rqhBu2ROn1qvEKPxAmgQblm7IIy3_vm1l7aXMUfLwk1Hq07V7ygqFTWilx_4t6F0N-FssauP9JGUBELaahfGbg&dl=1")
+        embed.set_image(
+            url="https://sun4-10.userapi.com/c240331/u352908625/docs/d10/140a7b79b61a/Aduare-artist-Pixel-Art-Pixel-Gif-6507066.gif?extra=SrdBHJb8jfuKrjJ_8df_2p7sFUkiP3wBcu4Gv8HLrpVQZaqnSSwWUK7d4Almxpt3QiM2rqhBu2ROn1qvEKPxAmgQblm7IIy3_vm1l7aXMUfLwk1Hq07V7ygqFTWilx_4t6F0N-FssauP9JGUBELaahfGbg&dl=1"
+        )
         await interaction.response.send_message(embed=embed)
 
     @nextcord.slash_command(
@@ -264,7 +301,7 @@ class Marriage(commands.Cog):
         description="Choose user you like and he will appear in /waifu command!",
         name_localizations=get_localized_name("like"),
         description_localizations=get_localized_description("like"),
-        default_member_permissions=Permissions(send_messages=True)
+        default_member_permissions=Permissions(send_messages=True),
     )
     async def __like(
         self,
@@ -272,8 +309,10 @@ class Marriage(commands.Cog):
         user: Optional[nextcord.Member] = SlashOption(
             required=True,
             description="The discord's user, tag someone with @",
-            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"},
-        )
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
+        ),
     ):
         if user == interaction.user:
             return await interaction.response.send_message("self choose error")
@@ -296,7 +335,7 @@ class Marriage(commands.Cog):
         description="change person that you like to noone",
         name_localizations=get_localized_name("unlike"),
         description_localizations=get_localized_description("unlike"),
-        default_member_permissions=Permissions(send_messages=True)
+        default_member_permissions=Permissions(send_messages=True),
     )
     async def __unlike(self, interaction: Interaction):
         update_user_like(interaction.guild.id, interaction.user.id, 0)
@@ -318,7 +357,7 @@ class Marriage(commands.Cog):
         description="shows gift shop menu",
         name_localizations=get_localized_name("gifts"),
         description_localizations=get_localized_description("gifts"),
-        default_member_permissions=Permissions(send_messages=True)
+        default_member_permissions=Permissions(send_messages=True),
     )
     async def __gifts(self, interaction: Interaction):
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
@@ -349,7 +388,7 @@ class Marriage(commands.Cog):
         description="Gift to @User gifts from shop!",
         name_localizations=get_localized_name("gift"),
         description_localizations=get_localized_description("gift"),
-        default_member_permissions=Permissions(send_messages=True)
+        default_member_permissions=Permissions(send_messages=True),
     )
     async def __gift(
         self,
@@ -357,7 +396,9 @@ class Marriage(commands.Cog):
         user: Optional[nextcord.Member] = SlashOption(
             required=True,
             description="The discord's user, tag someone with @",
-            description_localizations={"ru": "Пользователь дискорда, укажите кого-то @"},
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
         ),
         gift: str = SlashOption(
             name="picker",
@@ -410,7 +451,7 @@ class Marriage(commands.Cog):
         description="Set your couple description",
         name_localizations=get_localized_name("lovedescription"),
         description_localizations=get_localized_description("lovedescription"),
-        default_member_permissions=Permissions(send_messages=True)
+        default_member_permissions=Permissions(send_messages=True),
     )
     async def __lovedescription(
         self,
@@ -440,7 +481,7 @@ class Marriage(commands.Cog):
         description="Deposit money in your family bank",
         name_localizations=get_localized_name("lovedeposit"),
         description_localizations=get_localized_description("lovedeposit"),
-        default_member_permissions=Permissions(send_messages=True)
+        default_member_permissions=Permissions(send_messages=True),
     )
     async def __lovedeposit(
         self,

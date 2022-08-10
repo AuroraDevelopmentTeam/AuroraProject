@@ -479,5 +479,23 @@
     },
     "messages_counter": {
       "msg": "wrote messages total:"
+    },
+    "negative_value_error": {
+      "msg": "Aurora denied process of command execution due to __**negative or incorrect value**__\nYour command failed to successfully complete."
+    },
+    "bot_user_error": {
+      "msg": "Aurora denied process of command execution due to __**you indicated bot user**__\nYour command failed to successfully complete."
+    },
+    "self_choose_error": {
+      "msg": "Aurora denied process of command execution due to __**you indicated self**__\nYour command failed to successfully complete."
+    },
+    "already_in_shop": {
+      "msg": "role already in shop"
+    },
+    "not_in_shop": {
+      "msg": "role not in shop"
+    },
+    "not_enough_money_error": {
+      "msg": "You have not enough money for command execution."
     }
 }

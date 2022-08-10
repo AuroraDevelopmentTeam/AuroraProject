@@ -11,12 +11,7 @@ def write_in_tickets_config_standart_values(guilds) -> None:
                 "INSERT INTO tickets_config(guild_id, ticket_category, "
                 "ticket_archive, ticket_support) VALUES (?, ?, ?, ?)"
             )
-            val = (
-                guild.id,
-                0,
-                0,
-                0
-            )
+            val = (guild.id, 0, 0, 0)
             cursor.execute(sql, val)
             db.commit()
     cursor.close()

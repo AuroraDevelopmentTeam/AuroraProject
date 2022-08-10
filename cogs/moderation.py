@@ -231,23 +231,53 @@ class Moderation(commands.Cog):
         user: Optional[nextcord.Member] = SlashOption(required=True),
         reason: Optional[str] = SlashOption(required=False),
     ):
-        if user.bot:
-            return await interaction.response.send_message("bot_user_error")
-        if reason is None:
-            reason = " — "
-        write_new_warn(interaction.guild.id, user.id, reason)
-        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-        message = get_msg_from_locale_by_key(
-            interaction.guild.id, interaction.application_command.name
-        )
-        await interaction.response.send_message(
-            embed=construct_basic_embed(
-                interaction.application_command.name,
-                f"{message} {user.mention}",
-                f"📝 {reason}.\n{requested} {interaction.user}",
-                interaction.user.display_avatar,
+        await interaction.response.defer()
+        try:
+            if user.bot:
+                return await interaction.response.send_message("bot_user_error")
+            if reason is None:
+                reason = " — "
+            write_new_warn(interaction.guild.id, user.id, reason)
+            requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+            message = get_msg_from_locale_by_key(
+                interaction.guild.id, interaction.application_command.name
             )
-        )
+            warns = parse_warns_of_user(interaction.guild.id, user.id)
+            await interaction.followup.send(
+                embed=construct_basic_embed(
+                    interaction.application_command.name,
+                    f"{message} {user.mention}",
+                    f"📝 {reason}.\n{requested} {interaction.user}",
+                    interaction.user.display_avatar,
+                )
+            )
+            if (len(warns)) == 3:
+                for warn in warns:
+                    warn_id = warn[0]
+                    remove_warn_from_table(warn_id, interaction.guild.id, user.id)
+                await user.edit(
+                    timeout=nextcord.utils.utcnow() + datetime.timedelta(seconds=3600),
+                    reason=reason,
+                )
+                message = get_msg_from_locale_by_key(interaction.guild.id, "mute")
+                await interaction.followup.send(
+                    embed=construct_basic_embed(
+                        "Автомут за 3 варна и их очищение",
+                        f"{message} {user.mention}",
+                        f"📝 {reason}. 🕔 1 h\n{requested} {interaction.user}",
+                        interaction.user.display_avatar,
+                    )
+                )
+        except nextcord.Forbidden:
+            await interaction.followup.send(
+                embed=construct_error_forbidden_embed(
+                    "**Автомут за 3  варна и их очищение**\n"
+                    + get_msg_from_locale_by_key(
+                        interaction.guild.id, "forbidden_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
 
     @nextcord.slash_command(
         name="unwarn",
