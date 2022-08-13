@@ -19,6 +19,7 @@ from core.emotions.storage import (
     pat_gifs,
     lick_gifs,
 )
+from core.errors import construct_error_self_choose_embed
 
 
 class Emotions(commands.Cog):
@@ -63,7 +64,14 @@ class Emotions(commands.Cog):
         ),
     ):
         if user == interaction.user:
-            return await interaction.response.send_message("self choose error")
+            return await interaction.response.send_message(
+                embed=construct_error_self_choose_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "self_choose_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         embed = create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
@@ -100,7 +108,14 @@ class Emotions(commands.Cog):
         ),
     ):
         if user == interaction.user:
-            return await interaction.response.send_message("self choose error")
+            return await interaction.response.send_message(
+                embed=construct_error_self_choose_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "self_choose_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         embed = create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
@@ -191,7 +206,14 @@ class Emotions(commands.Cog):
         ),
     ):
         if user == interaction.user:
-            return await interaction.response.send_message("self choose error")
+            return await interaction.response.send_message(
+                embed=construct_error_self_choose_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "self_choose_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         embed = create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
@@ -255,7 +277,14 @@ class Emotions(commands.Cog):
         ),
     ):
         if user == interaction.user:
-            return await interaction.response.send_message("self choose error")
+            return await interaction.response.send_message(
+                embed=construct_error_self_choose_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "self_choose_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         embed = create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
@@ -292,7 +321,14 @@ class Emotions(commands.Cog):
         ),
     ):
         if user == interaction.user:
-            return await interaction.response.send_message("self choose error")
+            return await interaction.response.send_message(
+                embed=construct_error_self_choose_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "self_choose_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         embed = create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
@@ -329,7 +365,14 @@ class Emotions(commands.Cog):
         ),
     ):
         if user == interaction.user:
-            return await interaction.response.send_message("self choose error")
+            return await interaction.response.send_message(
+                embed=construct_error_self_choose_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "self_choose_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         embed = create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
@@ -366,7 +409,14 @@ class Emotions(commands.Cog):
         ),
     ):
         if user == interaction.user:
-            return await interaction.response.send_message("self choose error")
+            return await interaction.response.send_message(
+                embed=construct_error_self_choose_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "self_choose_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         embed = create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
@@ -403,7 +453,14 @@ class Emotions(commands.Cog):
         ),
     ):
         if user == interaction.user:
-            return await interaction.response.send_message("self choose error")
+            return await interaction.response.send_message(
+                embed=construct_error_self_choose_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "self_choose_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         embed = create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,

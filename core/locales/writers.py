@@ -9,6 +9,7 @@ def write_in_locales_standart_values(guilds) -> None:
     for guild in guilds:
         if is_guild_id_in_table("locales", guild.id) is False:
             guild_locale = guild.preferred_locale
+            print(guild_locale)
             if guild_locale is None:
                 guild_locale = settings["default_locale"]
             elif guild_locale == "ru":

@@ -85,6 +85,8 @@ class OnReadyListener(commands.Cog):
         write_in_loggers_standart_values(guilds)
         create_tickets_config_table()
         write_in_tickets_config_standart_values(guilds)
+        create_badges_table()
+        write_in_badges_standart_values(guilds)
         print(len(self.client.guilds))
         members = 0
         for guild in self.client.guilds:

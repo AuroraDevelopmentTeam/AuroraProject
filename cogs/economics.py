@@ -41,6 +41,7 @@ from core.errors import (
     construct_error_bot_user_embed,
     construct_error_self_choose_embed,
     construct_error_not_enough_embed,
+    construct_error_forbidden_embed
 )
 
 
@@ -81,7 +82,7 @@ class Economics(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        elif money >= 0 and isinstance(money, int):
+        elif money > 0 and isinstance(money, int):
             currency_symbol = get_guild_currency_symbol(interaction.guild.id)
             update_user_balance(interaction.guild.id, user.id, money)
             message = get_msg_from_locale_by_key(
@@ -98,7 +99,7 @@ class Economics(commands.Cog):
             )
         else:
             return await interaction.response.send_message(
-                construct_error_negative_value_embed(
+                embed=construct_error_negative_value_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "negative_value_error"
                     ),
@@ -140,7 +141,7 @@ class Economics(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        elif money >= 0 and isinstance(money, int):
+        elif money > 0 and isinstance(money, int):
             currency_symbol = get_guild_currency_symbol(interaction.guild.id)
             update_user_balance(interaction.guild.id, user.id, -money)
             message = get_msg_from_locale_by_key(
@@ -157,7 +158,7 @@ class Economics(commands.Cog):
             )
         else:
             return await interaction.response.send_message(
-                construct_error_negative_value_embed(
+                embed=construct_error_negative_value_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "negative_value_error"
                     ),
@@ -349,14 +350,14 @@ class Economics(commands.Cog):
             )
         elif user == interaction.user:
             return await interaction.response.send_message(
-                construct_error_self_choose_embed(
+                embed=construct_error_self_choose_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "self_choose_error"
                     ),
                     self.client.user.avatar.url,
                 )
             )
-        elif money >= 0 and isinstance(money, int):
+        elif money > 0 and isinstance(money, int):
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < money:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
@@ -389,7 +390,7 @@ class Economics(commands.Cog):
                 )
         else:
             return await interaction.response.send_message(
-                construct_error_negative_value_embed(
+                embed=construct_error_negative_value_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "negative_value_error"
                     ),
@@ -424,7 +425,7 @@ class Economics(commands.Cog):
     ):
         if cost < 0:
             return await interaction.response.send_message(
-                construct_error_negative_value_embed(
+                embed=construct_error_negative_value_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "negative_value_error"
                     ),
@@ -438,6 +439,7 @@ class Economics(commands.Cog):
                 description=get_msg_from_locale_by_key(
                     interaction.guild.id, "already_in_shop"
                 ),
+                color=DEFAULT_BOT_COLOR
             )
             return await interaction.response.send_message(embed=embed)
         write_role_in_shop(interaction.guild.id, role, cost)
@@ -477,6 +479,7 @@ class Economics(commands.Cog):
                 description=get_msg_from_locale_by_key(
                     interaction.guild.id, "not_in_shop"
                 ),
+                color=DEFAULT_BOT_COLOR
             )
             return await interaction.response.send_message(embed=embed)
         delete_role_from_shop(interaction.guild.id, role)
@@ -500,21 +503,13 @@ class Economics(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __shop(self, interaction: Interaction):
-        try:
-            guild_roles = parse_server_roles(interaction.guild)
-            pages = SelectButtonMenuPages(
-                source=MyEmbedDescriptionPageSource(guild_roles),
-                guild=interaction.guild,
-                disabled=False,
-            )
-            await pages.start(interaction=interaction)
-        except nextcord.Forbidden:
-            await interaction.response.send_message(
-                embed=construct_error_forbidden_embed(
-                    get_msg_from_locale_by_key(interaction.guild.id, "forbidden_error"),
-                    self.client.user.avatar.url,
-                )
-            )
+        guild_roles = parse_server_roles(interaction.guild)
+        pages = SelectButtonMenuPages(
+            source=MyEmbedDescriptionPageSource(guild_roles),
+            guild=interaction.guild,
+            disabled=False,
+        )
+        await pages.start(interaction=interaction)
 
 
 def setup(client):

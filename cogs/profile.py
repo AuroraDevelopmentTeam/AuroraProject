@@ -13,6 +13,11 @@ from core.money.getters import get_user_balance
 from core.honor.getters import get_user_honor_level, get_rome_symbol
 from core.levels.getters import get_user_level
 from core.profiles.getters import get_profile_description
+from core.badges.getters import get_user_badge_state
+from core.badges.converters import ACHIEVMENTS_DESCRIPTION, ACHIEVMENTS_LIST
+from core.embeds import DEFAULT_BOT_COLOR
+from core.badges.check import check_badges
+from core.errors import construct_error_bot_user_embed
 
 
 def get_description_rows(description: str):
@@ -42,26 +47,44 @@ class UserProfiles(commands.Cog):
 
     @__profile.subcommand(name="description")
     async def __description_profile(
-        self,
-        interaction: Interaction,
-        description: Optional[str] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            description: Optional[str] = SlashOption(required=True),
     ):
         if len(description) > 140:
-            return await interaction.response.send_message("too long error")
+            embed = nextcord.Embed(
+                title="error",
+                description=get_msg_from_locale_by_key(
+                    interaction.guild.id, "too_long"
+                ),
+                color=DEFAULT_BOT_COLOR
+            )
+            return await interaction.response.send_message(embed=embed)
         update_profile_description(interaction.user.id, description)
-        await interaction.response.send_message("done")
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} **{description}**",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
 
     @__profile.subcommand(
         name="avatar_form", description="set avatar form for your card commands"
     )
     async def __avatar_form_profile(
-        self,
-        interaction: Interaction,
-        form: str = SlashOption(
-            name="picker",
-            choices={"circle": "circle", "rounded rectangle": "rectangle"},
-            required=True,
-        ),
+            self,
+            interaction: Interaction,
+            form: str = SlashOption(
+                name="picker",
+                choices={"circle": "circle", "rounded rectangle": "rectangle"},
+                required=True,
+            ),
     ):
         """
         Parameters
@@ -72,20 +95,26 @@ class UserProfiles(commands.Cog):
             Form of profile avatar
         """
         update_avatar_form(interaction.user.id, form)
-        await interaction.response.send_message("done")
+        await interaction.response.send_message("feature in dev")
 
     @__profile.subcommand(name="me")
     async def __me_profile(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(required=False),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(required=False),
     ):
         await interaction.response.defer()
+        check_badges(interaction.guild.id, interaction.user)
         if user is None:
             user = interaction.user
         if user.bot:
-            return await interaction.response.send_message("bot_user_error")
-        background = Editor(f"./assets/profile.png")
+            return await interaction.response.send_message(
+                embed=construct_error_bot_user_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
+                    self.client.user.avatar.url,
+                )
+            )
+        background = Editor(f"./assets/without_badges.png")
         avatar = BytesIO()
         await user.display_avatar.with_format("png").save(avatar)
         profile_picture = Image.open(avatar)
@@ -95,6 +124,34 @@ class UserProfiles(commands.Cog):
         larger_font = Font.montserrat(size=40)
         font = Font.montserrat(size=21)
         level = get_user_level(interaction.guild.id, user.id)
+        if get_user_badge_state(interaction.guild.id, user.id, "badge_1") is True:
+            developer = Editor("./assets/developer_badge.png").resize((35, 35))
+            background.paste(developer, (105, 455))
+        if get_user_badge_state(interaction.guild.id, user.id, "badge_2") is True:
+            developer = Editor("./assets/staff_badge.png").resize((35, 35))
+            background.paste(developer, (175, 455))
+        if get_user_badge_state(interaction.guild.id, user.id, "badge_3") is True:
+            developer = Editor("./assets/golden_wings.png").resize((50, 35))
+            background.paste(developer, (245, 455))
+        if get_user_badge_state(interaction.guild.id, user.id, "badge_4") is True:
+            developer = Editor("./assets/diamond.png").resize((45, 45))
+            background.paste(developer, (100, 495))
+        if get_user_badge_state(interaction.guild.id, user.id, "badge_5") is True:
+            developer = Editor("./assets/honor.png").resize((55, 45))
+            background.paste(developer, (165, 495))
+        if get_user_badge_state(interaction.guild.id, user.id, "badge_6") is True:
+            developer = Editor("./assets/lab.png").resize((35, 35))
+            background.paste(developer, (250, 495))
+        if get_user_badge_state(interaction.guild.id, user.id, "badge_7") is True:
+            developer = Editor("./assets/bug_hunter.png").resize((35, 35))
+            background.paste(developer, (105, 545))
+        if get_user_badge_state(interaction.guild.id, user.id, "badge_8") is True:
+            developer = Editor("./assets/immortal.jpg").resize((45, 45))
+            background.paste(developer, (170, 535))
+        if get_user_badge_state(interaction.guild.id, user.id, "badge_8") is True:
+            developer = Editor("./assets/badge_heart.png").resize((50, 45))
+            background.paste(developer, (245, 535))
+
         if len(str(level)) == 2:
             coordinates = (715, 70)
         elif len(str(level)) >= 3:
@@ -141,6 +198,23 @@ class UserProfiles(commands.Cog):
             y_text += height
         file = nextcord.File(fp=background.image_bytes, filename="profile_card.png")
         await interaction.followup.send(file=file)
+
+    @__profile.subcommand(name="badges", description="show your badges achievements status")
+    async def __badges_profile(self,
+                               interaction: Interaction):
+        embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
+        check_badges(interaction.guild.id, interaction.user)
+        for i in range(9):
+            state = get_user_badge_state(interaction.guild.id,
+                                         interaction.user.id,
+                                         f"badge_{i + 1}")
+            if state is False:
+                state = '**Значок не получен**'
+            if state is True:
+                state = '**Значок получен**'
+            embed.add_field(name=ACHIEVMENTS_LIST[f"badge_{i + 1}"],
+                            value=ACHIEVMENTS_DESCRIPTION[f"badge_{i + 1}"] + "\n" + state)
+        await interaction.response.send_message(embed=embed)
 
 
 def setup(client):

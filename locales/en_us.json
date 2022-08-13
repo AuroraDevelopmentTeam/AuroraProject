@@ -497,5 +497,38 @@
     },
     "not_enough_money_error": {
       "msg": "You have not enough money for command execution."
+    },
+    "already_married_error": {
+      "msg": "You or indicated User already married.\nAurora denied process of command execution, your command failed to successfully complete."
+    },
+    "not_married_error": {
+      "msg": "You are not married.\nAurora denied process of command execution, your command failed to successfully complete."
+    },
+    "no_warn_in_table": {
+      "msg": "Cant find indicated warn, check ID!"
+    },
+    "user_no_warns": {
+      "msg": "Indicated user have no any warns"
+    },
+    "purge_warns": {
+      "msg": "All warns were purged from"
+    },
+    "too_long": {
+      "msg": "Description is too long, max length is 140 characters!"
+    },
+    "profile_description": {
+      "msg": "For your profiile card set this description:"
+    },
+    "edit_warn": {
+      "msg": "Warn reason changed to:"
+    },
+    "mute_invalid_timespan": {
+      "msg": "Failed to parse time of mute! Please use this format: 1h/3h/5h/1d/6m/9s\nExample: ``/mute`` **@Clonexy2362** **2h**"
+    },
+    "no_mute": {
+      "msg": "I cant unmute this user, he have no any mutes"
+    },
+    "ApplicationMissingPermissions": {
+      "msg": "You are missing some permissions to run this command"
     }
 }

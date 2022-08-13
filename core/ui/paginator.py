@@ -18,6 +18,8 @@ from core.money.getters import (
     get_guild_starting_balance,
     get_guild_payday_amount,
 )
+from core.locales.getters import get_msg_from_locale_by_key
+from core.errors import construct_error_forbidden_embed
 from typing import Union
 
 
@@ -89,7 +91,16 @@ class Dropdown(nextcord.ui.Select):
                         interaction.guild, interaction.user, disabled=True
                     ),
                 )
-            await interaction.user.add_roles(self.role_list[int(self.values[0]) - 1])
+            try:
+                await interaction.user.add_roles(self.role_list[int(self.values[0]) - 1])
+            except nextcord.Forbidden:
+                return await interaction.message.edit(
+                    embed=construct_error_forbidden_embed(
+                        get_msg_from_locale_by_key(interaction.guild.id, "forbidden_error"),
+                        interaction.user.display_avatar,
+                    ),
+                    view=DropdownView(interaction.guild, interaction.user, disabled=True)
+                )
             embed.add_field(
                 name="Shop",
                 value=f"{msg} {self.role_list[int(self.values[0]) - 1].mention}",
@@ -114,10 +125,10 @@ class Dropdown(nextcord.ui.Select):
 
 class DropdownView(nextcord.ui.View):
     def __init__(
-        self,
-        guild: nextcord.Guild,
-        author: Union[nextcord.Member, nextcord.User],
-        disabled: bool,
+            self,
+            guild: nextcord.Guild,
+            author: Union[nextcord.Member, nextcord.User],
+            disabled: bool,
     ):
         self.guild = guild
         self.author = author
@@ -145,11 +156,11 @@ class MyEmbedDescriptionPageSource(menus.ListPageSource):
 
 class SelectButtonMenuPages(menus.ButtonMenuPages, inherit_buttons=False):
     def __init__(
-        self,
-        source: menus.PageSource,
-        guild: nextcord.Guild,
-        disabled: bool,
-        timeout: int = 60,
+            self,
+            source: menus.PageSource,
+            guild: nextcord.Guild,
+            disabled: bool,
+            timeout: int = 60,
     ):
         self.guild = guild
         super().__init__(

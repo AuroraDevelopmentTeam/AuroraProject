@@ -56,6 +56,7 @@ class OnMemberListener(commands.Cog):
         write_in_honor_standart_values(guilds)
         write_in_profiles_standart_values(guilds)
         write_in_stats_standart_values(guilds)
+        write_in_badges_standart_values(guilds)
 
 
 def setup(client):

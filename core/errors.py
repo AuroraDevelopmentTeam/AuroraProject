@@ -62,3 +62,19 @@ def construct_error_not_enough_embed(
     embed = construct_error_embed(description)
     embed.set_footer(icon_url=icon, text=footer_text)
     return embed
+
+
+def construct_error_already_married_embed(
+    description: str, icon: Asset
+) -> nextcord.Embed:
+    embed = construct_error_embed(description)
+    embed.set_footer(icon_url=icon, text="♪ ♪ ♪")
+    return embed
+
+
+def construct_error_not_married_embed(
+    description: str, icon: Asset
+) -> nextcord.Embed:
+    embed = construct_error_embed(description)
+    embed.set_footer(icon_url=icon, text="♪ ♪ ♪")
+    return embed

@@ -1,5 +1,7 @@
 from nextcord.ext import commands
 import sqlite3
+import nextcord
+
 from core.locales.create import create_locales_table
 from core.locales.writers import write_in_locales_standart_values
 from core.checkers import is_guild_id_in_table
@@ -65,6 +67,7 @@ class OnGuildListener(commands.Cog):
         write_in_stats_standart_values(guilds)
         write_in_loggers_standart_values(guilds)
         write_in_tickets_config_standart_values(guilds)
+        write_in_badges_standart_values(guilds)
         print(len(self.client.guilds))
         members = 0
         for guild in self.client.guilds:

@@ -10,14 +10,17 @@ from core.errors import (
     construct_error_forbidden_embed,
     construct_error_limit_break_embed,
     construct_error_http_exception_embed,
+    construct_error_negative_value_embed,
+    construct_error_bot_user_embed,
 )
 from core.embeds import construct_basic_embed, construct_top_embed
 from core.locales.getters import get_msg_from_locale_by_key
 from core.parsers import parse_timeouts, parse_warns_of_user
 from core.warns.writers import write_new_warn
 from core.warns.updaters import remove_warn_from_table, update_warn_reason
-from core.warns.getters import check_warn
+from core.warns.getters import check_warn, get_warn_reason
 from core.checkers import is_warn_id_in_table
+from core.embeds import DEFAULT_BOT_COLOR
 
 
 class Moderation(commands.Cog):
@@ -51,7 +54,12 @@ class Moderation(commands.Cog):
             This parameter is optional, reason of mute
         """
         if user.bot:
-            return await interaction.response.send_message("bot_user_error")
+            return await interaction.response.send_message(
+                embed=construct_error_bot_user_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
+                    self.client.user.avatar.url,
+                )
+            )
         try:
             time_in_seconds = humanfriendly.parse_timespan(time)
             requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
@@ -80,6 +88,15 @@ class Moderation(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
+        except humanfriendly.InvalidTimespan:
+            embed = nextcord.Embed(
+                title="mute_invalid_timespan",
+                description=get_msg_from_locale_by_key(
+                    interaction.guild.id, "mute_invalid_timespan"
+                ),
+                color=DEFAULT_BOT_COLOR
+            )
+            return await interaction.response.send_message(embed=embed)
 
     @nextcord.slash_command(
         name="unmute",
@@ -101,7 +118,21 @@ class Moderation(commands.Cog):
             The discord's user, tag someone with @
         """
         if user.bot:
-            return await interaction.response.send_message("bot_user_error")
+            return await interaction.response.send_message(
+                embed=construct_error_bot_user_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
+                    self.client.user.avatar.url,
+                )
+            )
+        if user.timeout is None:
+            embed = nextcord.Embed(
+                title="No mute",
+                description=get_msg_from_locale_by_key(
+                    interaction.guild.id, "no_mute"
+                ),
+                color=DEFAULT_BOT_COLOR
+            )
+            return await interaction.response.send_message(embed=embed)
         try:
             requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
             await user.edit(timeout=None)
@@ -136,9 +167,10 @@ class Moderation(commands.Cog):
         interaction: Interaction
             The interaction object
         """
+        await interaction.response.defer()
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         mutes = parse_timeouts(interaction.guild.members)
-        await interaction.response.send_message(
+        await interaction.followup.send(
             embed=construct_top_embed(
                 interaction.application_command.name,
                 mutes,
@@ -173,6 +205,16 @@ class Moderation(commands.Cog):
         after
             ID of message, AFTER THIS message deletion will take place
         """
+        if messages_to_delete <= 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    messages_to_delete,
+                )
+            )
         if messages_to_delete > 1000:
             return await interaction.response.send_message(
                 embed=construct_error_limit_break_embed(
@@ -292,7 +334,12 @@ class Moderation(commands.Cog):
         warn_id: Optional[int] = SlashOption(required=True),
     ):
         if user.bot:
-            return await interaction.response.send_message("bot_user_error")
+            return await interaction.response.send_message(
+                embed=construct_error_bot_user_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
+                    self.client.user.avatar.url,
+                )
+            )
         if is_warn_id_in_table("warns", warn_id, interaction.guild.id, user.id) is True:
             remove_warn_from_table(warn_id, interaction.guild.id, user.id)
             requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
@@ -308,7 +355,14 @@ class Moderation(commands.Cog):
                 )
             )
         else:
-            await interaction.response.send_message("no value in db error")
+            embed = nextcord.Embed(
+                title="error",
+                description=get_msg_from_locale_by_key(
+                    interaction.guild.id, "no_warn_in_table"
+                ),
+                color=DEFAULT_BOT_COLOR
+            )
+            return await interaction.response.send_message(embed=embed)
 
     @nextcord.slash_command(
         name="warns",
@@ -320,17 +374,17 @@ class Moderation(commands.Cog):
         interaction: Interaction,
         user: Optional[nextcord.Member] = SlashOption(required=True),
     ):
-        """
-        Parameters
-        ----------
-        interaction: Interaction
-            The interaction object
-        """
+        await interaction.response.defer()
         if user.bot:
-            return await interaction.response.send_message("bot_user_error")
+            return await interaction.followup.send(
+                embed=construct_error_bot_user_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
+                    self.client.user.avatar.url,
+                )
+            )
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         warns = parse_warns_of_user(interaction.guild.id, user.id)
-        await interaction.response.send_message(
+        await interaction.followup.send(
             embed=construct_top_embed(
                 f"{interaction.application_command.name} - {user}",
                 warns,
@@ -352,9 +406,27 @@ class Moderation(commands.Cog):
         new_warn_reason: Optional[str] = SlashOption(required=True),
     ):
         if check_warn(interaction.guild.id, warn_id) is False:
-            return await interaction.response.send_message("no warn in table")
+            embed = nextcord.Embed(
+                title="error",
+                description=get_msg_from_locale_by_key(
+                    interaction.guild.id, "no_warn_in_table"
+                ),
+                color=DEFAULT_BOT_COLOR
+            )
+            return await interaction.response.send_message(embed=embed)
         update_warn_reason(interaction.guild.id, warn_id, new_warn_reason)
-        await interaction.response.send_message("done")
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} {new_warn_reason}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
 
     @nextcord.slash_command(
         name="purge_warns",
@@ -366,14 +438,37 @@ class Moderation(commands.Cog):
         self, interaction: Interaction, user: Optional[nextcord.Member]
     ):
         if user.bot:
-            return await interaction.response.send_message("bot_user_error")
+            return await interaction.response.send_message(
+                embed=construct_error_bot_user_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
+                    self.client.user.avatar.url,
+                )
+            )
         warns = parse_warns_of_user(interaction.guild.id, user.id)
         if len(warns) == 0:
-            return await interaction.response.send_message("no warns")
+            embed = nextcord.Embed(
+                title="error",
+                description=get_msg_from_locale_by_key(
+                    interaction.guild.id, "user_no_warns"
+                ),
+                color=DEFAULT_BOT_COLOR
+            )
+            return await interaction.response.send_message(embed=embed)
         for warn in warns:
             warn_id = warn[0]
             remove_warn_from_table(warn_id, interaction.guild.id, user.id)
-        await interaction.response.send_message("done")
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, interaction.application_command.name
+        )
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} {user.mention}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
 
 
 def setup(client):

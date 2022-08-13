@@ -1,3 +1,4 @@
+import asyncio
 from typing import Optional
 from easy_pil import *
 from PIL import Image
@@ -180,6 +181,15 @@ class Levels(commands.Cog):
             )
         min_exp, max_exp = exp_points, exp_points
         update_user_exp(interaction.guild.id, user.id, min_exp, max_exp)
+        user_level = get_user_level(interaction.guild.id, user.id)
+        user_exp = get_user_exp(interaction.guild.id, user.id)
+        if user_exp > 0:
+            leveling_formula = round((7 * (user_level**2)) + 58)
+            while self.level_up(interaction.guild.id, interaction.user.id):
+                update_user_exp(interaction.guild.id, interaction.user.id, -leveling_formula, -leveling_formula)
+                update_user_level(interaction.guild.id, interaction.user.id, 1)
+                user_level = get_user_level(interaction.guild.id, user.id)
+                leveling_formula = round((7 * (user_level ** 2)) + 58)
         msg = get_msg_from_locale_by_key(
             interaction.guild.id, interaction.application_command.name
         )

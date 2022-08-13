@@ -1,6 +1,10 @@
+from typing import Optional
+import psutil
+
 import nextcord
 from nextcord import Interaction, SlashOption, Permissions
 from nextcord.ext import commands
+
 from core.locales.getters import (
     get_msg_from_locale_by_key,
     get_keys_value_in_locale,
@@ -8,8 +12,6 @@ from core.locales.getters import (
     get_localized_name,
 )
 from core.embeds import construct_basic_embed, construct_long_embed, DEFAULT_BOT_COLOR
-from typing import Optional
-import cooldowns
 
 
 class Information(commands.Cog):

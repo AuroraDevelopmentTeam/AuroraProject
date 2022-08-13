@@ -5,6 +5,8 @@ from nextcord import Interaction
 from nextcord.ext import commands
 from nextcord.ext.application_checks import ApplicationMissingPermissions
 
+from core.locales.getters import get_msg_from_locale_by_key
+
 
 class ErrorHandler(commands.Cog):
     def __init__(self, client):
@@ -20,7 +22,8 @@ class ErrorHandler(commands.Cog):
             )
 
         elif isinstance(error, ApplicationMissingPermissions):
-            return await interaction.send(f"ApplicationMissingPermissions\n`{error}`")
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "ApplicationMissingPermissions")
+            return await interaction.send(f"{msg}\n`{error}`")
         else:
             raise error
 

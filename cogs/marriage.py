@@ -50,6 +50,8 @@ from core.errors import (
     construct_error_bot_user_embed,
     construct_error_self_choose_embed,
     construct_error_not_enough_embed,
+    construct_error_already_married_embed,
+    construct_error_not_married_embed
 )
 
 
@@ -60,21 +62,21 @@ class Marriage(commands.Cog):
     @nextcord.slash_command(
         name="marry",
         description="send marriage request to @User, "
-        "if marriage will be success you will pay 10000 currency on server",
+                    "if marriage will be success you will pay 10000 currency on server",
         name_localizations=get_localized_name("marry"),
         description_localizations=get_localized_description("marry"),
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __marry(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
     ):
         if user.bot:
             return await interaction.response.send_message(
@@ -93,9 +95,23 @@ class Marriage(commands.Cog):
                 )
             )
         if is_married(interaction.guild.id, interaction.user.id) is True:
-            return await interaction.response.send_message("already_married error")
+            return await interaction.response.send_message(
+                construct_error_already_married_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "already_married_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         if is_married(interaction.guild.id, user.id) is True:
-            return await interaction.response.send_message("already_married error")
+            return await interaction.response.send_message(
+                construct_error_already_married_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "already_married_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < 10000:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
@@ -105,7 +121,7 @@ class Marriage(commands.Cog):
                         interaction.guild.id, "not_enough_money_error"
                     ),
                     interaction.user.display_avatar,
-                    f"{msg} {balance}",
+                    f"{msg} {balance}/10000",
                 )
             )
         author = interaction.user
@@ -129,7 +145,7 @@ class Marriage(commands.Cog):
 
         async def marry_yes_callback(interaction: Interaction):
             embed = create_marry_yes_embed(interaction.guild.id, author, pair)
-            locale.setlocale(locale.LC_TIME, "en_US.UTF-8")
+            locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
             date_format = "%a, %d %b %Y %H:%M:%S"
             timestamp = datetime.now()
             date = timestamp.strftime(date_format)
@@ -161,7 +177,7 @@ class Marriage(commands.Cog):
     @nextcord.slash_command(
         name="loveprofile",
         description="sends your couple love card in chat with some "
-        "information about couple!",
+                    "information about couple!",
         name_localizations=get_localized_name("loveprofile"),
         description_localizations=get_localized_description("loveprofile"),
         default_member_permissions=Permissions(send_messages=True),
@@ -169,7 +185,14 @@ class Marriage(commands.Cog):
     async def __loveprofile(self, interaction: Interaction):
         await interaction.response.defer()
         if is_married(interaction.guild.id, interaction.user.id) is False:
-            return await interaction.followup.send("not married error")
+            return await interaction.response.send_message(
+                construct_error_not_married_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_married_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         pair = await self.client.fetch_user(
             get_user_pair_id(interaction.guild.id, interaction.user.id)
         )
@@ -197,7 +220,14 @@ class Marriage(commands.Cog):
     )
     async def __divorce(self, interaction: Interaction):
         if is_married(interaction.guild.id, interaction.user.id) is False:
-            return await interaction.response.send_message("not married error")
+            return await interaction.response.send_message(
+                construct_error_not_married_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_married_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         pair_id = get_user_pair_id(interaction.guild.id, interaction.user.id)
         pair = await self.client.fetch_user(pair_id)
         if pair is None:
@@ -226,20 +256,25 @@ class Marriage(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __waifu(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=False,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=False,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
     ):
         if user is None:
             user = interaction.user
         if user.bot:
-            return await interaction.response.send_message("bot_user_error")
+            return await interaction.response.send_message(
+                embed=construct_error_bot_user_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
+                    self.client.user.avatar.url,
+                )
+            )
         pair_id = get_user_pair_id(interaction.guild.id, user.id)
         like_id = get_user_like_id(interaction.guild.id, user.id)
         gift_price = get_user_gifts_price(interaction.guild.id, user.id)
@@ -304,18 +339,25 @@ class Marriage(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __like(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
     ):
         if user == interaction.user:
-            return await interaction.response.send_message("self choose error")
+            return await interaction.response.send_message(
+                embed=construct_error_self_choose_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "self_choose_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         update_user_like(interaction.guild.id, interaction.user.id, user.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, interaction.application_command.name
@@ -391,43 +433,84 @@ class Marriage(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __gift(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
-        gift: str = SlashOption(
-            name="picker",
-            choices={
-                f"1. Carrot 🥕": "gift_1",
-                f"2. Teddy Bear 🧸": "gift_2",
-                f"3. Cookie 🍪": "gift_3",
-                f"4. Lolipop 🍭": "gift_4",
-                f"5. Flower 🌸": "gift_5",
-                f"6. Scarf 🧣": "gift_6",
-                f"7. Cake 🎂": "gift_7",
-                f"8. Panda 🐼": "gift_8",
-                f"9. Duck 🦆": "gift_9",
-                f"10. Cat 🐱": "gift_10",
-            },
-            required=True,
-        ),
-        amount: Optional[int] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
+            gift: str = SlashOption(
+                name="picker",
+                choices={
+                    f"1. Carrot 🥕": "gift_1",
+                    f"2. Teddy Bear 🧸": "gift_2",
+                    f"3. Cookie 🍪": "gift_3",
+                    f"4. Lolipop 🍭": "gift_4",
+                    f"5. Flower 🌸": "gift_5",
+                    f"6. Scarf 🧣": "gift_6",
+                    f"7. Cake 🎂": "gift_7",
+                    f"8. Panda 🐼": "gift_8",
+                    f"9. Duck 🦆": "gift_9",
+                    f"10. Cat 🐱": "gift_10",
+                },
+                choice_localizations={"ru": {
+                    f"1. Морковка 🥕": "gift_1",
+                    f"2. Мишка 🧸": "gift_2",
+                    f"3. Печенька 🍪": "gift_3",
+                    f"4. Лолипоп 🍭": "gift_4",
+                    f"5. Цветочек 🌸": "gift_5",
+                    f"6. Шарфик 🧣": "gift_6",
+                    f"7. Тортик 🎂": "gift_7",
+                    f"8. Панда 🐼": "gift_8",
+                    f"9. Утка 🦆": "gift_9",
+                    f"10. Кошка 🐱": "gift_10",
+                }},
+                required=True,
+            ),
+            amount: Optional[int] = SlashOption(required=True),
     ):
         if amount < 1:
-            return await interaction.response.send_message("negative_value_error")
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         if user.bot:
-            return await interaction.response.send_message("bot_user_error")
+            return await interaction.response.send_message(
+                embed=construct_error_bot_user_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
+                    self.client.user.avatar.url,
+                )
+            )
         if user == interaction.user:
-            return await interaction.response.send_message("self choose error")
+            return await interaction.response.send_message(
+                embed=construct_error_self_choose_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "self_choose_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         price = GIFT_PRICES[gift] * amount
         if balance < price:
-            return await interaction.response.send_message("not_enough_money_error")
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            return await interaction.response.send_message(
+                embed=construct_error_not_enough_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_enough_money_error"
+                    ),
+                    interaction.user.display_avatar,
+                    f"{msg} {balance}",
+                )
+            )
         update_user_balance(interaction.guild.id, interaction.user.id, -price)
         update_user_gift_count(interaction.guild.id, user.id, gift, amount)
         update_user_gift_price(interaction.guild.id, user.id, price)
@@ -454,12 +537,19 @@ class Marriage(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __lovedescription(
-        self,
-        interaction: Interaction,
-        description: Optional[str] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            description: Optional[str] = SlashOption(required=True),
     ):
         if is_married(interaction.guild.id, interaction.user.id) is False:
-            return await interaction.response.send_message("not married error")
+            return await interaction.response.send_message(
+                construct_error_not_married_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_married_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         update_user_love_description(
             interaction.guild.id, interaction.user.id, description
         )
@@ -484,17 +574,41 @@ class Marriage(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __lovedeposit(
-        self,
-        interaction: Interaction,
-        amount: Optional[int] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            amount: Optional[int] = SlashOption(required=True),
     ):
         if is_married(interaction.guild.id, interaction.user.id) is False:
-            return await interaction.response.send_message("not married error")
+            return await interaction.response.send_message(
+                construct_error_not_married_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_married_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if amount <= 0:
-            return await interaction.response.send_message("negative_value_error")
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         if balance < amount:
-            return await interaction.response.send_message("not_enough_money_error")
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            return await interaction.response.send_message(
+                embed=construct_error_not_enough_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_enough_money_error"
+                    ),
+                    interaction.user.display_avatar,
+                    f"{msg} {balance}",
+                )
+            )
         pair = get_user_pair_id(interaction.guild.id, interaction.user.id)
         update_user_balance(interaction.guild.id, interaction.user.id, -amount)
         update_couple_family_money(
