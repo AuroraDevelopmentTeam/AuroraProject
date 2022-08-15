@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 import random
 
 import nextcord
@@ -48,10 +48,67 @@ from core.ui.buttons import create_button, ViewAuthorCheck
 from core.locales.getters import get_msg_from_locale_by_key
 from core.money.updaters import update_user_balance
 from core.money.getters import get_user_balance, get_guild_currency_symbol
+from core.errors import construct_error_negative_value_embed, construct_error_not_enough_embed
+from core.embeds import DEFAULT_BOT_COLOR
 
 MULTIPLIERS_FOR_TWO_ROWS = [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]
 
 MULTIPLIERS_FOR_THREE_ROWS = [2.0, 2.1, 2.2, 2.3, 2.4, 2.5]
+
+
+class DuelEnd(nextcord.ui.View):
+    def __init__(self):
+        super().__init__()
+
+    @nextcord.ui.button(
+        label="Дуэль",
+        style=nextcord.ButtonStyle.red,
+        custom_id="ticket_settings:red",
+        disabled=True,
+    )
+    async def duel_start(self, button: nextcord.ui.Button, interaction: Interaction):
+        pass
+
+
+class DuelStart(nextcord.ui.View):
+    def __init__(self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int]):
+        self.author = author
+        self.bet = bet
+        super().__init__()
+
+    async def interaction_check(self, interaction: Interaction) -> bool:
+        if interaction.user == self.author:
+            return False
+        if get_user_balance(interaction.guild.id, interaction.user.id) < self.bet:
+            return False
+        return True
+
+    @nextcord.ui.button(
+        label="Дуэль",
+        style=nextcord.ButtonStyle.red,
+        custom_id="ticket_settings:red",
+        disabled=False,
+    )
+    async def duel_start(self, button: nextcord.ui.Button, interaction: Interaction):
+        author = self.author
+        user = interaction.user
+        who_win = random.choice([author, user])
+        if who_win == author:
+            losed = user
+        else:
+            losed = author
+        currency = get_guild_currency_symbol(interaction.guild.id)
+        embed = nextcord.Embed(
+            title="Дуэль",
+            description=f'В дуэле побеждает {who_win.mention} и зарабатывает {self.bet} {currency}',
+            color=DEFAULT_BOT_COLOR
+        )
+        update_user_balance(interaction.guild.id, who_win.id, self.bet)
+        update_user_balance(interaction.guild.id, losed.id, -self.bet)
+        balance = get_user_balance(interaction.guild.id, who_win.id)
+        msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+        embed.set_footer(text=f"{msg} {balance}", icon_url=who_win.display_avatar)
+        await interaction.message.edit(embed=embed, view=DuelEnd())
 
 
 class Games(commands.Cog):
@@ -66,22 +123,39 @@ class Games(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __blackjack(
-        self,
-        interaction: Interaction,
-        bet: Optional[int] = SlashOption(
-            required=True,
-            description="Number of money you bet in game",
-            description_localizations={
-                "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            bet: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money you bet in game",
+                description_localizations={
+                    "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
+                },
+            ),
     ):
         await interaction.response.defer()
         if bet <= 0:
-            return await interaction.followup.send("negative_value_error")
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
-            return await interaction.followup.send("not_enough_money_error")
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            return await interaction.response.send_message(
+                embed=construct_error_not_enough_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_enough_money_error"
+                    ),
+                    interaction.user.display_avatar,
+                    f"{msg} {balance}",
+                )
+            )
         global player
         player = interaction.user
         deck = create_deck()
@@ -329,16 +403,38 @@ class Games(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __slots(
-        self,
-        interaction: Interaction,
-        bet: Optional[int] = SlashOption(
-            required=True,
-            description="Number of money you bet in game",
-            description_localizations={
-                "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            bet: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money you bet in game",
+                description_localizations={
+                    "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
+                },
+            ),
     ):
+        if bet <= 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
+        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if balance < bet:
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            return await interaction.response.send_message(
+                embed=construct_error_not_enough_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_enough_money_error"
+                    ),
+                    interaction.user.display_avatar,
+                    f"{msg} {balance}",
+                )
+            )
         player_got_row = spin_slots()
         is_win, multiplier = check_win_get_multiplier(player_got_row)
         if is_win is True:
@@ -390,21 +486,38 @@ class Games(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __gamble(
-        self,
-        interaction: Interaction,
-        bet: Optional[int] = SlashOption(
-            required=True,
-            description="Number of money you bet in game",
-            description_localizations={
-                "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            bet: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money you bet in game",
+                description_localizations={
+                    "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
+                },
+            ),
     ):
         if bet <= 0:
-            return await interaction.response.send_message("negative_value_error")
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
-            return await interaction.response.send_message("not_enough_money_error")
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            return await interaction.response.send_message(
+                embed=construct_error_not_enough_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_enough_money_error"
+                    ),
+                    interaction.user.display_avatar,
+                    f"{msg} {balance}",
+                )
+            )
         user_strikes, bot_strikes = perform_strikes()
         is_win = compare_strikes(user_strikes, bot_strikes)
         percentage, bet = approximate_bet(bet, is_win)
@@ -437,21 +550,38 @@ class Games(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __wheel(
-        self,
-        interaction: Interaction,
-        bet: Optional[int] = SlashOption(
-            required=True,
-            description="Number of money you bet in game",
-            description_localizations={
-                "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            bet: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money you bet in game",
+                description_localizations={
+                    "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
+                },
+            ),
     ):
         if bet <= 0:
-            return await interaction.response.send_message("negative_value_error")
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
-            return await interaction.response.send_message("not_enough_money_error")
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            return await interaction.response.send_message(
+                embed=construct_error_not_enough_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_enough_money_error"
+                    ),
+                    interaction.user.display_avatar,
+                    f"{msg} {balance}",
+                )
+            )
         update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
         multipliers = initialize_multipliers()
         wheel_number = spin_wheel()
@@ -470,6 +600,55 @@ class Games(commands.Cog):
                 interaction.user.display_avatar,
             )
         )
+
+    @nextcord.slash_command(
+        name="duel",
+        description="duel",
+        default_member_permissions=Permissions(send_messages=True),
+    )
+    async def __duel(
+            self,
+            interaction: Interaction,
+            bet: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money you bet in game",
+                description_localizations={
+                    "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
+                },
+            ),
+    ):
+        if bet <= 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
+        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if balance < bet:
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            return await interaction.response.send_message(
+                embed=construct_error_not_enough_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_enough_money_error"
+                    ),
+                    interaction.user.display_avatar,
+                    f"{msg} {balance}",
+                )
+            )
+        embed = nextcord.Embed(
+            title="Дуэль",
+            description=f"{interaction.user.mention} начинает поиск соперника для дуэли! Ставка **{bet}** "
+                        f"{get_guild_currency_symbol(interaction.guild.id)}",
+            color=DEFAULT_BOT_COLOR
+        )
+
+        await interaction.response.send_message(
+            embed=embed, view=DuelStart(interaction.user, bet)
+            )
 
 
 def setup(client):

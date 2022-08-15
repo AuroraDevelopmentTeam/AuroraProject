@@ -9,6 +9,7 @@ from core.money.create import create_money_table, create_money_config_table
 from core.money.writers import (
     write_in_money_standart_values,
     write_in_money_config_standart_values,
+    write_in_chat_money_standart_values
 )
 from core.levels.create import create_level_table, create_level_config_table
 from core.levels.writers import (
@@ -68,6 +69,7 @@ class OnGuildListener(commands.Cog):
         write_in_loggers_standart_values(guilds)
         write_in_tickets_config_standart_values(guilds)
         write_in_badges_standart_values(guilds)
+        write_in_chat_money_standart_values(guilds)
         print(len(self.client.guilds))
         members = 0
         for guild in self.client.guilds:

@@ -530,5 +530,35 @@
     },
     "ApplicationMissingPermissions": {
       "msg": "You are missing some permissions to run this command"
+    },
+    "income_min_max_message": {
+      "msg": "Now income for writing messages now will be given in this range:"
+    },
+    "income_min_max_voice": {
+      "msg": "Now income for being in voice channels now will be given in this range:"
+    },
+    "income_messages_per_income": {
+      "msg": "Now for income users must write this amount of messages:"
+    },
+    "income_voice_minutes": {
+      "msg": "Now for income users must be in voice channel this amount of minutes:"
+    },
+    "already_in_income": {
+      "msg": "role already in income system"
+    },
+    "income_role_add": {
+      "msg": "were added to income with income:"
+    },
+    "not_in_income": {
+      "msg": "role not in in income system"
+    },
+    "income_role_remove": {
+      "msg": "was removed from income"
+    },
+    "income_channel": {
+      "msg": "For channel"
+    },
+    "income_channel_2": {
+      "msg": "possibility to earn money were: "
     }
 }

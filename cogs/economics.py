@@ -4,7 +4,8 @@ import sqlite3
 
 from PIL import Image
 import cooldowns
-from nextcord.ext import commands, menus, application_checks
+from nextcord.ext import commands, menus, application_checks, tasks
+from nextcord.abc import GuildChannel
 from nextcord import Interaction, SlashOption, Permissions
 import nextcord
 
@@ -14,15 +15,21 @@ from core.money.updaters import (
     update_guild_payday_amount,
     update_user_balance,
     set_user_balance,
+    update_guild_msg_cooldown,
+    update_guild_min_max_msg_income,
+    update_guild_min_max_voice_income,
+    update_guild_voice_minutes_for_money,
 )
 from core.money.getters import (
     get_user_balance,
     get_guild_currency_symbol,
     get_guild_starting_balance,
     get_guild_payday_amount,
+
 )
+from core.money.writers import write_role_in_income, delete_role_from_income, write_channel_in_config
 from core.money.create import create_user_money_card
-from core.checkers import is_str_or_emoji, is_role_in_shop
+from core.checkers import is_str_or_emoji, is_role_in_shop, is_role_in_income, is_channel_in_config
 from core.locales.getters import (
     get_msg_from_locale_by_key,
     get_localized_description,
@@ -49,6 +56,24 @@ class Economics(commands.Cog):
     def __init__(self, client):
         self.client = client
 
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.give_roles_money.start(self.client.guilds)
+
+    @tasks.loop(hours=12)
+    async def give_roles_money(self, guilds):
+        db = sqlite3.connect("./databases/main.sqlite")
+        cursor = db.cursor()
+        for guild in guilds:
+            guild_id = guild.id
+            for row in cursor.execute(
+                    f"SELECT role_id, income FROM roles_money WHERE guild_id = {guild_id}"
+            ):
+                role = nextcord.utils.get(guild.roles, id=row[0])
+                for member in guild.members:
+                    if role.id in [role.id for role in member.roles]:
+                        update_user_balance(guild_id, member.id, row[1])
+
     @nextcord.slash_command(
         name="add_money",
         description="Administrator's command to add the money on the balance of @User",
@@ -58,22 +83,22 @@ class Economics(commands.Cog):
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __add_money(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
-        money: Optional[int] = SlashOption(
-            required=True,
-            description="Number of money the bot should send to user",
-            description_localizations={
-                "ru": "Количество денег, которое бот должен отправить"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
+            money: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money the bot should send to user",
+                description_localizations={
+                    "ru": "Количество денег, которое бот должен отправить"
+                },
+            ),
     ):
         if user.bot:
             return await interaction.response.send_message(
@@ -117,22 +142,22 @@ class Economics(commands.Cog):
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __remove_money(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
-        money: Optional[int] = SlashOption(
-            required=True,
-            description="Number of money the bot should take from user",
-            description_localizations={
-                "ru": "Количество денег, которое бот должен забрать"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
+            money: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money the bot should take from user",
+                description_localizations={
+                    "ru": "Количество денег, которое бот должен забрать"
+                },
+            ),
     ):
         if user.bot:
             return await interaction.response.send_message(
@@ -175,15 +200,15 @@ class Economics(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __money(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=False,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=False,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
     ):
         if user is None:
             user = interaction.user
@@ -209,7 +234,7 @@ class Economics(commands.Cog):
     @nextcord.slash_command(
         name="reset",
         description="Reset's server economics, "
-        "all user balances to starting balances",
+                    "all user balances to starting balances",
         name_localizations=get_localized_name("reset"),
         description_localizations=get_localized_description("reset"),
         default_member_permissions=Permissions(administrator=True),
@@ -228,15 +253,15 @@ class Economics(commands.Cog):
         description_localizations=get_localized_description("reset_balance"),
     )
     async def ___money(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
     ):
         if user.bot:
             return await interaction.response.send_message(
@@ -268,7 +293,7 @@ class Economics(commands.Cog):
     @__reset.subcommand(
         name="economics",
         description="Reset's server economics, "
-        "all user balances to starting balances",
+                    "all user balances to starting balances",
         name_localizations=get_localized_name("reset_economics"),
         description_localizations=get_localized_description("reset_economics"),
     )
@@ -324,22 +349,22 @@ class Economics(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __give(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
-        money: Optional[int] = SlashOption(
-            required=True,
-            description="Number of money you want to give @User",
-            description_localizations={
-                "ru": "Количество денег, которое вы хотите передать @Пользователю"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
+            money: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money you want to give @User",
+                description_localizations={
+                    "ru": "Количество денег, которое вы хотите передать @Пользователю"
+                },
+            ),
     ):
         if user.bot:
             return await interaction.response.send_message(
@@ -408,20 +433,20 @@ class Economics(commands.Cog):
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __add_shop(
-        self,
-        interaction: Interaction,
-        role: Optional[nextcord.Role] = SlashOption(
-            required=True,
-            description="Discord role on your server",
-            description_localizations={"ru": "Дискордовская роль на вашем сервере"},
-        ),
-        cost: Optional[int] = SlashOption(
-            required=True,
-            description="Number of money role will cost",
-            description_localizations={
-                "ru": "Количество денег, которое должна стоить роль"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            role: Optional[nextcord.Role] = SlashOption(
+                required=True,
+                description="Discord role on your server",
+                description_localizations={"ru": "Дискордовская роль на вашем сервере"},
+            ),
+            cost: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money role will cost",
+                description_localizations={
+                    "ru": "Количество денег, которое должна стоить роль"
+                },
+            ),
     ):
         if cost < 0:
             return await interaction.response.send_message(
@@ -465,13 +490,13 @@ class Economics(commands.Cog):
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __remove_shop(
-        self,
-        interaction: Interaction,
-        role: Optional[nextcord.Role] = SlashOption(
-            required=True,
-            description="Discord role on your server",
-            description_localizations={"ru": "Дискордовская роль на вашем сервере"},
-        ),
+            self,
+            interaction: Interaction,
+            role: Optional[nextcord.Role] = SlashOption(
+                required=True,
+                description="Discord role on your server",
+                description_localizations={"ru": "Дискордовская роль на вашем сервере"},
+            ),
     ):
         if is_role_in_shop(interaction.guild.id, role.id) is False:
             embed = nextcord.Embed(
@@ -510,6 +535,289 @@ class Economics(commands.Cog):
             disabled=False,
         )
         await pages.start(interaction=interaction)
+
+    @nextcord.slash_command(
+        name="shop",
+        description="show role shop menu",
+        name_localizations=get_localized_name("shop"),
+        description_localizations=get_localized_description("shop"),
+        default_member_permissions=Permissions(send_messages=True),
+    )
+    async def __shop(self, interaction: Interaction):
+        guild_roles = parse_server_roles(interaction.guild)
+        pages = SelectButtonMenuPages(
+            source=MyEmbedDescriptionPageSource(guild_roles),
+            guild=interaction.guild,
+            disabled=False,
+        )
+        await pages.start(interaction=interaction)
+
+    @nextcord.slash_command(
+        name="income", default_member_permissions=Permissions(administrator=True)
+    )
+    @application_checks.has_permissions(manage_guild=True)
+    async def __income(self, interaction: Interaction):
+        """
+        This is the set slash command that will be the prefix of income commands.
+        """
+        pass
+
+    @__income.subcommand(name="role_add",
+                         description="Choose bot's respond's main language on your server!",
+                         )
+    async def __income_role_add(
+            self,
+            interaction: Interaction,
+            role: Optional[nextcord.Role] = SlashOption(
+                required=True,
+                description="Discord role on your server",
+                description_localizations={"ru": "Дискордовская роль на вашем сервере"},
+            ),
+            income: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money role will cost",
+                description_localizations={
+                    "ru": "Количество денег, которое должна стоить роль"
+                },
+            ),
+    ):
+        if income <= 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    cost,
+                )
+            )
+        if is_role_in_income(interaction.guild.id, role.id) is True:
+            embed = nextcord.Embed(
+                title="error",
+                description=get_msg_from_locale_by_key(
+                    interaction.guild.id, "already_in_income"
+                ),
+                color=DEFAULT_BOT_COLOR
+            )
+            return await interaction.response.send_message(embed=embed)
+        write_role_in_income(interaction.guild.id, role, income)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"income_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{role.mention} {message} **{income}** {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
+
+    @__income.subcommand(name="role_remove",
+                         description="Choose bot's respond's main language on your server!",
+                         )
+    async def __income_role_remove(
+            self,
+            interaction: Interaction,
+            role: Optional[nextcord.Role] = SlashOption(
+                required=True,
+                description="Discord role on your server",
+                description_localizations={"ru": "Дискордовская роль на вашем сервере"},
+            ),
+    ):
+        if is_role_in_income(interaction.guild.id, role.id) is False:
+            embed = nextcord.Embed(
+                title="error",
+                description=get_msg_from_locale_by_key(
+                    interaction.guild.id, "not_in_income"
+                ),
+                color=DEFAULT_BOT_COLOR
+            )
+            return await interaction.response.send_message(embed=embed)
+        delete_role_from_income(interaction.guild.id, role)
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"income_{interaction.application_command.name}"
+        )
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{role.mention} {message}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
+
+    @__income.subcommand(name="channel",
+                         description="Choose bot's respond's main language on your server!",
+                         )
+    async def __income_channel_add(self, interaction: Interaction,
+                                   channel: Optional[GuildChannel] = SlashOption(required=True),
+                                   enabled: Optional[bool] = SlashOption(required=True)):
+        write_channel_in_config(interaction.guild.id, channel.id, enabled)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"income_{interaction.application_command.name}"
+        )
+        message_2 = get_msg_from_locale_by_key(
+            interaction.guild.id, f"income_{interaction.application_command.name}_2"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        if enabled is True:
+            enabled = get_msg_from_locale_by_key(
+                interaction.guild.id, "enabled"
+            )
+        else:
+            enabled = get_msg_from_locale_by_key(
+                interaction.guild.id, "disabled"
+            )
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} {channel.mention} {message_2} **{enabled}**",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
+
+    @__income.subcommand(
+        name="min_max_message",
+        description="Set min and max income for writing messages",
+    )
+    async def __min_max_message_income(
+            self,
+            interaction: Interaction,
+            min_msg_income: Optional[int] = SlashOption(required=True),
+            max_msg_income: Optional[int] = SlashOption(required=True),
+    ):
+        if min_msg_income < 0 or max_msg_income < 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    f"{min_msg_income} - {max_msg_income}",
+                )
+            )
+        if max_msg_income < min_msg_income:
+            return
+        update_guild_min_max_msg_income(interaction.guild.id, min_msg_income, max_msg_income)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"income_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} **{min_msg_income}** - **{max_msg_income}**",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
+
+    @__income.subcommand(
+        name="min_max_voice",
+        description="Set min and max income for being in voice chat",
+    )
+    async def __min_max_voice_income(
+            self,
+            interaction: Interaction,
+            min_voice_income: Optional[int] = SlashOption(required=True),
+            max_voice_income: Optional[int] = SlashOption(required=True),
+    ):
+        if min_voice_income < 0 or max_voice_income < 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    f"{min_voice_income} - {max_voice_income}",
+                )
+            )
+        if max_voice_income < min_voice_income:
+            return
+        update_guild_min_max_voice_income(interaction.guild.id, min_voice_income, max_voice_income)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"income_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} **{min_voice_income}** - **{max_voice_income}**",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
+
+    @__income.subcommand(
+        name="messages_per_income",
+        description="Set messages users must write before getting income",
+    )
+    async def __messages_per_income(
+            self,
+            interaction: Interaction,
+            msg_per_income: Optional[int] = SlashOption(required=True),
+    ):
+        if msg_per_income < 1:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    f"{min_msg_income} - {max_msg_income}",
+                )
+            )
+        update_guild_msg_cooldown(interaction.guild.id, msg_per_income)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"income_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} **{msg_per_income}**",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
+
+    @__income.subcommand(
+        name="voice_minutes",
+        description="Set minutes users must spent in voice chat before income",
+    )
+    async def __voice_minutes_income(
+            self,
+            interaction: Interaction,
+            voice_minutes: Optional[int] = SlashOption(required=True),
+    ):
+        if voice_minutes < 1:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    f"{min_msg_income} - {max_msg_income}",
+                )
+            )
+        update_guild_voice_minutes_for_money(interaction.guild.id, voice_minutes)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"income_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} **{voice_minutes}**",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+            )
+        )
 
 
 def setup(client):

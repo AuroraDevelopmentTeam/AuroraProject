@@ -40,8 +40,50 @@ def create_money_config_table() -> None:
     return
 
 
+def create_role_money_table() -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    cursor.execute(
+        f"""CREATE TABLE IF NOT EXISTS roles_money (
+        guild_id INTERGER, role_id INTERGER, income INTERGER, cooldown TEXT
+    )"""
+    )
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def create_chat_money_config_table() -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    cursor.execute(
+        f"""CREATE TABLE IF NOT EXISTS chat_money_config (
+        guild_id INTERGER, min_msg_income INTERGER, max_msg_income INTERGER, msg_cooldown INTERGER, 
+        min_voice_income INTERGER, max_voice_income INTERGER, voice_minutes_for_money INTERGER
+    )"""
+    )
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def create_money_channels_config_table() -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    cursor.execute(
+        f"""CREATE TABLE IF NOT EXISTS money_channels_config (
+        guild_id INTERGER, channel_id INTERGER, enabled BOOL)"""
+    )
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
 def create_user_money_card(
-    name, author, user, avatar, guild_id
+        name, author, user, avatar, guild_id
 ) -> tuple[nextcord.File, nextcord.Embed]:
     background = Editor("./assets/credit_card.png")
     profile = Editor(avatar).resize((250, 250)).circle_image()

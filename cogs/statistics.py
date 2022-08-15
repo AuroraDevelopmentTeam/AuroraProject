@@ -17,6 +17,14 @@ from core.stats.getters import (
     get_user_time_in_voice,
     get_user_messages_counter,
 )
+from core.money.getters import (
+    get_voice_minutes_for_income,
+    get_guild_min_max_voice_income,
+    get_guild_min_max_msg_income,
+    get_msg_cooldown,
+    get_channel_income_state,
+)
+from core.money.updaters import update_user_balance
 from core.utils import format_seconds_to_hhmmss
 from core.locales.getters import get_msg_from_locale_by_key
 from core.embeds import construct_basic_embed
@@ -30,6 +38,14 @@ class StatisticsCounter(commands.Cog):
     async def on_message(self, message: nextcord.Message):
         if not message.author.bot:
             update_user_messages_counter(message.guild.id, message.author.id, 1)
+            if get_channel_income_state(message.guild.id, message.channel.id) is False:
+                return
+
+            message_counter = get_user_messages_counter(message.guild.id, message.author.id)
+            messages_for_money = get_msg_cooldown(message.guild.id)
+            if message_counter % messages_for_money == 0:
+                min, max = get_guild_min_max_msg_income(message.guild.id)
+                update_user_balance(message.guild.id, message.author.id, random.randint(min, max))
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
@@ -47,6 +63,13 @@ class StatisticsCounter(commands.Cog):
                 second_in_voice = abs(calculate_time.total_seconds())
                 update_user_join_time(member.guild.id, member.id, "0")
                 update_user_time_in_voice(member.guild.id, member.id, second_in_voice)
+
+                minutes_in_voice = int(second_in_voice/60)
+                voice_minutes_for_income = get_voice_minutes_for_income(member.guild.id)
+                min, max = get_guild_min_max_voice_income(member.guild.id)
+                money_to_update = (minutes_in_voice//voice_minutes_for_income) * random.randint(min, max)
+                update_user_balance(member.guild.id, member.id, money_to_update)
+
         elif before.channel is None and after.channel is not None:
             join_time = datetime.datetime.now().time().strftime("%H:%M:%S")
             update_user_join_time(member.guild.id, member.id, join_time)

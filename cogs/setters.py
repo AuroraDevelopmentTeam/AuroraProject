@@ -51,6 +51,7 @@ from core.tickets.updaters import (
     update_ticket_category,
     update_ticket_support,
 )
+from core.errors import construct_error_negative_value_embed
 
 
 class EmbedModal(nextcord.ui.Modal):
@@ -81,7 +82,7 @@ class EmbedModal(nextcord.ui.Modal):
             max_length=250,
             required=True,
             placeholder="Enter the url of image in format: "
-            "https://www.example.com/image.png",
+                        "https://www.example.com/image.png",
         )
         self.add_item(self.embedTitle)
         self.add_item(self.embedDescription)
@@ -127,13 +128,13 @@ class Setters(commands.Cog):
         description="Choose bot's respond's main language on your server!",
     )
     async def __locale_set(
-        self,
-        interaction: Interaction,
-        locale: str = SlashOption(
-            name="picker",
-            choices={"russian": "ru_ru", "english": "en_us"},
-            required=True,
-        ),
+            self,
+            interaction: Interaction,
+            locale: str = SlashOption(
+                name="picker",
+                choices={"russian": "ru_ru", "english": "en_us"},
+                required=True,
+            ),
     ):
         """
         Parameters
@@ -164,9 +165,9 @@ class Setters(commands.Cog):
         name="currency", description="Set server's currency to new symbol"
     )
     async def __currency_set(
-        self,
-        interaction: Interaction,
-        currency_symbol: Optional[str] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            currency_symbol: Optional[str] = SlashOption(required=True),
     ):
         """
         Parameters
@@ -197,9 +198,9 @@ class Setters(commands.Cog):
         name="start_balance", description="Set's server starting balance to new number"
     )
     async def __start_balance_set(
-        self,
-        interaction: Interaction,
-        balance: Optional[int] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            balance: Optional[int] = SlashOption(required=True),
     ):
         """
         Parameters
@@ -231,9 +232,9 @@ class Setters(commands.Cog):
         description="Set's server payday amount per time with /timely " "command",
     )
     async def __payday_amount_set(
-        self,
-        interaction: Interaction,
-        payday_amount: Optional[int] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            payday_amount: Optional[int] = SlashOption(required=True),
     ):
         """
         Parameters
@@ -265,11 +266,11 @@ class Setters(commands.Cog):
         description="Turn on or turn off level up messages on your server",
     )
     async def __level_up_messages_state(
-        self,
-        interaction: Interaction,
-        level_up_messages_state: int = SlashOption(
-            name="picker", choices={"turn on": 1, "turn off": 0}, required=True
-        ),
+            self,
+            interaction: Interaction,
+            level_up_messages_state: int = SlashOption(
+                name="picker", choices={"turn on": 1, "turn off": 0}, required=True
+            ),
     ):
         level_up_messages_state = bool(level_up_messages_state)
         set_server_level_up_messages_state(
@@ -300,13 +301,21 @@ class Setters(commands.Cog):
         name="level", description="Setting user's level to some integer value"
     )
     async def __level_set(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(required=True),
-        level: Optional[int] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(required=True),
+            level: Optional[int] = SlashOption(required=True),
     ):
         if level <= 0:
-            return await interaction.response.send_message("negative_value_error")
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         set_user_level(interaction.guild.id, user.id, level)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"set_{interaction.application_command.name}"
@@ -329,15 +338,33 @@ class Setters(commands.Cog):
         description="Setting server's min and max exp per writed message",
     )
     async def __min_max_exp_set(
-        self,
-        interaction: Interaction,
-        min: Optional[int] = SlashOption(required=True),
-        max: Optional[int] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            min: Optional[int] = SlashOption(required=True),
+            max: Optional[int] = SlashOption(required=True),
     ):
         if min < 0:
-            return await interaction.response.send_message("negative_value_error")
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         if max < 0:
-            return await interaction.response.send_message("negative_value_error")
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
+        if max < min:
+            return
         update_min_max_exp(interaction.guild.id, min, max)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"set_{interaction.application_command.name}"
@@ -357,9 +384,9 @@ class Setters(commands.Cog):
         description="Setting server's welcome channel to send welcome messages",
     )
     async def welcome_channel_set(
-        self,
-        interaction: Interaction,
-        channel: Optional[str] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            channel: Optional[str] = SlashOption(required=True),
     ):
         """
         Parameters
@@ -400,16 +427,16 @@ class Setters(commands.Cog):
         description="Choose bot's welcome message type on your server!",
     )
     async def __welcome_message_type_set(
-        self,
-        interaction: Interaction,
-        welcome_message_type: str = SlashOption(
-            name="picker",
-            choices={
-                "Welcome message type: photo card": "card",
-                "Welcome message type: embed message": "embed",
-            },
-            required=True,
-        ),
+            self,
+            interaction: Interaction,
+            welcome_message_type: str = SlashOption(
+                name="picker",
+                choices={
+                    "Welcome message type: photo card": "card",
+                    "Welcome message type: embed message": "embed",
+                },
+                required=True,
+            ),
     ):
         """
         Parameters
@@ -438,11 +465,11 @@ class Setters(commands.Cog):
         description="Turn on or turn off welcome messages on your server",
     )
     async def __welcome_messages_state_set(
-        self,
-        interaction: Interaction,
-        welcome_message_state: int = SlashOption(
-            name="picker", choices={"turn on": 1, "turn off": 0}, required=True
-        ),
+            self,
+            interaction: Interaction,
+            welcome_message_state: int = SlashOption(
+                name="picker", choices={"turn on": 1, "turn off": 0}, required=True
+            ),
     ):
         welcome_message_state = bool(welcome_message_state)
         set_welcome_message_state(interaction.guild.id, welcome_message_state)
@@ -472,11 +499,11 @@ class Setters(commands.Cog):
         description="Turn on or turn off autoroles for new guests of server",
     )
     async def __autoroles_state_set(
-        self,
-        interaction: Interaction,
-        autoroles_state: int = SlashOption(
-            name="picker", choices={"turn on": 1, "turn off": 0}, required=True
-        ),
+            self,
+            interaction: Interaction,
+            autoroles_state: int = SlashOption(
+                name="picker", choices={"turn on": 1, "turn off": 0}, required=True
+            ),
     ):
         autoroles_state = bool(autoroles_state)
         set_autoroles_state(interaction.guild.id, autoroles_state)
@@ -506,9 +533,9 @@ class Setters(commands.Cog):
         description="Turn on or turn off autoroles for new guests of server",
     )
     async def __autorole_set(
-        self,
-        interaction: Interaction,
-        role: Optional[nextcord.Role] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            role: Optional[nextcord.Role] = SlashOption(required=True),
     ):
         update_autorole(interaction.guild.id, role.id)
         message = get_msg_from_locale_by_key(
@@ -529,9 +556,9 @@ class Setters(commands.Cog):
         description="Setting server's goodbye channel to send goodbye messages",
     )
     async def goodbye_channel_set(
-        self,
-        interaction: Interaction,
-        channel: Optional[str] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            channel: Optional[str] = SlashOption(required=True),
     ):
         """
         Parameters
@@ -572,16 +599,16 @@ class Setters(commands.Cog):
         description="Choose bot's goodbye message type on your server!",
     )
     async def __goodbye_message_type_set(
-        self,
-        interaction: Interaction,
-        goodbye_message_type: str = SlashOption(
-            name="picker",
-            choices={
-                "goodbye message type: photo card": "card",
-                "goodbye message type: embed message": "embed",
-            },
-            required=True,
-        ),
+            self,
+            interaction: Interaction,
+            goodbye_message_type: str = SlashOption(
+                name="picker",
+                choices={
+                    "goodbye message type: photo card": "card",
+                    "goodbye message type: embed message": "embed",
+                },
+                required=True,
+            ),
     ):
         """
         Parameters
@@ -610,11 +637,11 @@ class Setters(commands.Cog):
         description="Turn on or turn off goodbye messages on your server",
     )
     async def __goodbye_messages_state_set(
-        self,
-        interaction: Interaction,
-        goodbye_message_state: int = SlashOption(
-            name="picker", choices={"turn on": 1, "turn off": 0}, required=True
-        ),
+            self,
+            interaction: Interaction,
+            goodbye_message_state: int = SlashOption(
+                name="picker", choices={"turn on": 1, "turn off": 0}, required=True
+            ),
     ):
         goodbye_message_state = bool(goodbye_message_state)
         set_goodbye_message_state(interaction.guild.id, goodbye_message_state)
@@ -644,9 +671,9 @@ class Setters(commands.Cog):
         description="Setting server's message channel on nitro boost",
     )
     async def __nitro_channel_set(
-        self,
-        interaction: Interaction,
-        channel: Optional[str] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            channel: Optional[str] = SlashOption(required=True),
     ):
         """
         Parameters
@@ -687,11 +714,11 @@ class Setters(commands.Cog):
         description="Turn on or turn off on nitro boost messages on your " "server",
     )
     async def __nitro_messages_state_set(
-        self,
-        interaction: Interaction,
-        nitro_message_state: int = SlashOption(
-            name="picker", choices={"turn on": 1, "turn off": 0}, required=True
-        ),
+            self,
+            interaction: Interaction,
+            nitro_message_state: int = SlashOption(
+                name="picker", choices={"turn on": 1, "turn off": 0}, required=True
+            ),
     ):
         nitro_message_state = bool(nitro_message_state)
         set_nitro_message_state(interaction.guild.id, nitro_message_state)
@@ -720,7 +747,7 @@ class Setters(commands.Cog):
         name="logging_channel", description="Setting server's logs channel"
     )
     async def __logging_channel_set(
-        self, interaction: Interaction, channel=SlashOption(required=True)
+            self, interaction: Interaction, channel=SlashOption(required=True)
     ):
         channel = int(channel[2:-1])
         channel = nextcord.utils.get(interaction.guild.text_channels, id=channel)
@@ -742,11 +769,11 @@ class Setters(commands.Cog):
 
     @__set.subcommand(name="logging_state", description="Setting server's logs channel")
     async def __logging_state_set(
-        self,
-        interaction: Interaction,
-        logging_state: int = SlashOption(
-            name="picker", choices={"turn on": 1, "turn off": 0}, required=True
-        ),
+            self,
+            interaction: Interaction,
+            logging_state: int = SlashOption(
+                name="picker", choices={"turn on": 1, "turn off": 0}, required=True
+            ),
     ):
         logging_state = bool(logging_state)
         update_logging_guild_state(interaction.guild.id, logging_state)
@@ -769,16 +796,32 @@ class Setters(commands.Cog):
 
     @__set.subcommand(name="ticket_category", description="set tickets category")
     async def __ticket_category_set(
-        self,
-        interaction: Interaction,
-        ticket_category_id: Optional[str] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            ticket_category_id: Optional[str] = SlashOption(required=True),
     ):
         try:
             ticket_category_id = int(ticket_category_id)
         except ValueError:
-            return await interaction.response.send_message("negative_value_error")
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         if not isinstance(ticket_category_id, int):
-            return await interaction.response.send_message("negative_value_error")
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         try:
             category = nextcord.utils.get(
                 interaction.guild.categories, id=ticket_category_id
@@ -801,16 +844,32 @@ class Setters(commands.Cog):
 
     @__set.subcommand(name="ticket_archive", description="set tickets archive category")
     async def __ticket_archive_set(
-        self,
-        interaction: Interaction,
-        ticket_category_id: Optional[str] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            ticket_category_id: Optional[str] = SlashOption(required=True),
     ):
         try:
             ticket_category_id = int(ticket_category_id)
         except ValueError:
-            return await interaction.response.send_message("negative_value_error")
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         if not isinstance(ticket_category_id, int):
-            return await interaction.response.send_message("negative_value_error")
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         try:
             category = nextcord.utils.get(
                 interaction.guild.categories, id=ticket_category_id
@@ -833,9 +892,9 @@ class Setters(commands.Cog):
 
     @__set.subcommand(name="ticket_support", description="set tickets archive category")
     async def __ticket_support_set(
-        self,
-        interaction: Interaction,
-        ticket_support: Optional[nextcord.Role] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            ticket_support: Optional[nextcord.Role] = SlashOption(required=True),
     ):
         update_ticket_support(interaction.guild.id, ticket_support.id)
         message = get_msg_from_locale_by_key(

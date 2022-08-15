@@ -6,3 +6,4 @@ nextcord-ext-menus
 python-dotenv
 function-cooldowns
 humanfriendly
+psutil

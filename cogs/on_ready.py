@@ -5,10 +5,12 @@ import nextcord
 from core.locales.create import create_locales_table
 from core.locales.writers import write_in_locales_standart_values
 from core.checkers import is_guild_id_in_table
-from core.money.create import create_money_table, create_money_config_table
+from core.money.create import create_money_table, create_money_config_table, \
+    create_role_money_table, create_chat_money_config_table, create_money_channels_config_table
 from core.money.writers import (
     write_in_money_standart_values,
     write_in_money_config_standart_values,
+    write_in_chat_money_standart_values
 )
 from core.levels.create import create_level_table, create_level_config_table
 from core.levels.writers import (
@@ -87,6 +89,10 @@ class OnReadyListener(commands.Cog):
         write_in_tickets_config_standart_values(guilds)
         create_badges_table()
         write_in_badges_standart_values(guilds)
+        create_role_money_table()
+        create_chat_money_config_table()
+        write_in_chat_money_standart_values(guilds)
+        create_money_channels_config_table()
         print(len(self.client.guilds))
         members = 0
         for guild in self.client.guilds:

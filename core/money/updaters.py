@@ -61,3 +61,57 @@ def set_user_balance(guild_id: int, user_id: int, money: int) -> None:
     cursor.close()
     db.close()
     return
+
+
+def update_guild_min_max_msg_income(guild_id: int, min_income: int, max_income: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE chat_money_config SET min_msg_income = ? WHERE guild_id = ?"
+    values = (min_income, guild_id)
+    cursor.execute(sql, values)
+    sql = "UPDATE chat_money_config SET max_msg_income = ? WHERE guild_id = ?"
+    values = (max_income, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_guild_min_max_voice_income(guild_id: int, min_income: int, max_income: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE chat_money_config SET min_voice_income = ? WHERE guild_id = ?"
+    values = (min_income, guild_id)
+    cursor.execute(sql, values)
+    sql = "UPDATE chat_money_config SET max_voice_income = ? WHERE guild_id = ?"
+    values = (max_income, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_guild_msg_cooldown(guild_id: int, msg_per_income: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE chat_money_config SET msg_cooldown = ? WHERE guild_id = ?"
+    values = (msg_per_income, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_guild_voice_minutes_for_money(guild_id: int, voice_minutes: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE chat_money_config SET voice_minutes_for_money = ? WHERE guild_id = ?"
+    values = (voice_minutes, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
