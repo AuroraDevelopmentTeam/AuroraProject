@@ -63,7 +63,6 @@ class DuelEnd(nextcord.ui.View):
     @nextcord.ui.button(
         label="Дуэль",
         style=nextcord.ButtonStyle.red,
-        custom_id="ticket_settings:red",
         disabled=True,
     )
     async def duel_start(self, button: nextcord.ui.Button, interaction: Interaction):
@@ -86,7 +85,6 @@ class DuelStart(nextcord.ui.View):
     @nextcord.ui.button(
         label="Дуэль",
         style=nextcord.ButtonStyle.red,
-        custom_id="ticket_settings:red",
         disabled=False,
     )
     async def duel_start(self, button: nextcord.ui.Button, interaction: Interaction):
