@@ -14,7 +14,11 @@ from core.errors import (
     construct_error_bot_user_embed,
 )
 from core.embeds import construct_basic_embed, construct_top_embed
-from core.locales.getters import get_msg_from_locale_by_key
+from core.locales.getters import (
+    get_msg_from_locale_by_key,
+    get_localized_description,
+    get_localized_name,
+)
 from core.parsers import parse_timeouts, parse_warns_of_user
 from core.warns.writers import write_new_warn
 from core.warns.updaters import remove_warn_from_table, update_warn_reason
@@ -30,16 +34,39 @@ class Moderation(commands.Cog):
     @nextcord.slash_command(
         name="mute",
         description="Mute with timeout discord's user",
+        name_localizations=get_localized_name("mute"),
+        description_localizations=get_localized_description("mute"),
         default_member_permissions=Permissions(moderate_members=True),
     )
     @application_checks.has_permissions(moderate_members=True)
     async def __mute(
         self,
         interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(required=True),
-        time: Optional[str] = SlashOption(required=True),
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            name_localizations={"ru": "пользователь"},
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
+        ),
+        time: Optional[str] = SlashOption(
+            required=True,
+            description="Time of mute, 1h/2h/3d",
+            name_localizations={"ru": "время"},
+            description_localizations={
+                "ru": "Время мута, напишите в формате: 1h/2h/3d"
+            },
+        ),
         *,
-        reason: Optional[str] = SlashOption(required=False),
+        reason: Optional[str] = SlashOption(
+            required=False,
+            description="Reason of giving mute",
+            name_localizations={"ru": "причина"},
+            description_localizations={
+                "ru": "Причина выдаваемого мута"
+            },
+        )
     ):
         """
         Parameters
@@ -62,6 +89,16 @@ class Moderation(commands.Cog):
             )
         try:
             time_in_seconds = humanfriendly.parse_timespan(time)
+            if time_in_seconds <= 0:
+                return await interaction.response.send_message(
+                    embed=construct_error_negative_value_embed(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "negative_value_error"
+                        ),
+                        self.client.user.avatar.url,
+                        time_in_seconds,
+                    )
+                )
             requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
             if reason is None:
                 reason = " — "
@@ -78,7 +115,7 @@ class Moderation(commands.Cog):
                     interaction.application_command.name,
                     f"{message} {user.mention}",
                     f"📝 {reason}. 🕔 {time}\n{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
         except nextcord.Forbidden:
@@ -101,13 +138,22 @@ class Moderation(commands.Cog):
     @nextcord.slash_command(
         name="unmute",
         description="Unmute muted (timed out) discord user",
+        name_localizations=get_localized_name("unmute"),
+        description_localizations=get_localized_description("unmute"),
         default_member_permissions=Permissions(moderate_members=True),
     )
     @application_checks.has_permissions(moderate_members=True)
     async def __unmute(
         self,
         interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(required=True),
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            name_localizations={"ru": "пользователь"},
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
+        ),
     ):
         """
         Parameters
@@ -144,7 +190,7 @@ class Moderation(commands.Cog):
                     interaction.application_command.name,
                     f"{message} {user.mention}",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
         except nextcord.Forbidden:
@@ -158,6 +204,8 @@ class Moderation(commands.Cog):
     @nextcord.slash_command(
         name="mutes",
         description="Show list of active mutes on this server",
+        name_localizations=get_localized_name("mutes"),
+        description_localizations=get_localized_description("mutes"),
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __mutes(self, interaction: Interaction):
@@ -182,6 +230,8 @@ class Moderation(commands.Cog):
     @nextcord.slash_command(
         name="clear",
         description="Deletes messages in channel, where command was used",
+        name_localizations=get_localized_name("clear"),
+        description_localizations=get_localized_description("clear"),
         default_member_permissions=Permissions(administrator=True),
     )
     @application_checks.has_permissions(manage_guild=True)
@@ -243,7 +293,7 @@ class Moderation(commands.Cog):
                     interaction.application_command.name,
                     f"{message} {len(were_deleted)}",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
         except nextcord.Forbidden:
@@ -264,6 +314,8 @@ class Moderation(commands.Cog):
     @nextcord.slash_command(
         name="warn",
         description="Warn's user on your server",
+        name_localizations=get_localized_name("warn"),
+        description_localizations=get_localized_description("warn"),
         default_member_permissions=Permissions(manage_messages=True),
     )
     @application_checks.has_permissions(manage_messages=True)
@@ -290,7 +342,7 @@ class Moderation(commands.Cog):
                     interaction.application_command.name,
                     f"{message} {user.mention}",
                     f"📝 {reason}.\n{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
             if (len(warns)) == 3:
@@ -307,7 +359,7 @@ class Moderation(commands.Cog):
                         "Автомут за 3 варна и их очищение",
                         f"{message} {user.mention}",
                         f"📝 {reason}. 🕔 1 h\n{requested} {interaction.user}",
-                        interaction.user.display_avatar,
+                        interaction.user.display_avatar, interaction.guild.id
                     )
                 )
         except nextcord.Forbidden:
@@ -324,6 +376,8 @@ class Moderation(commands.Cog):
     @nextcord.slash_command(
         name="unwarn",
         description="Remove warn from user on your server",
+        name_localizations=get_localized_name("unwarn"),
+        description_localizations=get_localized_description("unwarn"),
         default_member_permissions=Permissions(manage_messages=True),
     )
     @application_checks.has_permissions(manage_messages=True)
@@ -351,7 +405,7 @@ class Moderation(commands.Cog):
                     interaction.application_command.name,
                     f"{message} {user.mention}",
                     f"ID#{warn_id}\n{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
         else:
@@ -367,6 +421,8 @@ class Moderation(commands.Cog):
     @nextcord.slash_command(
         name="warns",
         description="View warns of @User on your server",
+        name_localizations=get_localized_name("warns"),
+        description_localizations=get_localized_description("warns"),
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __warns(
@@ -396,6 +452,8 @@ class Moderation(commands.Cog):
     @nextcord.slash_command(
         name="edit_warn",
         description="Edit warn with this id on your server",
+        name_localizations=get_localized_name("edit_warn"),
+        description_localizations=get_localized_description("edit_warn"),
         default_member_permissions=Permissions(manage_messages=True),
     )
     @application_checks.has_permissions(manage_messages=True)
@@ -424,13 +482,15 @@ class Moderation(commands.Cog):
                 interaction.application_command.name,
                 f"{message} {new_warn_reason}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @nextcord.slash_command(
         name="purge_warns",
         description="remove all warns from user",
+        name_localizations=get_localized_name("purge_warns"),
+        description_localizations=get_localized_description("purge_warns"),
         default_member_permissions=Permissions(manage_messages=True),
     )
     @application_checks.has_permissions(manage_messages=True)
@@ -466,7 +526,7 @@ class Moderation(commands.Cog):
                 interaction.application_command.name,
                 f"{message} {user.mention}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 

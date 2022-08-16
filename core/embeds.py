@@ -2,7 +2,7 @@ import nextcord
 from nextcord import Asset
 from config import settings
 from nextcord.ext import commands
-from core.locales.getters import get_msg_from_locale_by_key
+from core.locales.getters import get_msg_from_locale_by_key, localize_name
 
 DEFAULT_BOT_COLOR = settings["default_color"]
 
@@ -13,8 +13,13 @@ def construct_error_embed(description: str) -> nextcord.Embed:
 
 
 def construct_basic_embed(
-    name: str, value: str, footer_text: str, footer_url: Asset
+    name: str, value: str, footer_text: str, footer_url: Asset, guild_id: int
 ) -> nextcord.Embed:
+    try:
+        name = localize_name(guild_id, name)
+    except Exception as error:
+        name = name
+        print(error)
     name = name.capitalize()
     name = name.replace("_", " ")
     embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)

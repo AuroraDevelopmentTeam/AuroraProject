@@ -26,6 +26,15 @@ def get_msg_from_locale_by_key(guild_id: int, key: str) -> str:
     return locales_file[key]["msg"]
 
 
+def localize_name(guild_id: int, key: str) -> str:
+    locale = get_guild_locale(guild_id)
+
+    with open(f"./locales/{locale}.json", "r", encoding="utf-8") as file:
+        locales_file = json.load(file)
+
+    return locales_file[key]["name"]
+
+
 def get_keys_in_locale(guild_id: int, command_name: str) -> list:
     locale = get_guild_locale(guild_id)
 

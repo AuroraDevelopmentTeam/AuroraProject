@@ -602,6 +602,8 @@ class Games(commands.Cog):
     @nextcord.slash_command(
         name="duel",
         description="duel",
+        name_localizations=get_localized_name("duel"),
+        description_localizations=get_localized_description("duel"),
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __duel(

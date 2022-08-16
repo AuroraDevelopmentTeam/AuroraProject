@@ -122,7 +122,7 @@ class Economics(commands.Cog):
                     interaction.application_command.name,
                     f"{message} {user.mention}\n +__**{money}**__ {currency_symbol}",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
         else:
@@ -181,7 +181,7 @@ class Economics(commands.Cog):
                     interaction.application_command.name,
                     f"{message} {user.mention}\n -__**{money}**__ {currency_symbol}",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
         else:
@@ -289,7 +289,7 @@ class Economics(commands.Cog):
                     interaction.application_command.name,
                     f"{message} {user.mention} {message_2} **{starting_balance}** {currency_symbol}",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
 
@@ -315,7 +315,7 @@ class Economics(commands.Cog):
                 interaction.application_command.name,
                 f"{message} **{starting_balance}** {currency_symbol}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
@@ -340,7 +340,7 @@ class Economics(commands.Cog):
                 interaction.application_command.name,
                 f"{message}" f"+__**{payday_amount}**__ {currency_symbol}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
@@ -413,7 +413,7 @@ class Economics(commands.Cog):
                         interaction.application_command.name,
                         f"__**{money}**__ {currency_symbol} {message} {user.mention}\n",
                         f"{requested} {interaction.user}",
-                        interaction.user.display_avatar,
+                        interaction.user.display_avatar, interaction.guild.id
                     )
                 )
         else:
@@ -480,7 +480,7 @@ class Economics(commands.Cog):
                 interaction.application_command.name,
                 f"{role.mention} {message}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
@@ -519,7 +519,7 @@ class Economics(commands.Cog):
                 interaction.application_command.name,
                 f"{role.mention} {message}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
@@ -556,7 +556,10 @@ class Economics(commands.Cog):
         await pages.start(interaction=interaction)
 
     @nextcord.slash_command(
-        name="income", default_member_permissions=Permissions(administrator=True)
+        name="income",
+        name_localizations=get_localized_name("income"),
+        description_localizations=get_localized_description("income"),
+        default_member_permissions=Permissions(administrator=True),
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __income(self, interaction: Interaction):
@@ -566,7 +569,9 @@ class Economics(commands.Cog):
         pass
 
     @__income.subcommand(name="role_add",
-                         description="Choose bot's respond's main language on your server!",
+                         description="Add role to income and users with role will get money per 12 hours",
+                         name_localizations=get_localized_name("income_role_add"),
+                         description_localizations=get_localized_description("income_role_add"),
                          )
     async def __income_role_add(
             self,
@@ -580,7 +585,7 @@ class Economics(commands.Cog):
                 required=True,
                 description="Number of money role will cost",
                 description_localizations={
-                    "ru": "Количество денег, которое должна стоить роль"
+                    "ru": "Количество денег, которое будут получать пользователи с данной ролью"
                 },
             ),
     ):
@@ -614,12 +619,14 @@ class Economics(commands.Cog):
                 interaction.application_command.name,
                 f"{role.mention} {message} **{income}** {currency_symbol}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @__income.subcommand(name="role_remove",
                          description="Choose bot's respond's main language on your server!",
+                         name_localizations=get_localized_name("income_role_remove"),
+                         description_localizations=get_localized_description("income_role_remove"),
                          )
     async def __income_role_remove(
             self,
@@ -649,16 +656,28 @@ class Economics(commands.Cog):
                 interaction.application_command.name,
                 f"{role.mention} {message}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @__income.subcommand(name="channel",
-                         description="Choose bot's respond's main language on your server!",
+                         description="Turn on/Turn off income in indicated channel",
+                         name_localizations=get_localized_name("income_channel"),
+                         description_localizations=get_localized_description("income_channel"),
                          )
     async def __income_channel_add(self, interaction: Interaction,
-                                   channel: Optional[GuildChannel] = SlashOption(required=True),
-                                   enabled: Optional[bool] = SlashOption(required=True)):
+                                   channel: Optional[GuildChannel] = SlashOption(
+                                       required=True,
+                                       description="Discord channel on your server",
+                                       description_localizations={"ru": "Дискордовский канал на вашем сервере"},
+                                   ),
+                                   enabled: Optional[bool] = SlashOption(
+                                       required=True,
+                                       description="True - turn on, False - Turn off",
+                                       name_localizations={"ru": "включено"},
+                                       description_localizations={"ru": "True - включить, False - выключить"},
+                                   ),
+                                   ):
         write_channel_in_config(interaction.guild.id, channel.id, enabled)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"income_{interaction.application_command.name}"
@@ -680,19 +699,29 @@ class Economics(commands.Cog):
                 interaction.application_command.name,
                 f"{message} {channel.mention} {message_2} **{enabled}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @__income.subcommand(
         name="min_max_message",
         description="Set min and max income for writing messages",
+        name_localizations=get_localized_name("income_min_max_message"),
+        description_localizations=get_localized_description("income_min_max_message"),
     )
     async def __min_max_message_income(
             self,
             interaction: Interaction,
-            min_msg_income: Optional[int] = SlashOption(required=True),
-            max_msg_income: Optional[int] = SlashOption(required=True),
+            min_msg_income: Optional[int] = SlashOption(
+                                       required=True,
+                                       description="Minimal income for writing messages",
+                                       description_localizations={"ru": "Минимальный доход за написание сообщений"},
+                                   ),
+            max_msg_income: Optional[int] = SlashOption(
+                                       required=True,
+                                       description="Maximal income for writing messages",
+                                       description_localizations={"ru": "Максимальный доход за написание сообщений"},
+                                   ),
     ):
         if min_msg_income < 0 or max_msg_income < 0:
             return await interaction.response.send_message(
@@ -716,19 +745,29 @@ class Economics(commands.Cog):
                 interaction.application_command.name,
                 f"{message} **{min_msg_income}** - **{max_msg_income}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @__income.subcommand(
         name="min_max_voice",
         description="Set min and max income for being in voice chat",
+        name_localizations=get_localized_name("income_min_max_voice"),
+        description_localizations=get_localized_description("income_min_max_voice"),
     )
     async def __min_max_voice_income(
             self,
             interaction: Interaction,
-            min_voice_income: Optional[int] = SlashOption(required=True),
-            max_voice_income: Optional[int] = SlashOption(required=True),
+            min_voice_income: Optional[int] = SlashOption(
+                                       required=True,
+                                       description="Maximal income for being in voice",
+                                       description_localizations={"ru": "Минимальный доход за нахождение в голосовом чате"},
+                                   ),
+            max_voice_income: Optional[int] = SlashOption(
+                                       required=True,
+                                       description="Maximal income for being in voice",
+                                       description_localizations={"ru": "Максимальный доход за нахождение в голосовом чате"},
+                                   ),
     ):
         if min_voice_income < 0 or max_voice_income < 0:
             return await interaction.response.send_message(
@@ -752,18 +791,24 @@ class Economics(commands.Cog):
                 interaction.application_command.name,
                 f"{message} **{min_voice_income}** - **{max_voice_income}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @__income.subcommand(
         name="messages_per_income",
         description="Set messages users must write before getting income",
+        name_localizations=get_localized_name("income_messages_per_income"),
+        description_localizations=get_localized_description("income_messages_per_income"),
     )
     async def __messages_per_income(
             self,
             interaction: Interaction,
-            msg_per_income: Optional[int] = SlashOption(required=True),
+            msg_per_income: Optional[int] = SlashOption(
+                                       required=True,
+                                       description="Messages user must write for income",
+                                       description_localizations={"ru": "Cообщений нужно написать для дохода"},
+                                   ),
     ):
         if msg_per_income < 1:
             return await interaction.response.send_message(
@@ -785,18 +830,24 @@ class Economics(commands.Cog):
                 interaction.application_command.name,
                 f"{message} **{msg_per_income}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @__income.subcommand(
         name="voice_minutes",
         description="Set minutes users must spent in voice chat before income",
+        name_localizations=get_localized_name("income_voice_minutes"),
+        description_localizations=get_localized_description("income_voice_minutes"),
     )
     async def __voice_minutes_income(
             self,
             interaction: Interaction,
-            voice_minutes: Optional[int] = SlashOption(required=True),
+            voice_minutes: Optional[int] = SlashOption(
+                                       required=True,
+                                       description="Minutes user must be in voice channel",
+                                       description_localizations={"ru": "Минут нужно быть в голосовом канале"},
+                                   ),
     ):
         if voice_minutes < 1:
             return await interaction.response.send_message(
@@ -818,7 +869,7 @@ class Economics(commands.Cog):
                 interaction.application_command.name,
                 f"{message} **{voice_minutes}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 

@@ -18,6 +18,11 @@ from core.badges.converters import ACHIEVMENTS_DESCRIPTION, ACHIEVMENTS_LIST
 from core.embeds import DEFAULT_BOT_COLOR
 from core.badges.check import check_badges
 from core.errors import construct_error_bot_user_embed
+from core.locales.getters import (
+    get_msg_from_locale_by_key,
+    get_localized_description,
+    get_localized_name,
+)
 
 
 def get_description_rows(description: str):
@@ -37,7 +42,10 @@ class UserProfiles(commands.Cog):
         self.client = client
 
     @nextcord.slash_command(
-        name="profile", default_member_permissions=Permissions(send_messages=True)
+        name="profile",
+        name_localizations=get_localized_name("profile"),
+        description_localizations=get_localized_description("profile"),
+        default_member_permissions=Permissions(send_messages=True)
     )
     async def __profile(self, interaction: Interaction):
         """
@@ -45,7 +53,7 @@ class UserProfiles(commands.Cog):
         """
         pass
 
-    @__profile.subcommand(name="description")
+    @__profile.subcommand(name="description", description="Sets your profile description in card")
     async def __description_profile(
             self,
             interaction: Interaction,
@@ -74,8 +82,10 @@ class UserProfiles(commands.Cog):
             )
         )
 
+    # TO-DO: make this work
+    """ 
     @__profile.subcommand(
-        name="avatar_form", description="set avatar form for your card commands"
+        name="avatar_form", description="IN DEVELOPMENT, DON'T WORK"
     )
     async def __avatar_form_profile(
             self,
@@ -86,19 +96,21 @@ class UserProfiles(commands.Cog):
                 required=True,
             ),
     ):
-        """
         Parameters
         ----------
         interaction: Interaction
             The interaction object
         form: Optional[str]
             Form of profile avatar
-        """
         update_avatar_form(interaction.user.id, form)
         await interaction.response.send_message("feature in dev")
+    """
 
-    @__profile.subcommand(name="me")
-    async def __me_profile(
+    @__profile.subcommand(name="show",
+                          name_localizations=get_localized_name("profile_show"),
+                          description_localizations=get_localized_description("profile_show"),
+                          )
+    async def __show_profile(
             self,
             interaction: Interaction,
             user: Optional[nextcord.Member] = SlashOption(required=False),
@@ -199,7 +211,10 @@ class UserProfiles(commands.Cog):
         file = nextcord.File(fp=background.image_bytes, filename="profile_card.png")
         await interaction.followup.send(file=file)
 
-    @__profile.subcommand(name="badges", description="show your badges achievements status")
+    @__profile.subcommand(name="badges", description="show your badges achievements status",
+                          name_localizations=get_localized_name("profile_badges"),
+                          description_localizations=get_localized_description("profile_badges"),
+                          )
     async def __badges_profile(self,
                                interaction: Interaction):
         embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)

@@ -37,7 +37,7 @@ class Information(commands.Cog):
                 interaction.application_command.name,
                 f"{message} {round(self.client.latency * 1000)} ms",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 

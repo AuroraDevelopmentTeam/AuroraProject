@@ -26,13 +26,28 @@ from core.money.getters import (
 )
 from core.money.updaters import update_user_balance
 from core.utils import format_seconds_to_hhmmss
-from core.locales.getters import get_msg_from_locale_by_key
+from core.locales.getters import (
+    get_msg_from_locale_by_key,
+    get_localized_description,
+    get_localized_name
+)
 from core.embeds import construct_basic_embed
+from core.levels.getters import get_user_level, get_min_max_exp, get_user_exp
+from core.levels.updaters import update_user_level, update_user_exp
 
 
 class StatisticsCounter(commands.Cog):
     def __init__(self, client):
         self.client = client
+
+    def level_up(self, guild_id, user_id):
+        user_exp = get_user_exp(guild_id, user_id)
+        user_level = get_user_level(guild_id, user_id)
+        leveling_formula = round((7 * (user_level**2)) + 58)
+        if user_exp >= leveling_formula:
+            return True
+        else:
+            return False
 
     @commands.Cog.listener()
     async def on_message(self, message: nextcord.Message):
@@ -67,8 +82,21 @@ class StatisticsCounter(commands.Cog):
                 minutes_in_voice = int(second_in_voice/60)
                 voice_minutes_for_income = get_voice_minutes_for_income(member.guild.id)
                 min, max = get_guild_min_max_voice_income(member.guild.id)
-                money_to_update = (minutes_in_voice//voice_minutes_for_income) * random.randint(min, max)
+                money_to_update = (int(minutes_in_voice//voice_minutes_for_income)) * random.randint(min, max)
                 update_user_balance(member.guild.id, member.id, money_to_update)
+
+                min_exp, max_exp = get_min_max_exp(message.guild.id)
+                exp = random.randint(min_exp, max_exp) * (int(minutes_in_voice//5))
+                update_user_exp(member.guild.id, member.id, exp, exp)
+                user_level = get_user_level(member.guild.id, member.id)
+                user_exp = get_user_exp(member.guild.id, member.id)
+                if user_exp > 0:
+                    leveling_formula = round((7 * (user_level ** 2)) + 58)
+                    while self.level_up(member.guild.id, member.id):
+                        update_user_exp(member.guild.id, member.id, -leveling_formula, -leveling_formula)
+                        update_user_level(member.guild.id, member.id, 1)
+                        user_level = get_user_level(member.guild.id, member.id)
+                        leveling_formula = round((7 * (user_level ** 2)) + 58)
 
         elif before.channel is None and after.channel is not None:
             join_time = datetime.datetime.now().time().strftime("%H:%M:%S")
@@ -79,6 +107,8 @@ class StatisticsCounter(commands.Cog):
     @nextcord.slash_command(
         name="online",
         default_member_permissions=Permissions(send_messages=True),
+        name_localizations=get_localized_name("online"),
+        description_localizations=get_localized_description("online"),
         description="Show your or user voice online",
     )
     async def __online(
@@ -106,13 +136,15 @@ class StatisticsCounter(commands.Cog):
                 interaction.application_command.name,
                 f"{user.mention} {message} **{format_seconds_to_hhmmss(voice_time)}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @nextcord.slash_command(
         name="messages_counter",
         default_member_permissions=Permissions(send_messages=True),
+        name_localizations=get_localized_name("messages_counter"),
+        description_localizations=get_localized_description("messages_counter"),
         description="Show your or user messages counter",
     )
     async def __messages_counter(
@@ -140,7 +172,7 @@ class StatisticsCounter(commands.Cog):
                 interaction.application_command.name,
                 f"{user.mention} {message} **{msg_count}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 

@@ -1,13 +1,19 @@
 import nextcord
 from nextcord import Interaction, SlashOption, Permissions
 from nextcord.ext import commands, application_checks
+from nextcord.abc import GuildChannel
 
 from typing import Optional
 from config import settings
 import sqlite3
 
 from core.embeds import construct_basic_embed
-from core.locales.getters import get_msg_from_locale_by_key, get_keys_value_in_locale
+from core.locales.getters import (
+    get_msg_from_locale_by_key,
+    get_keys_value_in_locale,
+    get_localized_description,
+    get_localized_name
+)
 from core.money.updaters import (
     update_guild_currency_symbol,
     update_guild_starting_balance,
@@ -114,7 +120,10 @@ class Setters(commands.Cog):
         self.client = client
 
     @nextcord.slash_command(
-        name="set", default_member_permissions=Permissions(administrator=True)
+        name="set",
+        name_localizations=get_localized_name("set"),
+        description_localizations=get_localized_description("set"),
+        default_member_permissions=Permissions(administrator=True)
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __set(self, interaction: Interaction):
@@ -126,6 +135,8 @@ class Setters(commands.Cog):
     @__set.subcommand(
         name="locale",
         description="Choose bot's respond's main language on your server!",
+        name_localizations=get_localized_name("set_locale"),
+        description_localizations=get_localized_description("set_locale"),
     )
     async def __locale_set(
             self,
@@ -155,14 +166,16 @@ class Setters(commands.Cog):
                     interaction.application_command.name,
                     f"{message} **{locale}**",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
         else:
             await interaction.response.send_message("something gone wrong")
 
     @__set.subcommand(
-        name="currency", description="Set server's currency to new symbol"
+        name="currency", description="Set server's currency to new symbol",
+        name_localizations=get_localized_name("set_currency"),
+        description_localizations=get_localized_description("set_currency"),
     )
     async def __currency_set(
             self,
@@ -188,14 +201,16 @@ class Setters(commands.Cog):
                     interaction.application_command.name,
                     f"{message} **{currency_symbol}**",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
         else:
             await interaction.response.send_message("error")
 
     @__set.subcommand(
-        name="start_balance", description="Set's server starting balance to new number"
+        name="start_balance", description="Set's server starting balance to new number",
+        name_localizations=get_localized_name("set_start_balance"),
+        description_localizations=get_localized_description("set_start_balance"),
     )
     async def __start_balance_set(
             self,
@@ -221,7 +236,7 @@ class Setters(commands.Cog):
                     interaction.application_command.name,
                     f"{message} **{balance}**",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
         else:
@@ -229,7 +244,9 @@ class Setters(commands.Cog):
 
     @__set.subcommand(
         name="timely_amount",
-        description="Set's server payday amount per time with /timely " "command",
+        description="Set's server payday amount per time with /timely command",
+        name_localizations=get_localized_name("set_timely_amount"),
+        description_localizations=get_localized_description("set_timely_amount"),
     )
     async def __payday_amount_set(
             self,
@@ -255,7 +272,7 @@ class Setters(commands.Cog):
                     interaction.application_command.name,
                     f"{message} **{payday_amount}**",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
         else:
@@ -264,6 +281,8 @@ class Setters(commands.Cog):
     @__set.subcommand(
         name="level_up_messages",
         description="Turn on or turn off level up messages on your server",
+        name_localizations=get_localized_name("set_level_up_messages"),
+        description_localizations=get_localized_description("set_level_up_messages"),
     )
     async def __level_up_messages_state(
             self,
@@ -293,12 +312,14 @@ class Setters(commands.Cog):
                 interaction.application_command.name,
                 f"{message} **{level_up_messages_state}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @__set.subcommand(
-        name="level", description="Setting user's level to some integer value"
+        name="level", description="Setting user's level to some integer value",
+        name_localizations=get_localized_name("set_level"),
+        description_localizations=get_localized_description("set_level"),
     )
     async def __level_set(
             self,
@@ -329,13 +350,15 @@ class Setters(commands.Cog):
                 interaction.application_command.name,
                 f"{message} {user.mention} {message_2} __**{level}**__",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @__set.subcommand(
         name="min_max_exp",
         description="Setting server's min and max exp per writed message",
+        name_localizations=get_localized_name("set_min_max_exp"),
+        description_localizations=get_localized_description("set_min_max_exp"),
     )
     async def __min_max_exp_set(
             self,
@@ -375,18 +398,20 @@ class Setters(commands.Cog):
                 interaction.application_command.name,
                 f"{message} **{min}** - **{max}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @__set.subcommand(
         name="welcome_channel",
         description="Setting server's welcome channel to send welcome messages",
+        name_localizations=get_localized_name("set_welcome_channel"),
+        description_localizations=get_localized_description("set_welcome_channel"),
     )
     async def welcome_channel_set(
             self,
             interaction: Interaction,
-            channel: Optional[str] = SlashOption(required=True),
+            channel: Optional[GuildChannel] = SlashOption(required=True),
     ):
         """
         Parameters
@@ -396,9 +421,7 @@ class Setters(commands.Cog):
         channel: str
             Channel to
         """
-        channel = int(channel[2:-1])
-        channel = nextcord.utils.get(interaction.guild.text_channels, id=channel)
-        if isinstance(channel, nextcord.TextChannel):
+        if isinstance(channel, GuildChannel):
             set_welcome_channel(interaction.guild.id, channel.id)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"set_{interaction.application_command.name}"
@@ -409,14 +432,16 @@ class Setters(commands.Cog):
                     interaction.application_command.name,
                     f"{message} __**{channel}**__",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
         else:
             await interaction.response.send_message("error")
 
     @__set.subcommand(
-        name="welcome_embed", description="Setting server's welcoming message embed"
+        name="welcome_embed", description="Setting server's welcoming message embed",
+        name_localizations=get_localized_name("set_welcome_embed"),
+        description_localizations=get_localized_description("set_welcome_embed"),
     )
     async def welcome_embed_set(self, interaction: Interaction):
         modal = EmbedModal("welcome")
@@ -425,6 +450,8 @@ class Setters(commands.Cog):
     @__set.subcommand(
         name="welcome_message_type",
         description="Choose bot's welcome message type on your server!",
+        name_localizations=get_localized_name("set_welcome_message_type"),
+        description_localizations=get_localized_description("set_welcome_message_type"),
     )
     async def __welcome_message_type_set(
             self,
@@ -456,13 +483,15 @@ class Setters(commands.Cog):
                 interaction.application_command.name,
                 f"{message} **{welcome_message_type}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @__set.subcommand(
         name="welcome_message_state",
         description="Turn on or turn off welcome messages on your server",
+        name_localizations=get_localized_name("set_welcome_message_state"),
+        description_localizations=get_localized_description("set_welcome_message_state"),
     )
     async def __welcome_messages_state_set(
             self,
@@ -490,13 +519,15 @@ class Setters(commands.Cog):
                 interaction.application_command.name,
                 f"{message} **{welcome_message_state}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @__set.subcommand(
         name="autoroles_state",
         description="Turn on or turn off autoroles for new guests of server",
+        name_localizations=get_localized_name("set_autoroles_state"),
+        description_localizations=get_localized_description("set_autoroles_state"),
     )
     async def __autoroles_state_set(
             self,
@@ -524,13 +555,15 @@ class Setters(commands.Cog):
                 interaction.application_command.name,
                 f"{message} **{autoroles_state}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @__set.subcommand(
         name="autorole",
         description="Turn on or turn off autoroles for new guests of server",
+        name_localizations=get_localized_name("set_autorole"),
+        description_localizations=get_localized_description("set_autorole"),
     )
     async def __autorole_set(
             self,
@@ -547,13 +580,15 @@ class Setters(commands.Cog):
                 interaction.application_command.name,
                 f"{message} **{role.mention}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @__set.subcommand(
         name="goodbye_channel",
         description="Setting server's goodbye channel to send goodbye messages",
+        name_localizations=get_localized_name("set_goodbye_channel"),
+        description_localizations=get_localized_description("set_goodbye_channel"),
     )
     async def goodbye_channel_set(
             self,
@@ -581,14 +616,16 @@ class Setters(commands.Cog):
                     interaction.application_command.name,
                     f"{message} __**{channel}**__",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
         else:
             await interaction.response.send_message("error")
 
     @__set.subcommand(
-        name="goodbye_embed", description="Setting server's welcoming message embed"
+        name="goodbye_embed", description="Setting server's goodbye message embed",
+        name_localizations=get_localized_name("set_goodbye_embed"),
+        description_localizations=get_localized_description("set_goodbye_embed"),
     )
     async def goodbye_embed_set(self, interaction: Interaction):
         modal = EmbedModal("goodbye")
@@ -597,6 +634,8 @@ class Setters(commands.Cog):
     @__set.subcommand(
         name="goodbye_message_type",
         description="Choose bot's goodbye message type on your server!",
+        name_localizations=get_localized_name("set_goodbye_message_type"),
+        description_localizations=get_localized_description("set_goodbye_message_type"),
     )
     async def __goodbye_message_type_set(
             self,
@@ -628,13 +667,15 @@ class Setters(commands.Cog):
                 interaction.application_command.name,
                 f"{message} **{goodbye_message_type}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @__set.subcommand(
         name="goodbye_message_state",
         description="Turn on or turn off goodbye messages on your server",
+        name_localizations=get_localized_name("set_goodbye_message_state"),
+        description_localizations=get_localized_description("set_goodbye_message_state"),
     )
     async def __goodbye_messages_state_set(
             self,
@@ -662,13 +703,15 @@ class Setters(commands.Cog):
                 interaction.application_command.name,
                 f"{message} **{goodbye_message_state}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @__set.subcommand(
         name="nitro_channel",
         description="Setting server's message channel on nitro boost",
+        name_localizations=get_localized_name("set_nitro_channel"),
+        description_localizations=get_localized_description("set_nitro_channel"),
     )
     async def __nitro_channel_set(
             self,
@@ -696,14 +739,16 @@ class Setters(commands.Cog):
                     interaction.application_command.name,
                     f"{message} __**{channel}**__",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
         else:
             await interaction.response.send_message("error")
 
     @__set.subcommand(
-        name="nitro_embed", description="Setting server's on nitro boost message embed"
+        name="nitro_embed", description="Setting server's on nitro boost message embed",
+        name_localizations=get_localized_name("set_nitro_embed"),
+        description_localizations=get_localized_description("set_nitro_embed"),
     )
     async def __nitro_embed_set(self, interaction: Interaction):
         modal = EmbedModal("nitro")
@@ -712,6 +757,8 @@ class Setters(commands.Cog):
     @__set.subcommand(
         name="nitro_message_state",
         description="Turn on or turn off on nitro boost messages on your " "server",
+        name_localizations=get_localized_name("set_nitro_message_state"),
+        description_localizations=get_localized_description("set_nitro_message_state"),
     )
     async def __nitro_messages_state_set(
             self,
@@ -739,12 +786,14 @@ class Setters(commands.Cog):
                 interaction.application_command.name,
                 f"{message} **{nitro_message_state}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
     @__set.subcommand(
-        name="logging_channel", description="Setting server's logs channel"
+        name="logging_channel", description="Setting server's logs channel",
+        name_localizations=get_localized_name("set_logging_channel"),
+        description_localizations=get_localized_description("set_logging_channel"),
     )
     async def __logging_channel_set(
             self, interaction: Interaction, channel=SlashOption(required=True)
@@ -763,11 +812,14 @@ class Setters(commands.Cog):
                 interaction.application_command.name,
                 f"{message} {channel}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
-    @__set.subcommand(name="logging_state", description="Setting server's logs channel")
+    @__set.subcommand(name="logging_state", description="Setting server's logs channel",
+                      name_localizations=get_localized_name("set_logging_state"),
+                      description_localizations=get_localized_description("set_logging_state"),
+                      )
     async def __logging_state_set(
             self,
             interaction: Interaction,
@@ -790,11 +842,14 @@ class Setters(commands.Cog):
                 interaction.application_command.name,
                 f"{message} **{logging_state}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
-    @__set.subcommand(name="ticket_category", description="set tickets category")
+    @__set.subcommand(name="ticket_category", description="set tickets category",
+                      name_localizations=get_localized_name("set_ticket_category"),
+                      description_localizations=get_localized_description("set_ticket_category"),
+                      )
     async def __ticket_category_set(
             self,
             interaction: Interaction,
@@ -836,13 +891,16 @@ class Setters(commands.Cog):
                     interaction.application_command.name,
                     f"{message} {category.mention}",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
         except:
             return
 
-    @__set.subcommand(name="ticket_archive", description="set tickets archive category")
+    @__set.subcommand(name="ticket_archive", description="set tickets archive category",
+                      name_localizations=get_localized_name("set_ticket_archive"),
+                      description_localizations=get_localized_description("set_ticket_archive"),
+                      )
     async def __ticket_archive_set(
             self,
             interaction: Interaction,
@@ -884,13 +942,16 @@ class Setters(commands.Cog):
                     interaction.application_command.name,
                     f"{message} {category.mention}",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar,
+                    interaction.user.display_avatar, interaction.guild.id
                 )
             )
         except:
             return
 
-    @__set.subcommand(name="ticket_support", description="set tickets archive category")
+    @__set.subcommand(name="ticket_support", description="set tickets archive category",
+                      name_localizations=get_localized_name("set_ticket_support"),
+                      description_localizations=get_localized_description("set_ticket_support"),
+                      )
     async def __ticket_support_set(
             self,
             interaction: Interaction,
@@ -906,7 +967,7 @@ class Setters(commands.Cog):
                 interaction.application_command.name,
                 f"{message} {ticket_support.mention}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 

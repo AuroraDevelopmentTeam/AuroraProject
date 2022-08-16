@@ -244,7 +244,7 @@ class Marriage(commands.Cog):
                 interaction.application_command.name,
                 f"{interaction.user.mention} {message} {pair}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
@@ -368,7 +368,7 @@ class Marriage(commands.Cog):
                 interaction.application_command.name,
                 f"{message} {user.mention}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
@@ -390,7 +390,7 @@ class Marriage(commands.Cog):
                 interaction.application_command.name,
                 f"{message}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
@@ -525,7 +525,7 @@ class Marriage(commands.Cog):
                 interaction.application_command.name,
                 f"**{amount}** {GIFT_EMOJIS[gift]} {message} {user.mention}",
                 f"{requested} {interaction.user}\n{msg} {balance}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
@@ -562,7 +562,7 @@ class Marriage(commands.Cog):
                 interaction.application_command.name,
                 f"{message} {description}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
@@ -626,7 +626,7 @@ class Marriage(commands.Cog):
                 interaction.application_command.name,
                 f"__**{amount}**__ {currency_symbol} {message}",
                 f"{requested} {interaction.user}\n{msg} {balance}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 

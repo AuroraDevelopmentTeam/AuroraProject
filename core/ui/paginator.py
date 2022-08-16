@@ -75,6 +75,7 @@ class Dropdown(nextcord.ui.Select):
         msg = get_msg_from_locale_by_key(self.guild.id, "shop")
         if self.values[0] != "...":
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
+            msg = get_msg_from_locale_by_key(self.guild.id, "on_balance")
             if balance < (self.price[int(self.values[0]) - 1]):
                 embed = construct_error_not_enough_embed(
                         get_msg_from_locale_by_key(

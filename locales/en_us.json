@@ -44,9 +44,13 @@
       "msg": "Discord denied me in process of command execution due to __**lack of permissions**__  or action is __**forbidden/impossible**__.\nYour command failed to successfully complete."
     },
     "mute": {
+      "name": "mute",
+      "description": "Mute with timeout discord's user",
       "msg": "Given mute to"
     },
     "unmute": {
+      "name": "unmute",
+      "description": "Unmute muted (timed out) discord user",
       "msg": "Removed mute from"
     },
     "http_exception": {
@@ -56,18 +60,28 @@
       "msg": "Too many arguments were specified to execute the command, reduce the query.\nYour command failed to successfully complete."
     },
     "clear": {
+      "name": "clear",
+      "description": "Deletes messages in channel, where command was used",
       "msg": "Messages were successfully deleted in the command invoke channel.\nMessages were deleted:"
     },
     "set_locale": {
+      "name": "locale",
+      "description": "Choose bot's respond's main language on your server!",
       "msg": "Bot respond language has been changed on:"
     },
     "set_currency": {
+      "name": "currency",
+      "description": "Set server's currency to new symbol",
       "msg": "Server currency symbol has been changed on:"
     },
     "set_timely_amount": {
+      "name": "timely_amount",
+      "description": "Set's server payday amount per time with /timely command",
       "msg": "Server payday amount has been changed on:"
     },
     "set_start_balance": {
+      "name": "start_balance",
+      "description": "Set's server starting balance to new number",
       "msg": "Server starting balance has been changed on:"
     },
     "add_money": {
@@ -99,9 +113,13 @@
       "msg": "Level has been raised"
     },
     "set_level_up_messages": {
+      "name": "level_up_messages",
+      "description": "Turn on or turn off level up messages on your server",
       "msg": "For leveling up messages have been set the following status:"
     },
     "set_level": {
+      "name": "level",
+      "description": "Setting user's level to some integer value",
       "msg": "For user"
     },
     "set_level_2": {
@@ -114,18 +132,32 @@
       "msg": "Hello {member.mention}!\n\nWe glad to see you on our server and hope you will like it!"
     },
     "set_welcome_channel": {
+      "name": "welcome_channel",
+      "description": "Setting server's welcome channel to send welcome messages",
       "msg": "The following channel has been set to welcome new users:"
     },
     "set_welcome_message_type": {
+      "name": "welcome_message_type",
+      "description": "Choose bot's welcome message type on your server!",
       "msg": "The following message type has been set to welcome new users:"
     },
     "set_welcome_message_state": {
+      "name": "welcome_message_state",
+      "description": "Turn on or turn off welcome messages on your server",
       "msg": "For welcome messages have been set the following status:"
     },
+    "set_welcome_embed": {
+      "name": "welcome_embed",
+      "description": "Setting up welcome embed"
+    },
     "warn": {
+      "name": "warn",
+      "description": "Warn's user on your server",
       "msg": "Warned user:"
     },
     "unwarn": {
+      "name": "unwarn",
+      "description": "Remove warn from user on your server",
       "msg": "Removed 1 warn with specified ID from user:"
     },
     "enabled": {
@@ -135,12 +167,16 @@
       "msg": "disabled"
     },
     "set_autoroles_state": {
-      "msg": "State of autoroles on server now is:"
+      "msg": "State of autoroles on server now is:",
+      "name": "autoroles_state",
+      "description": "Turn on or turn off autoroles for new guests of server"
     },
     "on_balance": {
       "msg": "Balance now:"
     },
     "set_autorole": {
+      "name": "autorole",
+      "description": "Set autorole for new guests of server",
       "msg": "Now this role will be given on server enter:"
     },
   "emotion": {
@@ -274,13 +310,23 @@
       "msg": "Bye bye {member.mention}!\n\nHope to see you soon again!"
     },
     "set_goodbye_channel": {
+      "name": "goodbye_channel",
+      "description": "Setting server's goodbye channel to send goodbye messages",
       "msg": "The following channel has been set to say goodbye:"
     },
     "set_goodbye_message_type": {
+      "name": "goodbye_message_type",
+      "description": "Choose bot's goodbye message type on your server!",
       "msg": "The following message type has been set to say goodbye:"
     },
     "set_goodbye_message_state": {
-      "msg": "For goodbye messages have been set the following status:"
+      "name": "goodbye_message_state",
+      "description": "Turn on or turn off goodbye messages on your server",
+      "msg": "Now goodbye messages state is:"
+    },
+    "set_goodbye_embed": {
+      "name": "goodbye_embed",
+      "description": "Setting server's goodbye message embed"
     },
     "default_nitro_message_title": {
       "msg": "{member}"
@@ -289,10 +335,18 @@
       "msg": "**Boosted server!**\n\n\nThank you very much for helping our server!"
     },
     "set_nitro_channel": {
+      "name": "nitro_channel",
+      "description": "Setting server's message channel on nitro boost",
       "msg": "The following channel has been set to thank users for nitro boost:"
     },
     "set_nitro_message_state": {
+      "name": "nitro_message_state",
+      "description": "Turn on or turn off on nitro boost messages on your server",
       "msg": "For on nitro boost messages have been set the following status:"
+    },
+    "set_nitro_embed": {
+      "name": "nitro_embed",
+      "description": "Thanks for nitro boost embed settings"
     },
     "default_profile_description": {
       "msg": "Write here something about you"
@@ -387,6 +441,14 @@
       "name": "waifu",
       "description": "Waifu(gifts total price) leaderboard of users on your server"
     },
+    "leaderboard_voice": {
+      "name": "voice",
+      "description": "Spent time on voice channels leaderboard of users on your server"
+    },
+    "leaderboard_messages": {
+      "name": "messages",
+      "description": "Messages leaderboard of users on your server"
+    },
     "level": {
       "msg": "Level",
       "name": "level",
@@ -457,27 +519,43 @@
       "msg": "Description in your love profile card changed to:\n"
     },
     "set_logging_channel": {
+      "name": "logging_channel",
+      "description": "Setting server's logs channel",
       "msg": "The following channel has been set to log events:"
     },
     "set_logging_state": {
+      "name": "logging_state",
+      "description": "Setting server's logs channel",
       "msg": "For logging have been set the following status:"
     },
     "set_min_max_exp": {
+      "name": "min_max_exp",
+      "description": "Setting server's min and max exp",
       "msg": "Now experience will be given in this range:"
     },
     "set_ticket_category": {
+      "name": "ticket_category",
+      "description": "Set tickets category",
       "msg": "Now this category is category for new created tickets:"
     },
     "set_ticket_archive": {
+      "name": "ticket_archive",
+      "description": "Set tickets archive category",
       "msg": "Now this category is category to store closed tickets:"
     },
     "set_ticket_support": {
+      "name": "ticket_support",
+      "description": "Set tickets support role",
       "msg": "Now this users with this role will be auto added to created tickets:"
     },
     "online": {
+      "name": "online",
+      "description": "Sends your or indicated user online in voice chats",
       "msg": "spent time in voice channels:"
     },
     "messages_counter": {
+      "name": "messages_counter",
+      "description": "Sends your or indicated user messages counter on guild",
       "msg": "wrote messages total:"
     },
     "negative_value_error": {
@@ -511,15 +589,21 @@
       "msg": "Indicated user have no any warns"
     },
     "purge_warns": {
+      "name": "purge_warns",
+      "description": "Remove all warns from user",
       "msg": "All warns were purged from"
     },
     "too_long": {
       "msg": "Description is too long, max length is 140 characters!"
     },
     "profile_description": {
-      "msg": "For your profiile card set this description:"
+      "name": "description",
+      "description": "Sets your profile description in card",
+      "msg": "For your profile card set this description:"
     },
     "edit_warn": {
+      "name": "edit_warn",
+      "description": "Edit warn with this id on your server",
       "msg": "Warn reason changed to:"
     },
     "mute_invalid_timespan": {
@@ -532,16 +616,24 @@
       "msg": "You are missing some permissions to run this command"
     },
     "income_min_max_message": {
-      "msg": "Now income for writing messages now will be given in this range:"
+      "msg": "Now income for writing messages now will be given in this range:",
+      "name": "min_max_message",
+      "description": "Set min max users income for writing messages"
     },
     "income_min_max_voice": {
-      "msg": "Now income for being in voice channels now will be given in this range:"
+      "msg": "Now income for being in voice channels now will be given in this range:",
+      "name": "min_max_voice",
+      "description": "Set min and max income for being in voice chat"
     },
     "income_messages_per_income": {
-      "msg": "Now for income users must write this amount of messages:"
+      "msg": "Now for income users must write this amount of messages:",
+      "name": "messages_per_income",
+      "description": "Set messages users must write before getting income"
     },
     "income_voice_minutes": {
-      "msg": "Now for income users must be in voice channel this amount of minutes:"
+      "msg": "Now for income users must be in voice channel this amount of minutes:",
+      "name": "voice_minutes",
+      "description": "Set minutes users must spent in voice chat before income"
     },
     "already_in_income": {
       "msg": "role already in income system"
@@ -550,18 +642,56 @@
       "msg": "role already in your server roles"
     },
     "income_role_add": {
-      "msg": "were added to income with income:"
+      "msg": "were added to income with income:",
+      "name": "role_add",
+      "description": "Add role to income and users with role will get money per 12 hours"
     },
     "not_in_income": {
       "msg": "role not in in income system"
     },
     "income_role_remove": {
-      "msg": "was removed from income"
+      "msg": "was removed from income",
+      "name": "role_remove",
+      "description": "Remove role from and users with role will not get money anymore"
     },
     "income_channel": {
-      "msg": "For channel"
+      "msg": "For channel",
+      "name": "channel",
+      "description": "Turn on/Turn off income in indicated channel"
     },
     "income_channel_2": {
       "msg": "possibility to earn money were: "
+    },
+    "income": {
+      "name": "reset",
+      "description": "This is the reset slash command that will be the prefix of economical reset commands"
+    },
+    "duel": {
+      "name": "duel",
+      "description": "Start duel with this bet and wait for your enemy!"
+    },
+    "mutes": {
+      "name": "mutes",
+      "description": "Show list of active mutes on this server"
+    },
+    "warns": {
+      "name": "warns",
+      "description": "View warns of @User on your server"
+    },
+    "profile": {
+      "name": "profile",
+      "description": "This is the slash command that will be the prefix of profile commands."
+    },
+    "profile_show": {
+      "name": "show",
+      "description": "Show your's or indicated user profile card"
+    },
+    "profile_badges": {
+      "name": "badges",
+      "description": "Show your badges achievements"
+    },
+    "set": {
+      "name": "set",
+      "description": "This is the set slash command that will be the prefix of set commands."
     }
 }

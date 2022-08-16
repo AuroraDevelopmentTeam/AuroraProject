@@ -59,7 +59,7 @@ class Levels(commands.Cog):
                     f"{message.author}",
                     f"{msg}",
                     f"{user_level}:" f"0/{round((7 * (user_level**2)) + 58)}",
-                    message.author.display_avatar,
+                    message.author.display_avatar, interaction.guild.id
                 )
                 await message.channel.send(embed=embed)
             else:
@@ -202,7 +202,7 @@ class Levels(commands.Cog):
                 interaction.application_command.name,
                 f"{msg} {user.mention} **{exp_points}** {msg_2}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
@@ -263,7 +263,7 @@ class Levels(commands.Cog):
                 interaction.application_command.name,
                 f"{msg} {user.mention} **{exp_points}** {msg_2}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
@@ -304,7 +304,7 @@ class Levels(commands.Cog):
                 interaction.application_command.name,
                 f"{msg} {user.mention}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
+                interaction.user.display_avatar, interaction.guild.id
             )
         )
 
