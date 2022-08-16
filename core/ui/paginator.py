@@ -19,7 +19,7 @@ from core.money.getters import (
     get_guild_payday_amount,
 )
 from core.locales.getters import get_msg_from_locale_by_key
-from core.errors import construct_error_forbidden_embed
+from core.errors import construct_error_forbidden_embed, construct_error_not_enough_embed
 from typing import Union
 
 
@@ -76,7 +76,13 @@ class Dropdown(nextcord.ui.Select):
         if self.values[0] != "...":
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < (self.price[int(self.values[0]) - 1]):
-                embed.add_field(name="error", value="not_enough_money_error")
+                embed = construct_error_not_enough_embed(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "not_enough_money_error"
+                        ),
+                        interaction.user.display_avatar,
+                        f"{msg} {balance}",
+                        )
                 return await interaction.message.edit(
                     embed=embed,
                     view=DropdownView(
@@ -84,7 +90,8 @@ class Dropdown(nextcord.ui.Select):
                     ),
                 )
             if self.role_list[int(self.values[0]) - 1] in interaction.user.roles:
-                embed.add_field(name="error", value="already have role")
+                message = get_msg_from_locale_by_key(interaction.guild.id, "already_have")
+                embed.add_field(name="error", value=f"{message}")
                 return await interaction.message.edit(
                     embed=embed,
                     view=DropdownView(
@@ -92,8 +99,11 @@ class Dropdown(nextcord.ui.Select):
                     ),
                 )
             try:
+                print(self.role_list[int(self.values[0]) - 1])
+                print(self.role_list)
                 await interaction.user.add_roles(self.role_list[int(self.values[0]) - 1])
-            except nextcord.Forbidden:
+            except Exception as error:
+                print(error)
                 return await interaction.message.edit(
                     embed=construct_error_forbidden_embed(
                         get_msg_from_locale_by_key(interaction.guild.id, "forbidden_error"),

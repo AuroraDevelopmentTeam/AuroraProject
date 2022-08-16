@@ -58,21 +58,24 @@ class Economics(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.give_roles_money.start(self.client.guilds)
+        self.give_roles_money.start()
 
     @tasks.loop(hours=12)
-    async def give_roles_money(self, guilds):
+    async def give_roles_money(self):
         db = sqlite3.connect("./databases/main.sqlite")
         cursor = db.cursor()
-        for guild in guilds:
-            guild_id = guild.id
-            for row in cursor.execute(
-                    f"SELECT role_id, income FROM roles_money WHERE guild_id = {guild_id}"
-            ):
-                role = nextcord.utils.get(guild.roles, id=row[0])
-                for member in guild.members:
+        rows = cursor.execute(
+            f"SELECT role_id, income, guild_id FROM roles_money"
+        ).fetchall()
+        cursor.close()
+        db.close()
+        for row in rows:
+            guild = self.client.get_guild(row[2])
+            role = nextcord.utils.get(guild.roles, id=row[0])
+            for member in guild.members:
+                if not member.bot:
                     if role.id in [role.id for role in member.roles]:
-                        update_user_balance(guild_id, member.id, row[1])
+                        update_user_balance(row[2], member.id, row[1])
 
     @nextcord.slash_command(
         name="add_money",

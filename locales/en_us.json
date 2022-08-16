@@ -546,6 +546,9 @@
     "already_in_income": {
       "msg": "role already in income system"
     },
+    "already_have": {
+      "msg": "role already in your server roles"
+    },
     "income_role_add": {
       "msg": "were added to income with income:"
     },
