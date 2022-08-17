@@ -1,5 +1,4 @@
 import nextcord
-from datetime import datetime
 import sqlite3
 from core.marriage.getters import GIFT_NAMES, GIFT_EMOJIS, get_user_gift_counter
 from core.locales.getters import get_msg_from_locale_by_key
@@ -10,9 +9,14 @@ def parse_timeouts(guild_members) -> list:
     timeouts = []
     for member in guild_members:
         if member.timeout is not None:
-            estimated_time = member.timeout - nextcord.utils.utcnow()
-            estimated_time = f"{estimated_time}"[:-7]
-            timeouts.append([member.mention, estimated_time])
+            print(member.timeout)
+            try:
+                if member.timeout > nextcord.utils.utcnow():
+                    estimated_time = member.timeout - nextcord.utils.utcnow()
+                    estimated_time = f"{estimated_time}"[:-7]
+                    timeouts.append([member.mention, estimated_time])
+            except TypeError:
+                pass
     return timeouts
 
 

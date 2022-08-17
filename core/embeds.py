@@ -26,6 +26,7 @@ def construct_basic_embed(
     except Exception as error:
         name = name
         print(error)
+    name = name.capitalize()
     name = name.replace("_", " ")
     embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
     embed.add_field(name=name, value=value)

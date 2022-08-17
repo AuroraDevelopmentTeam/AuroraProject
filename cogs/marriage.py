@@ -188,7 +188,7 @@ class Marriage(commands.Cog):
     async def __loveprofile(self, interaction: Interaction):
         await interaction.response.defer()
         if is_married(interaction.guild.id, interaction.user.id) is False:
-            return await interaction.response.send_message(
+            return await interaction.followup.send(
                 embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "not_married_error"
@@ -328,7 +328,7 @@ class Marriage(commands.Cog):
             icon_url=interaction.user.display_avatar,
         )
         embed.set_image(
-            url="https://sun4-10.userapi.com/c240331/u352908625/docs/d10/140a7b79b61a/Aduare-artist-Pixel-Art-Pixel-Gif-6507066.gif?extra=SrdBHJb8jfuKrjJ_8df_2p7sFUkiP3wBcu4Gv8HLrpVQZaqnSSwWUK7d4Almxpt3QiM2rqhBu2ROn1qvEKPxAmgQblm7IIy3_vm1l7aXMUfLwk1Hq07V7ygqFTWilx_4t6F0N-FssauP9JGUBELaahfGbg&dl=1"
+            url="https://cdn.discordapp.com/attachments/772385814483173398/1009395738758893578/808536e504da54a3522fcaa2a4e209e7.gif"
         )
         await interaction.response.send_message(embed=embed)
 

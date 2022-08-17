@@ -18,6 +18,7 @@ from core.locales.getters import (
     get_msg_from_locale_by_key,
     get_localized_description,
     get_localized_name,
+    localize_name,
 )
 from core.parsers import parse_timeouts, parse_warns_of_user
 from core.warns.writers import write_new_warn
@@ -201,6 +202,7 @@ class Moderation(commands.Cog):
                 )
             )
 
+
     @nextcord.slash_command(
         name="mutes",
         description="Show list of active mutes on this server",
@@ -255,8 +257,9 @@ class Moderation(commands.Cog):
         after
             ID of message, AFTER THIS message deletion will take place
         """
+        await interaction.response.defer()
         if messages_to_delete <= 0:
-            return await interaction.response.send_message(
+            return await interaction.followup.send(
                 embed=construct_error_negative_value_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "negative_value_error"
@@ -266,14 +269,15 @@ class Moderation(commands.Cog):
                 )
             )
         if messages_to_delete > 1000:
-            return await interaction.response.send_message(
+            return await interaction.followup.send(
                 embed=construct_error_limit_break_embed(
                     get_msg_from_locale_by_key(interaction.guild.id, "limit_break"),
                     self.client.user.avatar.url,
                 )
             )
+        message = await interaction.followup.send(f"/{localize_name(interaction.guild.id, 'clear')}...")
         if before is None:
-            before = interaction.message
+            before = message.created_at
         else:
             before = nextcord.Object(id=before)
 
@@ -288,23 +292,23 @@ class Moderation(commands.Cog):
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, interaction.application_command.name
             )
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 embed=construct_basic_embed(
                     interaction.application_command.name,
-                    f"{message} {len(were_deleted)}",
+                    f"{message} **{len(were_deleted)}**",
                     f"{requested} {interaction.user}",
                     interaction.user.display_avatar, interaction.guild.id
                 )
             )
         except nextcord.Forbidden:
-            return await interaction.response.send_message(
+            return await interaction.followup.send(
                 embed=construct_error_forbidden_embed(
                     get_msg_from_locale_by_key(interaction.guild.id, "forbidden_error"),
                     self.client.user.avatar.url,
                 )
             )
         except nextcord.HTTPException:
-            return await interaction.response.send_message(
+            return await interaction.followup.send(
                 embed=construct_error_http_exception_embed(
                     get_msg_from_locale_by_key(interaction.guild.id, "http_exception"),
                     self.client.user.avatar.url,
@@ -394,6 +398,16 @@ class Moderation(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
+        warns = parse_warns_of_user(interaction.guild.id, user.id)
+        if len(warns) == 0:
+            embed = nextcord.Embed(
+                title="error",
+                description=get_msg_from_locale_by_key(
+                    interaction.guild.id, "user_no_warns"
+                ),
+                color=DEFAULT_BOT_COLOR
+            )
+            return await interaction.response.send_message(embed=embed)
         if is_warn_id_in_table("warns", warn_id, interaction.guild.id, user.id) is True:
             remove_warn_from_table(warn_id, interaction.guild.id, user.id)
             requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")

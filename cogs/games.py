@@ -140,7 +140,7 @@ class Games(commands.Cog):
                         interaction.guild.id, "negative_value_error"
                     ),
                     self.client.user.avatar.url,
-                    money,
+                    bet,
                 )
             )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -419,7 +419,7 @@ class Games(commands.Cog):
                         interaction.guild.id, "negative_value_error"
                     ),
                     self.client.user.avatar.url,
-                    money,
+                    bet,
                 )
             )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -464,9 +464,10 @@ class Games(commands.Cog):
             )
             await interaction.response.send_message(embed=embed)
 
+    @commands.is_owner()
     @nextcord.slash_command(
         name="brick_knife_evidence_yandere",
-        default_member_permissions=Permissions(send_messages=True),
+        default_member_permissions=Permissions(),
     )
     async def __brick_knife_evidence_yandere_tentacles(self, interaction: Interaction):
         await interaction.response.defer()
@@ -502,7 +503,7 @@ class Games(commands.Cog):
                         interaction.guild.id, "negative_value_error"
                     ),
                     self.client.user.avatar.url,
-                    money,
+                    bet,
                 )
             )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -566,7 +567,7 @@ class Games(commands.Cog):
                         interaction.guild.id, "negative_value_error"
                     ),
                     self.client.user.avatar.url,
-                    money,
+                    bet,
                 )
             )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -625,7 +626,7 @@ class Games(commands.Cog):
                         interaction.guild.id, "negative_value_error"
                     ),
                     self.client.user.avatar.url,
-                    money,
+                    bet,
                 )
             )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -649,7 +650,7 @@ class Games(commands.Cog):
 
         await interaction.response.send_message(
             embed=embed, view=DuelStart(interaction.user, bet)
-            )
+        )
 
 
 def setup(client):

@@ -10,6 +10,8 @@ from nextcord.ext.application_checks import ApplicationMissingPermissions
 
 from core.locales.getters import get_msg_from_locale_by_key
 
+from core.embeds import DEFAULT_BOT_COLOR
+
 
 class ErrorHandler(commands.Cog):
     def __init__(self, client):
@@ -22,9 +24,10 @@ class ErrorHandler(commands.Cog):
         if isinstance(error, CallableOnCooldown):
             locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
             return await interaction.send(
-                f"{get_msg_from_locale_by_key(interaction.guild.id, 'rate_limit')} "
-                f"`{datetime.timedelta(seconds=int(error.retry_after))}`"
-            )
+                embed=nextcord.Embed(description=f"{get_msg_from_locale_by_key(interaction.guild.id, 'rate_limit')} "
+                                                 f"`{datetime.timedelta(seconds=int(error.retry_after))}`",
+                                     color=DEFAULT_BOT_COLOR)
+                )
 
         elif isinstance(error, ApplicationMissingPermissions):
             msg = get_msg_from_locale_by_key(interaction.guild.id, "ApplicationMissingPermissions")
