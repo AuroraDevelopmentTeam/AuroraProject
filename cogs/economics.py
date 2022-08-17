@@ -226,7 +226,7 @@ class Economics(commands.Cog):
         await user.display_avatar.with_format("png").save(avatar)
         profile_picture = Image.open(avatar)
         file, embed = create_user_money_card(
-            interaction.application_command.name.capitalize(),
+            interaction.application_command.name,
             interaction.user,
             user,
             profile_picture,
@@ -335,14 +335,14 @@ class Economics(commands.Cog):
             interaction.guild.id, f"{interaction.application_command.name}"
         )
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-        await interaction.response.send_message(
-            embed=construct_basic_embed(
+        embed = construct_basic_embed(
                 interaction.application_command.name,
                 f"{message}" f"+__**{payday_amount}**__ {currency_symbol}",
                 f"{requested} {interaction.user}",
                 interaction.user.display_avatar, interaction.guild.id
             )
-        )
+        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/996084073569194084/996084305031872574/white_clock.png")
+        await interaction.response.send_message(embed=embed)
 
     @nextcord.slash_command(
         name="give",
@@ -533,23 +533,7 @@ class Economics(commands.Cog):
     async def __shop(self, interaction: Interaction):
         guild_roles = parse_server_roles(interaction.guild)
         pages = SelectButtonMenuPages(
-            source=MyEmbedDescriptionPageSource(guild_roles),
-            guild=interaction.guild,
-            disabled=False,
-        )
-        await pages.start(interaction=interaction)
-
-    @nextcord.slash_command(
-        name="shop",
-        description="show role shop menu",
-        name_localizations=get_localized_name("shop"),
-        description_localizations=get_localized_description("shop"),
-        default_member_permissions=Permissions(send_messages=True),
-    )
-    async def __shop(self, interaction: Interaction):
-        guild_roles = parse_server_roles(interaction.guild)
-        pages = SelectButtonMenuPages(
-            source=MyEmbedDescriptionPageSource(guild_roles),
+            source=MyEmbedDescriptionPageSource(guild_roles, interaction.guild.id),
             guild=interaction.guild,
             disabled=False,
         )
@@ -780,7 +764,15 @@ class Economics(commands.Cog):
                 )
             )
         if max_voice_income < min_voice_income:
-            return
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    f"{min_voice_income} - {max_voice_income}",
+                )
+            )
         update_guild_min_max_voice_income(interaction.guild.id, min_voice_income, max_voice_income)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"income_{interaction.application_command.name}"

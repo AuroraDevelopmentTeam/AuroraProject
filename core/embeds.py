@@ -3,6 +3,7 @@ from nextcord import Asset
 from config import settings
 from nextcord.ext import commands
 from core.locales.getters import get_msg_from_locale_by_key, localize_name
+from core.emojify import CLOCK
 
 DEFAULT_BOT_COLOR = settings["default_color"]
 
@@ -16,11 +17,15 @@ def construct_basic_embed(
     name: str, value: str, footer_text: str, footer_url: Asset, guild_id: int
 ) -> nextcord.Embed:
     try:
-        name = localize_name(guild_id, name)
+        if name == 'timely':
+            name = f"{localize_name(guild_id, name).capitalize()}"
+            name = CLOCK + " " + name
+        else:
+            name = localize_name(guild_id, name)
+            name = name.capitalize()
     except Exception as error:
         name = name
         print(error)
-    name = name.capitalize()
     name = name.replace("_", " ")
     embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
     embed.add_field(name=name, value=value)

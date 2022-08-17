@@ -1,3 +1,6 @@
+import locale
+import datetime
+
 from cooldowns import CallableOnCooldown
 
 import nextcord
@@ -17,8 +20,10 @@ class ErrorHandler(commands.Cog):
         error = getattr(error, "original", error)
 
         if isinstance(error, CallableOnCooldown):
+            locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
             return await interaction.send(
-                f"You are being rate-limited! Retry in `{error.retry_after}` seconds."
+                f"{get_msg_from_locale_by_key(interaction.guild.id, 'rate_limit')} "
+                f"`{datetime.timedelta(seconds=int(error.retry_after))}`"
             )
 
         elif isinstance(error, ApplicationMissingPermissions):

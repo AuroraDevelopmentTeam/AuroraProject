@@ -5,7 +5,7 @@ from nextcord import Asset
 
 def construct_error_forbidden_embed(description: str, icon: Asset) -> nextcord.Embed:
     embed = construct_error_embed(description)
-    embed.set_footer(icon_url=icon, text=f"error status code #403")
+    embed.set_footer(icon_url=icon, text=f"error: FORBIDDEN\n discord #403")
     return embed
 
 
@@ -13,14 +13,14 @@ def construct_error_http_exception_embed(
     description: str, icon: Asset
 ) -> nextcord.Embed:
     embed = construct_error_embed(description)
-    embed.set_footer(icon_url=icon, text=f"error: HTTPException")
+    embed.set_footer(icon_url=icon, text=f"error: HTTPException\n discord error")
     return embed
 
 
 def construct_error_limit_break_embed(description: str, icon: Asset) -> nextcord.Embed:
     embed = construct_error_embed(description)
     embed.set_footer(
-        icon_url=icon, text=f"error: LIMIT BREAK|TOO MANY ARGS|ARGUMENT IS TOO BIG"
+        icon_url=icon, text=f"error: LIMIT BREAK\nstatus-code: #A903"
     )
     return embed
 
@@ -31,7 +31,7 @@ def construct_error_negative_value_embed(
     embed = construct_error_embed(description)
     embed.set_footer(
         icon_url=icon,
-        text=f"error: NOT POSITIVE/NOT INT VALUE\nnegative value: {value}",
+        text=f"error: NOT POSITIVE/NOT INT VALUE\nvalue: {value}\nstatus-code: #A243",
     )
     return embed
 
@@ -40,8 +40,7 @@ def construct_error_bot_user_embed(description: str, icon: Asset) -> nextcord.Em
     embed = construct_error_embed(description)
     embed.set_footer(
         icon_url=icon,
-        text=f"error: bot user\n this command can't be executed with bot user, it will indicate to "
-        f"ValueError ",
+        text=f"error: bot user\nstatus-code: #A003 ",
     )
     return embed
 
@@ -50,8 +49,7 @@ def construct_error_self_choose_embed(description: str, icon: Asset) -> nextcord
     embed = construct_error_embed(description)
     embed.set_footer(
         icon_url=icon,
-        text=f"error: bot user\n this command can't be executed with bot user, it will indicate to "
-        f"ValueError ",
+        text=f"error: self_choose_error\nstatus-code: #A178 ",
     )
     return embed
 

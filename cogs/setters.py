@@ -163,7 +163,7 @@ class Setters(commands.Cog):
             requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
             await interaction.response.send_message(
                 embed=construct_basic_embed(
-                    interaction.application_command.name,
+                    f"set_{interaction.application_command.name}",
                     f"{message} **{locale}**",
                     f"{requested} {interaction.user}",
                     interaction.user.display_avatar, interaction.guild.id
@@ -387,7 +387,15 @@ class Setters(commands.Cog):
                 )
             )
         if max < min:
-            return
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    f"{min} - {max}",
+                )
+            )
         update_min_max_exp(interaction.guild.id, min, max)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"set_{interaction.application_command.name}"

@@ -8,13 +8,14 @@ import nextcord
 from nextcord.ui import View, Button
 
 from core.embeds import DEFAULT_BOT_COLOR
-from core.locales.getters import get_msg_from_locale_by_key
+from core.locales.getters import get_msg_from_locale_by_key, localize_name
 from core.marriage.getters import (
     get_user_love_description,
     get_user_marry_date,
     get_family_money,
 )
 from core.money.getters import get_guild_currency_symbol
+from core.emojify import *
 
 
 def create_marriage_table() -> None:
@@ -53,7 +54,7 @@ def create_marry_embed(
     marry = get_msg_from_locale_by_key(guild_id, name)
     marry_answer = get_msg_from_locale_by_key(guild_id, f"{name}_answer")
     embed.add_field(
-        name=name.capitalize(),
+        name=f"{MARRY} {name.capitalize()}",
         value=f"{author.mention} {marry} {pair.mention} {marry_answer}",
         inline=False,
     )
@@ -67,7 +68,7 @@ def create_marry_yes_embed(
     marry = get_msg_from_locale_by_key(guild_id, f"marry_yes")
     marry_answer = get_msg_from_locale_by_key(guild_id, f"marry_yes_answer")
     embed.add_field(
-        name=marry,
+        name=f"{MARRY} {marry}",
         value=f"{author.mention}+{pair.mention} {marry_answer}",
         inline=False,
     )
@@ -109,21 +110,22 @@ def create_love_profile_embed(
     love_description = get_user_love_description(guild_id, user.id)
     love_date = get_user_marry_date(guild_id, user.id)
     family_money = get_family_money(guild_id, user.id)
-
+    name = localize_name(guild_id, name).capitalize()
+    name = name.replace("_", " ")
     embed.add_field(
-        name=name.capitalize(),
+        name=f"{MARRY} {name}",
         value=f"{user.mention} <a:emoji_20:996467596851417089> {pair.mention}",
         inline=False,
     )
     field_name = get_msg_from_locale_by_key(guild_id, "love_description")
-    embed.add_field(name=field_name, value=f"```{love_description}```", inline=False)
+    embed.add_field(name=f"{HEARTS_SCROLL} {field_name}", value=f"```{love_description}```", inline=False)
     currency_symbol = get_guild_currency_symbol(guild_id)
     field_name = get_msg_from_locale_by_key(guild_id, "love_money")
     embed.add_field(
-        name=field_name, value=f"__**{family_money}**__ {currency_symbol}", inline=True
+        name=f"{PIGBANK} {field_name}", value=f"__**{family_money}**__ {currency_symbol}", inline=True
     )
     field_name = get_msg_from_locale_by_key(guild_id, "love_date")
-    embed.add_field(name=field_name, value=f"**{love_date}**", inline=True)
+    embed.add_field(name=f"{HEARTS_MANY} {field_name}", value=f"**{love_date}**", inline=True)
     requested = get_msg_from_locale_by_key(guild_id, "requested_by")
     embed.set_footer(text=f"{requested} {user}", icon_url=user.display_avatar)
     embed.set_image(url="attachment://lovecard.png")

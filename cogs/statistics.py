@@ -85,7 +85,7 @@ class StatisticsCounter(commands.Cog):
                 money_to_update = (int(minutes_in_voice//voice_minutes_for_income)) * random.randint(min, max)
                 update_user_balance(member.guild.id, member.id, money_to_update)
 
-                min_exp, max_exp = get_min_max_exp(message.guild.id)
+                min_exp, max_exp = get_min_max_exp(member.guild.id)
                 exp = random.randint(min_exp, max_exp) * (int(minutes_in_voice//5))
                 update_user_exp(member.guild.id, member.id, exp, exp)
                 user_level = get_user_level(member.guild.id, member.id)

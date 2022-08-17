@@ -6,9 +6,10 @@ import sqlite3
 import nextcord
 
 from core.money.getters import get_user_balance
-from core.locales.getters import get_msg_from_locale_by_key
+from core.locales.getters import get_msg_from_locale_by_key, localize_name
 from core.checkers import is_guild_id_in_table, is_user_in_table
 from core.embeds import DEFAULT_BOT_COLOR
+from core.emojify import CREDIT_CARD
 
 
 def create_money_table() -> None:
@@ -94,8 +95,8 @@ def create_user_money_card(
     background.text((150, 530), str(user), font=font, color="#FFFFFF")
     background.text((400, 480), f"{balance}", font=larger_font, color="#FFFFFF")
     requested = get_msg_from_locale_by_key(guild_id, "requested_by")
-    embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
-    embed.set_author(name=f"{name} - {user}")
+    name = localize_name(guild_id, name).capitalize()
+    embed = nextcord.Embed(color=DEFAULT_BOT_COLOR, title=f"{CREDIT_CARD} {name} - {user}")
     embed.set_footer(icon_url=author.display_avatar, text=f"{requested} {author}")
     file = nextcord.File(fp=background.image_bytes, filename="balance_card.png")
     embed.set_image(url="attachment://balance_card.png")

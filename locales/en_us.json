@@ -693,5 +693,18 @@
     "set": {
       "name": "set",
       "description": "This is the set slash command that will be the prefix of set commands."
+    },
+    "joined_at": {
+      "msg": "joined at"
+    },
+    "already_like_noone": {
+      "msg": "Where are no any liked by you users, i can't execute command"
+    },
+    "help": {
+      "name": "help",
+      "description": "Send help menu with list of bot commands!"
+    },
+    "rate_limit": {
+      "msg": "Command right now is on cooldown!\nPlease retry after: "
     }
 }

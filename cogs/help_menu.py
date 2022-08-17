@@ -6,9 +6,11 @@ from core.locales.getters import (
     get_keys_value_in_locale,
     get_localized_description,
     get_localized_name,
+    localize_name,
 )
 from core.embeds import construct_basic_embed, construct_long_embed, DEFAULT_BOT_COLOR
 from typing import Optional
+from core.emojify import PAPER
 import cooldowns
 
 
@@ -33,22 +35,22 @@ class HelpSelectMenu(nextcord.ui.Select):
             ),
             nextcord.SelectOption(
                 label="Уровни",
-                description="Меню помощи по разделу 'Экономика'",
+                description="Меню помощи по разделу 'Уровни'",
                 emoji="🐉",
             ),
             nextcord.SelectOption(
                 label="Любовь и свадьбы",
-                description="Меню помощи по разделу 'Экономика'",
+                description="Меню помощи по разделу 'Любовь и свадьбы'",
                 emoji="🤍",
             ),
             nextcord.SelectOption(
                 label="Приветствия и прощания",
-                description="Меню помощи по разделу 'Экономика'",
+                description="Меню помощи по разделу 'Приветствия и прощания'",
                 emoji="👋",
             ),
             nextcord.SelectOption(
                 label="Благодарности за нитро буст(alpha)",
-                description="Меню помощи по разделу 'Экономика'",
+                description="Меню помощи по разделу 'Нитро'",
                 emoji="💎",
             ),
             nextcord.SelectOption(
@@ -324,12 +326,14 @@ class HelpMenu(commands.Cog):
     @nextcord.slash_command(
         name="help",
         description="Shows help menu",
+        name_localizations=get_localized_name("help"),
+        description_localizations=get_localized_description("help"),
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __help(self, interaction: Interaction):
         embed = nextcord.Embed(
             color=DEFAULT_BOT_COLOR,
-            title=interaction.application_command.name.capitalize(),
+            title=f"{PAPER} {localize_name(interaction.guild.id, interaction.application_command.name).capitalize()}",
             description="Приветствую тебя, **пользователь**\n\nСпасибо за то, что выбрали Аврору как вашего бота. "
             "Это команда для помощи и навигации по моим командам!\n\n**Выбери раздел**, чтобы посмотреть "
             "его команды. \n\n[Сайт бота](https://clonexy700.github.io/AuroraBotWebsite/index.html)\n"

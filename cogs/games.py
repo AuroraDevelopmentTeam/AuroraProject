@@ -50,6 +50,7 @@ from core.money.updaters import update_user_balance
 from core.money.getters import get_user_balance, get_guild_currency_symbol
 from core.errors import construct_error_negative_value_embed, construct_error_not_enough_embed
 from core.embeds import DEFAULT_BOT_COLOR
+from core.emojify import SWORD
 
 MULTIPLIERS_FOR_TWO_ROWS = [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]
 
@@ -97,7 +98,7 @@ class DuelStart(nextcord.ui.View):
             losed = author
         currency = get_guild_currency_symbol(interaction.guild.id)
         embed = nextcord.Embed(
-            title="Дуэль",
+            title=f"{SWORD} Дуэль",
             description=f'В дуэле побеждает {who_win.mention} и зарабатывает {self.bet} {currency}',
             color=DEFAULT_BOT_COLOR
         )
@@ -640,7 +641,7 @@ class Games(commands.Cog):
                 )
             )
         embed = nextcord.Embed(
-            title="Дуэль",
+            title=f"{SWORD} Дуэль",
             description=f"{interaction.user.mention} начинает поиск соперника для дуэли! Ставка **{bet}** "
                         f"{get_guild_currency_symbol(interaction.guild.id)}",
             color=DEFAULT_BOT_COLOR

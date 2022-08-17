@@ -42,7 +42,7 @@ from core.marriage.update import (
 )
 from core.embeds import construct_basic_embed
 from core.ui.buttons import create_button, ViewAuthorCheck, View
-from core.locales.getters import get_msg_from_locale_by_key, get_guild_locale
+from core.locales.getters import get_msg_from_locale_by_key, get_guild_locale, localize_name
 from core.parsers import parse_likes, parse_user_gifts
 from core.embeds import DEFAULT_BOT_COLOR
 from core.errors import (
@@ -53,6 +53,8 @@ from core.errors import (
     construct_error_already_married_embed,
     construct_error_not_married_embed
 )
+from core.emojify import SHOP, STAR, SWORD, SETTINGS, HANDWRITTEN_HEARTS, HEARTS_SCROLL, HEARTS_MANY, HEARTS_THREE, \
+    USERS, GIFT, MASK, RINGS, BROKEN_HEART, MESSAGE, PIGBANK, PRICE_TAG, VOICE, MARRY
 
 
 class Marriage(commands.Cog):
@@ -87,7 +89,7 @@ class Marriage(commands.Cog):
             )
         if user == interaction.user:
             return await interaction.response.send_message(
-                construct_error_self_choose_embed(
+                embed=construct_error_self_choose_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "self_choose_error"
                     ),
@@ -96,7 +98,7 @@ class Marriage(commands.Cog):
             )
         if is_married(interaction.guild.id, interaction.user.id) is True:
             return await interaction.response.send_message(
-                construct_error_already_married_embed(
+                embed=construct_error_already_married_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "already_married_error"
                     ),
@@ -105,7 +107,7 @@ class Marriage(commands.Cog):
             )
         if is_married(interaction.guild.id, user.id) is True:
             return await interaction.response.send_message(
-                construct_error_already_married_embed(
+                embed=construct_error_already_married_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "already_married_error"
                     ),
@@ -130,7 +132,7 @@ class Marriage(commands.Cog):
         async def marry_no_callback(interaction: Interaction):
             embed = create_marry_no_embed(interaction.guild.id, author, pair)
             embed.add_field(
-                name="Свадьба неудачна",
+                name=f"{emoji_no} Свадьба неудачна",
                 value=f"Время истекло или пользователь отказался от предложения",
                 inline=False,
             )
@@ -163,6 +165,7 @@ class Marriage(commands.Cog):
         embed = create_marry_embed(
             interaction.application_command.name, interaction.guild.id, author, pair
         )
+        print(embed)
         emoji_no = get(self.client.emojis, name="emoji_no")
         emoji_yes = get(self.client.emojis, name="emoji_yes")
         yes_button = create_button("yes", marry_yes_callback, False)
@@ -186,7 +189,7 @@ class Marriage(commands.Cog):
         await interaction.response.defer()
         if is_married(interaction.guild.id, interaction.user.id) is False:
             return await interaction.response.send_message(
-                construct_error_not_married_embed(
+                embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "not_married_error"
                     ),
@@ -221,7 +224,7 @@ class Marriage(commands.Cog):
     async def __divorce(self, interaction: Interaction):
         if is_married(interaction.guild.id, interaction.user.id) is False:
             return await interaction.response.send_message(
-                construct_error_not_married_embed(
+                embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "not_married_error"
                     ),
@@ -282,7 +285,8 @@ class Marriage(commands.Cog):
         divorces = get_divorce_counter(interaction.guild.id, user.id)
         likes_counter = parse_likes(interaction.guild.id, user.id)
         gifts = parse_user_gifts(interaction.guild.id, user.id)
-        embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
+        embed = nextcord.Embed(color=DEFAULT_BOT_COLOR,
+                               title=f"{HEARTS_SCROLL} {localize_name(interaction.guild.id, interaction.application_command.name).capitalize()} - {user}")
         if pair_id == 0:
             parther = "-"
         else:
@@ -294,11 +298,8 @@ class Marriage(commands.Cog):
             else:
                 parther = f"{parther.mention}"
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-        embed.set_author(
-            name=f"{interaction.application_command.name.capitalize()} - {user}"
-        )
         partner_msg = get_msg_from_locale_by_key(interaction.guild.id, "partner")
-        embed.add_field(name=partner_msg, value=parther, inline=True)
+        embed.add_field(name=f"{RINGS} {partner_msg}", value=parther, inline=True)
         if like_id == 0:
             parther = "-"
         else:
@@ -309,18 +310,18 @@ class Marriage(commands.Cog):
                 parther = f"{parther.mention}"
         like_msg = get_msg_from_locale_by_key(interaction.guild.id, "ilike")
         price_msg = get_msg_from_locale_by_key(interaction.guild.id, "price")
-        embed.add_field(name=like_msg, value=parther, inline=True)
+        embed.add_field(name=f"{HANDWRITTEN_HEARTS} {like_msg}", value=parther, inline=True)
         embed.add_field(
-            name=f"{price_msg}",
+            name=f"{PRICE_TAG} {price_msg}",
             value=f"__**{gift_price}**__ {currency_symbol}",
             inline=True,
         )
         divorces_msg = get_msg_from_locale_by_key(interaction.guild.id, "divorces")
         likes_msg = get_msg_from_locale_by_key(interaction.guild.id, "likes")
         gifts_msg = get_msg_from_locale_by_key(interaction.guild.id, "gifts")
-        embed.add_field(name=divorces_msg, value=divorces, inline=True)
-        embed.add_field(name=likes_msg, value=likes_counter, inline=True)
-        embed.add_field(name=gifts_msg, value=gifts, inline=False)
+        embed.add_field(name=f"{BROKEN_HEART} {divorces_msg}", value=divorces, inline=True)
+        embed.add_field(name=f"{HEARTS_MANY} {likes_msg}", value=likes_counter, inline=True)
+        embed.add_field(name=f"{GIFT} {gifts_msg}", value=gifts, inline=False)
         embed.set_thumbnail(url=user.display_avatar)
         embed.set_footer(
             text=f"{requested} {interaction.user}",
@@ -380,6 +381,16 @@ class Marriage(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __unlike(self, interaction: Interaction):
+        like_id = get_user_like_id(interaction.guild.id, interaction.user.id)
+        if like_id == 0:
+            embed = nextcord.Embed(
+                title="error",
+                description=get_msg_from_locale_by_key(
+                    interaction.guild.id, "already_like_noone"
+                ),
+                color=DEFAULT_BOT_COLOR
+            )
+            return await interaction.response.send_message(embed=embed)
         update_user_like(interaction.guild.id, interaction.user.id, 0)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, interaction.application_command.name
@@ -406,8 +417,7 @@ class Marriage(commands.Cog):
         guild_locale = get_guild_locale(interaction.guild.id)
         counter = 1
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-        embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
-        embed.set_author(name=f"{interaction.application_command.name.capitalize()}")
+        embed = nextcord.Embed(color=DEFAULT_BOT_COLOR, title=f"{GIFT} {localize_name(interaction.guild.id, interaction.application_command.name).capitalize()}")
         for i in range(10):
             gift_now = f"gift_{str(counter)}"
             embed.add_field(
@@ -543,7 +553,7 @@ class Marriage(commands.Cog):
     ):
         if is_married(interaction.guild.id, interaction.user.id) is False:
             return await interaction.response.send_message(
-                construct_error_not_married_embed(
+                embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "not_married_error"
                     ),
@@ -580,7 +590,7 @@ class Marriage(commands.Cog):
     ):
         if is_married(interaction.guild.id, interaction.user.id) is False:
             return await interaction.response.send_message(
-                construct_error_not_married_embed(
+                embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "not_married_error"
                     ),

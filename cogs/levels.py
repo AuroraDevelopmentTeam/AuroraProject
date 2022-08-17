@@ -59,7 +59,7 @@ class Levels(commands.Cog):
                     f"{message.author}",
                     f"{msg}",
                     f"{user_level}:" f"0/{round((7 * (user_level**2)) + 58)}",
-                    message.author.display_avatar, interaction.guild.id
+                    message.author.display_avatar, message.guild.id
                 )
                 await message.channel.send(embed=embed)
             else:
@@ -171,7 +171,7 @@ class Levels(commands.Cog):
             )
         if exp_points <= 0:
             return await interaction.response.send_message(
-                construct_error_negative_value_embed(
+                embed=construct_error_negative_value_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "negative_value_error"
                     ),
@@ -241,7 +241,7 @@ class Levels(commands.Cog):
             )
         if exp_points <= 0:
             return await interaction.response.send_message(
-                construct_error_negative_value_embed(
+                embed=construct_error_negative_value_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "negative_value_error"
                     ),

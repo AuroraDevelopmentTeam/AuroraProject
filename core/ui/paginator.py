@@ -18,9 +18,10 @@ from core.money.getters import (
     get_guild_starting_balance,
     get_guild_payday_amount,
 )
-from core.locales.getters import get_msg_from_locale_by_key
+from core.locales.getters import get_msg_from_locale_by_key, localize_name
 from core.errors import construct_error_forbidden_embed, construct_error_not_enough_embed
 from typing import Union
+from core.emojify import SHOP
 
 
 class MyEmbedFieldPageSource(menus.ListPageSource):
@@ -154,12 +155,13 @@ class DropdownView(nextcord.ui.View):
 
 
 class MyEmbedDescriptionPageSource(menus.ListPageSource):
-    def __init__(self, data):
+    def __init__(self, data, guild_id):
+        self.guild_id = guild_id
         super().__init__(data, per_page=6)
 
     async def format_page(self, menu, entries):
         embed = Embed(
-            title="Shop", description="\n".join(entries), color=DEFAULT_BOT_COLOR
+            title=f"{SHOP} {localize_name(self.guild_id, 'shop').capitalize()}", description="\n".join(entries), color=DEFAULT_BOT_COLOR
         )
         embed.set_footer(text=f"{menu.current_page + 1}/{self.get_max_pages()}")
         return embed
