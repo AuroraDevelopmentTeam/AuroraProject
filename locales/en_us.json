@@ -702,7 +702,8 @@
     },
     "help": {
       "name": "help",
-      "description": "Send help menu with list of bot commands!"
+      "description": "Send help menu with list of bot commands!",
+      "msg": "Hello, **user**\n\nThanks for choosing Aurora as your server bot. This command for help and navigation in my commands.\n\n**Choose section**, to view commands of this section. \n\n[Bot site](https://clonexy700.github.io/AuroraBotWebsite/index.html)\n[Commands in browser](https://clonexy700.github.io/AuroraBotWebsite/commands.html)\n[Finded a bug? Problems with bot? Support server](https://discord.gg/5j9hmZw6yY)"
     },
     "rate_limit": {
       "msg": "Command right now is on cooldown!\nPlease retry after: "
