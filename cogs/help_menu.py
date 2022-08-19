@@ -96,7 +96,7 @@ class HelpSelectMenuENG(nextcord.ui.Select):
             ),
         ]
         super().__init__(
-            placeholder="Выберите раздел, команды которого вы хотите увидеть",
+            placeholder="Choose section commands you want to view",
             min_values=1,
             max_values=1,
             options=options,
@@ -133,92 +133,93 @@ class HelpSelectMenuENG(nextcord.ui.Select):
         elif self.values[0] == "Economics":
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
-                title="💸 Экономика",
+                title="💸 Economics",
                 description="`/balance` — Send balance\n`/add_money` — Add money on someones balance\n"
-                            "`/remove_money` — Remove money from balance\n`/reset balance` — Сбросить баланс\n"
-                            "`/give` — Передать валюту\n`/add-shop` — Добавить роль в магазин\n"
-                            "`/remove-shop` — Убрать роль из магазина\n`/shop` — Магазин сервера\n"
-                            "`/set currency` — Установить символ валюты\n`/set start_balance` — Установить начальный "
-                            "баланс\n`/set timely_amount` — Установить выплату /timely\n`/slots` — Сыграть в слоты\n"
-                            "`/blackjack` — Сыграть в блэкджек\n`/gamble` — Сыграть в броски\n`/wheel` — Крутить колесо\n"
-                            "`/duel` — Начать дуэль\n`/income channel` — Отключить/Включить доход в канале\n"
-                            "`/income min_max_message` — Настроить доход за написание сообщений\n"
-                            "`/income min_max_voice` — Настроить доход за пребывание в голосовом чате\n"
-                            "`/income messages_per_income` — Настроить кол-во сообщений для выдачи дохода\n"
-                            "`/income voice_minutes` — Настроить кол-во минут в голосовом чате для выдачи дохода\n"
-                            "`/income role_add` — Добавить выдачу раз в 12 часов валюты роли\n"
-                            "`/income role_remove` — Убрать выдачу раз в 12 часов валюты роли",
+                            "`/remove_money` — Remove money from balance\n`/reset balance` — Reset user balance\n"
+                            "`/give` — Give money to someone\n`/add-shop` — Add role to shop\n"
+                            "`/remove-shop` — Remove role from shop\n`/shop` — Server role market\n"
+                            "`/set currency` — Set new currency symbol\n`/set start_balance` — Set new starting "
+                            "balance\n`/set timely_amount` — Set timely amount /timely\n`/slots` — Play slots\n"
+                            "`/blackjack` — Play blackjack\n`/gamble` — Play gamble\n`/wheel` — Spin wheel\n"
+                            "`/duel` — Start duel\n`/income channel` — Turn on/off income in channel\n"
+                            "`/income min_max_message` — Set income for message writing\n"
+                            "`/income min_max_voice` — Set income for being in voice chat\n"
+                            "`/income messages_per_income` — Set messages amount for income\n"
+                            "`/income voice_minutes` — Set voice minutes amount for income\n"
+                            "`/income role_add` — Add income to role per 12 hours\n"
+                            "`/income role_remove` — Remove role from income system",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006552600377839696/2623939ce6b6b5d3.gif"
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
-        elif self.values[0] == "Уровни":
+        elif self.values[0] == "Leveling":
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
-                title="🐉 Уровни",
-                description="`/level` — Узнать уровень\n`/add_exp` — Добавить опыт\n"
-                            "`/remove_exp` — Забрать опыт\n`/reset_level` — Сбросить уровень и опыт\n"
-                            "`/set level` — Установить уровень\n`/set min_max_exp` — Установить промежуток опыта\n"
-                            "`/set level_up_messages` — Вкл/выкл сообщения о повышении уровня",
+                title="🐉 Leveling",
+                description="`/level` — Send level card\n`/add_exp` — Add experience\n"
+                            "`/remove_exp` — Take experience\n`/reset_level` — Reset level and experience\n"
+                            "`/set level` — Set level to user\n`/set min_max_exp` — Set minimal and maximal "
+                            "experience gain\n "
+                            "`/set level_up_messages` — Turn on/off messages about level up",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006597709660172419/1.gif"
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
-        elif self.values[0] == "Любовь и свадьбы":
+        elif self.values[0] == "Love and marriage":
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
-                title="🤍 Любовь и свадьбы",
-                description="`/marry` — Отправить запрос на свадьбу\n`/loveprofile` — Профиль пары\n"
-                            "`/lovedescription` — Описание профиля пары\n`/lovedeposit` — Положить деньги на семейный "
-                            "счёт\n "
-                            "`/divorce` — Развод\n`/waifu` — Профиль вайфу\n"
-                            "`/like` — Указать пользователя который нравится",
+                title="🤍 Love and marriage",
+                description="`/marry` — Send marriage request\n`/loveprofile` — Couple profile\n"
+                            "`/lovedescription` — Set new description to couple profile\n`/lovedeposit` — Put money "
+                            "in family bank\n "
+                            "`/divorce` — Divorce\n`/waifu` — Waifu profile\n"
+                            "`/like` — Set user you like",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006598206966202368/Aduare-Pixel-Gif"
                     "-Pixel-Art-crusaders-quest-6050023.gif"
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
-        elif self.values[0] == "Приветствия и прощания":
+        elif self.values[0] == "Welcomers and Goodbyes":
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
-                title="👋 Приветствия и прощания",
-                description="`/set welcome_channel` — Установить канал приветствий\n`/set welcome_message_type` — "
-                            "Установить тип приветствий\n"
-                            "`/set welcome_message_state` — Включить/отключить приветствия\n`/set welcome_embed` — "
-                            "Настроить приветственный эмбед\n"
-                            "`/set goodbye_channel` — Установить канал прощаний\n`/set goodbye_message_type` — "
-                            "Установить тип прощаний\n"
-                            "/set goodbye_message_state — Включить/отключить приветствия\n/set goodbye_embed — "
-                            "Настроить прощальный эмбед",
+                title="👋 Welcomers and Goodbyes",
+                description="`/set welcome_channel` — Set welcome messages channel\n`/set welcome_message_type` — "
+                            "Set welcome messages type\n"
+                            "`/set welcome_message_state` — Turn on/off welcome messages\n`/set welcome_embed` — "
+                            "Change welcome embed message\n"
+                            "`/set goodbye_channel` — Set goodbye messages channel\n`/set goodbye_message_type` — "
+                            "Set goodbye messages type\n"
+                            "/set goodbye_message_state — Turn on/off goodbye messages\n/set goodbye_embed — "
+                            "Change goodbye embed message",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006598165358710784/Aduare-Pixel-Gif"
                     "-Pixel-Art--6117807.gif"
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
-        elif self.values[0] == "Эмоции, Реакции":
+        elif self.values[0] == "Emotions, reactions":
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
-                title="👋 Эмоции",
-                description="`/emotion kiss` — Поцеловать пользователя\n`/emotion hug` — Обнять пользователя\n"
-                            "`/emotion idk` — Не знаю\n`/emotion f` — Press F to pay respects\n"
-                            "`/emotion punch` — Ударить пользователя\n`/emotion cry` — Заплакать\n"
-                            "`/emotion bite` — Укусить пользователя\n`/emotion spank` — Отшлёпать пользователя\n"
-                            "`/emotion highfive` — Дать пять пользователю\n`/emotion pat` — Погладить пользователя\n"
-                            "`/emotion lick` — Лизнуть пользователя",
+                title="👋 Emotions",
+                description="`/emotion kiss` — Kiss user\n`/emotion hug` — Give a hug to user\n"
+                            "`/emotion idk` — I dont know\n`/emotion f` — Press F to pay respects\n"
+                            "`/emotion punch` — Punch user\n`/emotion cry` — Start crying\n"
+                            "`/emotion bite` — Bite user\n`/emotion spank` — Spank user\n"
+                            "`/emotion highfive` — Give a high-five to user\n`/emotion pat` — Pat user\n"
+                            "`/emotion lick` — Lick user",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006553773793083452/Aduare-artist"
                     "-Ganyu-Genshin-Impact-Genshin-Impact-7095755-min.gif"
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
-        elif self.values[0] == "Топы":
+        elif self.values[0] == "Leaderboards":
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
-                title="🏆 Топы",
+                title="🏆 Leaderboards",
                 description="`/leaderboard money` — Топ по деньгам\n`/leaderboard level` — Топ по уровням\n"
                             "`/leaderboard waifu` — Топ по общей стоимости вайфу(подаренных подарков)\n"
                             "`/leaderboard messages` — Топ по количеству сообщений\n"
@@ -228,22 +229,22 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006605404517716111/aduare-5star.gif"
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
-        elif self.values[0] == "Профили":
+        elif self.values[0] == "Profiles":
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
-                title="👤 Профили",
-                description="`/profile me` — Профиль\n"
-                            "`/profile description` — Установить описание профиля\n"
-                            "/`profile badges` — Отобразить достижения значков профиля",
+                title="👤 Profiles",
+                description="`/profile show` — Show profile card\n"
+                            "`/profile description` — Set profile description\n"
+                            "/`profile badges` — Show achievements of badges on your profile",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006604685257482373/yae-miko-onsen_1.gif"
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
-        elif self.values[0] == "Благодарности за нитро буст(alpha)":
+        elif self.values[0] == "Thanks for Nitro Boost":
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
-                title="💎 Благодарности за нитро буст(alpha)",
+                title="💎 Thanks for Nitro Boost",
                 description="`/set nitro_channel` — Установить канал Благодарности за нитро буст\n`/set nitro_embed` "
                             "— Установить нитро сообщение\n "
                             "`/set nitro_messages_state` — Включить/отключить благодарности за буст",
@@ -253,10 +254,10 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                     "-Pixel-Gif-Pixel-Art-6691638.gif "
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
-        elif self.values[0] == "Тикеты":
+        elif self.values[0] == "Tickets":
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
-                title="🎟️ Тикеты",
+                title="🎟️ Tickets",
                 description="`/setup_tickets` — Установить каналы и категории тикетов\n`/set ticket_category` — "
                             "Установить категорию для тикетов\n/set ticket_archive — Установить категорию - архив для "
                             "тикетов\n "
@@ -267,32 +268,32 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                     "-Pixel-Gif-Pixel-Art-6151675.gif "
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
-        elif self.values[0] == "Логи, Логирование событий":
+        elif self.values[0] == "Logs, events logging":
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
-                title="📄 Логи, Логирование событий",
-                description="`/set logging_channel` — Установить канал для логов\n"
-                            "`/set logging_state` — Включить/выключить логирование",
+                title="📄 Logs, events logging",
+                description="`/set logging_channel` — Set logging channel\n"
+                            "`/set logging_state` — Turn on/off logging on your server",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006608424043298836/ezgif-4-ac0c7ef452.gif"
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
-        elif self.values[0] == "Статистика":
+        elif self.values[0] == "Statistics":
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
-                title="📈 Статистика",
-                description="`/online` — Посмотреть онлайн в голосовых\n"
-                            "`/messages_counter` — Узнать количество сообщений",
+                title="📈 Statistics",
+                description="`/online` — Check your online in voice channels\n"
+                            "`/messages_counter` — Check your message counter",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006609404428308560/swire-arknights.gif"
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
-        elif self.values[0] == "Локализации":
+        elif self.values[0] == "Localisations":
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
-                title="📙 Локализации",
+                title="📙 Localisations",
                 description="`/set locale` — Установить язык ответа",
             )
             embed.set_image(
@@ -300,12 +301,12 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                     "-Pixel-Art-Last-Origin-6066260.gif "
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
-        elif self.values[0] == "Автороли":
+        elif self.values[0] == "Autoroles":
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
-                title="⚙️ Автороли",
-                description="`/set autorole` — Установить автороль на входе\n`/set autoroles_state` — "
-                            "Включает/выключает автороли ",
+                title="⚙️ Autoroles",
+                description="`/set autorole` — Set autorole on server enter\n`/set autoroles_state` — "
+                            "Enable/Disable autoroles ",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006610055589793862/Genshin-Impact-Ero"
