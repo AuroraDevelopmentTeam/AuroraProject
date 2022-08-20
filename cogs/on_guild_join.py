@@ -43,6 +43,7 @@ from core.loggers.create import create_loggers_table
 from core.loggers.writers import write_in_loggers_standart_values
 from core.tickets.create import create_tickets_config_table
 from core.tickets.writers import write_in_tickets_config_standart_values
+from core.auto.roles.create import create_reaction_autorole_table
 
 
 class OnGuildListener(commands.Cog):

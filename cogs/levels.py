@@ -30,6 +30,7 @@ from core.errors import (
     construct_error_negative_value_embed,
     construct_error_bot_user_embed,
 )
+from core.auto.roles.getters import check_level_autorole, get_server_level_autorole
 
 
 class Levels(commands.Cog):
@@ -52,6 +53,11 @@ class Levels(commands.Cog):
         elif self.level_up(message.guild.id, message.author.id):
             update_user_level(message.guild.id, message.author.id, 1)
             set_user_exp_to_zero(message.guild.id, message.author.id)
+            user_level = get_user_level(message.guild.id, message.author.id)
+            if check_level_autorole(message.guild.id, user_level) is True:
+                role = get_server_level_autorole(message.guild.id, user_level)
+                role = nextcord.utils.get(channel.guild.roles, id=role)
+                await message.author.add_roles(role)
             if get_guild_messages_state(message.guild.id) is True:
                 user_level = get_user_level(message.guild.id, message.author.id)
                 msg = get_msg_from_locale_by_key(message.guild.id, "level_up")
@@ -189,6 +195,10 @@ class Levels(commands.Cog):
                 update_user_exp(interaction.guild.id, interaction.user.id, -leveling_formula, -leveling_formula)
                 update_user_level(interaction.guild.id, interaction.user.id, 1)
                 user_level = get_user_level(interaction.guild.id, user.id)
+                if check_level_autorole(interaction.guild.id, user_level) is True:
+                    role = get_server_level_autorole(interaction.guild.id, user_level)
+                    role = nextcord.utils.get(interaction.guild.roles, id=role)
+                    await user.add_roles(role)
                 leveling_formula = round((7 * (user_level ** 2)) + 58)
         msg = get_msg_from_locale_by_key(
             interaction.guild.id, interaction.application_command.name

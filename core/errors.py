@@ -17,6 +17,14 @@ def construct_error_http_exception_embed(
     return embed
 
 
+def construct_error_not_found_embed(
+    description: str, icon: Asset
+) -> nextcord.Embed:
+    embed = construct_error_embed(description)
+    embed.set_footer(icon_url=icon, text=f"error: NOT FOUND\n discord #404")
+    return embed
+
+
 def construct_error_limit_break_embed(description: str, icon: Asset) -> nextcord.Embed:
     embed = construct_error_embed(description)
     embed.set_footer(

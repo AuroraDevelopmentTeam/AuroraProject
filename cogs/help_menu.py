@@ -220,7 +220,7 @@ class HelpSelectMenuENG(nextcord.ui.Select):
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
                 title="🏆 Leaderboards",
-                description="`/leaderboard money` — Топ по деньгам\n`/leaderboard level` — Топ по уровням\n"
+                description="`/leaderboard money` — Money leaderboard\n`/leaderboard level` — Levels leaderboard\n"
                             "`/leaderboard waifu` — Топ по общей стоимости вайфу(подаренных подарков)\n"
                             "`/leaderboard messages` — Топ по количеству сообщений\n"
                             "`/leaderboard voice` — Топ по времени в голосовых каналах",
@@ -258,10 +258,10 @@ class HelpSelectMenuENG(nextcord.ui.Select):
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
                 title="🎟️ Tickets",
-                description="`/setup_tickets` — Установить каналы и категории тикетов\n`/set ticket_category` — "
-                            "Установить категорию для тикетов\n/set ticket_archive — Установить категорию - архив для "
-                            "тикетов\n "
-                            "`/set ticket_support` — Установить роль модератора тикетов",
+                description="`/setup_tickets` — Setup tickets\n`/set ticket_category` — "
+                            "Set category channel for tickets\n/set ticket_archive — Set archive category for "
+                            "tickets\n "
+                            "`/set ticket_support` — Set role for ticket moderator",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006598165878820979/Aduare-artist"
@@ -294,7 +294,7 @@ class HelpSelectMenuENG(nextcord.ui.Select):
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
                 title="📙 Localisations",
-                description="`/set locale` — Установить язык ответа",
+                description="`/set locale` — Set new answer language",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006610072861937744/Aduare-Pixel-Gif"
@@ -305,8 +305,13 @@ class HelpSelectMenuENG(nextcord.ui.Select):
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
                 title="⚙️ Autoroles",
-                description="`/set autorole` — Set autorole on server enter\n`/set autoroles_state` — "
-                            "Enable/Disable autoroles ",
+                description="`/autorole on_enter` — Установить автороль на входе\n`/autorole enable` — "
+                            "Включает/выключает автороли\n`/autorole add_for_level` — Добавить автороль за уровень\n"
+                            "`/autorole remove_for_level` — Убрать автороль за уровень\n"
+                            "`/autorole display_for_level` — Показать все автороли за уровень\n"
+                            "`/autorole add_on_reaction` — Добавить автороль за реакцию на сообщение\n"
+                            "`/autorole remove_on_reaction` — Убрать автороль за реакцию на сообщение\n"
+                            "`/autorole display_on_reaction` — Показать все автороли за реакции на сообщение",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006610055589793862/Genshin-Impact-Ero"
@@ -602,8 +607,13 @@ class HelpSelectMenuRU(nextcord.ui.Select):
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
                 title="⚙️ Автороли",
-                description="`/set autorole` — Установить автороль на входе\n`/set autoroles_state` — "
-                            "Включает/выключает автороли ",
+                description="`/autorole on_enter` — Установить автороль на входе\n`/autorole enable` — "
+                            "Включает/выключает автороли\n`/autorole add_for_level` — Добавить автороль за уровень\n"
+                            "`/autorole remove_for_level` — Убрать автороль за уровень\n"
+                            "`/autorole display_for_level` — Показать все автороли за уровень\n"
+                            "`/autorole add_on_reaction` — Добавить автороль за реакцию на сообщение\n"
+                            "`/autorole remove_on_reaction` — Убрать автороль за реакцию на сообщение\n"
+                            "`/autorole display_on_reaction` — Показать все автороли за реакции на сообщение",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006610055589793862/Genshin-Impact-Ero"

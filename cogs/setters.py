@@ -35,7 +35,6 @@ from core.welcomers.updaters import (
     update_welcome_message_type,
     set_welcome_message_state,
 )
-from core.auto.roles.updaters import set_autoroles_state, update_autorole
 from core.goodbyes.updaters import (
     set_goodbye_channel,
     update_goodbye_message_description,
@@ -429,22 +428,41 @@ class Setters(commands.Cog):
         channel: str
             Channel to
         """
-        if isinstance(channel, GuildChannel):
-            set_welcome_channel(interaction.guild.id, channel.id)
-            message = get_msg_from_locale_by_key(
-                interaction.guild.id, f"set_{interaction.application_command.name}"
-            )
-            requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-            await interaction.response.send_message(
-                embed=construct_basic_embed(
-                    interaction.application_command.name,
-                    f"{message} __**{channel}**__",
-                    f"{requested} {interaction.user}",
-                    interaction.user.display_avatar, interaction.guild.id
+        try:
+            if isinstance(channel, nextcord.TextChannel):
+                set_welcome_channel(interaction.guild.id, channel.id)
+                message = get_msg_from_locale_by_key(
+                    interaction.guild.id, f"set_{interaction.application_command.name}"
+                )
+                requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+                await interaction.response.send_message(
+                    embed=construct_basic_embed(
+                        interaction.application_command.name,
+                        f"{message} __**{channel}**__",
+                        f"{requested} {interaction.user}",
+                        interaction.user.display_avatar, interaction.guild.id
+                    )
+                )
+            else:
+                return await interaction.response.send_message(
+                    embed=construct_error_negative_value_embed(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "negative_value_error"
+                        ),
+                        self.client.user.avatar.url,
+                        channel,
+                    )
+                )
+        except AttributeError:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    channel,
                 )
             )
-        else:
-            await interaction.response.send_message("error")
 
     @__set.subcommand(
         name="welcome_embed", description="Setting server's welcoming message embed",
@@ -526,67 +544,6 @@ class Setters(commands.Cog):
             embed=construct_basic_embed(
                 interaction.application_command.name,
                 f"{message} **{welcome_message_state}**",
-                f"{requested} {interaction.user}",
-                interaction.user.display_avatar, interaction.guild.id
-            )
-        )
-
-    @__set.subcommand(
-        name="autoroles_state",
-        description="Turn on or turn off autoroles for new guests of server",
-        name_localizations=get_localized_name("set_autoroles_state"),
-        description_localizations=get_localized_description("set_autoroles_state"),
-    )
-    async def __autoroles_state_set(
-            self,
-            interaction: Interaction,
-            autoroles_state: int = SlashOption(
-                name="picker", choices={"turn on": 1, "turn off": 0}, required=True
-            ),
-    ):
-        autoroles_state = bool(autoroles_state)
-        set_autoroles_state(interaction.guild.id, autoroles_state)
-        message = get_msg_from_locale_by_key(
-            interaction.guild.id, f"set_{interaction.application_command.name}"
-        )
-        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-        if autoroles_state is True:
-            autoroles_state = get_msg_from_locale_by_key(
-                interaction.guild.id, "enabled"
-            )
-        else:
-            autoroles_state = get_msg_from_locale_by_key(
-                interaction.guild.id, "disabled"
-            )
-        await interaction.response.send_message(
-            embed=construct_basic_embed(
-                interaction.application_command.name,
-                f"{message} **{autoroles_state}**",
-                f"{requested} {interaction.user}",
-                interaction.user.display_avatar, interaction.guild.id
-            )
-        )
-
-    @__set.subcommand(
-        name="autorole",
-        description="Turn on or turn off autoroles for new guests of server",
-        name_localizations=get_localized_name("set_autorole"),
-        description_localizations=get_localized_description("set_autorole"),
-    )
-    async def __autorole_set(
-            self,
-            interaction: Interaction,
-            role: Optional[nextcord.Role] = SlashOption(required=True),
-    ):
-        update_autorole(interaction.guild.id, role.id)
-        message = get_msg_from_locale_by_key(
-            interaction.guild.id, f"set_{interaction.application_command.name}"
-        )
-        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-        await interaction.response.send_message(
-            embed=construct_basic_embed(
-                interaction.application_command.name,
-                f"{message} **{role.mention}**",
                 f"{requested} {interaction.user}",
                 interaction.user.display_avatar, interaction.guild.id
             )

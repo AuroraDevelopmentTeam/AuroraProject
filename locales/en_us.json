@@ -166,16 +166,16 @@
     "disabled": {
       "msg": "disabled"
     },
-    "set_autoroles_state": {
+    "autorole_enable": {
       "msg": "State of autoroles on server now is:",
-      "name": "autoroles_state",
+      "name": "enable",
       "description": "Turn on or turn off autoroles for new guests of server"
     },
     "on_balance": {
       "msg": "Balance now:"
     },
-    "set_autorole": {
-      "name": "autorole",
+    "autorole_on_enter": {
+      "name": "on_enter",
       "description": "Set autorole for new guests of server",
       "msg": "Now this role will be given on server enter:"
     },
@@ -707,5 +707,58 @@
     },
     "rate_limit": {
       "msg": "Command right now is on cooldown!\nPlease retry after: "
+    },
+    "not_found_error": {
+      "msg": "In process of command execution raised exception because i can't find indicated by you object.\nYour command failed to successfully complete."
+    },
+    "BotMissingPermissions": {
+      "msg": "Aurora is missing some permissions to run this command"
+    },
+    "TimeoutError": {
+      "msg": "Time gived for command execution is over, try again"
+    },
+    "autorole": {
+      "name": "autorole",
+      "description": "Autorole commands section prefix"
+    },
+    "autorole_add_on_reaction": {
+      "name": "add_on_reaction",
+      "description": "Add new autorole on reaction to message",
+      "msg": "On indicated emoji reaction"
+    },
+    "autorole_add_on_reaction_2": {
+      "msg": "now will be given next role automatically:"
+    },
+    "autorole_remove_on_reaction": {
+      "name": "remove_on_reaction",
+      "description": "Remove autorole on reaction",
+      "msg": "This role removed from automatically role giving:"
+    },
+    "autorole_display_on_reaction": {
+      "name": "display_on_reaction",
+      "description": "Show all autoroles that must be given automatically"
+    },
+    "autorole_add_for_level": {
+      "name": "add_for_level",
+      "description": "Add new autorole on level gain",
+      "msg": "On level"
+    },
+    "autorole_add_for_level_2": {
+      "msg": "now will be given next role automatically:"
+    },
+    "autorole_remove_for_level": {
+      "name": "remove_for_level",
+      "description": "Remove autorole on level gain",
+      "msg": "Removed from automatical role giving system role on level"
+    },
+    "autorole_display_for_level": {
+      "name": "display_for_level",
+      "description": "Send list of autoroles for level"
+    },
+    "react_here": {
+      "msg": "React with emoji you want users to react for getting role on this message, i will attach it to message with id specified by you and will give and take role on reaction."
+    },
+    "no_in_table": {
+      "msg": "In Database there are no specified by you object to delete!"
     }
 }

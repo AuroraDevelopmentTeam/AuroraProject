@@ -161,7 +161,8 @@ class MyEmbedDescriptionPageSource(menus.ListPageSource):
 
     async def format_page(self, menu, entries):
         embed = Embed(
-            title=f"{SHOP} {localize_name(self.guild_id, 'shop').capitalize()}", description="\n".join(entries), color=DEFAULT_BOT_COLOR
+            title=f"{SHOP} {localize_name(self.guild_id, 'shop').capitalize()}", description="\n".join(entries),
+            color=DEFAULT_BOT_COLOR
         )
         embed.set_footer(text=f"{menu.current_page + 1}/{self.get_max_pages()}")
         return embed

@@ -3,7 +3,8 @@ easy-pil>=0.1.6
 fonttools>=4.33.3
 nextcord>=2.0.0
 nextcord-ext-menus
-python-dotenv
+python-dotenv~=0.20.0
 function-cooldowns
-humanfriendly
-psutil
+humanfriendly~=10.0
+psutil~=5.9.1
+emoji~=2.0.0

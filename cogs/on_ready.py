@@ -44,6 +44,7 @@ from core.loggers.create import create_loggers_table
 from core.loggers.writers import write_in_loggers_standart_values
 from core.tickets.create import create_tickets_config_table
 from core.tickets.writers import write_in_tickets_config_standart_values
+from core.auto.roles.create import create_reaction_autorole_table, create_level_autorole_table
 
 
 class OnReadyListener(commands.Cog):
@@ -93,6 +94,8 @@ class OnReadyListener(commands.Cog):
         create_chat_money_config_table()
         write_in_chat_money_standart_values(guilds)
         create_money_channels_config_table()
+        create_reaction_autorole_table()
+        create_level_autorole_table()
         print(len(self.client.guilds))
         members = 0
         for guild in self.client.guilds:
