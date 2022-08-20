@@ -10,6 +10,7 @@ from core.locales.getters import (
     get_localized_name,
     get_localized_description,
     get_msg_from_locale_by_key,
+    get_guild_locale
 )
 from core.games.blackjack import (
     Hand,
@@ -45,7 +46,7 @@ from core.games.wheel import (
     get_direction,
 )
 from core.ui.buttons import create_button, ViewAuthorCheck
-from core.locales.getters import get_msg_from_locale_by_key
+from core.locales.getters import get_msg_from_locale_by_key, localize_name
 from core.money.updaters import update_user_balance
 from core.money.getters import get_user_balance, get_guild_currency_symbol
 from core.errors import construct_error_negative_value_embed, construct_error_not_enough_embed
@@ -57,7 +58,7 @@ MULTIPLIERS_FOR_TWO_ROWS = [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]
 MULTIPLIERS_FOR_THREE_ROWS = [2.0, 2.1, 2.2, 2.3, 2.4, 2.5]
 
 
-class DuelEnd(nextcord.ui.View):
+class DuelEndRu(nextcord.ui.View):
     def __init__(self):
         super().__init__()
 
@@ -70,7 +71,7 @@ class DuelEnd(nextcord.ui.View):
         pass
 
 
-class DuelStart(nextcord.ui.View):
+class DuelStartRu(nextcord.ui.View):
     def __init__(self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int]):
         self.author = author
         self.bet = bet
@@ -107,7 +108,60 @@ class DuelStart(nextcord.ui.View):
         balance = get_user_balance(interaction.guild.id, who_win.id)
         msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
         embed.set_footer(text=f"{msg} {balance}", icon_url=who_win.display_avatar)
-        await interaction.message.edit(embed=embed, view=DuelEnd())
+        await interaction.message.edit(embed=embed, view=DuelEndRu())
+
+
+class DuelEndEng(nextcord.ui.View):
+    def __init__(self):
+        super().__init__()
+
+    @nextcord.ui.button(
+        label="Duel",
+        style=nextcord.ButtonStyle.red,
+        disabled=True,
+    )
+    async def duel_start(self, button: nextcord.ui.Button, interaction: Interaction):
+        pass
+
+
+class DuelStartEng(nextcord.ui.View):
+    def __init__(self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int]):
+        self.author = author
+        self.bet = bet
+        super().__init__()
+
+    async def interaction_check(self, interaction: Interaction) -> bool:
+        if interaction.user == self.author:
+            return False
+        if get_user_balance(interaction.guild.id, interaction.user.id) < self.bet:
+            return False
+        return True
+
+    @nextcord.ui.button(
+        label="Duel",
+        style=nextcord.ButtonStyle.red,
+        disabled=False,
+    )
+    async def duel_start(self, button: nextcord.ui.Button, interaction: Interaction):
+        author = self.author
+        user = interaction.user
+        who_win = random.choice([author, user])
+        if who_win == author:
+            losed = user
+        else:
+            losed = author
+        currency = get_guild_currency_symbol(interaction.guild.id)
+        embed = nextcord.Embed(
+            title=f"{SWORD} Duel",
+            description=f'In duel **won** {who_win.mention} and this user get **{self.bet}** {currency}',
+            color=DEFAULT_BOT_COLOR
+        )
+        update_user_balance(interaction.guild.id, who_win.id, self.bet)
+        update_user_balance(interaction.guild.id, losed.id, -self.bet)
+        balance = get_user_balance(interaction.guild.id, who_win.id)
+        msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+        embed.set_footer(text=f"{msg} {balance}", icon_url=who_win.display_avatar)
+        await interaction.message.edit(embed=embed, view=DuelEndEng())
 
 
 class Games(commands.Cog):
@@ -642,15 +696,19 @@ class Games(commands.Cog):
                 )
             )
         embed = nextcord.Embed(
-            title=f"{SWORD} Дуэль",
-            description=f"{interaction.user.mention} начинает поиск соперника для дуэли! Ставка **{bet}** "
+            title=f"{SWORD} {localize_name(interaction.guild.id, 'duel').capitalize()}",
+            description=f"{interaction.user.mention} {get_msg_from_locale_by_key(interaction.guild.id, 'duel')} **{bet}** "
                         f"{get_guild_currency_symbol(interaction.guild.id)}",
             color=DEFAULT_BOT_COLOR
         )
-
-        await interaction.response.send_message(
-            embed=embed, view=DuelStart(interaction.user, bet)
-        )
+        if get_guild_locale(interaction.guild.id) == 'ru_ru':
+            await interaction.response.send_message(
+                embed=embed, view=DuelStartRu(interaction.user, bet)
+            )
+        else:
+            await interaction.response.send_message(
+                embed=embed, view=DuelStartEng(interaction.user, bet)
+            )
 
 
 def setup(client):

@@ -4,21 +4,23 @@ from nextcord import Interaction, Permissions, SlashOption
 
 from core.embeds import construct_top_embed
 from core.money.getters import get_guild_currency_symbol
-from core.locales.getters import get_msg_from_locale_by_key
+from core.locales.getters import get_msg_from_locale_by_key, get_guild_locale, \
+    get_localized_name, get_localized_description
 from core.tickets.getters import (
     get_ticket_archive,
     get_ticket_category,
     get_ticket_support,
 )
 from core.tickets.updaters import update_ticket_archive, update_ticket_category
+from core.embeds import DEFAULT_BOT_COLOR
 
 
-class TicketDisabled(nextcord.ui.View):
+class TicketDisabledEng(nextcord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
     @nextcord.ui.button(
-        label="Закрыть тикет",
+        label="Close ticket",
         style=nextcord.ButtonStyle.red,
         custom_id="ticket_settings:red",
         disabled=True,
@@ -27,12 +29,12 @@ class TicketDisabled(nextcord.ui.View):
         pass
 
 
-class TicketSettings(nextcord.ui.View):
+class TicketSettingsEng(nextcord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
     @nextcord.ui.button(
-        label="Закрыть тикет",
+        label="Close ticket",
         style=nextcord.ButtonStyle.red,
         custom_id="ticket_settings:red",
         disabled=False,
@@ -41,12 +43,53 @@ class TicketSettings(nextcord.ui.View):
         pass
 
 
-class CreateTicket(nextcord.ui.View):
+class CreateTicketEng(nextcord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
     @nextcord.ui.button(
-        label="Создать тикет",
+        label="Create a ticket",
+        style=nextcord.ButtonStyle.blurple,
+        custom_id="create_ticket:blurple",
+    )
+    async def create_ticket(self, button: nextcord.ui.Button, interaction: Interaction):
+        pass
+
+
+class TicketDisabledRu(nextcord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @nextcord.ui.button(
+        label="Создать Тикет",
+        style=nextcord.ButtonStyle.red,
+        custom_id="ticket_settings:red",
+        disabled=True,
+    )
+    async def close_ticket(self, button: nextcord.ui.Button, interaction: Interaction):
+        pass
+
+
+class TicketSettingsRu(nextcord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @nextcord.ui.button(
+        label="Закрыть Тикет",
+        style=nextcord.ButtonStyle.red,
+        custom_id="ticket_settings:red",
+        disabled=False,
+    )
+    async def close_ticket(self, button: nextcord.ui.Button, interaction: Interaction):
+        pass
+
+
+class CreateTicketRu(nextcord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @nextcord.ui.button(
+        label="Создать Тикет",
         style=nextcord.ButtonStyle.blurple,
         custom_id="create_ticket:blurple",
     )
@@ -70,10 +113,15 @@ class Tickets(commands.Cog):
         try:
             custom_id = interaction.data["custom_id"]
             if custom_id == "create_ticket:blurple":
-                await interaction.response.defer()
+                try:
+                    await interaction.response.defer()
+                except:
+                    pass
                 if get_ticket_category(interaction.guild.id) == 0:
                     return
-                embed = nextcord.Embed(title="Тикет", description=f"Тикет создаётся...")
+                embed = nextcord.Embed(title=get_msg_from_locale_by_key(interaction.guild.id, "ticket"),
+                                       description=get_msg_from_locale_by_key(interaction.guild.id, "ticket_creating"),
+                                       color=DEFAULT_BOT_COLOR)
                 msg = await interaction.followup.send(embed=embed, ephemeral=True)
                 support_role = nextcord.utils.get(
                     interaction.guild.roles, id=get_ticket_support(interaction.guild.id)
@@ -93,19 +141,25 @@ class Tickets(commands.Cog):
                     f"{interaction.user.name}-ticket", overwrites=overwrites
                 )
                 embed = nextcord.Embed(
-                    title="Ticket",
-                    description=f"Ваш тикет был создан! Кликните сюда: {channel.mention}",
+                    title=get_msg_from_locale_by_key(interaction.guild.id, "ticket"),
+                    description=f"{get_msg_from_locale_by_key(interaction.guild.id, 'ticket_now_is_created')} "
+                                f"{channel.mention}", color=DEFAULT_BOT_COLOR
                 )
                 await msg.edit(embed=embed)
                 embed = nextcord.Embed(
-                    title="Тикет",
-                    description=f"{interaction.user.mention} создал тикет!",
+                    title=get_msg_from_locale_by_key(interaction.guild.id, "ticket"),
+                    description=f"{interaction.user.mention} "
+                                f"{get_msg_from_locale_by_key(interaction.guild.id, 'created_ticket')}",
+                    color=DEFAULT_BOT_COLOR
                 )
-                await channel.send(embed=embed, view=TicketSettings())
+                if get_guild_locale(interaction.guild.id) == 'ru_ru':
+                    await channel.send(embed=embed, view=TicketSettingsRu())
+                else:
+                    await channel.send(embed=embed, view=TicketSettingsEng())
             if custom_id == "ticket_settings:red":
                 if get_ticket_archive(interaction.guild.id) == 0:
                     return
-                await interaction.channel.send("Закрываю тикет...")
+                await interaction.channel.send(get_msg_from_locale_by_key(interaction.guild.id, "ticket_closing"))
                 archive_channel = get_ticket_archive(interaction.guild.id)
                 category_channel = nextcord.utils.get(
                     interaction.guild.categories, id=archive_channel
@@ -115,9 +169,12 @@ class Tickets(commands.Cog):
                         read_messages=False
                     )
                 }
-                await interaction.user.send(f"Тикет закрыт!")
-                await interaction.message.edit(view=TicketDisabled())
-                await interaction.channel.send(f"Тикет закрыт!")
+                await interaction.user.send(f"{get_msg_from_locale_by_key(interaction.guild.id, 'ticket_closed')}")
+                if get_guild_locale(interaction.guild.id) == 'ru_ru':
+                    await interaction.message.edit(view=TicketDisabledRu())
+                else:
+                    await interaction.message.edit(view=TicketDisabledEng())
+                await interaction.channel.send(f"{get_msg_from_locale_by_key(interaction.guild.id, 'ticket_closed')}")
                 await interaction.channel.edit(
                     category=category_channel,
                     overwrites=overwrites,
@@ -127,7 +184,10 @@ class Tickets(commands.Cog):
             pass
 
     @nextcord.slash_command(
-        name="setup_tickets", default_member_permissions=Permissions(administrator=True)
+        name="setup_tickets",
+        name_localizations=get_localized_name("setup_tickets"),
+        description_localizations=get_localized_description("setup_tickets"),
+        default_member_permissions=Permissions(administrator=True)
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __setup_tickets(
@@ -137,11 +197,11 @@ class Tickets(commands.Cog):
             name="picker", choices={"auto": "auto", "self": "self"}, required=True
         ),
     ):
+        await interaction.response.defer()
         embed = nextcord.Embed(
-            title="Создание тикетов",
-            description="Нажмите `создать тикет` кнопку, чтобы создать тикет. "
-            "Стафф сервера получит уведомление и постарается решить вашу проблему/рассмотреть идею, "
-            "предложение сразу, как сможет.",
+            title=get_msg_from_locale_by_key(interaction.guild.id, "create_ticket"),
+            description=get_msg_from_locale_by_key(interaction.guild.id, "ticket_desc"),
+            color=DEFAULT_BOT_COLOR
         )
         if create_mode == "auto":
             overwrites = {
@@ -158,7 +218,10 @@ class Tickets(commands.Cog):
                 name="Aurora-Archive", overwrites=overwrites
             )
             update_ticket_archive(interaction.guild.id, archive_category.id)
-        await interaction.response.send_message(embed=embed, view=CreateTicket())
+        if get_guild_locale(interaction.guild.id) == 'ru_ru':
+            await interaction.followup.send(embed=embed, view=CreateTicketRu())
+        else:
+            await interaction.followup.send(embed=embed, view=CreateTicketEng())
 
 
 def setup(client):

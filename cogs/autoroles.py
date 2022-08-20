@@ -129,6 +129,7 @@ class Autorole(commands.Cog):
         description_localizations=get_localized_description("autorole"),
         default_member_permissions=Permissions(administrator=True),
     )
+    @application_checks.has_permissions(manage_guild=True)
     async def __autorole(self, interaction: Interaction):
         pass
 

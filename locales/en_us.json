@@ -668,7 +668,8 @@
     },
     "duel": {
       "name": "duel",
-      "description": "Start duel with this bet and wait for your enemy!"
+      "description": "Start duel with this bet and wait for your enemy!",
+      "msg": "start searching enemy for duel! Bet of duel is"
     },
     "mutes": {
       "name": "mutes",
@@ -760,5 +761,39 @@
     },
     "no_in_table": {
       "msg": "In Database there are no specified by you object to delete!"
+    },
+    "close_ticket": {
+      "msg": "Close ticket"
+    },
+    "create_ticket": {
+      "msg": "Create ticket"
+    },
+    "ticket": {
+      "msg": "Ticket"
+    },
+    "ticket_creating": {
+      "msg": "Ticket is in process of creating..."
+    },
+    "ticket_closing": {
+      "msg": "Ticket is in process of closing..."
+    },
+    "ticket_now_is_created": {
+      "msg": "Your ticket has been created, click here:"
+    },
+    "created_ticket": {
+      "msg": "Created a ticket!"
+    },
+    "ticket_main_title": {
+      "msg": "Create a ticket"
+    },
+    "ticket_desc": {
+      "msg": "Click `create ticket` button, to create a ticket. Server's stuff will be notified and will try their best in solving your problem/answering on your suggestion as soon as they will have opportunity to answer you"
+    },
+    "ticket_closed": {
+      "msg": "Ticket closed!"
+    },
+    "setup_tickets": {
+      "name": "setup_tickets",
+      "description": "Setup tickets system on your server"
     }
 }

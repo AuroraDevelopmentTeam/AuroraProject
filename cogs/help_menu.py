@@ -221,9 +221,9 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 color=DEFAULT_BOT_COLOR,
                 title="🏆 Leaderboards",
                 description="`/leaderboard money` — Money leaderboard\n`/leaderboard level` — Levels leaderboard\n"
-                            "`/leaderboard waifu` — Топ по общей стоимости вайфу(подаренных подарков)\n"
-                            "`/leaderboard messages` — Топ по количеству сообщений\n"
-                            "`/leaderboard voice` — Топ по времени в голосовых каналах",
+                            "`/leaderboard waifu` — Leaderboard by your waifu price\n"
+                            "`/leaderboard messages` — Leaderboard by messages count\n"
+                            "`/leaderboard voice` — Leaderboard by spent time in voice channels",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006605404517716111/aduare-5star.gif"
@@ -245,9 +245,9 @@ class HelpSelectMenuENG(nextcord.ui.Select):
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
                 title="💎 Thanks for Nitro Boost",
-                description="`/set nitro_channel` — Установить канал Благодарности за нитро буст\n`/set nitro_embed` "
-                            "— Установить нитро сообщение\n "
-                            "`/set nitro_messages_state` — Включить/отключить благодарности за буст",
+                description="`/set nitro_channel` — Set channel to send respect and thanks on nitro boost\n`/set nitro_embed` "
+                            "— Edit on nitro message\n "
+                            "`/set nitro_messages_state` — Turn on or turn off nitro boost messages",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006607576181506048/Aduare-artist"
@@ -305,13 +305,13 @@ class HelpSelectMenuENG(nextcord.ui.Select):
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
                 title="⚙️ Autoroles",
-                description="`/autorole on_enter` — Установить автороль на входе\n`/autorole enable` — "
-                            "Включает/выключает автороли\n`/autorole add_for_level` — Добавить автороль за уровень\n"
-                            "`/autorole remove_for_level` — Убрать автороль за уровень\n"
-                            "`/autorole display_for_level` — Показать все автороли за уровень\n"
-                            "`/autorole add_on_reaction` — Добавить автороль за реакцию на сообщение\n"
-                            "`/autorole remove_on_reaction` — Убрать автороль за реакцию на сообщение\n"
-                            "`/autorole display_on_reaction` — Показать все автороли за реакции на сообщение",
+                description="`/autorole on_enter` — Set new autorole on server enter\n`/autorole enable` — "
+                            "Turn on/off autoroles system\n`/autorole add_for_level` — Add autorole for level\n"
+                            "`/autorole remove_for_level` — Remove autorole for level\n"
+                            "`/autorole display_for_level` — Show all autoroles for level\n"
+                            "`/autorole add_on_reaction` — Add autorole for reaction on message\n"
+                            "`/autorole remove_on_reaction` — Remove autorole for reaction on message\n"
+                            "`/autorole display_on_reaction` — Show all autoroles for reaction on message",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006610055589793862/Genshin-Impact-Ero"

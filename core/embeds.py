@@ -25,8 +25,7 @@ def construct_basic_embed(
             name = name.capitalize()
     except Exception as error:
         name = name
-        print(error)
-    name = name.capitalize()
+        name = name.capitalize()
     name = name.replace("_", " ")
     embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
     embed.add_field(name=name, value=value)
@@ -168,8 +167,7 @@ def construct_log(
     if channel_after is not None:
         embed.add_field(
             name="After",
-            value=f"``{channel_after.name}``, {channel_after.mention}\n"
-            f"Changed roles: {channel_after.changed_roles} ",
+            value=f"``{channel_after.name}``, {channel_after.mention}",
             inline=True,
         )
     embed.set_footer(text=f"{guild.name}\nAURORA", icon_url=guild.icon)
