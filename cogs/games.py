@@ -27,10 +27,6 @@ from core.games.blackjack import (
     create_game_start_blackjack_embed,
 )
 from core.games.slots import check_win_get_multiplier, spin_slots, create_slots_embed
-from core.games.brick_knife_evidence_yandere_tentacles import (
-    create_starting_embed,
-    create_starting_view,
-)
 from core.games.gamble import (
     perform_strikes,
     compare_strikes,
@@ -517,20 +513,6 @@ class Games(commands.Cog):
                 game_state,
             )
             await interaction.response.send_message(embed=embed)
-
-    @commands.is_owner()
-    @nextcord.slash_command(
-        name="brick_knife_evidence_yandere",
-        default_member_permissions=Permissions(),
-    )
-    async def __brick_knife_evidence_yandere_tentacles(self, interaction: Interaction):
-        await interaction.response.defer()
-        embed = create_starting_embed(
-            "Brick Knife Evidence Yandere Tentacles",
-            "Pick 1 of 5 options and see that's will happen",
-        )
-        view = create_starting_view()
-        await interaction.followup.send(embed=embed, view=view)
 
     @nextcord.slash_command(
         name="gamble",

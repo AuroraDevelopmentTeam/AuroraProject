@@ -94,6 +94,11 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 description="Help menu 'Autoroles' section",
                 emoji="⚙️",
             ),
+            nextcord.SelectOption(
+                label="Funny",
+                description="Help menu 'Autoroles' section",
+                emoji="😊",
+            ),
         ]
         super().__init__(
             placeholder="Choose section commands you want to view",
@@ -200,7 +205,7 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                     "-Pixel-Art--6117807.gif"
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
-        elif self.values[0] == "Emotions, reactions":
+        elif self.values[0] == "Emotions, Reactions":
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
                 title="👋 Emotions",
@@ -318,6 +323,24 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                     "-Genshin-Impact--Hu-Tao-Genshin-Impact-6593150.gif "
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
+        elif self.values[0] == "Funny":
+            embed = nextcord.Embed(
+                color=DEFAULT_BOT_COLOR,
+                title="😊 Funny",
+                description="`/brick_knife_evidence_yandere` — Game: Brick Knife Evidence Yandere Tentacles \n"
+                            "`/ball` — 8ball\n"
+                            "`/coin` — Flip coin\n"
+                            "`/cat` — Random cat image\n"
+                            "`/dog` — Random dog image\n"
+                            "`/fox` — Random fox image\n"
+                            "`/bird` — Random birb image\n"
+                            "`/panda` — Random panda image\n"
+                            "`/red_panda` — Random red panda image\n"
+            )
+            embed.set_image(
+                url="https://cdn.discordapp.com/attachments/772385814483173398/1011291356267810907/2.gif"
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 class HelpSelectMenuRU(nextcord.ui.Select):
@@ -396,6 +419,11 @@ class HelpSelectMenuRU(nextcord.ui.Select):
                 label="Автороли",
                 description="Меню помощи по разделу 'Автороли'",
                 emoji="⚙️",
+            ),
+            nextcord.SelectOption(
+                label="Развлечения",
+                description="Меню помощи по разделу 'Развлечения'",
+                emoji="😊",
             ),
         ]
         super().__init__(
@@ -494,7 +522,7 @@ class HelpSelectMenuRU(nextcord.ui.Select):
                             "Настроить приветственный эмбед\n"
                             "`/set goodbye_channel` — Установить канал прощаний\n`/set goodbye_message_type` — "
                             "Установить тип прощаний\n"
-                            "/set goodbye_message_state — Включить/отключить приветствия\n/set goodbye_embed — "
+                            "`/set goodbye_message_state` — Включить/отключить приветствия\n`/set goodbye_embed` — "
                             "Настроить прощальный эмбед",
             )
             embed.set_image(
@@ -618,6 +646,24 @@ class HelpSelectMenuRU(nextcord.ui.Select):
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006610055589793862/Genshin-Impact-Ero"
                     "-Genshin-Impact--Hu-Tao-Genshin-Impact-6593150.gif "
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        elif self.values[0] == "Развлечения":
+            embed = nextcord.Embed(
+                color=DEFAULT_BOT_COLOR,
+                title="😊 Развлечения",
+                description="`/brick_knife_evidence_yandere` — Игра: Кирпич Нож Компромат Яндере Тентакли \n"
+                            "`/ball` — Шар предсказаний\n"
+                            "`/coin` — Подбросить монетку\n"
+                            "`/cat` — Случайное изображение котика\n"
+                            "`/dog` — Случайное изображение собаки\n"
+                            "`/fox` — Случайное изображение лисы\n"
+                            "`/bird` — Случайное изображение птички\n"
+                            "`/panda` — Случайное изображение панды\n"
+                            "`/red_panda` — Случайное изображение красной панды\n"
+            )
+            embed.set_image(
+                url="https://cdn.discordapp.com/attachments/772385814483173398/1011291356267810907/2.gif"
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
 

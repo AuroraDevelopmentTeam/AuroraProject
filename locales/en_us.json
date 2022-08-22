@@ -795,5 +795,51 @@
     "setup_tickets": {
       "name": "setup_tickets",
       "description": "Setup tickets system on your server"
+    },
+    "bkeyt": {
+      "name": "brick_knife_evidence_yandere",
+      "description": "Game: Brick Knife Evidence Yandere Tentacles",
+      "msg": "Brick Knife Evidence Yandere Tentacles"
+    },
+    "your_choice": {
+      "msg": "Your choice:"
+    },
+    "my_choice": {
+      "msg": "My choice:"
+    },
+    "pick_one_of_options": {
+      "msg": "\nPick 1 of 5 options and see that's will happen"
+    },
+    "ball": {
+      "name": "ball",
+      "description": "Prediction ball, it will answer on your question"
+    },
+    "coin": {
+      "name": "coin",
+      "description": "Toss a coin and get heads or tails"
+    },
+    "cat": {
+      "name": "cat",
+      "description": "Sends random image of cat!"
+    },
+    "dog": {
+      "name": "dog",
+      "description": "Sends random image of dog!"
+    },
+    "fox": {
+      "name": "fox",
+      "description": "Sends random image of fox!"
+    },
+    "bird": {
+      "name": "bird",
+      "description": "Sends random image of bird!"
+    },
+    "panda": {
+      "name": "panda",
+      "description": "Sends random image of panda!"
+    },
+    "red_panda": {
+      "name": "red_panda",
+      "description": "Sends random image of red panda!"
     }
 }

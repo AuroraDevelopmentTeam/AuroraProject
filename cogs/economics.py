@@ -69,13 +69,17 @@ class Economics(commands.Cog):
         ).fetchall()
         cursor.close()
         db.close()
-        for row in rows:
-            guild = self.client.get_guild(row[2])
-            role = nextcord.utils.get(guild.roles, id=row[0])
-            for member in guild.members:
-                if not member.bot:
-                    if role.id in [role.id for role in member.roles]:
-                        update_user_balance(row[2], member.id, row[1])
+        try:
+            for row in rows:
+                guild = self.client.get_guild(row[2])
+                role = nextcord.utils.get(guild.roles, id=row[0])
+                print(guild, role)
+                for member in guild.members:
+                    if not member.bot:
+                        if role.id in [role.id for role in member.roles]:
+                            update_user_balance(row[2], member.id, row[1])
+        except AttributeError:
+            pass
 
     @nextcord.slash_command(
         name="add_money",
@@ -514,6 +518,7 @@ class Economics(commands.Cog):
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"{interaction.application_command.name}"
         )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         await interaction.response.send_message(
             embed=construct_basic_embed(
                 interaction.application_command.name,
