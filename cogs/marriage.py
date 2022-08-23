@@ -147,7 +147,10 @@ class Marriage(commands.Cog):
 
         async def marry_yes_callback(interaction: Interaction):
             embed = create_marry_yes_embed(interaction.guild.id, author, pair)
-            locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
+            if get_guild_locale(interaction.guild.id) == 'ru_ru':
+                locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
+            else:
+                locales.setlocale(locale.LC_ALL, 'en_US.UTF-8')
             date_format = "%a, %d %b %Y %H:%M:%S"
             timestamp = datetime.now()
             date = timestamp.strftime(date_format)

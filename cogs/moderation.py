@@ -332,7 +332,12 @@ class Moderation(commands.Cog):
         await interaction.response.defer()
         try:
             if user.bot:
-                return await interaction.response.send_message("bot_user_error")
+                return await interaction.followup.send(
+                    embed=construct_error_bot_user_embed(
+                        get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
+                        self.client.user.avatar.url,
+                    )
+                )
             if reason is None:
                 reason = " — "
             write_new_warn(interaction.guild.id, user.id, reason)

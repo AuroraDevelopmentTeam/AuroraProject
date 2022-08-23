@@ -1,5 +1,6 @@
 from typing import Optional
 import psutil
+import locale
 
 import nextcord
 from nextcord import Interaction, SlashOption, Permissions
@@ -10,6 +11,7 @@ from core.locales.getters import (
     get_keys_value_in_locale,
     get_localized_description,
     get_localized_name,
+    get_guild_locale,
 )
 from core.embeds import construct_basic_embed, construct_long_embed, DEFAULT_BOT_COLOR
 
@@ -54,6 +56,10 @@ class Information(commands.Cog):
         names_of_embed_fields = get_keys_value_in_locale(
             guild.id, interaction.application_command.name
         )
+        if get_guild_locale(interaction.guild.id) == 'ru_ru':
+            locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
+        else:
+            locales.setlocale(locale.LC_ALL, 'en_US.UTF-8')
         embed = construct_long_embed(
             f"{guild.name}:",
             guild.icon,
@@ -112,16 +118,16 @@ class Information(commands.Cog):
             interaction.user.display_avatar,
             names_of_embed_fields,
             [
-                f"```{user.created_at.strftime('%a, %d %b %Y')}```",
-                f"```#{user.discriminator}```",
-                f"```{user.joined_at.strftime('%a, %d %b %Y')}```",
+                f"{nextcord.utils.format_dt(user.joined_at)}",
+                f"#{user.discriminator}",
+                f"{nextcord.utils.format_dt(user.joined_at)}",
                 f"```{user.desktop_status}```",
                 f"```{user.web_status}```",
                 f"```{user.mobile_status}```",
                 f"```{user.id}```",
                 f"```{user.nick}```",
                 f"```{len(user.roles)}```",
-                f"{user.activity}",
+                f"{user.activity.name}",
             ],
             True,
         )

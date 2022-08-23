@@ -189,13 +189,14 @@ class Tickets(commands.Cog):
         description_localizations=get_localized_description("setup_tickets"),
         default_member_permissions=Permissions(administrator=True)
     )
+    @application_checks.bot_has_guild_permissions(manage_channels=True)
     @application_checks.has_permissions(manage_guild=True)
     async def __setup_tickets(
-        self,
-        interaction: Interaction,
-        create_mode: str = SlashOption(
-            name="picker", choices={"auto": "auto", "self": "self"}, required=True
-        ),
+            self,
+            interaction: Interaction,
+            create_mode: str = SlashOption(
+                name="picker", choices={"auto": "auto", "self": "self"}, required=True
+            ),
     ):
         await interaction.response.defer()
         embed = nextcord.Embed(
