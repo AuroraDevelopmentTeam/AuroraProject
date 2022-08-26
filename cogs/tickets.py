@@ -169,7 +169,10 @@ class Tickets(commands.Cog):
                         read_messages=False
                     )
                 }
-                await interaction.user.send(f"{get_msg_from_locale_by_key(interaction.guild.id, 'ticket_closed')}")
+                try:
+                    await interaction.user.send(f"{get_msg_from_locale_by_key(interaction.guild.id, 'ticket_closed')}")
+                except nextcord.Forbidden:
+                    pass
                 if get_guild_locale(interaction.guild.id) == 'ru_ru':
                     await interaction.message.edit(view=TicketDisabledRu())
                 else:
@@ -183,14 +186,14 @@ class Tickets(commands.Cog):
         except KeyError:
             pass
 
+    @application_checks.bot_has_guild_permissions(manage_channels=True)
+    @application_checks.has_permissions(manage_guild=True)
     @nextcord.slash_command(
         name="setup_tickets",
         name_localizations=get_localized_name("setup_tickets"),
         description_localizations=get_localized_description("setup_tickets"),
         default_member_permissions=Permissions(administrator=True)
     )
-    @application_checks.bot_has_guild_permissions(manage_channels=True)
-    @application_checks.has_permissions(manage_guild=True)
     async def __setup_tickets(
             self,
             interaction: Interaction,

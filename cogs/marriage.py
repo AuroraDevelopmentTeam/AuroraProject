@@ -150,7 +150,7 @@ class Marriage(commands.Cog):
             if get_guild_locale(interaction.guild.id) == 'ru_ru':
                 locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
             else:
-                locales.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+                locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
             date_format = "%a, %d %b %Y %H:%M:%S"
             timestamp = datetime.now()
             date = timestamp.strftime(date_format)

@@ -474,6 +474,16 @@ class Economics(commands.Cog):
                 color=DEFAULT_BOT_COLOR
             )
             return await interaction.response.send_message(embed=embed)
+        guild_roles = parse_server_roles(interaction.guild)
+        if len(guild_roles) >= 25:
+            embed = nextcord.Embed(
+                title="error",
+                description=get_msg_from_locale_by_key(
+                    interaction.guild.id, "too_many_roles"
+                ),
+                color=DEFAULT_BOT_COLOR
+            )
+            return await interaction.response.send_message(embed=embed)
         write_role_in_shop(interaction.guild.id, role, cost)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"{interaction.application_command.name}"

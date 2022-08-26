@@ -30,6 +30,11 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 emoji="🛡️",
             ),
             nextcord.SelectOption(
+                label="AutoModeration",
+                description="Help menu 'AutoModeration' section",
+                emoji="🗡️",
+            ),
+            nextcord.SelectOption(
                 label="Economics",
                 description="Help menu 'Economics' section",
                 emoji="💸",
@@ -133,6 +138,33 @@ class HelpSelectMenuENG(nextcord.ui.Select):
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006553773235253248/Aduare-artist"
                     "-Ayaka-Genshin-Impact-Genshin-Impact-7211646-min.gif"
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        elif self.values[0] == "AutoModeration":
+            embed = nextcord.Embed(
+                color=DEFAULT_BOT_COLOR,
+                title="🗡 Automoderation",
+                description="`/automod setup` — Setup full automod system on your server."
+                            "Works only for community servers with **community** moderation type. "
+                            "\n`/automod word_add` — Add new forbidden word\n "
+                            "`/automod word_remove` — Remove word from automod\n`/automod exempt_role_add` — "
+                            "Works only for community servers with **community** moderation type. Add "
+                            "exempt role, users with this role can violate automod rules. "
+                            "\n`/automod exempt_role_remove` — Remove exempt role\n"
+                            "`/automod exempt_channel_add` — Works only for community servers with **community** "
+                            "moderation type. "
+                            "Add exempt channel, users in this channel can violate automod rules "
+                            "\n`/automod exempt_channel_remove` — Remove exempt channel\n "
+                            "`/automod nickname_detect` — Turn on/Turn off detection of forbidden words in nicknames\n"
+                            "`/automod description_detect` — Turn on/Turn off detection of forbidden words in "
+                            "activity status "
+                            "активности\n "
+                            "`/automod link_detect` — Turn on/Turn off link block\n"
+                            "`/automod enable` — Turn on/Turn off Automoderation system\n"
+                            "`/automod moderation_mode` — Change moderation type on your server",
+            )
+            embed.set_image(
+                url="https://cdn.discordapp.com/attachments/772385814483173398/1012636048041451540/3.gif"
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
         elif self.values[0] == "Economics":
@@ -240,7 +272,7 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 title="👤 Profiles",
                 description="`/profile show` — Show profile card\n"
                             "`/profile description` — Set profile description\n"
-                            "/`profile badges` — Show achievements of badges on your profile",
+                            "`/profile badges` — Show achievements of badges on your profile",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006604685257482373/yae-miko-onsen_1.gif"
@@ -358,6 +390,11 @@ class HelpSelectMenuRU(nextcord.ui.Select):
                 emoji="🛡️",
             ),
             nextcord.SelectOption(
+                label="Автомодерация",
+                description="Help menu 'Автомодерация' section",
+                emoji="🗡️",
+            ),
+            nextcord.SelectOption(
                 label="Экономика",
                 description="Меню помощи по разделу 'Экономика'",
                 emoji="💸",
@@ -459,6 +496,31 @@ class HelpSelectMenuRU(nextcord.ui.Select):
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006553773235253248/Aduare-artist"
                     "-Ayaka-Genshin-Impact-Genshin-Impact-7211646-min.gif"
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        elif self.values[0] == "Автомодерация":
+            embed = nextcord.Embed(
+                color=DEFAULT_BOT_COLOR,
+                title="🗡 Автомодерация",
+                description="`/automod setup` — Устанавливает полную систему автомодерации без ограничений на "
+                            "сервере. Работает только для серверов - сообществ с **community** типом "
+                            "модерации\n`/automod word_add` — Добавляет новое запрещённое слово для автомодерации\n "
+                            "`/automod word_remove` — Удаляет слово из автомодерации\n`/automod exempt_role_add` — "
+                            "Работает только для серверов - сообществ с **community** типом модерации. Добавляет "
+                            "исключение для данной роли, пользователям с этой ролью можно будет нарушать правила "
+                            "автомодерации.\n`/automod exempt_role_remove` — Убирает исключение для данной роли\n"
+                            "`/automod exempt_channel_add` — Работает только для серверов - сообществ с **community** "
+                            "типом модерации. Добавляет исключение для данного канала, в нём можно будет нарушать "
+                            "правила автомодерации\n`/automod exempt_channel_remove` — Убирает исключение для канала\n "
+                            "`/automod nickname_detect` — Включает/Отключает поиск запрещённых слов в никнеймах\n"
+                            "`/automod description_detect` — Включает/Отключает поиск запрещённых слов в статусах "
+                            "активности\n "
+                            "`/automod link_detect` — Включает/Отключает блокировку ссылок\n"
+                            "`/automod enable` — Включает/Отключает автомодерацию\n"
+                            "`/automod moderation_mode` — Изменяет вид модерации на сервере",
+            )
+            embed.set_image(
+                url="https://cdn.discordapp.com/attachments/772385814483173398/1012636048041451540/3.gif"
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
         elif self.values[0] == "Экономика":
@@ -563,7 +625,7 @@ class HelpSelectMenuRU(nextcord.ui.Select):
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
                 title="👤 Профили",
-                description="`/profile me` — Профиль\n"
+                description="`/profile show` — Профиль\n"
                             "`/profile description` — Установить описание профиля\n"
                             "/`profile badges` — Отобразить достижения значков профиля",
             )

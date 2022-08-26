@@ -66,8 +66,8 @@ class Funny(commands.Cog):
         )
 
     @nextcord.slash_command(name="coin", description="toss a coin",
-                            name_localizations=get_localized_name("ball"),
-                            description_localizations=get_localized_description("ball"),
+                            name_localizations=get_localized_name("coin"),
+                            description_localizations=get_localized_description("coin"),
                             default_member_permissions=Permissions(send_messages=True)
                             )
     async def __coin(self, interaction: Interaction):

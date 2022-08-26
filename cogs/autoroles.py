@@ -253,8 +253,13 @@ class Autorole(commands.Cog):
 
             def check(reaction, user):
                 return (reaction.message.id == message_for_reaction.id) and (user.id == interaction.user.id)
-
-            reaction, user = await self.client.wait_for('reaction_add', check=check, timeout=60)
+            try:
+                reaction, user = await self.client.wait_for('reaction_add', check=check, timeout=60)
+            except asyncio.TimeoutError as error:
+                embed = nextcord.Embed(
+                    color=DEFAULT_BOT_COLOR, description=f"{error}"
+                )
+                return await interaction.followup.send(embed=embed)
             await message.add_reaction(str(reaction.emoji))
             if emoji.emoji_count(str(reaction.emoji)) >= 1:
                 is_custom = False

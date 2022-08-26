@@ -5,7 +5,7 @@ white = Color.from_rgb(255, 255, 255)
 
 settings = {
     "PREFIX": "*",
-    "version": "1.4.4.2",
+    "version": "1.5.0.0",
     "default_color": white,
     "default_locale": "ru_ru",
     "default_payday_amount": 200,

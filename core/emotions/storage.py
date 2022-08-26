@@ -220,3 +220,61 @@ lick_gifs = [
     "https://media1.tenor.com/images/5ca31fd724f6baca41e366db4258a1e6/tenor.gif?itemid=12141726",
     "https://cdn.idunetwork.eu.org/images/lick/7.gif",
 ]
+
+run_gifs = [
+    "https://c.tenor.com/mUIXigPWPuYAAAAd/anime-anime-girl-running.gif",
+    "https://c.tenor.com/fCNJ5gEgwEYAAAAC/naruto-anime.gif",
+    "https://c.tenor.com/04XfMGlTteMAAAAC/anime-chibi-anime.gif",
+    "https://c.tenor.com/BF9yBwexIbMAAAAC/anime-run.gif",
+    "https://c.tenor.com/eDfWpD2K5m0AAAAC/hideri-anime.gif",
+    "https://c.tenor.com/PAOfog-IuSAAAAAC/anime-nezuko-kamado.gif",
+    "https://c.tenor.com/1bY9whrzLs0AAAAM/%E0%B8%81%E0%B8%A5%E0%B8%B1%E0%B8%A7-luffy.gif",
+    "https://c.tenor.com/kzFPb4jwFhoAAAAd/demon-slayer-entertainment-district.gif",
+    "https://c.tenor.com/XF1STRo10EsAAAAd/demon-slayer-rengoku.gif",
+    "https://c.tenor.com/D0W1InOddxIAAAAC/kageyamatobio-run.gif",
+    "https://c.tenor.com/XbfdY2Lx-zwAAAAC/zenitsu-running-away.gif",
+    "https://c.tenor.com/yky_3Nk0xNYAAAAC/uma-musume-special-week.gif",
+    "https://c.tenor.com/am4tzoTsnRoAAAAd/ichigaya-arisa-bang-dream.gif",
+    "https://c.tenor.com/5YeXm0KWRPgAAAAC/anime-running.gif",
+    "https://c.tenor.com/4BUyUqKlXrMAAAAC/scared-anime-scared.gif",
+    "https://c.tenor.com/vox8I6cNnYUAAAAC/anime-running-running.gif",
+    "https://c.tenor.com/W_0ux9exhhwAAAAC/machikado-mazoku-running-away.gif"
+]
+
+good_morning_gifs = [
+    "https://c.tenor.com/6IicLfOaw1AAAAAM/tora-dora-good-morning.gif",
+    "https://c.tenor.com/XSHvSSXSJIUAAAAM/moring-anime.gif",
+    "https://c.tenor.com/siyjThcv6uwAAAAC/little-witch.gif",
+    "https://c.tenor.com/fZBeyroFGIYAAAAC/good-morning.gif",
+    "https://c.tenor.com/C3yQOr7vm1wAAAAC/good-morning-yuuta.gif",
+    "https://c.tenor.com/UvzYO27Xt3IAAAAC/good-morning-coffee-anime.gif",
+    "https://c.tenor.com/Biat4ih7bEYAAAAC/good-morning-anime.gif",
+    "https://c.tenor.com/oXWg44r_GOkAAAAC/good-morning-anime-girl-good-morning.gif",
+    "https://c.tenor.com/foyhEz23-_cAAAAC/anime-good-morning.gif",
+    "https://c.tenor.com/okFSX9uMZ0MAAAAC/good-morning-morning.gif",
+    "https://c.tenor.com/6FI0mgYvKG4AAAAd/kawaii-anime.gif",
+    "https://c.tenor.com/unsWbKQHBtkAAAAC/good-morning.gif",
+    "https://c.tenor.com/wDDY2RNqRGEAAAAC/anime.gif",
+    "https://c.tenor.com/hOXmY2CmM2MAAAAC/good-morning-anime.gif",
+    "https://c.tenor.com/pXLDlms6KakAAAAd/anime-good-morning.gif",
+    "https://c.tenor.com/DqkI-wUFAqcAAAAC/little-witch-academia-witch.gif",
+    "https://c.tenor.com/Rcg72HKEX-4AAAAC/bonne-nuit-anime-anime.gif",
+    "https://c.tenor.com/vnMdqC9XioEAAAAC/good-morning-yuru-yuri.gif",
+    "https://c.tenor.com/3Hs6Qw9tbFsAAAAC/tired-sleepy.gif",
+    "https://c.tenor.com/_uzLvIwydtsAAAAC/good-morning-anime.gif"
+]
+
+good_night_gifs = [
+    "https://c.tenor.com/QJttJWrHFMAAAAAC/cute-anime-fox-girl.gif",
+    "https://c.tenor.com/Jjml0HZg_koAAAAC/bonne-nuit-bonne-nuit-anime.gif",
+    "https://c.tenor.com/ZqNJE6Rl9ycAAAAd/anime-tired.gif",
+    "https://c.tenor.com/qe20v9RtMUYAAAAC/sleep-anime.gif",
+    "https://c.tenor.com/rVQy1P3iqJkAAAAC/gura-gawr.gif",
+    "https://c.tenor.com/3eouI6QChiEAAAAC/anime-cuteness.gif",
+    "https://c.tenor.com/n-w4AazQL9oAAAAC/good-night-tired.gif",
+    "https://c.tenor.com/S8o2LlhdpDgAAAAC/good-tired.gif",
+    "https://c.tenor.com/0WU4kckmSfsAAAAC/anime-animu.gif",
+    "https://c.tenor.com/SkP5OA_hX38AAAAC/anime-bedtime.gif",
+    "https://c.tenor.com/23NQtnQLhLQAAAAC/rit-red.gif",
+    "https://c.tenor.com/nQjxqh16XCcAAAAC/good-night-sleepy.gif"
+]

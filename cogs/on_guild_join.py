@@ -44,6 +44,7 @@ from core.loggers.writers import write_in_loggers_standart_values
 from core.tickets.create import create_tickets_config_table
 from core.tickets.writers import write_in_tickets_config_standart_values
 from core.auto.roles.create import create_reaction_autorole_table
+from core.auto.mod.writers import write_in_mod_config_standart_values
 
 
 class OnGuildListener(commands.Cog):
@@ -71,16 +72,14 @@ class OnGuildListener(commands.Cog):
         write_in_tickets_config_standart_values(guilds)
         write_in_badges_standart_values(guilds)
         write_in_chat_money_standart_values(guilds)
+        write_in_mod_config_standart_values(guilds)
         print(len(self.client.guilds))
-        members = 0
         for guild in self.client.guilds:
-            members += len(guild.members)
             print(f"{guild.name} - {(len(guild.members))}")
-        print(members)
         await self.client.change_presence(
             activity=nextcord.Game(
                 name=f"/help - Ты милый!\n"
-                f"Пользователи: {members}\n Сервера: {len(self.client.guilds)}"
+                f"Пользователи: {len(self.client.users)}\n Сервера: {len(self.client.guilds)}"
             )
         )
 

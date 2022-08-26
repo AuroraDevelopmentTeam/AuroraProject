@@ -29,6 +29,7 @@ from core.emojify import SHOP, STAR, SWORD, SETTINGS, HANDWRITTEN_HEARTS, HEARTS
     USERS, GIFT, MASK, RINGS, BROKEN_HEART, MESSAGE, PIGBANK, PRICE_TAG, VOICE
 from core.stats.getters import get_user_messages_counter, get_user_time_in_voice
 from core.utils import format_seconds_to_hhmmss
+from core.embeds import construct_basic_embed
 
 
 def get_description_rows(description: str):
@@ -79,15 +80,16 @@ class UserProfiles(commands.Cog):
             return await interaction.response.send_message(embed=embed)
         update_profile_description(interaction.user.id, description)
         message = get_msg_from_locale_by_key(
-            interaction.guild.id, f"{interaction.application_command.name}"
+            interaction.guild.id, f"profile_{interaction.application_command.name}"
         )
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         await interaction.response.send_message(
             embed=construct_basic_embed(
-                interaction.application_command.name,
+                f"profile_{interaction.application_command.name}",
                 f"{message} **{description}**",
                 f"{requested} {interaction.user}",
                 interaction.user.display_avatar,
+                interaction.guild.id
             )
         )
 
@@ -128,7 +130,7 @@ class UserProfiles(commands.Cog):
         if user is None:
             user = interaction.user
         if user.bot:
-            return await interaction.response.send_message(
+            return await interaction.followup.send(
                 embed=construct_error_bot_user_embed(
                     get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
                     self.client.user.avatar.url,
@@ -169,7 +171,7 @@ class UserProfiles(commands.Cog):
         if get_user_badge_state(interaction.guild.id, user.id, "badge_8") is True:
             developer = Editor("./assets/immortal.jpg").resize((45, 45))
             background.paste(developer, (170, 535))
-        if get_user_badge_state(interaction.guild.id, user.id, "badge_8") is True:
+        if get_user_badge_state(interaction.guild.id, user.id, "badge_9") is True:
             developer = Editor("./assets/badge_heart.png").resize((50, 45))
             background.paste(developer, (245, 535))
 

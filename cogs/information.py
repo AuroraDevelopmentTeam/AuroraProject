@@ -59,7 +59,7 @@ class Information(commands.Cog):
         if get_guild_locale(interaction.guild.id) == 'ru_ru':
             locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
         else:
-            locales.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+            locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
         embed = construct_long_embed(
             f"{guild.name}:",
             guild.icon,
@@ -111,6 +111,10 @@ class Information(commands.Cog):
         names_of_embed_fields = get_keys_value_in_locale(
             interaction.guild.id, interaction.application_command.name
         )
+        try:
+            activity = user.activity.name
+        except AttributeError:
+            activity = user.activity
         embed = construct_long_embed(
             f"{user.name}:",
             user.avatar,
@@ -127,7 +131,7 @@ class Information(commands.Cog):
                 f"```{user.id}```",
                 f"```{user.nick}```",
                 f"```{len(user.roles)}```",
-                f"{user.activity.name}",
+                f"{activity}",
             ],
             True,
         )

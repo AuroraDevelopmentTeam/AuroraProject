@@ -184,7 +184,7 @@ class Games(commands.Cog):
     ):
         await interaction.response.defer()
         if bet <= 0:
-            return await interaction.response.send_message(
+            return await interaction.followup.send(
                 embed=construct_error_negative_value_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "negative_value_error"
@@ -196,13 +196,13 @@ class Games(commands.Cog):
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
-            return await interaction.response.send_message(
+            return await interaction.followup.send(
                 embed=construct_error_not_enough_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "not_enough_money_error"
                     ),
                     interaction.user.display_avatar,
-                    f"{msg} {balance}",
+                    f"{msg} {balance}/{bet}",
                 )
             )
         global player

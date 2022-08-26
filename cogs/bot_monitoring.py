@@ -15,8 +15,10 @@ class BotsSDC(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        """
         bots = sdc_api_py.Bots(self.client, SDC_TOKEN, fork_name="nextcord")
         bots.create_loop()
+        """
 
 
 def setup(client):

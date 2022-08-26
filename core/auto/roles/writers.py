@@ -22,9 +22,9 @@ def write_in_autoroles_standart_values(guilds) -> None:
 def write_in_levelroles_value(guild_id, level, role_id):
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
-    cursor.execute(
-        "INSERT INTO autoroles_level(guild_id, level, " "autorole_id) VALUES (?, ?, ?)"
-    )
+    sql = "INSERT INTO autoroles_level(guild_id, level, autorole_id) VALUES (?, ?, ?)"
+    val = (guild_id, level, role_id)
+    cursor.execute(sql, val)
     db.commit()
     cursor.close()
     db.close()

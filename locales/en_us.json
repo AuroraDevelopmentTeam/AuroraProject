@@ -841,5 +841,105 @@
     "red_panda": {
       "name": "red_panda",
       "description": "Sends random image of red panda!"
+    },
+    "automod_link_detect": {
+      "name": "link_detect",
+      "description": "Turn on/Turn off automoderating chat for links",
+      "msg": "Now link detection is "
+    },
+    "automod_nickname_detect": {
+      "name": "nickname_detect",
+      "description": "Turn on/Turn off automoderating newcomers nickname",
+      "msg": "Now nickname detection is "
+    },
+    "automod_description_detect": {
+      "name": "description_detect",
+      "description": "Turn on/Turn off automoderating newcomers status description",
+      "msg": "Now desription detection is "
+    },
+    "automod_enable": {
+      "name": "enable",
+      "description": "Turn on/Turn off automoderating on your server",
+      "msg": "Now automod system is "
+    },
+    "automod_moderation_mode": {
+      "name": "moderation_mode",
+      "description": "Changes moderation mode on your server",
+      "msg": "Now server's moderation mode is:"
+    },
+    "forbidden_description": {
+      "msg": "Hello, on server you are trying to enter enabled Automoderation system. I found in your activity status description forbidden in this server word, and this is the reason why you are got kicked. Edit your nickname and try again"
+    },
+    "forbidden_nickname": {
+      "msg": "Hello, on server you are trying to enter enabled Automoderation system. I found in your nickname forbidden in this server word, and this is the reason why you are got kicked. Edit your nickname and try again"
+    },
+    "only_community": {
+      "msg": "This command works only for servers with automoderation type: **community**. Enable community in server setting and automoderation in server settings. Or if you don't want community server use /automod moderation_mode friends_group"
+    },
+    "automod_setup": {
+      "name": "setup",
+      "description": "Add word to automoderation",
+      "msg": "I added new automoderation rule Aurora-Automoderation for your server"
+    },
+    "already_automod": {
+      "msg": "Your community already has an auto-moderation rule"
+    },
+    "automod_word_add": {
+      "name": "word_add",
+      "description": "Add word to automoderation",
+      "msg": "Added new word to automoderation system:"
+    },
+    "already_in_list": {
+      "msg": "Requested object already in database, i can't add new"
+    },
+    "already_not_in_list": {
+      "msg": "Requested object not in database, i can't remove it"
+    },
+    "automod_word_remove": {
+      "name": "word_remove",
+      "description": "Remove word from automoderation",
+      "msg": "Removed word from automoderation system:"
+    },
+    "automod_exempt_role_add": {
+      "name": "exempt_role_add",
+      "description": "Added exempt role to automoderation",
+      "msg": "Added exempt role: "
+    },
+    "automod_exempt_role_remove": {
+      "name": "exempt_role_remove",
+      "description": "Removed exempt role from automoderation",
+      "msg": "Removed exempt role: "
+    },
+    "automod_exempt_channel_add": {
+      "name": "exempt_channel_add",
+      "description": "Add new exempt channel from automoderation",
+      "msg": "Added exempt channel. Now this channel will not be moderated: "
+    },
+    "automod_exempt_channel_remove": {
+      "name": "exempt_channel_remove",
+      "description": "Remove exempt channel",
+      "msg": "Removed exempt channel: "
+    },
+    "automod": {
+      "name": "automod",
+      "description": "Automod system"
+    },
+    "emotion_run": {
+      "name": "run",
+      "description": "Emotion command, send running emotion",
+      "msg": "Run! Run! Run!"
+    },
+    "emotion_good_morning": {
+      "name": "good_morning",
+      "description": "Emotion command, send good morning emotion",
+      "msg": "Good morning! ☀️"
+    },
+    "emotion_good_night": {
+      "name": "good_night",
+      "description": "Emotion command, send good night emotion",
+      "msg": "Good night! \uD83C\uDF19"
+    },
+    "too_many_roles": {
+      "msg": "In the shop can be only from 1 to 25 roles!"
     }
 }
