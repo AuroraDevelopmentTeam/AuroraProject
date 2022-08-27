@@ -69,17 +69,18 @@ class Economics(commands.Cog):
         ).fetchall()
         cursor.close()
         db.close()
-        try:
-            for row in rows:
+        for row in rows:
+            try:
                 guild = self.client.get_guild(row[2])
                 role = nextcord.utils.get(guild.roles, id=row[0])
-                print(guild, role)
+            except:
+                continue
+            print(guild, role)
+            if role is not None:
                 for member in guild.members:
                     if not member.bot:
                         if role.id in [role.id for role in member.roles]:
                             update_user_balance(row[2], member.id, row[1])
-        except AttributeError:
-            pass
 
     @nextcord.slash_command(
         name="add_money",
