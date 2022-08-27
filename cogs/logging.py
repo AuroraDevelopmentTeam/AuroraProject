@@ -20,16 +20,19 @@ class EventsLogging(commands.Cog):
         if get_logging_state(message.guild.id) is False:
             return
 
-        logging_channel = self.client.get_channel(get_logging_channel(message.guild.id))
-        await logging_channel.send(
-            embed=construct_log(
-                "Message delete",
-                message.guild,
-                message_channel=message.channel,
-                user=message.author,
-                message=message,
+        try:
+            logging_channel = self.client.get_channel(get_logging_channel(message.guild.id))
+            await logging_channel.send(
+                embed=construct_log(
+                    "Message delete",
+                    message.guild,
+                    message_channel=message.channel,
+                    user=message.author,
+                    message=message,
+                )
             )
-        )
+        except TypeError:
+            pass
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
@@ -39,20 +42,23 @@ class EventsLogging(commands.Cog):
             return
         if get_logging_state(before.guild.id) is False:
             return
-        logging_channel = self.client.get_channel(get_logging_channel(before.guild.id))
-        await logging_channel.send(
-            embed=construct_log(
-                "Message edit",
-                after.guild,
-                display_message=False,
-                message=after,
-                jump_url=True,
-                message_channel=after.channel,
-                user=after.author,
-                before=before,
-                after=after,
+        try:
+            logging_channel = self.client.get_channel(get_logging_channel(before.guild.id))
+            await logging_channel.send(
+                embed=construct_log(
+                    "Message edit",
+                    after.guild,
+                    display_message=False,
+                    message=after,
+                    jump_url=True,
+                    message_channel=after.channel,
+                    user=after.author,
+                    before=before,
+                    after=after,
+                )
             )
-        )
+        except TypeError:
+            pass
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
@@ -62,10 +68,13 @@ class EventsLogging(commands.Cog):
             return
         if get_logging_state(member.guild.id) is False:
             return
-        logging_channel = self.client.get_channel(get_logging_channel(member.guild.id))
-        await logging_channel.send(
-            embed=construct_log("Member join", member.guild, user=member)
-        )
+        try:
+            logging_channel = self.client.get_channel(get_logging_channel(member.guild.id))
+            await logging_channel.send(
+                embed=construct_log("Member join", member.guild, user=member)
+            )
+        except TypeError:
+            pass
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
@@ -75,10 +84,13 @@ class EventsLogging(commands.Cog):
             return
         if get_logging_state(member.guild.id) is False:
             return
-        logging_channel = self.client.get_channel(get_logging_channel(member.guild.id))
-        await logging_channel.send(
-            embed=construct_log("Member remove", member.guild, user=member)
-        )
+        try:
+            logging_channel = self.client.get_channel(get_logging_channel(member.guild.id))
+            await logging_channel.send(
+                embed=construct_log("Member remove", member.guild, user=member)
+            )
+        except TypeError:
+            pass
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild, user):
@@ -88,8 +100,11 @@ class EventsLogging(commands.Cog):
             return
         if get_logging_state(guild.id) is False:
             return
-        logging_channel = self.client.get_channel(get_logging_channel(guild.id))
-        await logging_channel.send(embed=construct_log("Member ban", guild, user=user))
+        try:
+            logging_channel = self.client.get_channel(get_logging_channel(guild.id))
+            await logging_channel.send(embed=construct_log("Member ban", guild, user=user))
+        except TypeError:
+            pass
 
     @commands.Cog.listener()
     async def on_member_unban(self, guild, user):
@@ -99,10 +114,13 @@ class EventsLogging(commands.Cog):
             return
         if get_logging_state(guild.id) is False:
             return
-        logging_channel = self.client.get_channel(get_logging_channel(guild.id))
-        await logging_channel.send(
-            embed=construct_log("Member unban", guild, user=user)
-        )
+        try:
+            logging_channel = self.client.get_channel(get_logging_channel(guild.id))
+            await logging_channel.send(
+                embed=construct_log("Member unban", guild, user=user)
+            )
+        except TypeError:
+            pass
 
     @commands.Cog.listener()
     async def on_guild_role_update(self, before, after):
@@ -116,12 +134,15 @@ class EventsLogging(commands.Cog):
                     if before.permissions.value == after.permissions.value:
                         if before.color == after.color:
                             return
-        logging_channel = self.client.get_channel(get_logging_channel(before.guild.id))
-        await logging_channel.send(
-            embed=construct_log(
-                "Role update", after.guild, role_before=before, role_after=after
+        try:
+            logging_channel = self.client.get_channel(get_logging_channel(before.guild.id))
+            await logging_channel.send(
+                embed=construct_log(
+                    "Role update", after.guild, role_before=before, role_after=after
+                )
             )
-        )
+        except TypeError:
+            pass
 
     @commands.Cog.listener()
     async def on_guild_role_create(self, role):
@@ -129,10 +150,13 @@ class EventsLogging(commands.Cog):
             return
         if get_logging_state(role.guild.id) is False:
             return
-        logging_channel = self.client.get_channel(get_logging_channel(role.guild.id))
-        await logging_channel.send(
-            embed=construct_log("Role create", role.guild, role=role)
-        )
+        try:
+            logging_channel = self.client.get_channel(get_logging_channel(role.guild.id))
+            await logging_channel.send(
+                embed=construct_log("Role create", role.guild, role=role)
+            )
+        except TypeError:
+            pass
 
     @commands.Cog.listener()
     async def on_guild_role_delete(self, role):
@@ -140,10 +164,13 @@ class EventsLogging(commands.Cog):
             return
         if get_logging_state(role.guild.id) is False:
             return
-        logging_channel = self.client.get_channel(get_logging_channele(role.guild.id))
-        await logging_channel.send(
-            embed=construct_log("Role delete", role.guild, role=role)
-        )
+        try:
+            logging_channel = self.client.get_channel(get_logging_channele(role.guild.id))
+            await logging_channel.send(
+                embed=construct_log("Role delete", role.guild, role=role)
+            )
+        except TypeError:
+            pass
 
     @commands.Cog.listener()
     async def on_guild_channel_create(self, channel):
@@ -151,10 +178,13 @@ class EventsLogging(commands.Cog):
             return
         if get_logging_state(channel.guild.id) is False:
             return
-        logging_channel = self.client.get_channel(get_logging_channel(channel.guild.id))
-        await logging_channel.send(
-            embed=construct_log("Channel create", channel.guild, channel=channel)
-        )
+        try:
+            logging_channel = self.client.get_channel(get_logging_channel(channel.guild.id))
+            await logging_channel.send(
+                embed=construct_log("Channel create", channel.guild, channel=channel)
+            )
+        except TypeError:
+            pass
 
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel):
@@ -162,10 +192,13 @@ class EventsLogging(commands.Cog):
             return
         if get_logging_state(channel.guild.id) is False:
             return
-        logging_channel = self.client.get_channel(get_logging_channel(channel.guild.id))
-        await logging_channel.send(
-            embed=construct_log("Channel delete", channel.guild, channel=channel)
-        )
+        try:
+            logging_channel = self.client.get_channel(get_logging_channel(channel.guild.id))
+            await logging_channel.send(
+                embed=construct_log("Channel delete", channel.guild, channel=channel)
+            )
+        except TypeError:
+            pass
 
     @commands.Cog.listener()
     async def on_guild_channel_update(self, before, after):
@@ -173,15 +206,18 @@ class EventsLogging(commands.Cog):
             return
         if get_logging_state(before.guild.id) is False:
             return
-        logging_channel = self.client.get_channel(get_logging_channel(before.guild.id))
-        await logging_channel.send(
-            embed=construct_log(
-                "Channel update",
-                after.guild,
-                channel_before=before,
-                channel_after=after,
+        try:
+            logging_channel = self.client.get_channel(get_logging_channel(before.guild.id))
+            await logging_channel.send(
+                embed=construct_log(
+                    "Channel update",
+                    after.guild,
+                    channel_before=before,
+                    channel_after=after,
+                )
             )
-        )
+        except TypeError:
+            pass
 
 
 def setup(client):

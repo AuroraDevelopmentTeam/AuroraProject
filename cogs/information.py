@@ -122,7 +122,7 @@ class Information(commands.Cog):
             interaction.user.display_avatar,
             names_of_embed_fields,
             [
-                f"{nextcord.utils.format_dt(user.joined_at)}",
+                f"{nextcord.utils.format_dt(user.created_at)}",
                 f"#{user.discriminator}",
                 f"{nextcord.utils.format_dt(user.joined_at)}",
                 f"```{user.desktop_status}```",

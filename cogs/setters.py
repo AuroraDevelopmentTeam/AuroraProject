@@ -438,7 +438,7 @@ class Setters(commands.Cog):
                 await interaction.response.send_message(
                     embed=construct_basic_embed(
                         interaction.application_command.name,
-                        f"{message} __**{channel}**__",
+                        f"{message} {channel.mention}",
                         f"{requested} {interaction.user}",
                         interaction.user.display_avatar, interaction.guild.id
                     )
@@ -558,7 +558,7 @@ class Setters(commands.Cog):
     async def goodbye_channel_set(
             self,
             interaction: Interaction,
-            channel: Optional[str] = SlashOption(required=True),
+            channel: Optional[GuildChannel] = SlashOption(required=True),
     ):
         """
         Parameters
@@ -568,8 +568,6 @@ class Setters(commands.Cog):
         channel: str
             Channel to
         """
-        channel = int(channel[2:-1])
-        channel = nextcord.utils.get(interaction.guild.text_channels, id=channel)
         if isinstance(channel, nextcord.TextChannel):
             set_goodbye_channel(interaction.guild.id, channel.id)
             message = get_msg_from_locale_by_key(
@@ -579,13 +577,21 @@ class Setters(commands.Cog):
             await interaction.response.send_message(
                 embed=construct_basic_embed(
                     interaction.application_command.name,
-                    f"{message} __**{channel}**__",
+                    f"{message} {channel.mention}",
                     f"{requested} {interaction.user}",
                     interaction.user.display_avatar, interaction.guild.id
                 )
             )
         else:
-            await interaction.response.send_message("error")
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    channel,
+                )
+            )
 
     @__set.subcommand(
         name="goodbye_embed", description="Setting server's goodbye message embed",
@@ -681,7 +687,7 @@ class Setters(commands.Cog):
     async def __nitro_channel_set(
             self,
             interaction: Interaction,
-            channel: Optional[str] = SlashOption(required=True),
+            channel: Optional[GuildChannel] = SlashOption(required=True),
     ):
         """
         Parameters
@@ -691,8 +697,6 @@ class Setters(commands.Cog):
         channel: str
             Channel to
         """
-        channel = int(channel[2:-1])
-        channel = nextcord.utils.get(interaction.guild.text_channels, id=channel)
         if isinstance(channel, nextcord.TextChannel):
             set_nitro_channel(interaction.guild.id, channel.id)
             message = get_msg_from_locale_by_key(
@@ -702,13 +706,21 @@ class Setters(commands.Cog):
             await interaction.response.send_message(
                 embed=construct_basic_embed(
                     interaction.application_command.name,
-                    f"{message} __**{channel}**__",
+                    f"{message} {channel.mention}",
                     f"{requested} {interaction.user}",
                     interaction.user.display_avatar, interaction.guild.id
                 )
             )
         else:
-            await interaction.response.send_message("error")
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    channel,
+                )
+            )
 
     @__set.subcommand(
         name="nitro_embed", description="Setting server's on nitro boost message embed",
@@ -761,12 +773,18 @@ class Setters(commands.Cog):
         description_localizations=get_localized_description("set_logging_channel"),
     )
     async def __logging_channel_set(
-            self, interaction: Interaction, channel=SlashOption(required=True)
+            self, interaction: Interaction, channel: Optional[GuildChannel] = SlashOption(required=True)
     ):
-        channel = int(channel[2:-1])
-        channel = nextcord.utils.get(interaction.guild.text_channels, id=channel)
         if not isinstance(channel, nextcord.TextChannel):
-            return await interaction.response.send_message("not channel")
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    channel,
+                )
+            )
         update_logging_channel_id(interaction.guild.id, channel.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"set_{interaction.application_command.name}"
@@ -775,7 +793,7 @@ class Setters(commands.Cog):
         await interaction.response.send_message(
             embed=construct_basic_embed(
                 interaction.application_command.name,
-                f"{message} {channel}",
+                f"{message} {channel.mention}",
                 f"{requested} {interaction.user}",
                 interaction.user.display_avatar, interaction.guild.id
             )
