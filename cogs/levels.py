@@ -95,6 +95,7 @@ class Levels(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
+        await interaction.response.defer()
         user_exp = get_user_exp(interaction.guild.id, user.id)
         user_level = get_user_level(interaction.guild.id, user.id)
         exp_to_next_level = round((7 * (user_level**2)) + 58)
@@ -140,7 +141,7 @@ class Levels(commands.Cog):
             color="#FFFFFF",
         )
         file = nextcord.File(fp=background.image_bytes, filename="levelcard.png")
-        await interaction.response.send_message(file=file)
+        await interaction.followup.send(file=file)
 
     @nextcord.slash_command(
         name="add_exp",

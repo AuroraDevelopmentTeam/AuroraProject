@@ -14,6 +14,9 @@ client = commands.Bot(
     intents=nextcord.Intents.all(),
 )
 
+activity = nextcord.Game(name=f"You cute! /help")
+client.activity = activity
+
 
 if __name__ == "__main__":
     for filename in os.listdir("./cogs"):

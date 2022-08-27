@@ -21,7 +21,7 @@ eight_ball_answers = {
         "Нет! Нет! Нет! Нет!",
         "Нет"
     ),
-    "en_us": {
+    "en_us":
         ('As I see it, yes.',
          'Yes.',
          'Positive',
@@ -43,7 +43,6 @@ eight_ball_answers = {
          'Im to lazy to predict.',
          'Concentrate and ask again'
          'I am tired. *proceeds with sleeping*')
-    }
 }
 
 

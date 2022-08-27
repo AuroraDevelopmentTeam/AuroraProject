@@ -56,6 +56,7 @@ class OnReadyListener(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         guilds = self.client.guilds
+        """
         create_locales_table()
         write_in_locales_standart_values(guilds)
         create_money_config_table()
@@ -101,15 +102,12 @@ class OnReadyListener(commands.Cog):
         create_mod_config_table()
         create_mod_word_table()
         write_in_mod_config_standart_values(guilds)
+        """
         print(len(self.client.guilds))
         for guild in self.client.guilds:
             print(f"{guild.name} - {(len(guild.members))}")
-        await self.client.change_presence(
-            activity=nextcord.Game(
-                name=f"/help - Ты милый!\n"
-                f"Пользователи: {len(self.client.users)}\n Сервера: {len(self.client.guilds)}"
-            )
-        )
+        await self.client.change_presence(activity=nextcord.Game(name=f"You cute! /help\nСервера: {len(guilds)}\n"
+                                                                      f"Пользователи: {len(self.client.users)}"))
 
 
 def setup(client):

@@ -4,7 +4,7 @@ import nextcord
 from nextcord import Interaction, Permissions, SlashOption
 from nextcord.ext import commands
 
-from core.locales.getters import get_localized_description, get_localized_name
+from core.locales.getters import get_localized_description, get_localized_name, get_msg_from_locale_by_key
 from core.emotions.create import create_emotion_embed
 from core.emotions.storage import (
     kiss_gifs,

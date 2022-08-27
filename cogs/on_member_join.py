@@ -40,6 +40,8 @@ from core.loggers.create import create_loggers_table
 from core.loggers.writers import write_in_loggers_standart_values
 from core.tickets.create import create_tickets_config_table
 from core.tickets.writers import write_in_tickets_config_standart_values
+from core.utils import write_member_in_gifts, write_member_in_badges, write_member_in_levels, write_member_in_marriage,\
+    write_member_in_profiles, write_member_in_stats, write_member_in_honor, write_member_in_money
 
 
 class OnMemberListener(commands.Cog):
@@ -48,15 +50,16 @@ class OnMemberListener(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        guilds = [member.guild]
-        write_in_money_standart_values(guilds)
-        write_in_levels_standart_values(guilds)
-        write_in_marriage_standart_values(guilds)
-        write_in_gifts_standart_values(guilds)
-        write_in_honor_standart_values(guilds)
-        write_in_profiles_standart_values(guilds)
-        write_in_stats_standart_values(guilds)
-        write_in_badges_standart_values(guilds)
+        guild = member.guild
+        write_member_in_money(guild, member)
+        write_member_in_levels(guild, member)
+        write_member_in_profiles(guild, member)
+        write_member_in_marriage(guild, member)
+        write_member_in_gifts(guild, member)
+        write_member_in_honor(member)
+        write_member_in_profiles(guild, member)
+        write_member_in_stats(guild, member)
+        write_member_in_badges(guild, member)
 
 
 def setup(client):
