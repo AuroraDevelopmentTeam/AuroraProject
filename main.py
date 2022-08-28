@@ -12,11 +12,12 @@ client = commands.Bot(
     command_prefix=settings["PREFIX"],
     case_insensitive=True,
     intents=nextcord.Intents.all(),
+    activity=nextcord.Game(name=f"You cute! /help")
 )
 
-activity = nextcord.Game(name=f"You cute! /help")
-client.activity = activity
+# REWRITE all database to one connect at bot init and working with cursors
 
+# ADD recursive method of cogs loading
 
 if __name__ == "__main__":
     for filename in os.listdir("./cogs"):

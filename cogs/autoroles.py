@@ -202,7 +202,7 @@ class Autorole(commands.Cog):
         await interaction.response.send_message(
             embed=construct_basic_embed(
                 f"autorole_{interaction.application_command.name}",
-                f"{message} {role.mention}",
+                f"{message} **{level}**",
                 f"{requested} {interaction.user}",
                 interaction.user.display_avatar, interaction.guild.id
             )

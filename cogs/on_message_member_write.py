@@ -45,7 +45,7 @@ from core.utils import write_member_in_gifts, write_member_in_badges, write_memb
     write_member_in_profiles, write_member_in_stats, write_member_in_honor, write_member_in_money
 
 
-class OnMemberListener(commands.Cog):
+class OnMessageListener(commands.Cog):
     def __init__(self, client):
         self.client = client
 
@@ -65,4 +65,4 @@ class OnMemberListener(commands.Cog):
 
 
 def setup(client):
-    client.add_cog(OnMemberListener(client))
+    client.add_cog(OnMessageListener(client))

@@ -6,7 +6,7 @@ def create_loggers_table() -> None:
     cursor = db.cursor()
     cursor.execute(
         f"""CREATE TABLE IF NOT EXISTS loggers (
-        guild_id INTERGER, log_channel_id INTERGER, logs_enabled BOOL
+        guild_id INTEGER, log_channel_id INTEGER, logs_enabled BOOL
     )"""
     )
     db.commit()

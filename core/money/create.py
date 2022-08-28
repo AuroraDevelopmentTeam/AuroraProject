@@ -17,7 +17,7 @@ def create_money_table() -> None:
     cursor = db.cursor()
     cursor.execute(
         f"""CREATE TABLE IF NOT EXISTS money (
-        guild_id INTERGER, user_id INTERGER, balance INTERGER
+        guild_id INTEGER, user_id INTEGER, balance INTEGER
     )"""
     )
     db.commit()
@@ -31,8 +31,8 @@ def create_money_config_table() -> None:
     cursor = db.cursor()
     cursor.execute(
         f"""CREATE TABLE IF NOT EXISTS money_config (
-        guild_id INTERGER, guild_currency TEXT, guild_payday_amount INTERGER, 
-        guild_starting_balance INTERGER
+        guild_id INTEGER, guild_currency TEXT, guild_payday_amount INTEGER, 
+        guild_starting_balance INTEGER
     )"""
     )
     db.commit()
@@ -46,7 +46,7 @@ def create_role_money_table() -> None:
     cursor = db.cursor()
     cursor.execute(
         f"""CREATE TABLE IF NOT EXISTS roles_money (
-        guild_id INTERGER, role_id INTERGER, income INTERGER, cooldown TEXT
+        guild_id INTEGER, role_id INTEGER, income INTEGER, cooldown TEXT
     )"""
     )
     db.commit()
@@ -60,8 +60,8 @@ def create_chat_money_config_table() -> None:
     cursor = db.cursor()
     cursor.execute(
         f"""CREATE TABLE IF NOT EXISTS chat_money_config (
-        guild_id INTERGER, min_msg_income INTERGER, max_msg_income INTERGER, msg_cooldown INTERGER, 
-        min_voice_income INTERGER, max_voice_income INTERGER, voice_minutes_for_money INTERGER
+        guild_id INTEGER, min_msg_income INTEGER, max_msg_income INTEGER, msg_cooldown INTEGER, 
+        min_voice_income INTEGER, max_voice_income INTEGER, voice_minutes_for_money INTEGER
     )"""
     )
     db.commit()
@@ -75,7 +75,7 @@ def create_money_channels_config_table() -> None:
     cursor = db.cursor()
     cursor.execute(
         f"""CREATE TABLE IF NOT EXISTS money_channels_config (
-        guild_id INTERGER, channel_id INTERGER, enabled BOOL)"""
+        guild_id INTEGER, channel_id INTEGER, enabled BOOL)"""
     )
     db.commit()
     cursor.close()

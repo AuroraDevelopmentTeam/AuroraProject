@@ -11,8 +11,8 @@ def create_goodbye_config() -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     cursor.execute(
-        f"""CREATE TABLE IF NOT EXISTS goodbye_config ( guild_id INTERGER, goodbye_message_enabled BOOLEAN, 
-    goodbye_message_channel INTERGER, goodbye_message_type TEXT, 
+        f"""CREATE TABLE IF NOT EXISTS goodbye_config (guild_id INTEGER, goodbye_message_enabled BOOLEAN, 
+    goodbye_message_channel INTEGER, goodbye_message_type TEXT, 
     goodbye_message_title TEXT, goodbye_message_description TEXT, goodbye_message_url TEXT )"""
     )
     db.commit()
