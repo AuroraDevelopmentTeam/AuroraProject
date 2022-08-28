@@ -29,7 +29,8 @@ def write_in_clan_config_standart_values(guilds) -> None:
         if is_guild_id_in_table("clan_config", guild.id) is False:
             sql = (
                 "INSERT INTO clan_config(guild_id, create_cost, upgrade_attack_cost, "
-                "upgrade_limit_cost, change_icon_cost, upgrade_boss_cost) VALUES (?, ?, ?, ?, ?, ?)"
+                "upgrade_limit_cost, change_icon_cost, change_image_cost, upgrade_boss_cost) VALUES (?, ?, ?, ?, ?, "
+                "?, ?) "
             )
             val = (
                 guild.id,
@@ -37,6 +38,7 @@ def write_in_clan_config_standart_values(guilds) -> None:
                 500000,
                 1000000,
                 10000,
+                50000,
                 250000
             )
             cursor.execute(sql, val)

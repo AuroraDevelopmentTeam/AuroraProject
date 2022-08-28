@@ -9,7 +9,7 @@ def create_locales_table() -> None:
     cursor = db.cursor()
     cursor.execute(
         f"""CREATE TABLE IF NOT EXISTS locales (
-        guild_id INTERGER, locale TEXT
+        guild_id INTEGER, locale TEXT
     )"""
     )
     db.commit()

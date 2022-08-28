@@ -663,8 +663,8 @@
       "msg": "possibility to earn money were: "
     },
     "income": {
-      "name": "reset",
-      "description": "This is the reset slash command that will be the prefix of economical reset commands"
+      "name": "income",
+      "description": "This is the income slash command that will be the prefix of economical reset commands"
     },
     "duel": {
       "name": "duel",
@@ -941,5 +941,9 @@
     },
     "too_many_roles": {
       "msg": "In the shop can be only from 1 to 25 roles!"
+    },
+    "income_display_roles": {
+      "name": "display_roles",
+      "description": "Show list of roles with income set"
     }
 }

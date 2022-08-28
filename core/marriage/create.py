@@ -23,8 +23,8 @@ def create_marriage_table() -> None:
     cursor = db.cursor()
     cursor.execute(
         f"""CREATE TABLE IF NOT EXISTS marriage (
-        guild_id INTERGER, user_id INTERGER, pair_id INTERGER, like_id INTERGER, 
-        divorces INTERGER, love_description TEXT, date TEXT, family_money INTERGER)"""
+        guild_id INTEGER, user_id INTEGER, pair_id INTEGER, like_id INTEGER, 
+        divorces INTEGER, love_description TEXT, date TEXT, family_money INTEGER)"""
     )
     db.commit()
     cursor.close()
@@ -37,9 +37,9 @@ def create_gifts_table() -> None:
     cursor = db.cursor()
     cursor.execute(
         f"""CREATE TABLE IF NOT EXISTS gifts (
-        guild_id INTERGER, user_id INTERGER, gift_1 INTERGER, gift_2 INTERGER, gift_3 INTERGER, 
-        gift_4 INTERGER, gift_5 INTERGER, gift_6 INTERGER, gift_7 INTERGER, gift_8 INTERGER, gift_9 INTERGER, 
-        gift_10 INTERGER, gift_price INTERGER)"""
+        guild_id INTEGER, user_id INTEGER, gift_1 INTEGER, gift_2 INTEGER, gift_3 INTEGER, 
+        gift_4 INTEGER, gift_5 INTEGER, gift_6 INTEGER, gift_7 INTEGER, gift_8 INTEGER, gift_9 INTEGER, 
+        gift_10 INTEGER, gift_price INTEGER)"""
     )
     db.commit()
     cursor.close()

@@ -111,3 +111,14 @@ def get_channel_income_state(guild_id: int, channel_id: int) -> bool:
     else:
         state = messages_state[0]
         return bool(state)
+
+
+def list_income_roles(guild_id: int):
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    rows = cursor.execute(
+        f"SELECT role_id, income FROM roles_money WHERE guild_id = {guild_id}"
+    ).fetchall()
+    cursor.close()
+    db.close()
+    return rows

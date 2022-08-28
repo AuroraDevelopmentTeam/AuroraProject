@@ -25,7 +25,7 @@ from core.money.getters import (
     get_guild_currency_symbol,
     get_guild_starting_balance,
     get_guild_payday_amount,
-
+    list_income_roles
 )
 from core.money.writers import write_role_in_income, delete_role_from_income, write_channel_in_config
 from core.money.create import create_user_money_card
@@ -34,6 +34,7 @@ from core.locales.getters import (
     get_msg_from_locale_by_key,
     get_localized_description,
     get_localized_name,
+    localize_name
 )
 from core.embeds import construct_basic_embed, construct_top_embed, DEFAULT_BOT_COLOR
 from core.shop.writers import write_role_in_shop, delete_role_from_shop
@@ -50,6 +51,34 @@ from core.errors import (
     construct_error_not_enough_embed,
     construct_error_forbidden_embed
 )
+
+
+class AutorolesList(menus.ListPageSource):
+    def __init__(self, data, guild_id):
+        self.guild_id = guild_id
+        super().__init__(data, per_page=6)
+
+    async def format_page(self, menu, entries) -> nextcord.Embed:
+        embed = nextcord.Embed(title=localize_name(self.guild_id, "income").capitalize(), color=DEFAULT_BOT_COLOR)
+        for entry in entries:
+            embed.add_field(name=entry[0], value=entry[1], inline=False)
+        embed.set_footer(text=f"{menu.current_page + 1}/{self.get_max_pages()}")
+        return embed
+
+
+class NoStopButtonMenuPages(menus.ButtonMenuPages, inherit_buttons=False):
+
+    def __init__(self, source, timeout=60):
+        super().__init__(source, timeout=timeout)
+
+        # Add the buttons we want
+        self.add_item(menus.MenuPaginationButton(emoji=self.FIRST_PAGE))
+        self.add_item(menus.MenuPaginationButton(emoji=self.PREVIOUS_PAGE))
+        self.add_item(menus.MenuPaginationButton(emoji=self.NEXT_PAGE))
+        self.add_item(menus.MenuPaginationButton(emoji=self.LAST_PAGE))
+
+        # Disable buttons that are unavailable to be pressed at the start
+        self._disable_unavailable_buttons()
 
 
 class Economics(commands.Cog):
@@ -341,12 +370,13 @@ class Economics(commands.Cog):
         )
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         embed = construct_basic_embed(
-                interaction.application_command.name,
-                f"{message}" f"+__**{payday_amount}**__ {currency_symbol}",
-                f"{requested} {interaction.user}",
-                interaction.user.display_avatar, interaction.guild.id
-            )
-        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/996084073569194084/996084305031872574/white_clock.png")
+            interaction.application_command.name,
+            f"{message}" f"+__**{payday_amount}**__ {currency_symbol}",
+            f"{requested} {interaction.user}",
+            interaction.user.display_avatar, interaction.guild.id
+        )
+        embed.set_thumbnail(
+            url="https://cdn.discordapp.com/attachments/996084073569194084/996084305031872574/white_clock.png")
         await interaction.response.send_message(embed=embed)
 
     @nextcord.slash_command(
@@ -713,15 +743,15 @@ class Economics(commands.Cog):
             self,
             interaction: Interaction,
             min_msg_income: Optional[int] = SlashOption(
-                                       required=True,
-                                       description="Minimal income for writing messages",
-                                       description_localizations={"ru": "Минимальный доход за написание сообщений"},
-                                   ),
+                required=True,
+                description="Minimal income for writing messages",
+                description_localizations={"ru": "Минимальный доход за написание сообщений"},
+            ),
             max_msg_income: Optional[int] = SlashOption(
-                                       required=True,
-                                       description="Maximal income for writing messages",
-                                       description_localizations={"ru": "Максимальный доход за написание сообщений"},
-                                   ),
+                required=True,
+                description="Maximal income for writing messages",
+                description_localizations={"ru": "Максимальный доход за написание сообщений"},
+            ),
     ):
         if min_msg_income < 0 or max_msg_income < 0:
             return await interaction.response.send_message(
@@ -759,15 +789,15 @@ class Economics(commands.Cog):
             self,
             interaction: Interaction,
             min_voice_income: Optional[int] = SlashOption(
-                                       required=True,
-                                       description="Maximal income for being in voice",
-                                       description_localizations={"ru": "Минимальный доход за нахождение в голосовом чате"},
-                                   ),
+                required=True,
+                description="Maximal income for being in voice",
+                description_localizations={"ru": "Минимальный доход за нахождение в голосовом чате"},
+            ),
             max_voice_income: Optional[int] = SlashOption(
-                                       required=True,
-                                       description="Maximal income for being in voice",
-                                       description_localizations={"ru": "Максимальный доход за нахождение в голосовом чате"},
-                                   ),
+                required=True,
+                description="Maximal income for being in voice",
+                description_localizations={"ru": "Максимальный доход за нахождение в голосовом чате"},
+            ),
     ):
         if min_voice_income < 0 or max_voice_income < 0:
             return await interaction.response.send_message(
@@ -813,10 +843,10 @@ class Economics(commands.Cog):
             self,
             interaction: Interaction,
             msg_per_income: Optional[int] = SlashOption(
-                                       required=True,
-                                       description="Messages user must write for income",
-                                       description_localizations={"ru": "Cообщений нужно написать для дохода"},
-                                   ),
+                required=True,
+                description="Messages user must write for income",
+                description_localizations={"ru": "Cообщений нужно написать для дохода"},
+            ),
     ):
         if msg_per_income < 1:
             return await interaction.response.send_message(
@@ -852,10 +882,10 @@ class Economics(commands.Cog):
             self,
             interaction: Interaction,
             voice_minutes: Optional[int] = SlashOption(
-                                       required=True,
-                                       description="Minutes user must be in voice channel",
-                                       description_localizations={"ru": "Минут нужно быть в голосовом канале"},
-                                   ),
+                required=True,
+                description="Minutes user must be in voice channel",
+                description_localizations={"ru": "Минут нужно быть в голосовом канале"},
+            ),
     ):
         if voice_minutes < 1:
             return await interaction.response.send_message(
@@ -880,6 +910,25 @@ class Economics(commands.Cog):
                 interaction.user.display_avatar, interaction.guild.id
             )
         )
+
+    @__income.subcommand(name="display_roles",
+                         description="Show list of roles with income set",
+                         name_localizations=get_localized_name("income_display_roles"),
+                         description_localizations=get_localized_description("income_display_roles"),
+                         )
+    async def __income_display_roles(self, interaction: Interaction):
+        roles = list_income_roles(interaction.guild.id)
+        source_for_pages = []
+        for row in roles:
+            role = nextcord.utils.get(interaction.guild.roles, id=row[0])
+            role = role.mention
+            income_msg = localize_name(interaction.guild.id, "income").capitalize()
+            level = f"{income_msg} - {row[1]}"
+            source_for_pages.append([level, role])
+        pages = NoStopButtonMenuPages(
+            source=AutorolesList(source_for_pages, interaction.guild.id),
+        )
+        await pages.start(interaction=interaction)
 
 
 def setup(client):

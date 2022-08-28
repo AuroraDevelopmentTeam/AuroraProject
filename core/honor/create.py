@@ -6,7 +6,7 @@ def create_honor_table() -> None:
     cursor = db.cursor()
     cursor.execute(
         f"""CREATE TABLE IF NOT EXISTS honor (
-        user_id INTERGER, honor_level INTERGER, honor_points INTERGER
+        user_id INTEGER, honor_level INTEGER, honor_points INTEGER
     )"""
     )
     db.commit()
