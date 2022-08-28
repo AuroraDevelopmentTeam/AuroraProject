@@ -18,3 +18,4 @@ Our goal of project is to replace almost all bots on bot user's server with Auro
  - user cool profile cards
  - statistics handling like messages counting and counting time in voice
  - autoroles for newcomers, for reactions and levels
+
