@@ -30,7 +30,6 @@ def write_in_clan_config_standart_values(guilds) -> None:
                 "upgrade_limit_cost, change_icon_cost, change_image_cost, upgrade_boss_cost) VALUES (?, ?, ?, ?, ?, "
                 "?, ?) "
             )
-<<<<<<< Updated upstream
             val = (
                 guild.id,
                 100000,
@@ -40,9 +39,7 @@ def write_in_clan_config_standart_values(guilds) -> None:
                 50000,
                 250000
             )
-=======
             val = (guild.id, 100000, 500000, 1000000, 10000, 250000)
->>>>>>> Stashed changes
             cursor.execute(sql, val)
             db.commit()
     cursor.close()

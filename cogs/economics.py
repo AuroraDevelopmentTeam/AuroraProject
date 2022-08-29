@@ -27,10 +27,9 @@ from core.money.getters import (
     get_guild_currency_symbol,
     get_guild_starting_balance,
     get_guild_payday_amount,
-<<<<<<< Updated upstream
     list_income_roles
-=======
->>>>>>> Stashed changes
+
+
 )
 from core.money.writers import (
     write_role_in_income,
@@ -398,20 +397,14 @@ class Economics(commands.Cog):
             interaction.application_command.name,
             f"{message}" f"+__**{payday_amount}**__ {currency_symbol}",
             f"{requested} {interaction.user}",
-<<<<<<< Updated upstream
             interaction.user.display_avatar, interaction.guild.id
         )
         embed.set_thumbnail(
             url="https://cdn.discordapp.com/attachments/996084073569194084/996084305031872574/white_clock.png")
-=======
-            interaction.user.display_avatar,
-            interaction.guild.id,
-        )
         embed.set_thumbnail(
             url="https://cdn.discordapp.com/attachments/996084073569194084/996084305031872574"
                 "/white_clock.png"
         )
->>>>>>> Stashed changes
         await interaction.response.send_message(embed=embed)
 
     @nextcord.slash_command(
@@ -883,24 +876,24 @@ class Economics(commands.Cog):
             min_msg_income: Optional[int] = SlashOption(
                 required=True,
                 description="Minimal income for writing messages",
-<<<<<<< Updated upstream
+
                 description_localizations={"ru": "Минимальный доход за написание сообщений"},
-=======
+
                 description_localizations={
                     "ru": "Минимальный доход за написание сообщений"
                 },
->>>>>>> Stashed changes
+
             ),
             max_msg_income: Optional[int] = SlashOption(
                 required=True,
                 description="Maximal income for writing messages",
-<<<<<<< Updated upstream
+
                 description_localizations={"ru": "Максимальный доход за написание сообщений"},
-=======
+
                 description_localizations={
                     "ru": "Максимальный доход за написание сообщений"
                 },
->>>>>>> Stashed changes
+
             ),
     ):
         if min_msg_income < 0 or max_msg_income < 0:
@@ -944,24 +937,24 @@ class Economics(commands.Cog):
             min_voice_income: Optional[int] = SlashOption(
                 required=True,
                 description="Maximal income for being in voice",
-<<<<<<< Updated upstream
+
                 description_localizations={"ru": "Минимальный доход за нахождение в голосовом чате"},
-=======
+
                 description_localizations={
                     "ru": "Минимальный доход за нахождение в голосовом " "чате"
                 },
->>>>>>> Stashed changes
+
             ),
             max_voice_income: Optional[int] = SlashOption(
                 required=True,
                 description="Maximal income for being in voice",
-<<<<<<< Updated upstream
+
                 description_localizations={"ru": "Максимальный доход за нахождение в голосовом чате"},
-=======
+
                 description_localizations={
                     "ru": "Максимальный доход за нахождение в голосовом чате"
                 },
->>>>>>> Stashed changes
+
             ),
     ):
         if min_voice_income < 0 or max_voice_income < 0:
