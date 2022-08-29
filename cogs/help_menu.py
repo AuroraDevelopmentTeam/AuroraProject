@@ -171,7 +171,8 @@ class HelpSelectMenuENG(nextcord.ui.Select):
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
                 title="💸 Economics",
-                description="`/balance` — Send balance\n`/add_money` — Add money on someones balance\n"
+                description="`/timely` — get money timely amount\n`/balance` — Send balance\n`/add_money` — Add money "
+                            "on someones balance\n "
                             "`/remove_money` — Remove money from balance\n`/reset balance` — Reset user balance\n"
                             "`/give` — Give money to someone\n`/add-shop` — Add role to shop\n"
                             "`/remove-shop` — Remove role from shop\n`/shop` — Server role market\n"
@@ -527,7 +528,8 @@ class HelpSelectMenuRU(nextcord.ui.Select):
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
                 title="💸 Экономика",
-                description="`/balance` — Узнать баланс\n`/add_money` — Добавить деньги\n"
+                description="`/timely` — получить денежную выплату\n`/balance` — Узнать баланс\n`/add_money` — "
+                            "Добавить деньги\n "
                             "`/remove_money` — Забрать деньги\n`/reset balance` — Сбросить баланс\n"
                             "`/give` — Передать валюту\n`/add-shop` — Добавить роль в магазин\n"
                             "`/remove-shop` — Убрать роль из магазина\n`/shop` — Магазин сервера\n"

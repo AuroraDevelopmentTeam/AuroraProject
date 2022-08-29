@@ -135,9 +135,9 @@ def create_server_welcome_embed(
     return embed
 
 
-def create_welcome_card(member) -> nextcord.File:
+def create_welcome_card(member: nextcord.Member) -> nextcord.File:
     background = Editor(Canvas((900, 300), color="#141414"))
-    profile_picture = load_image(str(member.avatar.url))
+    profile_picture = load_image(str(member.display_avatar))
     profile = Editor(profile_picture).resize((150, 150)).circle_image()
     larger_font = Font.montserrat(size=35)
     font = Font.montserrat(size=25)

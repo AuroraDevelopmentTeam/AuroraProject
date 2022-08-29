@@ -165,7 +165,7 @@ class EventsLogging(commands.Cog):
         if get_logging_state(role.guild.id) is False:
             return
         try:
-            logging_channel = self.client.get_channel(get_logging_channele(role.guild.id))
+            logging_channel = self.client.get_channel(get_logging_channel(role.guild.id))
             await logging_channel.send(
                 embed=construct_log("Role delete", role.guild, role=role)
             )
