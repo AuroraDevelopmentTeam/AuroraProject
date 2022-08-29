@@ -118,14 +118,22 @@ def create_love_profile_embed(
         inline=False,
     )
     field_name = get_msg_from_locale_by_key(guild_id, "love_description")
-    embed.add_field(name=f"{HEARTS_SCROLL} {field_name}", value=f"```{love_description}```", inline=False)
+    embed.add_field(
+        name=f"{HEARTS_SCROLL} {field_name}",
+        value=f"```{love_description}```",
+        inline=False,
+    )
     currency_symbol = get_guild_currency_symbol(guild_id)
     field_name = get_msg_from_locale_by_key(guild_id, "love_money")
     embed.add_field(
-        name=f"{PIGBANK} {field_name}", value=f"__**{family_money}**__ {currency_symbol}", inline=True
+        name=f"{PIGBANK} {field_name}",
+        value=f"__**{family_money}**__ {currency_symbol}",
+        inline=True,
     )
     field_name = get_msg_from_locale_by_key(guild_id, "love_date")
-    embed.add_field(name=f"{HEARTS_MANY} {field_name}", value=f"**{love_date}**", inline=True)
+    embed.add_field(
+        name=f"{HEARTS_MANY} {field_name}", value=f"**{love_date}**", inline=True
+    )
     requested = get_msg_from_locale_by_key(guild_id, "requested_by")
     embed.set_footer(text=f"{requested} {user}", icon_url=user.display_avatar)
     embed.set_image(url="attachment://lovecard.png")

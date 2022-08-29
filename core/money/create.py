@@ -84,7 +84,7 @@ def create_money_channels_config_table() -> None:
 
 
 def create_user_money_card(
-        name, author, user, avatar, guild_id
+    name, author, user, avatar, guild_id
 ) -> tuple[nextcord.File, nextcord.Embed]:
     background = Editor("./assets/credit_card.png")
     profile = Editor(avatar).resize((250, 250)).circle_image()
@@ -96,7 +96,9 @@ def create_user_money_card(
     background.text((400, 480), f"{balance}", font=larger_font, color="#FFFFFF")
     requested = get_msg_from_locale_by_key(guild_id, "requested_by")
     name = localize_name(guild_id, name).capitalize()
-    embed = nextcord.Embed(color=DEFAULT_BOT_COLOR, title=f"{CREDIT_CARD} {name} - {user}")
+    embed = nextcord.Embed(
+        color=DEFAULT_BOT_COLOR, title=f"{CREDIT_CARD} {name} - {user}"
+    )
     embed.set_footer(icon_url=author.display_avatar, text=f"{requested} {author}")
     file = nextcord.File(fp=background.image_bytes, filename="balance_card.png")
     embed.set_image(url="attachment://balance_card.png")

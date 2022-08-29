@@ -14,14 +14,7 @@ def write_in_mod_config_standart_values(guilds) -> None:
                 "link_detect, nickname_detect, status_detect, "
                 "guild_moderation_mode) VALUES (?, ?, ?, ?, ?, ?)"
             )
-            val = (
-                guild.id,
-                True,
-                True,
-                True,
-                True,
-                "community"
-            )
+            val = (guild.id, True, True, True, True, "community")
             cursor.execute(sql, val)
             db.commit()
     cursor.close()

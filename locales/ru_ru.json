@@ -939,8 +939,22 @@
     "too_many_roles": {
       "msg": "В магазине можно разместить только от 1 до 25 ролей!"
     },
+<<<<<<< Updated upstream
     "income_display_roles": {
       "name": "показать_роли",
       "description": "Показывает список ролей за доход"
+=======
+    "custom-shop": {
+      "name": "магазин-пользователей",
+      "description": "магазин пользовательских ролей"
+    },
+    "add-custom-shop": {
+      "name": "добавить-роль",
+      "description": "добавить роль в магазин пользовательских ролей"
+    },
+    "remove-custom-shop": {
+      "name": "добавить-a",
+      "description": "a роль в магазин пользовательских ролей"
+>>>>>>> Stashed changes
     }
 }

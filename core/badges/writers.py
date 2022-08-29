@@ -14,7 +14,19 @@ def write_in_badges_standart_values(guilds) -> None:
                         "INSERT INTO badges(guild_id, user_id, badge_1, badge_2, badge_3, badge_4, badge_5, badge_6, "
                         "badge_7, badge_8, badge_9) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                     )
-                    val = (guild.id, member.id, False, False, False, False, False, False, False, False, False)
+                    val = (
+                        guild.id,
+                        member.id,
+                        False,
+                        False,
+                        False,
+                        False,
+                        False,
+                        False,
+                        False,
+                        False,
+                        False,
+                    )
                     cursor.execute(sql, val)
                     db.commit()
     cursor.close()

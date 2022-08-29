@@ -3,13 +3,12 @@ from nextcord.ext import commands
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+# load_dotenv()
 
-SDC_TOKEN = os.getenv("SDC_TOKEN")
+# SDC_TOKEN = os.getenv("SDC_TOKEN")
 
 
 class BotsSDC(commands.Cog):
-
     def __init__(self, client):
         self.client = client
 

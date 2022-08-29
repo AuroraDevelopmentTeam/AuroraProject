@@ -7,15 +7,37 @@ from nextcord import Interaction, Message, Permissions, SlashOption
 from nextcord.ext import commands, menus, application_checks
 from nextcord.abc import GuildChannel
 
-from core.auto.roles.getters import get_server_autorole_state, get_server_autorole_id, get_server_reaction_autorole, \
-    check_level_autorole, list_level_autoroles, list_reaction_autoroles, check_reaction_autorole
-from core.auto.roles.updaters import delete_autorole_for_reaction, write_autorole_for_reaction, \
-    write_autorole_for_level, update_autorole_for_level, delete_autorole_for_level, set_autoroles_state, update_autorole
+from core.auto.roles.getters import (
+    get_server_autorole_state,
+    get_server_autorole_id,
+    get_server_reaction_autorole,
+    check_level_autorole,
+    list_level_autoroles,
+    list_reaction_autoroles,
+    check_reaction_autorole,
+)
+from core.auto.roles.updaters import (
+    delete_autorole_for_reaction,
+    write_autorole_for_reaction,
+    write_autorole_for_level,
+    update_autorole_for_level,
+    delete_autorole_for_level,
+    set_autoroles_state,
+    update_autorole,
+)
 from core.embeds import DEFAULT_BOT_COLOR, construct_basic_embed
-from core.locales.getters import get_msg_from_locale_by_key, get_localized_description, get_localized_name, \
-    localize_name
-from core.errors import construct_error_forbidden_embed, construct_error_negative_value_embed, \
-    construct_error_http_exception_embed, construct_error_not_found_embed
+from core.locales.getters import (
+    get_msg_from_locale_by_key,
+    get_localized_description,
+    get_localized_name,
+    localize_name,
+)
+from core.errors import (
+    construct_error_forbidden_embed,
+    construct_error_negative_value_embed,
+    construct_error_http_exception_embed,
+    construct_error_not_found_embed,
+)
 
 
 class AutorolesList(menus.ListPageSource):
@@ -24,7 +46,10 @@ class AutorolesList(menus.ListPageSource):
         super().__init__(data, per_page=6)
 
     async def format_page(self, menu, entries) -> nextcord.Embed:
-        embed = nextcord.Embed(title=localize_name(self.guild_id, "autorole").capitalize(), color=DEFAULT_BOT_COLOR)
+        embed = nextcord.Embed(
+            title=localize_name(self.guild_id, "autorole").capitalize(),
+            color=DEFAULT_BOT_COLOR,
+        )
         for entry in entries:
             embed.add_field(name=entry[0], value=entry[1], inline=False)
         embed.set_footer(text=f"{menu.current_page + 1}/{self.get_max_pages()}")
@@ -32,7 +57,6 @@ class AutorolesList(menus.ListPageSource):
 
 
 class NoStopButtonMenuPages(menus.ButtonMenuPages, inherit_buttons=False):
-
     def __init__(self, source, timeout=60):
         super().__init__(source, timeout=timeout)
 
@@ -76,7 +100,9 @@ class Autorole(commands.Cog):
         else:
             is_custom = True
         if is_custom is True:
-            autoroles = get_server_reaction_autorole(channel.guild.id, channel.id, message.id, str(emote.id))
+            autoroles = get_server_reaction_autorole(
+                channel.guild.id, channel.id, message.id, str(emote.id)
+            )
             if autoroles is None:
                 return
             for autorole in autoroles:
@@ -84,7 +110,9 @@ class Autorole(commands.Cog):
                 await member.add_roles(role)
         else:
             emote = emoji.demojize(str(emote), delimiters=("", ""))
-            autoroles = get_server_reaction_autorole(channel.guild.id, channel.id, message.id, str(emote))
+            autoroles = get_server_reaction_autorole(
+                channel.guild.id, channel.id, message.id, str(emote)
+            )
             if autoroles is None:
                 return
             for autorole in autoroles:
@@ -107,7 +135,9 @@ class Autorole(commands.Cog):
         else:
             is_custom = True
         if is_custom is True:
-            autoroles = get_server_reaction_autorole(channel.guild.id, channel.id, message.id, str(emote.id))
+            autoroles = get_server_reaction_autorole(
+                channel.guild.id, channel.id, message.id, str(emote.id)
+            )
             if autoroles is None:
                 return
             for autorole in autoroles:
@@ -115,7 +145,9 @@ class Autorole(commands.Cog):
                 await member.remove_roles(role)
         else:
             emote = emoji.demojize(str(emote), delimiters=("", ""))
-            autoroles = get_server_reaction_autorole(channel.guild.id, channel.id, message.id, str(emote))
+            autoroles = get_server_reaction_autorole(
+                channel.guild.id, channel.id, message.id, str(emote)
+            )
             if autoroles is None:
                 return
             for autorole in autoroles:
@@ -133,14 +165,19 @@ class Autorole(commands.Cog):
     async def __autorole(self, interaction: Interaction):
         pass
 
-    @__autorole.subcommand(name="add_for_level", description="Add new autorole for indicated level",
-                           name_localizations=get_localized_name("autorole_add_for_level"),
-                           description_localizations=get_localized_description("autorole_add_for_level"),
-                           )
+    @__autorole.subcommand(
+        name="add_for_level",
+        description="Add new autorole for indicated level",
+        name_localizations=get_localized_name("autorole_add_for_level"),
+        description_localizations=get_localized_description("autorole_add_for_level"),
+    )
     @application_checks.bot_has_guild_permissions(manage_roles=True)
-    async def __autorole_for_level_add(self, interaction: Interaction,
-                                       role: Optional[nextcord.Role] = SlashOption(required=True),
-                                       level: Optional[int] = SlashOption(required=True)):
+    async def __autorole_for_level_add(
+        self,
+        interaction: Interaction,
+        role: Optional[nextcord.Role] = SlashOption(required=True),
+        level: Optional[int] = SlashOption(required=True),
+    ):
         try:
             if check_level_autorole(interaction.guild.id, level):
                 update_autorole_for_level(interaction.guild.id, role, level)
@@ -150,7 +187,8 @@ class Autorole(commands.Cog):
                 interaction.guild.id, f"autorole_{interaction.application_command.name}"
             )
             message_2 = get_msg_from_locale_by_key(
-                interaction.guild.id, f"autorole_{interaction.application_command.name}_2"
+                interaction.guild.id,
+                f"autorole_{interaction.application_command.name}_2",
             )
             requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
             await interaction.response.send_message(
@@ -158,7 +196,8 @@ class Autorole(commands.Cog):
                     f"autorole_{interaction.application_command.name}",
                     f"{message} {level} {message_2} {role.mention}",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar, interaction.guild.id
+                    interaction.user.display_avatar,
+                    interaction.guild.id,
                 )
             )
         except nextcord.Forbidden:
@@ -169,12 +208,19 @@ class Autorole(commands.Cog):
                 )
             )
 
-    @__autorole.subcommand(name="remove_for_level", description="Add new autorole for indicated level",
-                           name_localizations=get_localized_name("autorole_remove_for_level"),
-                           description_localizations=get_localized_description("autorole_remove_for_level"),
-                           )
-    async def __autorole_for_level_remove(self, interaction: Interaction,
-                                          level: Optional[int] = SlashOption(required=True)):
+    @__autorole.subcommand(
+        name="remove_for_level",
+        description="Add new autorole for indicated level",
+        name_localizations=get_localized_name("autorole_remove_for_level"),
+        description_localizations=get_localized_description(
+            "autorole_remove_for_level"
+        ),
+    )
+    async def __autorole_for_level_remove(
+        self,
+        interaction: Interaction,
+        level: Optional[int] = SlashOption(required=True),
+    ):
         if level <= 1:
             return await interaction.response.send_message(
                 embed=construct_error_negative_value_embed(
@@ -191,7 +237,7 @@ class Autorole(commands.Cog):
                 description=get_msg_from_locale_by_key(
                     interaction.guild.id, "no_in_table"
                 ),
-                color=DEFAULT_BOT_COLOR
+                color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
         delete_autorole_for_level(interaction.guild.id, level)
@@ -204,22 +250,28 @@ class Autorole(commands.Cog):
                 f"autorole_{interaction.application_command.name}",
                 f"{message} **{level}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar, interaction.guild.id
+                interaction.user.display_avatar,
+                interaction.guild.id,
             )
         )
 
-    @__autorole.subcommand(name="display_for_level",
-                           description="Lists all autoroles for level",
-                           name_localizations=get_localized_name("autorole_display_for_level"),
-                           description_localizations=get_localized_description("autorole_display_for_level"),
-                           )
+    @__autorole.subcommand(
+        name="display_for_level",
+        description="Lists all autoroles for level",
+        name_localizations=get_localized_name("autorole_display_for_level"),
+        description_localizations=get_localized_description(
+            "autorole_display_for_level"
+        ),
+    )
     async def __autorole_for_level_display(self, interaction: Interaction):
         autoroles = list_level_autoroles(interaction.guild.id)
         source_for_pages = []
         for row in autoroles:
             role = nextcord.utils.get(interaction.guild.roles, id=row[0])
             role = role.mention
-            lvl_msg = get_msg_from_locale_by_key(interaction.guild.id, "level").capitalize()
+            lvl_msg = get_msg_from_locale_by_key(
+                interaction.guild.id, "level"
+            ).capitalize()
             level = f"{lvl_msg} {row[1]}"
             source_for_pages.append([level, role])
         pages = NoStopButtonMenuPages(
@@ -227,16 +279,20 @@ class Autorole(commands.Cog):
         )
         await pages.start(interaction=interaction)
 
-    @__autorole.subcommand(name="add_on_reaction",
-                           description="Add new autorole on reaction",
-                           name_localizations=get_localized_name("autorole_add_on_reaction"),
-                           description_localizations=get_localized_description("autorole_add_on_reaction"),
-                           )
+    @__autorole.subcommand(
+        name="add_on_reaction",
+        description="Add new autorole on reaction",
+        name_localizations=get_localized_name("autorole_add_on_reaction"),
+        description_localizations=get_localized_description("autorole_add_on_reaction"),
+    )
     @application_checks.bot_has_guild_permissions(manage_roles=True)
-    async def __autorole_on_reaction_add(self, interaction: Interaction,
-                                         channel: Optional[GuildChannel] = SlashOption(required=True),
-                                         message_id: Optional[str] = SlashOption(required=True),
-                                         role: Optional[nextcord.Role] = SlashOption(required=True)):
+    async def __autorole_on_reaction_add(
+        self,
+        interaction: Interaction,
+        channel: Optional[GuildChannel] = SlashOption(required=True),
+        message_id: Optional[str] = SlashOption(required=True),
+        role: Optional[nextcord.Role] = SlashOption(required=True),
+    ):
         try:
             await interaction.response.defer()
             message_id = int(message_id)
@@ -246,19 +302,22 @@ class Autorole(commands.Cog):
                 description=get_msg_from_locale_by_key(
                     interaction.guild.id, "react_here"
                 ),
-                color=DEFAULT_BOT_COLOR
+                color=DEFAULT_BOT_COLOR,
             )
 
             message_for_reaction = await interaction.followup.send(embed=embed)
 
             def check(reaction, user):
-                return (reaction.message.id == message_for_reaction.id) and (user.id == interaction.user.id)
-            try:
-                reaction, user = await self.client.wait_for('reaction_add', check=check, timeout=60)
-            except asyncio.TimeoutError as error:
-                embed = nextcord.Embed(
-                    color=DEFAULT_BOT_COLOR, description=f"{error}"
+                return (reaction.message.id == message_for_reaction.id) and (
+                    user.id == interaction.user.id
                 )
+
+            try:
+                reaction, user = await self.client.wait_for(
+                    "reaction_add", check=check, timeout=60
+                )
+            except asyncio.TimeoutError as error:
+                embed = nextcord.Embed(color=DEFAULT_BOT_COLOR, description=f"{error}")
                 return await interaction.followup.send(embed=embed)
             await message.add_reaction(str(reaction.emoji))
             if emoji.emoji_count(str(reaction.emoji)) >= 1:
@@ -266,16 +325,30 @@ class Autorole(commands.Cog):
             else:
                 is_custom = True
             if is_custom is True:
-                write_autorole_for_reaction(interaction.guild.id, channel.id, message.id, str(reaction.emoji.id), role,
-                                            is_custom)
+                write_autorole_for_reaction(
+                    interaction.guild.id,
+                    channel.id,
+                    message.id,
+                    str(reaction.emoji.id),
+                    role,
+                    is_custom,
+                )
             else:
                 emote = emoji.demojize(str(reaction.emoji), delimiters=("", ""))
-                write_autorole_for_reaction(interaction.guild.id, channel.id, message.id, str(emote), role, is_custom)
+                write_autorole_for_reaction(
+                    interaction.guild.id,
+                    channel.id,
+                    message.id,
+                    str(emote),
+                    role,
+                    is_custom,
+                )
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"autorole_{interaction.application_command.name}"
             )
             message_2 = get_msg_from_locale_by_key(
-                interaction.guild.id, f"autorole_{interaction.application_command.name}_2"
+                interaction.guild.id,
+                f"autorole_{interaction.application_command.name}_2",
             )
             requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
             await interaction.followup.send(
@@ -283,15 +356,14 @@ class Autorole(commands.Cog):
                     f"autorole_{interaction.application_command.name}",
                     f"{message} {reaction.emoji} {message_2} {role.mention}",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar, interaction.guild.id
+                    interaction.user.display_avatar,
+                    interaction.guild.id,
                 )
             )
         except nextcord.NotFound:
             return await interaction.followup.send(
                 embed=construct_error_not_found_embed(
-                    get_msg_from_locale_by_key(
-                        interaction.guild.id, "not_found_error"
-                    ),
+                    get_msg_from_locale_by_key(interaction.guild.id, "not_found_error"),
                     self.client.user.avatar.url,
                 )
             )
@@ -330,20 +402,26 @@ class Autorole(commands.Cog):
                 )
             )
 
-    @__autorole.subcommand(name="remove_on_reaction",
-                           description="Add new autorole on reaction",
-                           name_localizations=get_localized_name("autorole_remove_on_reaction"),
-                           description_localizations=get_localized_description("autorole_remove_on_reaction"),
-                           )
-    async def __autorole_on_reaction_remove(self, interaction: Interaction,
-                                            role: Optional[nextcord.Role] = SlashOption(required=True)):
+    @__autorole.subcommand(
+        name="remove_on_reaction",
+        description="Add new autorole on reaction",
+        name_localizations=get_localized_name("autorole_remove_on_reaction"),
+        description_localizations=get_localized_description(
+            "autorole_remove_on_reaction"
+        ),
+    )
+    async def __autorole_on_reaction_remove(
+        self,
+        interaction: Interaction,
+        role: Optional[nextcord.Role] = SlashOption(required=True),
+    ):
         if check_reaction_autorole(interaction.guild.id, role) is False:
             embed = nextcord.Embed(
                 title="error",
                 description=get_msg_from_locale_by_key(
                     interaction.guild.id, "no_in_table"
                 ),
-                color=DEFAULT_BOT_COLOR
+                color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
         delete_autorole_for_reaction(interaction.guild.id, role)
@@ -356,14 +434,19 @@ class Autorole(commands.Cog):
                 f"autorole_{interaction.application_command.name}",
                 f"{message} {role.mention}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar, interaction.guild.id
+                interaction.user.display_avatar,
+                interaction.guild.id,
             )
         )
 
-    @__autorole.subcommand(name="display_on_reaction", description="Show all autoroles that must be given automatically",
-                           name_localizations=get_localized_name("autorole_display_on_reaction"),
-                           description_localizations=get_localized_description("autorole_display_on_reaction"),
-                           )
+    @__autorole.subcommand(
+        name="display_on_reaction",
+        description="Show all autoroles that must be given automatically",
+        name_localizations=get_localized_name("autorole_display_on_reaction"),
+        description_localizations=get_localized_description(
+            "autorole_display_on_reaction"
+        ),
+    )
     async def __autorole_on_reaction_display(self, interaction: Interaction):
         autoroles = list_reaction_autoroles(interaction.guild.id)
         source_for_pages = []
@@ -384,11 +467,11 @@ class Autorole(commands.Cog):
         description_localizations=get_localized_description("autorole_enable"),
     )
     async def __autoroles_state_set(
-            self,
-            interaction: Interaction,
-            autoroles_state: int = SlashOption(
-                name="picker", choices={"turn on": 1, "turn off": 0}, required=True
-            ),
+        self,
+        interaction: Interaction,
+        autoroles_state: int = SlashOption(
+            name="picker", choices={"turn on": 1, "turn off": 0}, required=True
+        ),
     ):
         autoroles_state = bool(autoroles_state)
         set_autoroles_state(interaction.guild.id, autoroles_state)
@@ -409,7 +492,8 @@ class Autorole(commands.Cog):
                 f"autorole_{interaction.application_command.name}",
                 f"{message} **{autoroles_state}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar, interaction.guild.id
+                interaction.user.display_avatar,
+                interaction.guild.id,
             )
         )
 
@@ -421,9 +505,9 @@ class Autorole(commands.Cog):
     )
     @application_checks.bot_has_guild_permissions(manage_roles=True)
     async def __autorole_set(
-            self,
-            interaction: Interaction,
-            role: Optional[nextcord.Role] = SlashOption(required=True),
+        self,
+        interaction: Interaction,
+        role: Optional[nextcord.Role] = SlashOption(required=True),
     ):
         try:
             update_autorole(interaction.guild.id, role.id)
@@ -436,7 +520,8 @@ class Autorole(commands.Cog):
                     f"autorole_{interaction.application_command.name}",
                     f"{message} **{role.mention}**",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar, interaction.guild.id
+                    interaction.user.display_avatar,
+                    interaction.guild.id,
                 )
             )
         except nextcord.Forbidden:

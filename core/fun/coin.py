@@ -2,14 +2,8 @@ import random
 import nextcord
 
 coin_toss = {
-    "ru_ru": {
-        0: "**Орёл**",
-        1: "**Решка**"
-    },
-    "en_us": {
-        0: "**Heads**",
-        1: "**Tails**"
-    }
+    "ru_ru": {0: "**Орёл**", 1: "**Решка**"},
+    "en_us": {0: "**Heads**", 1: "**Tails**"},
 }
 
 

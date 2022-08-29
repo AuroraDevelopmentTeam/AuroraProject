@@ -3,8 +3,20 @@ import sqlite3
 
 
 class Clan:
-    def __init__(self, description, role_id, level, owner, members, members_limit, storage, create_date, icon, image,
-                 guild_boss):
+    def __init__(
+        self,
+        description,
+        role_id,
+        level,
+        owner,
+        members,
+        members_limit,
+        storage,
+        create_date,
+        icon,
+        image,
+        guild_boss,
+    ):
         self.description = description
         self.role_id = role_id
         self.level = level
@@ -21,8 +33,6 @@ class Clan:
 class ClanHandler(commands.Cog):
     def __init__(self, client):
         self.client = client
-
-
 
 
 def setup(client):

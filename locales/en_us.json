@@ -942,8 +942,22 @@
     "too_many_roles": {
       "msg": "In the shop can be only from 1 to 25 roles!"
     },
+<<<<<<< Updated upstream
     "income_display_roles": {
       "name": "display_roles",
       "description": "Show list of roles with income set"
+=======
+    "custom-shop": {
+      "name": "custom-shop",
+      "description": "custom roles shop"
+    },
+    "add-custom-shop": {
+      "name": "da-asd",
+      "description": "dsa das ads"
+    },
+    "remove-custom-shop": {
+      "name": "a-роль",
+      "description": "добавить роль в a пользовательских ролей"
+>>>>>>> Stashed changes
     }
 }

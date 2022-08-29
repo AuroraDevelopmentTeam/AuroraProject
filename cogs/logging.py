@@ -21,7 +21,9 @@ class EventsLogging(commands.Cog):
             return
 
         try:
-            logging_channel = self.client.get_channel(get_logging_channel(message.guild.id))
+            logging_channel = self.client.get_channel(
+                get_logging_channel(message.guild.id)
+            )
             await logging_channel.send(
                 embed=construct_log(
                     "Message delete",
@@ -43,7 +45,9 @@ class EventsLogging(commands.Cog):
         if get_logging_state(before.guild.id) is False:
             return
         try:
-            logging_channel = self.client.get_channel(get_logging_channel(before.guild.id))
+            logging_channel = self.client.get_channel(
+                get_logging_channel(before.guild.id)
+            )
             await logging_channel.send(
                 embed=construct_log(
                     "Message edit",
@@ -69,7 +73,9 @@ class EventsLogging(commands.Cog):
         if get_logging_state(member.guild.id) is False:
             return
         try:
-            logging_channel = self.client.get_channel(get_logging_channel(member.guild.id))
+            logging_channel = self.client.get_channel(
+                get_logging_channel(member.guild.id)
+            )
             await logging_channel.send(
                 embed=construct_log("Member join", member.guild, user=member)
             )
@@ -85,7 +91,9 @@ class EventsLogging(commands.Cog):
         if get_logging_state(member.guild.id) is False:
             return
         try:
-            logging_channel = self.client.get_channel(get_logging_channel(member.guild.id))
+            logging_channel = self.client.get_channel(
+                get_logging_channel(member.guild.id)
+            )
             await logging_channel.send(
                 embed=construct_log("Member remove", member.guild, user=member)
             )
@@ -102,7 +110,9 @@ class EventsLogging(commands.Cog):
             return
         try:
             logging_channel = self.client.get_channel(get_logging_channel(guild.id))
-            await logging_channel.send(embed=construct_log("Member ban", guild, user=user))
+            await logging_channel.send(
+                embed=construct_log("Member ban", guild, user=user)
+            )
         except TypeError:
             pass
 
@@ -135,7 +145,9 @@ class EventsLogging(commands.Cog):
                         if before.color == after.color:
                             return
         try:
-            logging_channel = self.client.get_channel(get_logging_channel(before.guild.id))
+            logging_channel = self.client.get_channel(
+                get_logging_channel(before.guild.id)
+            )
             await logging_channel.send(
                 embed=construct_log(
                     "Role update", after.guild, role_before=before, role_after=after
@@ -151,7 +163,9 @@ class EventsLogging(commands.Cog):
         if get_logging_state(role.guild.id) is False:
             return
         try:
-            logging_channel = self.client.get_channel(get_logging_channel(role.guild.id))
+            logging_channel = self.client.get_channel(
+                get_logging_channel(role.guild.id)
+            )
             await logging_channel.send(
                 embed=construct_log("Role create", role.guild, role=role)
             )
@@ -165,7 +179,13 @@ class EventsLogging(commands.Cog):
         if get_logging_state(role.guild.id) is False:
             return
         try:
+<<<<<<< Updated upstream
             logging_channel = self.client.get_channel(get_logging_channel(role.guild.id))
+=======
+            logging_channel = self.client.get_channel(
+                get_logging_channele(role.guild.id)
+            )
+>>>>>>> Stashed changes
             await logging_channel.send(
                 embed=construct_log("Role delete", role.guild, role=role)
             )
@@ -179,7 +199,9 @@ class EventsLogging(commands.Cog):
         if get_logging_state(channel.guild.id) is False:
             return
         try:
-            logging_channel = self.client.get_channel(get_logging_channel(channel.guild.id))
+            logging_channel = self.client.get_channel(
+                get_logging_channel(channel.guild.id)
+            )
             await logging_channel.send(
                 embed=construct_log("Channel create", channel.guild, channel=channel)
             )
@@ -193,7 +215,9 @@ class EventsLogging(commands.Cog):
         if get_logging_state(channel.guild.id) is False:
             return
         try:
-            logging_channel = self.client.get_channel(get_logging_channel(channel.guild.id))
+            logging_channel = self.client.get_channel(
+                get_logging_channel(channel.guild.id)
+            )
             await logging_channel.send(
                 embed=construct_log("Channel delete", channel.guild, channel=channel)
             )
@@ -207,7 +231,9 @@ class EventsLogging(commands.Cog):
         if get_logging_state(before.guild.id) is False:
             return
         try:
-            logging_channel = self.client.get_channel(get_logging_channel(before.guild.id))
+            logging_channel = self.client.get_channel(
+                get_logging_channel(before.guild.id)
+            )
             await logging_channel.send(
                 embed=construct_log(
                     "Channel update",

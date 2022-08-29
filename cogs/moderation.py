@@ -64,10 +64,8 @@ class Moderation(commands.Cog):
             required=False,
             description="Reason of giving mute",
             name_localizations={"ru": "причина"},
-            description_localizations={
-                "ru": "Причина выдаваемого мута"
-            },
-        )
+            description_localizations={"ru": "Причина выдаваемого мута"},
+        ),
     ):
         """
         Parameters
@@ -116,7 +114,8 @@ class Moderation(commands.Cog):
                     interaction.application_command.name,
                     f"{message} {user.mention}",
                     f"📝 {reason}. 🕔 {time}\n{requested} {interaction.user}",
-                    interaction.user.display_avatar, interaction.guild.id
+                    interaction.user.display_avatar,
+                    interaction.guild.id,
                 )
             )
         except nextcord.Forbidden:
@@ -132,7 +131,7 @@ class Moderation(commands.Cog):
                 description=get_msg_from_locale_by_key(
                     interaction.guild.id, "mute_invalid_timespan"
                 ),
-                color=DEFAULT_BOT_COLOR
+                color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
 
@@ -174,10 +173,8 @@ class Moderation(commands.Cog):
         if user.timeout is None:
             embed = nextcord.Embed(
                 title="No mute",
-                description=get_msg_from_locale_by_key(
-                    interaction.guild.id, "no_mute"
-                ),
-                color=DEFAULT_BOT_COLOR
+                description=get_msg_from_locale_by_key(interaction.guild.id, "no_mute"),
+                color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
         try:
@@ -191,7 +188,8 @@ class Moderation(commands.Cog):
                     interaction.application_command.name,
                     f"{message} {user.mention}",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar, interaction.guild.id
+                    interaction.user.display_avatar,
+                    interaction.guild.id,
                 )
             )
         except nextcord.Forbidden:
@@ -201,7 +199,6 @@ class Moderation(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-
 
     @nextcord.slash_command(
         name="mutes",
@@ -275,7 +272,9 @@ class Moderation(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        message = await interaction.followup.send(f"/{localize_name(interaction.guild.id, 'clear')}...")
+        message = await interaction.followup.send(
+            f"/{localize_name(interaction.guild.id, 'clear')}..."
+        )
         if before is None:
             before = message.created_at
         else:
@@ -297,7 +296,8 @@ class Moderation(commands.Cog):
                     interaction.application_command.name,
                     f"{message} **{len(were_deleted)}**",
                     f"{requested} {interaction.user}",
-                    interaction.user.display_avatar, interaction.guild.id
+                    interaction.user.display_avatar,
+                    interaction.guild.id,
                 )
             )
         except nextcord.Forbidden:
@@ -334,7 +334,9 @@ class Moderation(commands.Cog):
             if user.bot:
                 return await interaction.followup.send(
                     embed=construct_error_bot_user_embed(
-                        get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "bot_user_error"
+                        ),
                         self.client.user.avatar.url,
                     )
                 )
@@ -351,7 +353,8 @@ class Moderation(commands.Cog):
                     interaction.application_command.name,
                     f"{message} {user.mention}",
                     f"📝 {reason}.\n{requested} {interaction.user}",
-                    interaction.user.display_avatar, interaction.guild.id
+                    interaction.user.display_avatar,
+                    interaction.guild.id,
                 )
             )
             if (len(warns)) == 3:
@@ -368,7 +371,8 @@ class Moderation(commands.Cog):
                         "Автомут за 3 варна и их очищение",
                         f"{message} {user.mention}",
                         f"📝 {reason}. 🕔 1 h\n{requested} {interaction.user}",
-                        interaction.user.display_avatar, interaction.guild.id
+                        interaction.user.display_avatar,
+                        interaction.guild.id,
                     )
                 )
         except nextcord.Forbidden:
@@ -410,7 +414,7 @@ class Moderation(commands.Cog):
                 description=get_msg_from_locale_by_key(
                     interaction.guild.id, "user_no_warns"
                 ),
-                color=DEFAULT_BOT_COLOR
+                color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
         if is_warn_id_in_table("warns", warn_id, interaction.guild.id, user.id) is True:
@@ -424,7 +428,8 @@ class Moderation(commands.Cog):
                     interaction.application_command.name,
                     f"{message} {user.mention}",
                     f"ID#{warn_id}\n{requested} {interaction.user}",
-                    interaction.user.display_avatar, interaction.guild.id
+                    interaction.user.display_avatar,
+                    interaction.guild.id,
                 )
             )
         else:
@@ -433,7 +438,7 @@ class Moderation(commands.Cog):
                 description=get_msg_from_locale_by_key(
                     interaction.guild.id, "no_warn_in_table"
                 ),
-                color=DEFAULT_BOT_COLOR
+                color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
 
@@ -488,7 +493,7 @@ class Moderation(commands.Cog):
                 description=get_msg_from_locale_by_key(
                     interaction.guild.id, "no_warn_in_table"
                 ),
-                color=DEFAULT_BOT_COLOR
+                color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
         update_warn_reason(interaction.guild.id, warn_id, new_warn_reason)
@@ -501,7 +506,8 @@ class Moderation(commands.Cog):
                 interaction.application_command.name,
                 f"{message} {new_warn_reason}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar, interaction.guild.id
+                interaction.user.display_avatar,
+                interaction.guild.id,
             )
         )
 
@@ -530,7 +536,7 @@ class Moderation(commands.Cog):
                 description=get_msg_from_locale_by_key(
                     interaction.guild.id, "user_no_warns"
                 ),
-                color=DEFAULT_BOT_COLOR
+                color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
         for warn in warns:
@@ -545,7 +551,8 @@ class Moderation(commands.Cog):
                 interaction.application_command.name,
                 f"{message} {user.mention}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar, interaction.guild.id
+                interaction.user.display_avatar,
+                interaction.guild.id,
             )
         )
 

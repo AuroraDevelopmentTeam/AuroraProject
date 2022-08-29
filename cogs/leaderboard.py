@@ -127,10 +127,12 @@ class Leaderboard(commands.Cog):
         )
         await interaction.followup.send(embed=embed)
 
-    @__leaderboard.subcommand(name="voice", description="voice leaderboard",
-                              name_localizations=get_localized_name("leaderboard_voice"),
-                              description_localizations=get_localized_description("leaderboard_voice"),
-                              )
+    @__leaderboard.subcommand(
+        name="voice",
+        description="voice leaderboard",
+        name_localizations=get_localized_name("leaderboard_voice"),
+        description_localizations=get_localized_description("leaderboard_voice"),
+    )
     async def __voice_leaderboard(self, interaction: Interaction):
         await interaction.response.defer()
         db = sqlite3.connect("./databases/main.sqlite")
@@ -154,10 +156,12 @@ class Leaderboard(commands.Cog):
         embed.set_image(url="https://giffiles.alphacoders.com/209/209343.gif")
         await interaction.followup.send(embed=embed)
 
-    @__leaderboard.subcommand(name="messages", description="messages leaderboard",
-                              name_localizations=get_localized_name("leaderboard_messages"),
-                              description_localizations=get_localized_description("leaderboard_messages"),
-                              )
+    @__leaderboard.subcommand(
+        name="messages",
+        description="messages leaderboard",
+        name_localizations=get_localized_name("leaderboard_messages"),
+        description_localizations=get_localized_description("leaderboard_messages"),
+    )
     async def __messages_leaderboard(self, interaction: Interaction):
         await interaction.response.defer()
         db = sqlite3.connect("./databases/main.sqlite")

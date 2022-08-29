@@ -3,7 +3,9 @@ import sqlite3
 
 def get_user_balance(guild_id: int, user_id: int) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
+    print(db)
     cursor = db.cursor()
+    print(cursor)
     balance = cursor.execute(
         f"SELECT balance FROM money WHERE guild_id = {guild_id} AND user_id = {user_id}"
     ).fetchone()[0]
@@ -64,8 +66,7 @@ def get_msg_cooldown(guild_id: int) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     msg_cooldown = cursor.execute(
-        f"SELECT msg_cooldown FROM chat_money_config"
-        f" WHERE guild_id = {guild_id}"
+        f"SELECT msg_cooldown FROM chat_money_config" f" WHERE guild_id = {guild_id}"
     ).fetchone()[0]
     cursor.close()
     db.close()

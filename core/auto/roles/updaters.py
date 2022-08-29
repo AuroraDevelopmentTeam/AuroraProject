@@ -58,8 +58,14 @@ def delete_autorole_for_level(guild_id: int, level: int) -> None:
     db.close()
 
 
-def write_autorole_for_reaction(guild_id: int, channel_id: int, message_id: int, reaction: str,
-                                role: nextcord.Role, is_custom: bool) -> None:
+def write_autorole_for_reaction(
+    guild_id: int,
+    channel_id: int,
+    message_id: int,
+    reaction: str,
+    role: nextcord.Role,
+    is_custom: bool,
+) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     sql = "INSERT INTO reaction_autorole (guild_id, channel_id, message_id, reaction, autorole_id, is_custom) VALUES (?, ?, ?, ?, ?, ?) "

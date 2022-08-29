@@ -21,4 +21,5 @@ settings = {
     "default_nitro_messages_state": True,
     "default_profile_avatar_form": "circle",
     "default_logs_enabled": True,
+    "default_custom_shop_create_role": 2000,
 }
