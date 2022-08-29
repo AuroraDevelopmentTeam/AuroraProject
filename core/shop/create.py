@@ -6,7 +6,7 @@ def create_shop_table() -> None:
     cursor = db.cursor()
     cursor.execute(
         """CREATE TABLE IF NOT EXISTS shop (
-        guild_id INTERGER, role_id INTERGER, cost INTERGER
+        guild_id INTEGER, role_id INTEGER, cost INTEGER
     )"""
     )
     db.commit()

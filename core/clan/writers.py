@@ -29,8 +29,9 @@ def write_in_clan_config_standart_values(guilds) -> None:
         if is_guild_id_in_table("clan_config", guild.id) is False:
             sql = (
                 "INSERT INTO clan_config(guild_id, create_cost, upgrade_attack_cost, "
-                "upgrade_limit_cost, change_icon_cost, change_image_cost, upgrade_boss_cost) VALUES (?, ?, ?, ?, ?, "
-                "?, ?) "
+                "upgrade_limit_cost, change_icon_cost, change_image_cost, upgrade_boss_cost, create_clan_channels, "
+                "clan_voice_category) VALUES (?, ?, ?, ?, ?, "
+                "?, ?, ?, ?) "
             )
             val = (
                 guild.id,
@@ -39,7 +40,9 @@ def write_in_clan_config_standart_values(guilds) -> None:
                 1000000,
                 10000,
                 50000,
-                250000
+                250000,
+                True,
+                0
             )
             cursor.execute(sql, val)
             db.commit()
@@ -49,14 +52,15 @@ def write_in_clan_config_standart_values(guilds) -> None:
 
 
 def write_clan(guild_id: int, owner_id: int, create_date: str, icon: str, clan_description: str,
-               clan_name: str) -> None:
+               clan_name: str, clan_role: int) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     sql = "INSERT INTO clans(guild_id, clan_id, level, clan_exp, owner_id, member_limit, storage, create_date, " \
-          "icon, image, min_attack, max_attack, guild_boss_level, guild_boss_hp, clan_description, clan_name) VALUES " \
-          "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+          "icon, image, min_attack, max_attack, guild_boss_level, guild_boss_hp, clan_description, clan_name, " \
+          "clan_role) VALUES " \
+          "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
     val = (guild_id, random.randint(1, 999999999999999), 1, 0, owner_id, 15, 0, create_date, icon, '0', 4, 9, 1, 100,
-           clan_description, clan_name)
+           clan_description, clan_name, clan_role)
     cursor.execute(sql, val)
     db.commit()
     cursor.close()

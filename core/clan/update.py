@@ -4,7 +4,7 @@ from core.clan.getters import get_clan_max_attack, get_clan_min_attack, get_clan
     get_clan_storage, get_clan_guild_boss_hp, get_clan_guild_boss_level
 
 
-# Changes in clan
+# Clan update
 
 def update_clan_icon(guild_id: int, clan_id: int, icon_url: str) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
@@ -150,6 +150,20 @@ def update_user_clan_id(guild_id: int, user_id: int, clan_id: int) -> None:
     cursor = db.cursor()
     sql = "UPDATE clan_members SET clan_id = ? WHERE guild_id = ? AND user_id = ?"
     values = (clan_id, guild_id, user_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+# Config update
+
+def update_server_clan_create_cost(guild_id: int, clan_creation_cost: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE clan_config SET create_cost = ? WHERE guild_id = ?"
+    values = (clan_creation_cost, guild_id)
     cursor.execute(sql, values)
     db.commit()
     cursor.close()

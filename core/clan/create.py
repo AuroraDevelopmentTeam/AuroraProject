@@ -8,7 +8,7 @@ def create_clan_table() -> None:
         f"""CREATE TABLE IF NOT EXISTS clans ( guild_id INTEGER, clan_id INTEGER, clan_level INTEGER, clan_exp 
         INTEGER, owner_id INTEGER, member_limit INTEGER, storage INTEGER, create_date TEXT, icon TEXT, image TEXT, 
         min_attack INTEGER, max_attack INTEGER, guild_boss_level INTEGER, guild_boss_hp INTEGER, clan_description 
-        TEXT, clan_name TEXT ) """
+        TEXT, clan_name TEXT, clan_role INTEGER) """
     )
     db.commit()
     cursor.close()

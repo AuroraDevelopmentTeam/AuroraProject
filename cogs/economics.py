@@ -256,6 +256,7 @@ class Economics(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
+        await interaction.response.defer()
         avatar = BytesIO()
         await user.display_avatar.with_format("png").save(avatar)
         profile_picture = Image.open(avatar)
@@ -266,7 +267,7 @@ class Economics(commands.Cog):
             profile_picture,
             interaction.guild.id,
         )
-        await interaction.response.send_message(embed=embed, file=file)
+        await interaction.followup.send(embed=embed, file=file)
 
     @nextcord.slash_command(
         name="reset",

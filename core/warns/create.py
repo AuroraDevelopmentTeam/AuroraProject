@@ -10,7 +10,7 @@ def create_warns_table() -> None:
     cursor = db.cursor()
     cursor.execute(
         f"""CREATE TABLE IF NOT EXISTS warns (
-        warn_id INTERGER, guild_id INTERGER, user_id INTERGER, warn_reason TEXT
+        warn_id INTEGER, guild_id INTEGER, user_id INTEGER, warn_reason TEXT
     )"""
     )
     db.commit()
