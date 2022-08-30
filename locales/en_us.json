@@ -945,5 +945,16 @@
     "income_display_roles": {
       "name": "display_roles",
       "description": "Show list of roles with income set"
+    },
+    "clan_create": {
+      "name": "create",
+      "description": "Create a clan with this command",
+      "msg": "Creating a clan is not cheap, if you really want to create clan be ready to pay your server currency in next amount:"
+    },
+    "yes": {
+      "msg": "yes"
+    },
+    "no": {
+      "msg": "no"
     }
 }

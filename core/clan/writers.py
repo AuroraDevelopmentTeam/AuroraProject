@@ -52,15 +52,30 @@ def write_in_clan_config_standart_values(guilds) -> None:
 
 
 def write_clan(guild_id: int, owner_id: int, create_date: str, icon: str, clan_description: str,
-               clan_name: str, clan_role: int) -> None:
+               clan_name: str, clan_role: int, clan_voice_channel: int, clan_color: str) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
-    sql = "INSERT INTO clans(guild_id, clan_id, level, clan_exp, owner_id, member_limit, storage, create_date, " \
+    sql = "INSERT INTO clans(guild_id, clan_id, clan_level, clan_exp, owner_id, member_limit, storage, create_date, " \
           "icon, image, min_attack, max_attack, guild_boss_level, guild_boss_hp, clan_description, clan_name, " \
-          "clan_role) VALUES " \
-          "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+          "clan_role, clan_voice_channel, clan_color) VALUES " \
+          "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
     val = (guild_id, random.randint(1, 999999999999999), 1, 0, owner_id, 15, 0, create_date, icon, '0', 4, 9, 1, 100,
-           clan_description, clan_name, clan_role)
+           clan_description, clan_name, clan_role, clan_voice_channel, clan_color)
+    cursor.execute(sql, val)
+    db.commit()
+    cursor.close()
+    db.close()
+
+
+def write_clan_on_start(guild_id: int, owner_id: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "INSERT INTO clans(guild_id, clan_id, clan_level, clan_exp, owner_id, member_limit, storage, create_date, " \
+          "icon, image, min_attack, max_attack, guild_boss_level, guild_boss_hp, clan_description, clan_name, " \
+          "clan_role, clan_voice_channel, clan_color) VALUES " \
+          "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+    val = (guild_id, random.randint(1, 999999999999999), 1, 0, owner_id, 15, 0, '0', '0', '0', 4, 9, 1, 100,
+           '0', '0', '0', '0', '0')
     cursor.execute(sql, val)
     db.commit()
     cursor.close()

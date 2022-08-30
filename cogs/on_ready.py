@@ -47,6 +47,8 @@ from core.tickets.writers import write_in_tickets_config_standart_values
 from core.auto.roles.create import create_reaction_autorole_table, create_level_autorole_table
 from core.auto.mod.create import create_mod_word_table, create_mod_config_table
 from core.auto.mod.writers import write_in_mod_config_standart_values
+from core.clan.create import create_clan_table, create_clan_config_table, create_clan_members_table
+from core.clan.writers import write_in_clan_members_standart_values, write_in_clan_config_standart_values
 
 
 class OnReadyListener(commands.Cog):
@@ -56,7 +58,6 @@ class OnReadyListener(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         guilds = self.client.guilds
-        """
         create_locales_table()
         write_in_locales_standart_values(guilds)
         create_money_config_table()
@@ -102,7 +103,11 @@ class OnReadyListener(commands.Cog):
         create_mod_config_table()
         create_mod_word_table()
         write_in_mod_config_standart_values(guilds)
-        """
+        create_clan_table()
+        create_clan_members_table()
+        create_clan_config_table()
+        write_in_clan_config_standart_values(guilds)
+        write_in_clan_members_standart_values(guilds)
         print(len(self.client.guilds))
         for guild in self.client.guilds:
             print(f"{guild.name} - {(len(guild.members))}")
