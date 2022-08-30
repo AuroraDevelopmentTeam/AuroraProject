@@ -158,8 +158,8 @@ class Marriage(commands.Cog):
                 value=f"Время истекло или пользователь отказался от предложения",
                 inline=False,
             )
-            yes_button = create_button("yes", False, True)
-            no_button = create_button("no", False, True)
+            yes_button = create_button(get_msg_from_locale_by_key(interaction.guild.id, "yes"), False, True)
+            no_button = create_button(get_msg_from_locale_by_key(interaction.guild.id, "no"), False, True)
             yes_button.emoji = emoji_yes
             no_button.emoji = emoji_no
             view = View()
@@ -178,8 +178,8 @@ class Marriage(commands.Cog):
             date = timestamp.strftime(date_format)
             marry_users(interaction.guild.id, author.id, pair.id, date)
             update_user_balance(interaction.guild.id, author.id, -10000)
-            yes_button = create_button("yes", False, True)
-            no_button = create_button("no", False, True)
+            yes_button = create_button(get_msg_from_locale_by_key(interaction.guild.id, "yes"), False, True)
+            no_button = create_button(get_msg_from_locale_by_key(interaction.guild.id, "no"), False, True)
             yes_button.emoji = emoji_yes
             no_button.emoji = emoji_no
             view = View()
@@ -190,11 +190,10 @@ class Marriage(commands.Cog):
         embed = create_marry_embed(
             interaction.application_command.name, interaction.guild.id, author, pair
         )
-        print(embed)
         emoji_no = get(self.client.emojis, name="emoji_no")
         emoji_yes = get(self.client.emojis, name="emoji_yes")
-        yes_button = create_button("yes", marry_yes_callback, False)
-        no_button = create_button("no", marry_no_callback, False)
+        yes_button = create_button(get_msg_from_locale_by_key(interaction.guild.id, "yes"), marry_yes_callback, False)
+        no_button = create_button(get_msg_from_locale_by_key(interaction.guild.id, "no"), marry_no_callback, False)
         yes_button.emoji = emoji_yes
         no_button.emoji = emoji_no
         view = ViewAuthorCheck(pair)

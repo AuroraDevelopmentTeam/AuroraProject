@@ -42,7 +42,7 @@ def get_clan_level(guild_id: int, clan_id: int) -> int:
     cursor = db.cursor()
     clan_level = cursor.execute(
         f"SELECT clan_level FROM clans WHERE guild_id = {guild_id} AND clan_id = {clan_id}"
-    ).fetchone()
+    ).fetchone()[0]
     cursor.close()
     db.close()
     return clan_level
@@ -52,7 +52,7 @@ def get_clan_create_date(guild_id: int, clan_id: int) -> str:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     clan_level = cursor.execute(
-        f"SELECT clan_level FROM clans WHERE guild_id = {guild_id} AND clan_id = {clan_id}"
+        f"SELECT create_date FROM clans WHERE guild_id = {guild_id} AND clan_id = {clan_id}"
     ).fetchone()[0]
     cursor.close()
     db.close()
@@ -158,11 +158,55 @@ def get_clan_owner_id(guild_id: int, clan_id: int) -> int:
     return owner_id
 
 
+def get_clan_color(guild_id: int, clan_id: int) -> str:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    clan_color = cursor.execute(
+        f"SELECT clan_color FROM clans WHERE guild_id = {guild_id} AND clan_id = {clan_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return clan_color
+
+
+def get_clan_role(guild_id: int, clan_id: int) -> int:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    clan_role = cursor.execute(
+        f"SELECT clan_role FROM clans WHERE guild_id = {guild_id} AND clan_id = {clan_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return clan_role
+
+
+def get_owner_clan_id(guild_id: int, user_id: int) -> int:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    clan_id = cursor.execute(
+        f"SELECT clan_id FROM clans WHERE guild_id = {guild_id} AND owner_id = {user_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return clan_id
+
+
 def get_user_clan_id(guild_id: int, user_id: int) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     clan_id = cursor.execute(
-        f"SELECT clan_id FROM clans WHERE guild_id = {guild_id} AND user_id = {user_id}"
+        f"SELECT clan_id FROM clan_members WHERE guild_id = {guild_id} AND user_id = {user_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return clan_id
+
+
+def get_user_join_date(guild_id: int, user_id: int, clan_id: int) -> int:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    clan_id = cursor.execute(
+        f"SELECT join_date FROM clan_members WHERE guild_id = {guild_id} AND user_id = {user_id} AND clan_id = {clan_id}"
     ).fetchone()[0]
     cursor.close()
     db.close()
@@ -250,6 +294,27 @@ def get_server_clan_upgrade_boss_cost(guild_id: int) -> int:
     db.close()
     return upgrade_boss_cost
 
+
+def get_server_clan_voice_category(guild_id: int) -> int:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    clan_voice_category = cursor.execute(
+        f"SELECT clan_voice_category FROM clan_config WHERE guild_id = {guild_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return clan_voice_category
+
+
+def get_server_create_clan_channels(guild_id: int) -> bool:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    create_clan_channels = cursor.execute(
+        f"SELECT create_clan_channels FROM clan_config WHERE guild_id = {guild_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return bool(create_clan_channels)
 
 # _____________________________________
 

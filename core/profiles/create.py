@@ -6,7 +6,7 @@ def create_profiles_table() -> None:
     cursor = db.cursor()
     cursor.execute(
         f"""CREATE TABLE IF NOT EXISTS profiles (
-        user_id INTERGER, description TEXT, avatar_form TEXT
+        user_id INTEGER, description TEXT, avatar_form TEXT
     )"""
     )
     db.commit()

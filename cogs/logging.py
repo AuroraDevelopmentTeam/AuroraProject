@@ -35,6 +35,8 @@ class EventsLogging(commands.Cog):
             )
         except TypeError:
             pass
+        except AttributeError:
+            pass
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
@@ -63,6 +65,8 @@ class EventsLogging(commands.Cog):
             )
         except TypeError:
             pass
+        except AttributeError:
+            pass
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
@@ -80,6 +84,8 @@ class EventsLogging(commands.Cog):
                 embed=construct_log("Member join", member.guild, user=member)
             )
         except TypeError:
+            pass
+        except AttributeError:
             pass
 
     @commands.Cog.listener()
@@ -99,6 +105,8 @@ class EventsLogging(commands.Cog):
             )
         except TypeError:
             pass
+        except AttributeError:
+            pass
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild, user):
@@ -115,6 +123,8 @@ class EventsLogging(commands.Cog):
             )
         except TypeError:
             pass
+        except AttributeError:
+            pass
 
     @commands.Cog.listener()
     async def on_member_unban(self, guild, user):
@@ -130,6 +140,8 @@ class EventsLogging(commands.Cog):
                 embed=construct_log("Member unban", guild, user=user)
             )
         except TypeError:
+            pass
+        except AttributeError:
             pass
 
     @commands.Cog.listener()
@@ -155,6 +167,8 @@ class EventsLogging(commands.Cog):
             )
         except TypeError:
             pass
+        except AttributeError:
+            pass
 
     @commands.Cog.listener()
     async def on_guild_role_create(self, role):
@@ -170,6 +184,8 @@ class EventsLogging(commands.Cog):
                 embed=construct_log("Role create", role.guild, role=role)
             )
         except TypeError:
+            pass
+        except AttributeError:
             pass
 
     @commands.Cog.listener()
@@ -193,6 +209,8 @@ class EventsLogging(commands.Cog):
             )
         except TypeError:
             pass
+        except AttributeError:
+            pass
 
     @commands.Cog.listener()
     async def on_guild_channel_create(self, channel):
@@ -209,6 +227,8 @@ class EventsLogging(commands.Cog):
             )
         except TypeError:
             pass
+        except AttributeError:
+            pass
 
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel):
@@ -224,6 +244,8 @@ class EventsLogging(commands.Cog):
                 embed=construct_log("Channel delete", channel.guild, channel=channel)
             )
         except TypeError:
+            pass
+        except AttributeError:
             pass
 
     @commands.Cog.listener()
@@ -245,6 +267,8 @@ class EventsLogging(commands.Cog):
                 )
             )
         except TypeError:
+            pass
+        except AttributeError:
             pass
 
 

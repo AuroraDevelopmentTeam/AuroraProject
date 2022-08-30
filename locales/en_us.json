@@ -951,12 +951,18 @@
       "description": "custom roles shop"
     },
     "add-custom-shop": {
-      "name": "da-asd",
-      "description": "dsa das ads"
+      "name": "add role",
+      "description": "adding role to custom shop"
     },
-    "remove-custom-shop": {
-      "name": "a-роль",
-      "description": "добавить роль в a пользовательских ролей"
-
+    "clan_create": {
+      "name": "create",
+      "description": "Create a clan with this command",
+      "msg": "Creating a clan is not cheap, if you really want to create clan be ready to pay your server currency in next amount:"
+    },
+    "yes": {
+      "msg": "yes"
+    },
+    "no": {
+      "msg": "no"
     }
 }

@@ -11,7 +11,7 @@ from core.clan.getters import (
 )
 
 
-# Changes in clan
+# Clan update
 
 
 def update_clan_icon(guild_id: int, clan_id: int, icon_url: str) -> None:
@@ -153,11 +153,181 @@ def update_clan_owner_id(guild_id: int, clan_id: int, owner_id: int) -> None:
     return
 
 
+def update_clan_name(guild_id: int, owner_id: int, name: str) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE clans SET clan_name = ? WHERE guild_id = ? AND owner_id = ?"
+    values = (name, guild_id, owner_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_clan_desc_on_creation(guild_id: int, owner_id: int, desc: str) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE clans SET clan_description = ? WHERE guild_id = ? AND owner_id = ?"
+    values = (desc, guild_id, owner_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_clan_color(guild_id: int, owner_id: int, color: str) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE clans SET clan_color = ? WHERE guild_id = ? AND owner_id = ?"
+    values = (color, guild_id, owner_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_clan_icon_on_creation(guild_id: int, owner_id: int, icon: str) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE clans SET icon = ? WHERE guild_id = ? AND owner_id = ?"
+    values = (icon, guild_id, owner_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
 def update_user_clan_id(guild_id: int, user_id: int, clan_id: int) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     sql = "UPDATE clan_members SET clan_id = ? WHERE guild_id = ? AND user_id = ?"
     values = (clan_id, guild_id, user_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_user_join_date(guild_id: int, user_id: int, join_date: str) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE clan_members SET join_date = ? WHERE guild_id = ? AND user_id = ?"
+    values = (join_date, guild_id, user_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+# Config update
+
+def update_server_clan_create_cost(guild_id: int, clan_creation_cost: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE clan_config SET create_cost = ? WHERE guild_id = ?"
+    values = (clan_creation_cost, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_server_clan_upgrade_attack_cost(guild_id: int, upgrade_attack_cost: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE clan_config SET upgrade_attack_cost = ? WHERE guild_id = ?"
+    values = (upgrade_attack_cost, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_server_clan_upgrade_limit_cost(guild_id: int, upgrade_limit_cost: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE clan_config SET upgrade_limit_cost = ? WHERE guild_id = ?"
+    values = (upgrade_limit_cost, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_server_clan_change_icon_cost(guild_id: int, change_icon_cost: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE clan_config SET change_icon_cost = ? WHERE guild_id = ?"
+    values = (change_icon_cost, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_server_clan_change_image_cost(guild_id: int, change_image_cost: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE clan_config SET change_icon_cost = ? WHERE guild_id = ?"
+    values = (change_image_cost, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_server_clan_upgrade_boss_cost(guild_id: int, upgrade_boss_cost: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE clan_config SET upgrade_boss_cost = ? WHERE guild_id = ?"
+    values = (upgrade_boss_cost, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_server_create_clan_channels(guild_id: int, create_clan_channels: bool) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE clan_config SET create_clan_channels = ? WHERE guild_id = ?"
+    values = (create_clan_channels, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_server_clan_voice_category(guild_id: int, create_clan_channels: bool) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE clan_config SET create_clan_channels = ? WHERE guild_id = ?"
+    values = (create_clan_channels, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def delete_clan(guild_id: int, owner_id: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "DELETE from clans WHERE guild_id = ? AND owner_id = ?"
+    values = (guild_id, owner_id)
     cursor.execute(sql, values)
     db.commit()
     cursor.close()
