@@ -316,7 +316,6 @@ def get_server_create_clan_channels(guild_id: int) -> bool:
     db.close()
     return bool(create_clan_channels)
 
-
 # _____________________________________
 
 # Misc section consisting of all getters integrated together

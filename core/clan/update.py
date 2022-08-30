@@ -227,7 +227,6 @@ def update_user_join_date(guild_id: int, user_id: int, join_date: str) -> None:
 
 # Config update
 
-
 def update_server_clan_create_cost(guild_id: int, clan_creation_cost: int) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
@@ -240,9 +239,7 @@ def update_server_clan_create_cost(guild_id: int, clan_creation_cost: int) -> No
     return
 
 
-def update_server_clan_upgrade_attack_cost(
-    guild_id: int, upgrade_attack_cost: int
-) -> None:
+def update_server_clan_upgrade_attack_cost(guild_id: int, upgrade_attack_cost: int) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     sql = "UPDATE clan_config SET upgrade_attack_cost = ? WHERE guild_id = ?"
@@ -254,9 +251,7 @@ def update_server_clan_upgrade_attack_cost(
     return
 
 
-def update_server_clan_upgrade_limit_cost(
-    guild_id: int, upgrade_limit_cost: int
-) -> None:
+def update_server_clan_upgrade_limit_cost(guild_id: int, upgrade_limit_cost: int) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     sql = "UPDATE clan_config SET upgrade_limit_cost = ? WHERE guild_id = ?"
@@ -304,9 +299,7 @@ def update_server_clan_upgrade_boss_cost(guild_id: int, upgrade_boss_cost: int) 
     return
 
 
-def update_server_create_clan_channels(
-    guild_id: int, create_clan_channels: bool
-) -> None:
+def update_server_create_clan_channels(guild_id: int, create_clan_channels: bool) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     sql = "UPDATE clan_config SET create_clan_channels = ? WHERE guild_id = ?"
@@ -318,9 +311,7 @@ def update_server_create_clan_channels(
     return
 
 
-def update_server_clan_voice_category(
-    guild_id: int, create_clan_channels: bool
-) -> None:
+def update_server_clan_voice_category(guild_id: int, create_clan_channels: bool) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     sql = "UPDATE clan_config SET create_clan_channels = ? WHERE guild_id = ?"
