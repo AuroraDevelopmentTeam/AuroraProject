@@ -455,7 +455,7 @@ class ClanHandler(commands.Cog):
             view=view
         )
 
-    @__clan.subcommand(name="display", description="Displaying your clan")
+    @__clan.subcommand(name="show", description="Displaying your clan")
     async def __clan_display(self, interaction: Interaction):
         await interaction.response.defer()
         clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
@@ -509,9 +509,106 @@ class ClanHandler(commands.Cog):
     async def __clan_leave(self, interaction: Interaction):
         pass
 
+    @__clan.subcommand(name="kick", description="Disband clan")
+    async def __clan_disband(self, interaction: Interaction):
+        pass
+
+    @__clan.subcommand(name="members", description="Disband clan")
+    async def __clan_disband(self, interaction: Interaction):
+        pass
+
+    @__clan.subcommand(name="disband", description="Disband clan")
+    async def __clan_disband(self, interaction: Interaction):
+        pass
+
     @__clan.subcommand(name="invite", description="Send invite in your clan to user")
     async def __clan_invite(self, interaction: Interaction,
                             user: Optional[nextcord.Member] = SlashOption(required=True)):
+        clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+        clan_name = get_clan_name(interaction.guild.id, clan_id)
+        author = interaction.user
+
+        async def invite_yes(interaction: Interaction):
+            message = get_msg_from_locale_by_key(
+                interaction.guild.id, f"clan_invite_yes"
+            )
+            update_user_clan_id(interaction.guild.id, user.id, clan_id)
+            timestamp = nextcord.utils.format_dt(datetime.datetime.now())
+            clan_role = get_clan_role(interaction.guild.id, clan_id)
+            clan_role = nextcord.utils.get(interaction.guild.roles, id=clan_role)
+            await user.add_roles(clan_role)
+            update_user_join_date(interaction.guild.id, interaction.user.id, timestamp)
+            yes_button = create_button(get_msg_from_locale_by_key(interaction.guild.id, "yes"), False, True)
+            no_button = create_button(get_msg_from_locale_by_key(interaction.guild.id, "no"), False, True)
+            emoji_no = "<:emoji_no:996720327197458442>"
+            emoji_yes = "<:emoji_yes:995604874584657951>"
+            yes_button.emoji = emoji_yes
+            no_button.emoji = emoji_no
+            view = ViewAuthorCheck(interaction.user)
+            view.add_item(yes_button)
+            view.add_item(no_button)
+            await interaction.response.send_message(
+                embed=construct_basic_embed(
+                    "clan_invite",
+                    f"{message} **{clan_name}**",
+                    f"{requested} {author}",
+                    author.display_avatar, interaction.guild.id
+                ),
+                view=view
+            )
+
+        async def invite_no(interaction: Interaction):
+            message = get_msg_from_locale_by_key(
+                interaction.guild.id, f"clan_invite_no"
+            )
+            yes_button = create_button(get_msg_from_locale_by_key(interaction.guild.id, "yes"), False, True)
+            no_button = create_button(get_msg_from_locale_by_key(interaction.guild.id, "no"), False, True)
+            emoji_no = "<:emoji_no:996720327197458442>"
+            emoji_yes = "<:emoji_yes:995604874584657951>"
+            yes_button.emoji = emoji_yes
+            no_button.emoji = emoji_no
+            view = ViewAuthorCheck(interaction.user)
+            view.add_item(yes_button)
+            view.add_item(no_button)
+            await interaction.response.send_message(
+                embed=construct_basic_embed(
+                    "clan_invite",
+                    f"{message} **{clan_name}**",
+                    f"{requested} {author}",
+                    author.display_avatar, interaction.guild.id
+                ),
+                view=view
+            )
+
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(
+            interaction.guild.id, "requested_by"
+        )
+        yes_button = create_button(get_msg_from_locale_by_key(interaction.guild.id, "yes"), invite_yes,
+                                   False)
+        no_button = create_button(get_msg_from_locale_by_key(interaction.guild.id, "no"), invite_no,
+                                  False)
+        emoji_no = "<:emoji_no:996720327197458442>"
+        emoji_yes = "<:emoji_yes:995604874584657951>"
+        yes_button.emoji = emoji_yes
+        no_button.emoji = emoji_no
+        view = ViewAuthorCheck(user)
+        view.add_item(yes_button)
+        view.add_item(no_button)
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{user.mention}\n{message} **{clan_name}**",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar, interaction.guild.id
+            ),
+            view=view
+        )
+
+    @__clan.subcommand(name="attack_clan_boss", description="Send invite in your clan to user")
+    async def __clan_attack_clan_boss(self, interaction: Interaction):
         pass
 
 

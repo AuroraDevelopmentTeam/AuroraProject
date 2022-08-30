@@ -956,5 +956,14 @@
     },
     "no": {
       "msg": "no"
+    },
+    "clan_invite": {
+      "msg": "You was invited to clan:"
+    },
+    "clan_invite_yes": {
+      "msg": "You accepted invitation and now in clan"
+    },
+    "clan_invite_no": {
+      "msg": "You refused the invitation in clan"
     }
 }
