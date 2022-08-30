@@ -3,6 +3,7 @@ import sqlite3
 
 # Clan getters section
 
+
 def get_clan_name(guild_id: int, clan_id: int) -> str:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
@@ -183,6 +184,7 @@ def fetchall_clan_members(guild_id: int, clan_id: int) -> list:
 
 # Clan configuration getters section
 
+
 def get_server_clan_create_cost(guild_id: int) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
@@ -247,6 +249,7 @@ def get_server_clan_upgrade_boss_cost(guild_id: int) -> int:
     cursor.close()
     db.close()
     return upgrade_boss_cost
+
 
 # _____________________________________
 

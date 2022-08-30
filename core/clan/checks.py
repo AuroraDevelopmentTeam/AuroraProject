@@ -17,6 +17,3 @@ def is_clan_owner(guild_id: int, user_id: int) -> bool:
         return True
     else:
         return False
-
-
-

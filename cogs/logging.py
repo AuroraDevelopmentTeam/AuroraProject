@@ -180,7 +180,9 @@ class EventsLogging(commands.Cog):
             return
         try:
 
-            logging_channel = self.client.get_channel(get_logging_channel(role.guild.id))
+            logging_channel = self.client.get_channel(
+                get_logging_channel(role.guild.id)
+            )
 
             logging_channel = self.client.get_channel(
                 get_logging_channele(role.guild.id)

@@ -171,24 +171,8 @@ class HelpSelectMenuENG(nextcord.ui.Select):
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
                 title="💸 Economics",
-
                 description="`/timely` — get money timely amount\n`/balance` — Send balance\n`/add_money` — Add money "
-                            "on someones balance\n "
-                            "`/remove_money` — Remove money from balance\n`/reset balance` — Reset user balance\n"
-                            "`/give` — Give money to someone\n`/add-shop` — Add role to shop\n"
-                            "`/remove-shop` — Remove role from shop\n`/shop` — Server role market\n"
-                            "`/set currency` — Set new currency symbol\n`/set start_balance` — Set new starting "
-                            "balance\n`/set timely_amount` — Set timely amount /timely\n`/slots` — Play slots\n"
-                            "`/blackjack` — Play blackjack\n`/gamble` — Play gamble\n`/wheel` — Spin wheel\n"
-                            "`/duel` — Start duel\n`/income channel` — Turn on/off income in channel\n"
-                            "`/income min_max_message` — Set income for message writing\n"
-                            "`/income min_max_voice` — Set income for being in voice chat\n"
-                            "`/income messages_per_income` — Set messages amount for income\n"
-                            "`/income voice_minutes` — Set voice minutes amount for income\n"
-                            "`/income role_add` — Add income to role per 12 hours\n"
-                            "`/income role_remove` — Remove role from income system",
-
-                description="`/balance` — Send balance\n`/add_money` — Add money on someones balance\n"
+                "on someones balance\n "
                 "`/remove_money` — Remove money from balance\n`/reset balance` — Reset user balance\n"
                 "`/give` — Give money to someone\n`/add-shop` — Add role to shop\n"
                 "`/remove-shop` — Remove role from shop\n`/shop` — Server role market\n"
@@ -202,7 +186,6 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 "`/income voice_minutes` — Set voice minutes amount for income\n"
                 "`/income role_add` — Add income to role per 12 hours\n"
                 "`/income role_remove` — Remove role from income system",
-
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006552600377839696/2623939ce6b6b5d3.gif"
@@ -545,24 +528,8 @@ class HelpSelectMenuRU(nextcord.ui.Select):
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
                 title="💸 Экономика",
-
                 description="`/timely` — получить денежную выплату\n`/balance` — Узнать баланс\n`/add_money` — "
-                            "Добавить деньги\n "
-                            "`/remove_money` — Забрать деньги\n`/reset balance` — Сбросить баланс\n"
-                            "`/give` — Передать валюту\n`/add-shop` — Добавить роль в магазин\n"
-                            "`/remove-shop` — Убрать роль из магазина\n`/shop` — Магазин сервера\n"
-                            "`/set currency` — Установить символ валюты\n`/set start_balance` — Установить начальный "
-                            "баланс\n`/set timely_amount` — Установить выплату /timely\n`/slots` — Сыграть в слоты\n"
-                            "`/blackjack` — Сыграть в блэкджек\n`/gamble` — Сыграть в броски\n`/wheel` — Крутить колесо\n"
-                            "`/duel` — Начать дуэль\n`/income channel` — Отключить/Включить доход в канале\n"
-                            "`/income min_max_message` — Настроить доход за написание сообщений\n"
-                            "`/income min_max_voice` — Настроить доход за пребывание в голосовом чате\n"
-                            "`/income messages_per_income` — Настроить кол-во сообщений для выдачи дохода\n"
-                            "`/income voice_minutes` — Настроить кол-во минут в голосовом чате для выдачи дохода\n"
-                            "`/income role_add` — Добавить выдачу раз в 12 часов валюты роли\n"
-                            "`/income role_remove` — Убрать выдачу раз в 12 часов валюты роли",
-
-                description="`/balance` — Узнать баланс\n`/add_money` — Добавить деньги\n"
+                "Добавить деньги\n "
                 "`/remove_money` — Забрать деньги\n`/reset balance` — Сбросить баланс\n"
                 "`/give` — Передать валюту\n`/add-shop` — Добавить роль в магазин\n"
                 "`/remove-shop` — Убрать роль из магазина\n`/shop` — Магазин сервера\n"
@@ -576,7 +543,6 @@ class HelpSelectMenuRU(nextcord.ui.Select):
                 "`/income voice_minutes` — Настроить кол-во минут в голосовом чате для выдачи дохода\n"
                 "`/income role_add` — Добавить выдачу раз в 12 часов валюты роли\n"
                 "`/income role_remove` — Убрать выдачу раз в 12 часов валюты роли",
-
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006552600377839696/2623939ce6b6b5d3.gif"

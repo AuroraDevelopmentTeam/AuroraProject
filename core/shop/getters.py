@@ -1,13 +1,15 @@
 import nextcord
 from nextcord.ui import Button, Select, View
-from core.shop.updaters import buy_role
+from core.shop.updaters import buy_role, delete_role_from_shop
 import sqlite3
 from typing import Coroutine, Any
 from core.dataclassesList import CustomRole
 
 
 class BuyButton(Button):
-    def __init__(self, label, interaction, role, emoji=None):  # TODO make custom shop emojis for guilds
+    def __init__(
+        self, label, interaction, role, emoji=None
+    ):  # TODO make custom shop emojis for guilds
         super().__init__(label=label, style=nextcord.ButtonStyle.primary, emoji="🛒")
         self.interaction = interaction
         self.role = role
@@ -15,7 +17,6 @@ class BuyButton(Button):
     async def callback(self, interaction) -> None:
         if interaction.user == self.interaction.user:
 
-            # await interaction.response.edit_message(embed=None,view=None, content="Действие выполнено")
             await interaction.response.defer()
             role = nextcord.utils.get(self.interaction.guild.roles, name=self.role)
             await buy_role(self.interaction, role)
@@ -24,7 +25,9 @@ class BuyButton(Button):
 
 
 class NextPageButton(Button):
-    def __init__(self, label, interaction, page, emoji=None, shop_filter="notnew"):  # filt = filter
+    def __init__(
+        self, label, interaction, page, emoji=None, shop_filter="notnew"
+    ):  # filt = filter
         super().__init__(style=nextcord.ButtonStyle.secondary, emoji=emoji, row=3)
         self.interaction = interaction
         self.page: int = page
@@ -95,6 +98,9 @@ async def custom_shop_embed(
 
         col += 1
         objecta = nextcord.utils.get(inter.guild.roles, id=each.role_id)
+        if objecta is None:
+            delete_role_from_shop(inter.guild, each.role_id)
+            return await custom_shop_embed(inter, pagen, order)
         button = BuyButton(label=col, interaction=inter, role=objecta.name)
         view.add_item(button)
         embed.add_field(
@@ -137,10 +143,18 @@ async def custom_shop_embed(
     select.callback = select_callback
     view.add_item(select)
     button1 = NextPageButton(
-        label=f"Страница {pagen - 1}", interaction=inter, page=pagen - 1, emoji="⬅️", shop_filter=order
+        label=f"Страница {pagen - 1}",
+        interaction=inter,
+        page=pagen - 1,
+        emoji="⬅️",
+        shop_filter=order,
     )
     button3 = NextPageButton(
-        label=f"Страница {pagen + 1}", interaction=inter, page=pagen + 1, emoji="➡️", shop_filter=order
+        label=f"Страница {pagen + 1}",
+        interaction=inter,
+        page=pagen + 1,
+        emoji="➡️",
+        shop_filter=order,
     )
     button2 = ShopLeave()
     if pagen >= 2:
@@ -148,10 +162,8 @@ async def custom_shop_embed(
     else:
         button1.disabled = True
         button3.disabled = True
-
     if pagen < pagescol:
         button3.disabled = False
-
     else:
         button3.disabled = True
     view.add_item(button1)

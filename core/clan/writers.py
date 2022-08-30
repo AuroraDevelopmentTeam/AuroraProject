@@ -30,15 +30,7 @@ def write_in_clan_config_standart_values(guilds) -> None:
                 "upgrade_limit_cost, change_icon_cost, change_image_cost, upgrade_boss_cost) VALUES (?, ?, ?, ?, ?, "
                 "?, ?) "
             )
-            val = (
-                guild.id,
-                100000,
-                500000,
-                1000000,
-                10000,
-                50000,
-                250000
-            )
+            val = (guild.id, 100000, 500000, 1000000, 10000, 50000, 250000)
             val = (guild.id, 100000, 500000, 1000000, 10000, 250000)
             cursor.execute(sql, val)
             db.commit()
