@@ -29,7 +29,7 @@ from core.utils import format_seconds_to_hhmmss
 from core.locales.getters import (
     get_msg_from_locale_by_key,
     get_localized_description,
-    get_localized_name
+    get_localized_name,
 )
 from core.embeds import construct_basic_embed
 from core.levels.getters import get_user_level, get_min_max_exp, get_user_exp
@@ -57,11 +57,15 @@ class StatisticsCounter(commands.Cog):
             if get_channel_income_state(message.guild.id, message.channel.id) is False:
                 return
 
-            message_counter = get_user_messages_counter(message.guild.id, message.author.id)
+            message_counter = get_user_messages_counter(
+                message.guild.id, message.author.id
+            )
             messages_for_money = get_msg_cooldown(message.guild.id)
             if message_counter % messages_for_money == 0:
                 min, max = get_guild_min_max_msg_income(message.guild.id)
-                update_user_balance(message.guild.id, message.author.id, random.randint(min, max))
+                update_user_balance(
+                    message.guild.id, message.author.id, random.randint(min, max)
+                )
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
@@ -80,28 +84,37 @@ class StatisticsCounter(commands.Cog):
                 update_user_join_time(member.guild.id, member.id, "0")
                 update_user_time_in_voice(member.guild.id, member.id, second_in_voice)
 
-                minutes_in_voice = int(second_in_voice/60)
+                minutes_in_voice = int(second_in_voice / 60)
                 voice_minutes_for_income = get_voice_minutes_for_income(member.guild.id)
                 min, max = get_guild_min_max_voice_income(member.guild.id)
-                money_to_update = (int(minutes_in_voice//voice_minutes_for_income)) * random.randint(min, max)
+                money_to_update = (
+                    int(minutes_in_voice // voice_minutes_for_income)
+                ) * random.randint(min, max)
                 update_user_balance(member.guild.id, member.id, money_to_update)
 
                 min_exp, max_exp = get_min_max_exp(member.guild.id)
-                exp = random.randint(min_exp, max_exp) * (int(minutes_in_voice//5))
+                exp = random.randint(min_exp, max_exp) * (int(minutes_in_voice // 5))
                 update_user_exp(member.guild.id, member.id, exp, exp)
                 user_level = get_user_level(member.guild.id, member.id)
                 user_exp = get_user_exp(member.guild.id, member.id)
                 if user_exp > 0:
-                    leveling_formula = round((7 * (user_level ** 2)) + 58)
+                    leveling_formula = round((7 * (user_level**2)) + 58)
                     while self.level_up(member.guild.id, member.id):
-                        update_user_exp(member.guild.id, member.id, -leveling_formula, -leveling_formula)
+                        update_user_exp(
+                            member.guild.id,
+                            member.id,
+                            -leveling_formula,
+                            -leveling_formula,
+                        )
                         update_user_level(member.guild.id, member.id, 1)
                         user_level = get_user_level(member.guild.id, member.id)
                         if check_level_autorole(member.guild.id, user_level) is True:
-                            role = get_server_level_autorole(member.guild.id, user_level)
+                            role = get_server_level_autorole(
+                                member.guild.id, user_level
+                            )
                             role = nextcord.utils.get(member.guild.roles, id=role)
                             await member.add_roles(role)
-                        leveling_formula = round((7 * (user_level ** 2)) + 58)
+                        leveling_formula = round((7 * (user_level**2)) + 58)
 
         elif before.channel is None and after.channel is not None:
             join_time = datetime.datetime.now().time().strftime("%H:%M:%S")
@@ -141,7 +154,8 @@ class StatisticsCounter(commands.Cog):
                 interaction.application_command.name,
                 f"{user.mention} {message} **{format_seconds_to_hhmmss(voice_time)}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar, interaction.guild.id
+                interaction.user.display_avatar,
+                interaction.guild.id,
             )
         )
 
@@ -177,7 +191,8 @@ class StatisticsCounter(commands.Cog):
                 interaction.application_command.name,
                 f"{user.mention} {message} **{msg_count}**",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar, interaction.guild.id
+                interaction.user.display_avatar,
+                interaction.guild.id,
             )
         )
 

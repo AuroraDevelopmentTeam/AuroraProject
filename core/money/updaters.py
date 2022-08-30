@@ -63,7 +63,9 @@ def set_user_balance(guild_id: int, user_id: int, money: int) -> None:
     return
 
 
-def update_guild_min_max_msg_income(guild_id: int, min_income: int, max_income: int) -> None:
+def update_guild_min_max_msg_income(
+    guild_id: int, min_income: int, max_income: int
+) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     sql = "UPDATE chat_money_config SET min_msg_income = ? WHERE guild_id = ?"
@@ -78,7 +80,9 @@ def update_guild_min_max_msg_income(guild_id: int, min_income: int, max_income: 
     return
 
 
-def update_guild_min_max_voice_income(guild_id: int, min_income: int, max_income: int) -> None:
+def update_guild_min_max_voice_income(
+    guild_id: int, min_income: int, max_income: int
+) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     sql = "UPDATE chat_money_config SET min_voice_income = ? WHERE guild_id = ?"

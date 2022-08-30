@@ -41,8 +41,16 @@ from core.loggers.create import create_loggers_table
 from core.loggers.writers import write_in_loggers_standart_values
 from core.tickets.create import create_tickets_config_table
 from core.tickets.writers import write_in_tickets_config_standart_values
-from core.utils import write_member_in_gifts, write_member_in_badges, write_member_in_levels, write_member_in_marriage,\
-    write_member_in_profiles, write_member_in_stats, write_member_in_honor, write_member_in_money
+from core.utils import (
+    write_member_in_gifts,
+    write_member_in_badges,
+    write_member_in_levels,
+    write_member_in_marriage,
+    write_member_in_profiles,
+    write_member_in_stats,
+    write_member_in_honor,
+    write_member_in_money,
+)
 
 
 class OnMessageListener(commands.Cog):

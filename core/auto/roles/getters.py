@@ -26,13 +26,15 @@ def get_server_autorole_id(guild_id: int) -> int:
     return autorole_id
 
 
-def get_server_reaction_autorole(guild_id: int, channel_id: int, message_id: int, reaction: str) -> list[int]:
+def get_server_reaction_autorole(
+    guild_id: int, channel_id: int, message_id: int, reaction: str
+) -> list[int]:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     list_of_autoroles = []
     for row in cursor.execute(
-            f"SELECT autorole_id FROM reaction_autorole WHERE guild_id = {guild_id} AND channel_id = {channel_id} AND "
-            f"message_id = {message_id} AND reaction = '{reaction}'"
+        f"SELECT autorole_id FROM reaction_autorole WHERE guild_id = {guild_id} AND channel_id = {channel_id} AND "
+        f"message_id = {message_id} AND reaction = '{reaction}'"
     ):
         list_of_autoroles.append(row[0])
     cursor.close()

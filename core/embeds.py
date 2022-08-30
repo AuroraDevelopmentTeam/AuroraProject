@@ -17,7 +17,7 @@ def construct_basic_embed(
     name: str, value: str, footer_text: str, footer_url: Asset, guild_id: int
 ) -> nextcord.Embed:
     try:
-        if name == 'timely':
+        if name == "timely":
             name = f"{localize_name(guild_id, name).capitalize()}"
             name = CLOCK + " " + name
         else:

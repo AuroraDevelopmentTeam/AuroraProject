@@ -65,7 +65,8 @@ class Levels(commands.Cog):
                     f"{message.author}",
                     f"{msg}",
                     f"{user_level}:" f"0/{round((7 * (user_level**2)) + 58)}",
-                    message.author.display_avatar, message.guild.id
+                    message.author.display_avatar,
+                    message.guild.id,
                 )
                 await message.channel.send(embed=embed)
             else:
@@ -193,14 +194,19 @@ class Levels(commands.Cog):
         if user_exp > 0:
             leveling_formula = round((7 * (user_level**2)) + 58)
             while self.level_up(interaction.guild.id, interaction.user.id):
-                update_user_exp(interaction.guild.id, interaction.user.id, -leveling_formula, -leveling_formula)
+                update_user_exp(
+                    interaction.guild.id,
+                    interaction.user.id,
+                    -leveling_formula,
+                    -leveling_formula,
+                )
                 update_user_level(interaction.guild.id, interaction.user.id, 1)
                 user_level = get_user_level(interaction.guild.id, user.id)
                 if check_level_autorole(interaction.guild.id, user_level) is True:
                     role = get_server_level_autorole(interaction.guild.id, user_level)
                     role = nextcord.utils.get(interaction.guild.roles, id=role)
                     await user.add_roles(role)
-                leveling_formula = round((7 * (user_level ** 2)) + 58)
+                leveling_formula = round((7 * (user_level**2)) + 58)
         msg = get_msg_from_locale_by_key(
             interaction.guild.id, interaction.application_command.name
         )
@@ -213,7 +219,8 @@ class Levels(commands.Cog):
                 interaction.application_command.name,
                 f"{msg} {user.mention} **{exp_points}** {msg_2}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar, interaction.guild.id
+                interaction.user.display_avatar,
+                interaction.guild.id,
             )
         )
 
@@ -274,7 +281,8 @@ class Levels(commands.Cog):
                 interaction.application_command.name,
                 f"{msg} {user.mention} **{exp_points}** {msg_2}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar, interaction.guild.id
+                interaction.user.display_avatar,
+                interaction.guild.id,
             )
         )
 
@@ -315,7 +323,8 @@ class Levels(commands.Cog):
                 interaction.application_command.name,
                 f"{msg} {user.mention}",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar, interaction.guild.id
+                interaction.user.display_avatar,
+                interaction.guild.id,
             )
         )
 

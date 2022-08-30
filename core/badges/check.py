@@ -16,7 +16,7 @@ def check_badges(guild_id: int, user: nextcord.Member):
     if user.id in TESTERS:
         update_user_badge_state(guild_id, user.id, "badge_6", True)
     level = get_user_level(guild_id, user.id)
-    time_in_voice = int(get_user_time_in_voice(guild_id, user.id))/3600
+    time_in_voice = int(get_user_time_in_voice(guild_id, user.id)) / 3600
     messages = get_user_messages_counter(guild_id, user.id)
     if level >= 10 and time_in_voice >= 100 and messages >= 1000:
         update_user_badge_state(guild_id, user.id, "badge_3", True)

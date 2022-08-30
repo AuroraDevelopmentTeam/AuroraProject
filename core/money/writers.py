@@ -90,15 +90,7 @@ def write_in_chat_money_standart_values(guilds) -> None:
                 "msg_cooldown, min_voice_income, max_voice_income, voice_minutes_for_money) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?)"
             )
-            val = (
-                guild.id,
-                0,
-                1,
-                5,
-                1,
-                2,
-                2
-            )
+            val = (guild.id, 0, 1, 5, 1, 2, 2)
             cursor.execute(sql, val)
             db.commit()
     cursor.close()

@@ -238,7 +238,7 @@ run_gifs = [
     "https://c.tenor.com/5YeXm0KWRPgAAAAC/anime-running.gif",
     "https://c.tenor.com/4BUyUqKlXrMAAAAC/scared-anime-scared.gif",
     "https://c.tenor.com/vox8I6cNnYUAAAAC/anime-running-running.gif",
-    "https://c.tenor.com/W_0ux9exhhwAAAAC/machikado-mazoku-running-away.gif"
+    "https://c.tenor.com/W_0ux9exhhwAAAAC/machikado-mazoku-running-away.gif",
 ]
 
 good_morning_gifs = [
@@ -261,7 +261,7 @@ good_morning_gifs = [
     "https://c.tenor.com/Rcg72HKEX-4AAAAC/bonne-nuit-anime-anime.gif",
     "https://c.tenor.com/vnMdqC9XioEAAAAC/good-morning-yuru-yuri.gif",
     "https://c.tenor.com/3Hs6Qw9tbFsAAAAC/tired-sleepy.gif",
-    "https://c.tenor.com/_uzLvIwydtsAAAAC/good-morning-anime.gif"
+    "https://c.tenor.com/_uzLvIwydtsAAAAC/good-morning-anime.gif",
 ]
 
 good_night_gifs = [
@@ -276,5 +276,5 @@ good_night_gifs = [
     "https://c.tenor.com/0WU4kckmSfsAAAAC/anime-animu.gif",
     "https://c.tenor.com/SkP5OA_hX38AAAAC/anime-bedtime.gif",
     "https://c.tenor.com/23NQtnQLhLQAAAAC/rit-red.gif",
-    "https://c.tenor.com/nQjxqh16XCcAAAAC/good-night-sleepy.gif"
+    "https://c.tenor.com/nQjxqh16XCcAAAAC/good-night-sleepy.gif",
 ]

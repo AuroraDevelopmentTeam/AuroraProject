@@ -1,10 +1,18 @@
 import sqlite3
 
-from core.clan.getters import get_clan_max_attack, get_clan_min_attack, get_clan_level, get_clan_exp, \
-    get_clan_storage, get_clan_guild_boss_hp, get_clan_guild_boss_level
+from core.clan.getters import (
+    get_clan_max_attack,
+    get_clan_min_attack,
+    get_clan_level,
+    get_clan_exp,
+    get_clan_storage,
+    get_clan_guild_boss_hp,
+    get_clan_guild_boss_level,
+)
 
 
 # Clan update
+
 
 def update_clan_icon(guild_id: int, clan_id: int, icon_url: str) -> None:
     db = sqlite3.connect("./databases/main.sqlite")

@@ -4,7 +4,11 @@ import nextcord
 from nextcord import Interaction, Permissions, SlashOption
 from nextcord.ext import commands
 
-from core.locales.getters import get_localized_description, get_localized_name, get_msg_from_locale_by_key
+from core.locales.getters import (
+    get_localized_description,
+    get_localized_name,
+    get_msg_from_locale_by_key,
+)
 from core.emotions.create import create_emotion_embed
 from core.emotions.storage import (
     kiss_gifs,
@@ -49,22 +53,22 @@ class Emotions(commands.Cog):
         description_localizations=get_localized_description("emotion_kiss"),
     )
     async def __kiss(
-            self,
-            interaction: Interaction,
-            user: Optional[nextcord.Member] = SlashOption(
-                required=True,
-                description="The discord's user, tag someone with @",
-                description_localizations={
-                    "ru": "Пользователь дискорда, укажите кого-то @"
-                },
-            ),
-            message: Optional[str] = SlashOption(
-                required=False,
-                description="Message pinned to emotion message",
-                description_localizations={
-                    "ru": "Сообщение, которое будет прикреплено к эмоции"
-                },
-            ),
+        self,
+        interaction: Interaction,
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
+        ),
+        message: Optional[str] = SlashOption(
+            required=False,
+            description="Message pinned to emotion message",
+            description_localizations={
+                "ru": "Сообщение, которое будет прикреплено к эмоции"
+            },
+        ),
     ):
         if user == interaction.user:
             return await interaction.response.send_message(
@@ -93,22 +97,22 @@ class Emotions(commands.Cog):
         description_localizations=get_localized_description("emotion_hug"),
     )
     async def __hug(
-            self,
-            interaction: Interaction,
-            user: Optional[nextcord.Member] = SlashOption(
-                required=True,
-                description="The discord's user, tag someone with @",
-                description_localizations={
-                    "ru": "Пользователь дискорда, укажите кого-то @"
-                },
-            ),
-            message: Optional[str] = SlashOption(
-                required=False,
-                description="Message pinned to emotion message",
-                description_localizations={
-                    "ru": "Сообщение, которое будет прикреплено к эмоции"
-                },
-            ),
+        self,
+        interaction: Interaction,
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
+        ),
+        message: Optional[str] = SlashOption(
+            required=False,
+            description="Message pinned to emotion message",
+            description_localizations={
+                "ru": "Сообщение, которое будет прикреплено к эмоции"
+            },
+        ),
     ):
         if user == interaction.user:
             return await interaction.response.send_message(
@@ -137,15 +141,15 @@ class Emotions(commands.Cog):
         description_localizations=get_localized_description("emotion_idk"),
     )
     async def __idk(
-            self,
-            interaction: Interaction,
-            message: Optional[str] = SlashOption(
-                required=False,
-                description="Message pinned to emotion message",
-                description_localizations={
-                    "ru": "Сообщение, которое будет прикреплено к эмоции"
-                },
-            ),
+        self,
+        interaction: Interaction,
+        message: Optional[str] = SlashOption(
+            required=False,
+            description="Message pinned to emotion message",
+            description_localizations={
+                "ru": "Сообщение, которое будет прикреплено к эмоции"
+            },
+        ),
     ):
         embed = create_emotion_embed(
             interaction.guild.id,
@@ -164,15 +168,15 @@ class Emotions(commands.Cog):
         description_localizations=get_localized_description("emotion_f"),
     )
     async def __pay_respects(
-            self,
-            interaction: Interaction,
-            message: Optional[str] = SlashOption(
-                required=False,
-                description="Message pinned to emotion message",
-                description_localizations={
-                    "ru": "Сообщение, которое будет прикреплено к эмоции"
-                },
-            ),
+        self,
+        interaction: Interaction,
+        message: Optional[str] = SlashOption(
+            required=False,
+            description="Message pinned to emotion message",
+            description_localizations={
+                "ru": "Сообщение, которое будет прикреплено к эмоции"
+            },
+        ),
     ):
         embed = create_emotion_embed(
             interaction.guild.id,
@@ -191,22 +195,22 @@ class Emotions(commands.Cog):
         description_localizations=get_localized_description("emotion_punch"),
     )
     async def __punch(
-            self,
-            interaction: Interaction,
-            user: Optional[nextcord.Member] = SlashOption(
-                required=True,
-                description="The discord's user, tag someone with @",
-                description_localizations={
-                    "ru": "Пользователь дискорда, укажите кого-то @"
-                },
-            ),
-            message: Optional[str] = SlashOption(
-                required=False,
-                description="Message pinned to emotion message",
-                description_localizations={
-                    "ru": "Сообщение, которое будет прикреплено к эмоции"
-                },
-            ),
+        self,
+        interaction: Interaction,
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
+        ),
+        message: Optional[str] = SlashOption(
+            required=False,
+            description="Message pinned to emotion message",
+            description_localizations={
+                "ru": "Сообщение, которое будет прикреплено к эмоции"
+            },
+        ),
     ):
         if user == interaction.user:
             return await interaction.response.send_message(
@@ -235,15 +239,15 @@ class Emotions(commands.Cog):
         description_localizations=get_localized_description("emotion_cry"),
     )
     async def __cry(
-            self,
-            interaction: Interaction,
-            message: Optional[str] = SlashOption(
-                required=False,
-                description="Message pinned to emotion message",
-                description_localizations={
-                    "ru": "Сообщение, которое будет прикреплено к эмоции"
-                },
-            ),
+        self,
+        interaction: Interaction,
+        message: Optional[str] = SlashOption(
+            required=False,
+            description="Message pinned to emotion message",
+            description_localizations={
+                "ru": "Сообщение, которое будет прикреплено к эмоции"
+            },
+        ),
     ):
         embed = create_emotion_embed(
             interaction.guild.id,
@@ -262,22 +266,22 @@ class Emotions(commands.Cog):
         description_localizations=get_localized_description("emotion_bite"),
     )
     async def __bite(
-            self,
-            interaction: Interaction,
-            user: Optional[nextcord.Member] = SlashOption(
-                required=True,
-                description="The discord's user, tag someone with @",
-                description_localizations={
-                    "ru": "Пользователь дискорда, укажите кого-то @"
-                },
-            ),
-            message: Optional[str] = SlashOption(
-                required=False,
-                description="Message pinned to emotion message",
-                description_localizations={
-                    "ru": "Сообщение, которое будет прикреплено к эмоции"
-                },
-            ),
+        self,
+        interaction: Interaction,
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
+        ),
+        message: Optional[str] = SlashOption(
+            required=False,
+            description="Message pinned to emotion message",
+            description_localizations={
+                "ru": "Сообщение, которое будет прикреплено к эмоции"
+            },
+        ),
     ):
         if user == interaction.user:
             return await interaction.response.send_message(
@@ -306,22 +310,22 @@ class Emotions(commands.Cog):
         description_localizations=get_localized_description("emotion_spank"),
     )
     async def __spank(
-            self,
-            interaction: Interaction,
-            user: Optional[nextcord.Member] = SlashOption(
-                required=True,
-                description="The discord's user, tag someone with @",
-                description_localizations={
-                    "ru": "Пользователь дискорда, укажите кого-то @"
-                },
-            ),
-            message: Optional[str] = SlashOption(
-                required=False,
-                description="Message pinned to emotion message",
-                description_localizations={
-                    "ru": "Сообщение, которое будет прикреплено к эмоции"
-                },
-            ),
+        self,
+        interaction: Interaction,
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
+        ),
+        message: Optional[str] = SlashOption(
+            required=False,
+            description="Message pinned to emotion message",
+            description_localizations={
+                "ru": "Сообщение, которое будет прикреплено к эмоции"
+            },
+        ),
     ):
         if user == interaction.user:
             return await interaction.response.send_message(
@@ -350,22 +354,22 @@ class Emotions(commands.Cog):
         description_localizations=get_localized_description("emotion_highfive"),
     )
     async def __highfive(
-            self,
-            interaction: Interaction,
-            user: Optional[nextcord.Member] = SlashOption(
-                required=True,
-                description="The discord's user, tag someone with @",
-                description_localizations={
-                    "ru": "Пользователь дискорда, укажите кого-то @"
-                },
-            ),
-            message: Optional[str] = SlashOption(
-                required=False,
-                description="Message pinned to emotion message",
-                description_localizations={
-                    "ru": "Сообщение, которое будет прикреплено к эмоции"
-                },
-            ),
+        self,
+        interaction: Interaction,
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
+        ),
+        message: Optional[str] = SlashOption(
+            required=False,
+            description="Message pinned to emotion message",
+            description_localizations={
+                "ru": "Сообщение, которое будет прикреплено к эмоции"
+            },
+        ),
     ):
         if user == interaction.user:
             return await interaction.response.send_message(
@@ -394,22 +398,22 @@ class Emotions(commands.Cog):
         description_localizations=get_localized_description("emotion_pat"),
     )
     async def __pat(
-            self,
-            interaction: Interaction,
-            user: Optional[nextcord.Member] = SlashOption(
-                required=True,
-                description="The discord's user, tag someone with @",
-                description_localizations={
-                    "ru": "Пользователь дискорда, укажите кого-то @"
-                },
-            ),
-            message: Optional[str] = SlashOption(
-                required=False,
-                description="Message pinned to emotion message",
-                description_localizations={
-                    "ru": "Сообщение, которое будет прикреплено к эмоции"
-                },
-            ),
+        self,
+        interaction: Interaction,
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
+        ),
+        message: Optional[str] = SlashOption(
+            required=False,
+            description="Message pinned to emotion message",
+            description_localizations={
+                "ru": "Сообщение, которое будет прикреплено к эмоции"
+            },
+        ),
     ):
         if user == interaction.user:
             return await interaction.response.send_message(
@@ -438,22 +442,22 @@ class Emotions(commands.Cog):
         description_localizations=get_localized_description("emotion_lick"),
     )
     async def __lick(
-            self,
-            interaction: Interaction,
-            user: Optional[nextcord.Member] = SlashOption(
-                required=True,
-                description="The discord's user, tag someone with @",
-                description_localizations={
-                    "ru": "Пользователь дискорда, укажите кого-то @"
-                },
-            ),
-            message: Optional[str] = SlashOption(
-                required=False,
-                description="Message pinned to emotion message",
-                description_localizations={
-                    "ru": "Сообщение, которое будет прикреплено к эмоции"
-                },
-            ),
+        self,
+        interaction: Interaction,
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
+        ),
+        message: Optional[str] = SlashOption(
+            required=False,
+            description="Message pinned to emotion message",
+            description_localizations={
+                "ru": "Сообщение, которое будет прикреплено к эмоции"
+            },
+        ),
     ):
         if user == interaction.user:
             return await interaction.response.send_message(
@@ -482,15 +486,15 @@ class Emotions(commands.Cog):
         description_localizations=get_localized_description("emotion_run"),
     )
     async def __run(
-            self,
-            interaction: Interaction,
-            message: Optional[str] = SlashOption(
-                required=False,
-                description="Message pinned to emotion message",
-                description_localizations={
-                    "ru": "Сообщение, которое будет прикреплено к эмоции"
-                },
-            ),
+        self,
+        interaction: Interaction,
+        message: Optional[str] = SlashOption(
+            required=False,
+            description="Message pinned to emotion message",
+            description_localizations={
+                "ru": "Сообщение, которое будет прикреплено к эмоции"
+            },
+        ),
     ):
         embed = create_emotion_embed(
             interaction.guild.id,
@@ -509,15 +513,15 @@ class Emotions(commands.Cog):
         description_localizations=get_localized_description("emotion_good_morning"),
     )
     async def __good_morning(
-            self,
-            interaction: Interaction,
-            message: Optional[str] = SlashOption(
-                required=False,
-                description="Message pinned to emotion message",
-                description_localizations={
-                    "ru": "Сообщение, которое будет прикреплено к эмоции"
-                },
-            ),
+        self,
+        interaction: Interaction,
+        message: Optional[str] = SlashOption(
+            required=False,
+            description="Message pinned to emotion message",
+            description_localizations={
+                "ru": "Сообщение, которое будет прикреплено к эмоции"
+            },
+        ),
     ):
         embed = create_emotion_embed(
             interaction.guild.id,
@@ -536,15 +540,15 @@ class Emotions(commands.Cog):
         description_localizations=get_localized_description("emotion_good_night"),
     )
     async def __good_night(
-            self,
-            interaction: Interaction,
-            message: Optional[str] = SlashOption(
-                required=False,
-                description="Message pinned to emotion message",
-                description_localizations={
-                    "ru": "Сообщение, которое будет прикреплено к эмоции"
-                },
-            ),
+        self,
+        interaction: Interaction,
+        message: Optional[str] = SlashOption(
+            required=False,
+            description="Message pinned to emotion message",
+            description_localizations={
+                "ru": "Сообщение, которое будет прикреплено к эмоции"
+            },
+        ),
     ):
         embed = create_emotion_embed(
             interaction.guild.id,

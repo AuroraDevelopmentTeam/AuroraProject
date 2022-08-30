@@ -22,9 +22,7 @@ def write_member_in_money(guild: nextcord.Guild, member: nextcord.Member):
     ).fetchone()[0]
     if not member.bot:
         if is_user_in_table("money", guild.id, member.id) is False:
-            sql = (
-                "INSERT INTO money(guild_id, user_id, balance) VALUES (?, ?, ?)"
-            )
+            sql = "INSERT INTO money(guild_id, user_id, balance) VALUES (?, ?, ?)"
             val = (guild.id, member.id, guild_starting_balance)
             cursor.execute(sql, val)
             db.commit()
@@ -38,7 +36,9 @@ def write_member_in_levels(guild: nextcord.Guild, member: nextcord.Member) -> No
     cursor = db.cursor()
     if not member.bot:
         if is_user_in_table("levels", guild.id, member.id) is False:
-            sql = "INSERT INTO levels(guild_id, user_id, level, exp) VALUES (?, ?, ?, ?)"
+            sql = (
+                "INSERT INTO levels(guild_id, user_id, level, exp) VALUES (?, ?, ?, ?)"
+            )
             val = (guild.id, member.id, 1, 0)
             cursor.execute(sql, val)
             db.commit()
@@ -86,12 +86,14 @@ def write_member_in_honor(member: nextcord.Member) -> None:
     cursor = db.cursor()
     if not member.bot:
         if (
-                cursor.execute(
-                    f"SELECT user_id FROM honor WHERE user_id = {member.id}"
-                ).fetchone()
-                is None
+            cursor.execute(
+                f"SELECT user_id FROM honor WHERE user_id = {member.id}"
+            ).fetchone()
+            is None
         ):
-            sql = "INSERT INTO honor(user_id, honor_level, honor_points) VALUES (?, ?, ?)"
+            sql = (
+                "INSERT INTO honor(user_id, honor_level, honor_points) VALUES (?, ?, ?)"
+            )
             val = (member.id, 2, 0)
             cursor.execute(sql, val)
             db.commit()
@@ -102,15 +104,13 @@ def write_member_in_honor(member: nextcord.Member) -> None:
 def write_member_in_profiles(guild: nextcord.Guild, member: nextcord.Member) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
-    description = get_msg_from_locale_by_key(
-        guild.id, "default_profile_description"
-    )
+    description = get_msg_from_locale_by_key(guild.id, "default_profile_description")
     if not member.bot:
         if (
-                cursor.execute(
-                    f"SELECT user_id FROM profiles WHERE user_id = {member.id}"
-                ).fetchone()
-                is None
+            cursor.execute(
+                f"SELECT user_id FROM profiles WHERE user_id = {member.id}"
+            ).fetchone()
+            is None
         ):
             sql = "INSERT INTO profiles(user_id, description, avatar_form) VALUES (?, ?, ?)"
             val = (
@@ -148,7 +148,19 @@ def write_member_in_badges(guild: nextcord.Guild, member: nextcord.Member) -> No
                 "INSERT INTO badges(guild_id, user_id, badge_1, badge_2, badge_3, badge_4, badge_5, badge_6, "
                 "badge_7, badge_8, badge_9) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             )
-            val = (guild.id, member.id, False, False, False, False, False, False, False, False, False)
+            val = (
+                guild.id,
+                member.id,
+                False,
+                False,
+                False,
+                False,
+                False,
+                False,
+                False,
+                False,
+                False,
+            )
             cursor.execute(sql, val)
             db.commit()
     cursor.close()

@@ -4,8 +4,12 @@ from nextcord import Interaction, Permissions, SlashOption
 
 from core.embeds import construct_top_embed
 from core.money.getters import get_guild_currency_symbol
-from core.locales.getters import get_msg_from_locale_by_key, get_guild_locale, \
-    get_localized_name, get_localized_description
+from core.locales.getters import (
+    get_msg_from_locale_by_key,
+    get_guild_locale,
+    get_localized_name,
+    get_localized_description,
+)
 from core.tickets.getters import (
     get_ticket_archive,
     get_ticket_category,
@@ -119,9 +123,13 @@ class Tickets(commands.Cog):
                     pass
                 if get_ticket_category(interaction.guild.id) == 0:
                     return
-                embed = nextcord.Embed(title=get_msg_from_locale_by_key(interaction.guild.id, "ticket"),
-                                       description=get_msg_from_locale_by_key(interaction.guild.id, "ticket_creating"),
-                                       color=DEFAULT_BOT_COLOR)
+                embed = nextcord.Embed(
+                    title=get_msg_from_locale_by_key(interaction.guild.id, "ticket"),
+                    description=get_msg_from_locale_by_key(
+                        interaction.guild.id, "ticket_creating"
+                    ),
+                    color=DEFAULT_BOT_COLOR,
+                )
                 msg = await interaction.followup.send(embed=embed, ephemeral=True)
                 support_role = nextcord.utils.get(
                     interaction.guild.roles, id=get_ticket_support(interaction.guild.id)
@@ -143,23 +151,26 @@ class Tickets(commands.Cog):
                 embed = nextcord.Embed(
                     title=get_msg_from_locale_by_key(interaction.guild.id, "ticket"),
                     description=f"{get_msg_from_locale_by_key(interaction.guild.id, 'ticket_now_is_created')} "
-                                f"{channel.mention}", color=DEFAULT_BOT_COLOR
+                    f"{channel.mention}",
+                    color=DEFAULT_BOT_COLOR,
                 )
                 await msg.edit(embed=embed)
                 embed = nextcord.Embed(
                     title=get_msg_from_locale_by_key(interaction.guild.id, "ticket"),
                     description=f"{interaction.user.mention} "
-                                f"{get_msg_from_locale_by_key(interaction.guild.id, 'created_ticket')}",
-                    color=DEFAULT_BOT_COLOR
+                    f"{get_msg_from_locale_by_key(interaction.guild.id, 'created_ticket')}",
+                    color=DEFAULT_BOT_COLOR,
                 )
-                if get_guild_locale(interaction.guild.id) == 'ru_ru':
+                if get_guild_locale(interaction.guild.id) == "ru_ru":
                     await channel.send(embed=embed, view=TicketSettingsRu())
                 else:
                     await channel.send(embed=embed, view=TicketSettingsEng())
             if custom_id == "ticket_settings:red":
                 if get_ticket_archive(interaction.guild.id) == 0:
                     return
-                await interaction.channel.send(get_msg_from_locale_by_key(interaction.guild.id, "ticket_closing"))
+                await interaction.channel.send(
+                    get_msg_from_locale_by_key(interaction.guild.id, "ticket_closing")
+                )
                 archive_channel = get_ticket_archive(interaction.guild.id)
                 category_channel = nextcord.utils.get(
                     interaction.guild.categories, id=archive_channel
@@ -170,14 +181,18 @@ class Tickets(commands.Cog):
                     )
                 }
                 try:
-                    await interaction.user.send(f"{get_msg_from_locale_by_key(interaction.guild.id, 'ticket_closed')}")
+                    await interaction.user.send(
+                        f"{get_msg_from_locale_by_key(interaction.guild.id, 'ticket_closed')}"
+                    )
                 except nextcord.Forbidden:
                     pass
-                if get_guild_locale(interaction.guild.id) == 'ru_ru':
+                if get_guild_locale(interaction.guild.id) == "ru_ru":
                     await interaction.message.edit(view=TicketDisabledRu())
                 else:
                     await interaction.message.edit(view=TicketDisabledEng())
-                await interaction.channel.send(f"{get_msg_from_locale_by_key(interaction.guild.id, 'ticket_closed')}")
+                await interaction.channel.send(
+                    f"{get_msg_from_locale_by_key(interaction.guild.id, 'ticket_closed')}"
+                )
                 await interaction.channel.edit(
                     category=category_channel,
                     overwrites=overwrites,
@@ -192,20 +207,20 @@ class Tickets(commands.Cog):
         name="setup_tickets",
         name_localizations=get_localized_name("setup_tickets"),
         description_localizations=get_localized_description("setup_tickets"),
-        default_member_permissions=Permissions(administrator=True)
+        default_member_permissions=Permissions(administrator=True),
     )
     async def __setup_tickets(
-            self,
-            interaction: Interaction,
-            create_mode: str = SlashOption(
-                name="picker", choices={"auto": "auto", "self": "self"}, required=True
-            ),
+        self,
+        interaction: Interaction,
+        create_mode: str = SlashOption(
+            name="picker", choices={"auto": "auto", "self": "self"}, required=True
+        ),
     ):
         await interaction.response.defer()
         embed = nextcord.Embed(
             title=get_msg_from_locale_by_key(interaction.guild.id, "create_ticket"),
             description=get_msg_from_locale_by_key(interaction.guild.id, "ticket_desc"),
-            color=DEFAULT_BOT_COLOR
+            color=DEFAULT_BOT_COLOR,
         )
         if create_mode == "auto":
             overwrites = {
@@ -222,7 +237,7 @@ class Tickets(commands.Cog):
                 name="Aurora-Archive", overwrites=overwrites
             )
             update_ticket_archive(interaction.guild.id, archive_category.id)
-        if get_guild_locale(interaction.guild.id) == 'ru_ru':
+        if get_guild_locale(interaction.guild.id) == "ru_ru":
             await interaction.followup.send(embed=embed, view=CreateTicketRu())
         else:
             await interaction.followup.send(embed=embed, view=CreateTicketEng())

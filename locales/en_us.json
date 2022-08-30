@@ -946,6 +946,14 @@
       "name": "display_roles",
       "description": "Show list of roles with income set"
     },
+    "custom-shop": {
+      "name": "custom-shop",
+      "description": "custom roles shop"
+    },
+    "add-custom-shop": {
+      "name": "add role",
+      "description": "adding role to custom shop"
+    },
     "clan_create": {
       "name": "create",
       "description": "Create a clan with this command",

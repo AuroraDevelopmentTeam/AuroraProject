@@ -5,12 +5,17 @@ import nextcord
 from core.locales.create import create_locales_table
 from core.locales.writers import write_in_locales_standart_values
 from core.checkers import is_guild_id_in_table
-from core.money.create import create_money_table, create_money_config_table, \
-    create_role_money_table, create_chat_money_config_table, create_money_channels_config_table
+from core.money.create import (
+    create_money_table,
+    create_money_config_table,
+    create_role_money_table,
+    create_chat_money_config_table,
+    create_money_channels_config_table,
+)
 from core.money.writers import (
     write_in_money_standart_values,
     write_in_money_config_standart_values,
-    write_in_chat_money_standart_values
+    write_in_chat_money_standart_values,
 )
 from core.levels.create import create_level_table, create_level_config_table
 from core.levels.writers import (
@@ -27,7 +32,7 @@ from core.marriage.writers import (
     write_in_marriage_standart_values,
     write_in_gifts_standart_values,
 )
-from core.shop.create import create_shop_table
+from core.shop.create import create_shop_table, create_custom_shop_table
 from core.goodbyes.create import create_goodbye_config
 from core.goodbyes.writers import write_in_goodbye_config_standart_values
 from core.nitro.create import create_on_nitro_config
@@ -44,7 +49,10 @@ from core.loggers.create import create_loggers_table
 from core.loggers.writers import write_in_loggers_standart_values
 from core.tickets.create import create_tickets_config_table
 from core.tickets.writers import write_in_tickets_config_standart_values
-from core.auto.roles.create import create_reaction_autorole_table, create_level_autorole_table
+from core.auto.roles.create import (
+    create_reaction_autorole_table,
+    create_level_autorole_table,
+)
 from core.auto.mod.create import create_mod_word_table, create_mod_config_table
 from core.auto.mod.writers import write_in_mod_config_standart_values
 from core.clan.create import create_clan_table, create_clan_config_table, create_clan_members_table
@@ -78,6 +86,7 @@ class OnReadyListener(commands.Cog):
         create_gifts_table()
         write_in_gifts_standart_values(guilds)
         create_shop_table()
+        create_custom_shop_table()
         create_goodbye_config()
         write_in_goodbye_config_standart_values(guilds)
         create_on_nitro_config()
@@ -111,8 +120,12 @@ class OnReadyListener(commands.Cog):
         print(len(self.client.guilds))
         for guild in self.client.guilds:
             print(f"{guild.name} - {(len(guild.members))}")
-        await self.client.change_presence(activity=nextcord.Game(name=f"You cute! /help\nСервера: {len(guilds)}\n"
-                                                                      f"Пользователи: {len(self.client.users)}"))
+        await self.client.change_presence(
+            activity=nextcord.Game(
+                name=f"You cute! /help\nСервера: {len(guilds)}\n"
+                f"Пользователи: {len(self.client.users)}"
+            )
+        )
 
 
 def setup(client):

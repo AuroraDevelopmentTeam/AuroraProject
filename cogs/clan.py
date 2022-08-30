@@ -354,8 +354,20 @@ class NameModal(nextcord.ui.Modal):
 
 
 class Clan:
-    def __init__(self, description, role_id, level, owner, members, members_limit, storage, create_date, icon, image,
-                 guild_boss):
+    def __init__(
+        self,
+        description,
+        role_id,
+        level,
+        owner,
+        members,
+        members_limit,
+        storage,
+        create_date,
+        icon,
+        image,
+        guild_boss,
+    ):
         self.description = description
         self.role_id = role_id
         self.level = level

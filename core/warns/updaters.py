@@ -9,7 +9,7 @@ def remove_warn_from_table(warn_id: int, guild_id: int, user_id: int) -> None:
     )
     db.commit()
     cursor.close()
-    db.commit()
+    db.close()
     return
 
 

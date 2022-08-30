@@ -39,7 +39,8 @@ class Information(commands.Cog):
                 interaction.application_command.name,
                 f"{message} {round(self.client.latency * 1000)} ms",
                 f"{requested} {interaction.user}",
-                interaction.user.display_avatar, interaction.guild.id
+                interaction.user.display_avatar,
+                interaction.guild.id,
             )
         )
 
@@ -56,10 +57,10 @@ class Information(commands.Cog):
         names_of_embed_fields = get_keys_value_in_locale(
             guild.id, interaction.application_command.name
         )
-        if get_guild_locale(interaction.guild.id) == 'ru_ru':
-            locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
+        if get_guild_locale(interaction.guild.id) == "ru_ru":
+            locale.setlocale(locale.LC_ALL, "ru_RU.UTF-8")
         else:
-            locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+            locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
         embed = construct_long_embed(
             f"{guild.name}:",
             guild.icon,

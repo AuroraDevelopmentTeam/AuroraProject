@@ -8,10 +8,10 @@ def is_guild_id_in_table(table_name: str, guild_id: int) -> bool:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     if (
-            cursor.execute(
-                f"SELECT guild_id FROM {table_name} WHERE guild_id = {guild_id}"
-            ).fetchone()
-            is None
+        cursor.execute(
+            f"SELECT guild_id FROM {table_name} WHERE guild_id = {guild_id}"
+        ).fetchone()
+        is None
     ):
         cursor.close()
         db.close()
@@ -23,16 +23,16 @@ def is_guild_id_in_table(table_name: str, guild_id: int) -> bool:
 
 
 def is_warn_id_in_table(
-        table_name: str, warn_id: int, guild_id: int, user_id: int
+    table_name: str, warn_id: int, guild_id: int, user_id: int
 ) -> bool:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     if (
-            cursor.execute(
-                f"SELECT warn_id FROM {table_name} WHERE warn_id = {warn_id} "
-                f"AND guild_id = {guild_id} AND user_id = {user_id}"
-            ).fetchone()
-            is None
+        cursor.execute(
+            f"SELECT warn_id FROM {table_name} WHERE warn_id = {warn_id} "
+            f"AND guild_id = {guild_id} AND user_id = {user_id}"
+        ).fetchone()
+        is None
     ):
         cursor.close()
         db.close()
@@ -55,11 +55,11 @@ def is_user_in_table(table_name, guild_id, user_id) -> bool:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     if (
-            cursor.execute(
-                f"SELECT user_id FROM {table_name} WHERE guild_id = {guild_id} "
-                f"AND user_id = {user_id}"
-            ).fetchone()
-            is None
+        cursor.execute(
+            f"SELECT user_id FROM {table_name} WHERE guild_id = {guild_id} "
+            f"AND user_id = {user_id}"
+        ).fetchone()
+        is None
     ):
         cursor.close()
         db.close()
@@ -89,11 +89,11 @@ def is_role_in_shop(guild_id, role_id) -> bool:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     if (
-            cursor.execute(
-                f"SELECT role_id FROM shop WHERE guild_id = {guild_id} "
-                f"AND role_id = {role_id}"
-            ).fetchone()
-            is None
+        cursor.execute(
+            f"SELECT role_id FROM shop WHERE guild_id = {guild_id} "
+            f"AND role_id = {role_id}"
+        ).fetchone()
+        is None
     ):
         return False
     else:
@@ -104,11 +104,11 @@ def is_role_in_income(guild_id, role_id) -> bool:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     if (
-            cursor.execute(
-                f"SELECT role_id FROM roles_money WHERE guild_id = {guild_id} "
-                f"AND role_id = {role_id}"
-            ).fetchone()
-            is None
+        cursor.execute(
+            f"SELECT role_id FROM roles_money WHERE guild_id = {guild_id} "
+            f"AND role_id = {role_id}"
+        ).fetchone()
+        is None
     ):
         return False
     else:
@@ -119,11 +119,11 @@ def is_channel_in_config(guild_id, channel_id) -> bool:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     if (
-            cursor.execute(
-                f"SELECT channel_id FROM money_channels_config WHERE guild_id = {guild_id} "
-                f"AND channel_id = {channel_id}"
-            ).fetchone()
-            is None
+        cursor.execute(
+            f"SELECT channel_id FROM money_channels_config WHERE guild_id = {guild_id} "
+            f"AND channel_id = {channel_id}"
+        ).fetchone()
+        is None
     ):
         return False
     else:
