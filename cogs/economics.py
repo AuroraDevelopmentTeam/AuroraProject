@@ -53,7 +53,7 @@ from core.shop.writers import (
     write_role_in_custom_shop,
     delete_role_from_shop
 )
-from core.shop.getters import custom_shop_embed
+from core.shop.getters import custom_shop_embed, get_custom_shop_roles_limit
 
 from core.parsers import parse_server_roles
 from core.ui.paginator import (
@@ -656,10 +656,14 @@ class Economics(commands.Cog):
                         if inter.user == interaction.user:
                             await inter.response.defer()
                             await inter.delete_original_message()
+                            if get_custom_shop_roles_limit():
+                                return await inter.send("В магазине достигнут лимит ролей - 50!", delete_after=5)
+
                             await inter.guild.create_role(
                                 name=role_name,
                                 color=nextcord.Colour(colors[select.values[0]]),
                             )
+
                             role = nextcord.utils.get(inter.guild.roles, name=role_name)
                             write_role_in_custom_shop(
                                 inter.guild.id, role, cost, inter.user.id
