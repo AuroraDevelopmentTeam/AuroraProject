@@ -637,14 +637,39 @@ class ClanHandler(commands.Cog):
             interaction.guild.id, f"clan_{interaction.application_command.name}"
         )
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"clan_{interaction.application_command.name}",
+                f"{message} **{money}**",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
 
     @__clan.subcommand(name="leave", description="Leave from clan")
     async def __clan_leave(self, interaction: Interaction):
         pass
 
-    @__clan.subcommand(name="kick", description="Disband clan")
-    async def __clan_kick(self, interaction: Interaction):
-        pass
+    @__clan.subcommand(name="kick", description="Kick user from clan")
+    async def __clan_kick(self, interaction: Interaction, user: Optional[nextcord.Member]):
+        clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+        clan_name = get_clan_name(interaction.guild.id, clan_id)
+        update_user_clan_id(interaction.guild.id, user.id, 0)
+        update_user_join_date(interaction.guild.id, user.id, '0')
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"clan_{interaction.application_command.name}",
+                f"{message} **{clan_name}** {user.mention}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
 
     @__clan.subcommand(name="members", description="Disband clan")
     async def __clan_list_members(self, interaction: Interaction):

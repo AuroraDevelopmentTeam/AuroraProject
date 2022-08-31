@@ -982,5 +982,11 @@
     },
     "fatal_damage_clan_boss": {
       "msg": "Clan boss died and dropped clan EXP and money in storage:"
+    },
+    "clan_deposit": {
+      "msg": "You deposited money in clan bank"
+    },
+    "clan_kick": {
+      "msg": "You kicked from clan"
     }
 }
