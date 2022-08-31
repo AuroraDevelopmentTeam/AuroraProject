@@ -1,4 +1,5 @@
 import nextcord
+from nextcord import Interaction
 from nextcord.ui import Button, Select, View
 from core.shop.updaters import buy_role, delete_role_from_shop
 import sqlite3
@@ -57,7 +58,7 @@ class ShopLeave(Button):
 
 
 async def custom_shop_embed(
-    inter, pagen: int = 1, order: str = "notnew"
+    inter: Interaction, pagen: int = 1, order: str = "notnew"
 ) -> Coroutine[Any, Any, tuple[nextcord.Embed, View]]:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
@@ -69,21 +70,22 @@ async def custom_shop_embed(
     lowcost = False
     if order == "notnew":
         roles = cursor.execute(
-            "SELECT * FROM custom_shop ORDER BY created ASC"
+            f"SELECT * FROM custom_shop WHERE guild_id = {inter.guild.id} ORDER BY created ASC"
         ).fetchall()
         notnew = True
     elif order == "new":
         roles = cursor.execute(
-            "SELECT * FROM custom_shop ORDER BY created DESC"
+            f"SELECT * FROM custom_shop WHERE guild_id = {inter.guild.id} ORDER BY created DESC"
         ).fetchall()
         new = True
     elif order == "highcost":
         roles = cursor.execute(
-            "SELECT * FROM custom_shop ORDER BY cost DESC"
+            f"SELECT * FROM custom_shop WHERE guild_id = {inter.guild.id} ORDER BY cost DESC"
         ).fetchall()
         highcost = True
     elif order == "lowcost":
-        roles = cursor.execute("SELECT * FROM custom_shop ORDER BY cost ASC").fetchall()
+        roles = cursor.execute(
+            f"SELECT * FROM custom_shop WHERE guild_id = {inter.guild.id} ORDER BY cost ASC").fetchall()
         lowcost = True
     cursor.close()
     db.close()
