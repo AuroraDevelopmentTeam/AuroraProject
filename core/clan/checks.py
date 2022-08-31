@@ -1,6 +1,6 @@
 import sqlite3
 
-from core.clan.getters import get_user_clan_id, get_clan_owner_id
+from core.clan.getters import get_user_clan_id, get_clan_owner_id, get_clan_guild_boss_hp
 
 
 def is_user_in_clan(guild_id: int, user_id: int) -> bool:
@@ -31,3 +31,8 @@ def is_clan_id_in_table(guild_id: int, clan_id: int) -> bool:
         return False
     else:
         return True
+
+
+def boss_alive(guild_id: int, clan_id: int) -> bool:
+    hp = get_clan_guild_boss_hp(guild_id, clan_id)
+    return True if hp > 0 else False

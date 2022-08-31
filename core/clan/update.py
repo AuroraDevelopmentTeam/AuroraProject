@@ -1,3 +1,4 @@
+import random
 import sqlite3
 
 from core.clan.getters import (
@@ -8,7 +9,10 @@ from core.clan.getters import (
     get_clan_storage,
     get_clan_guild_boss_hp,
     get_clan_guild_boss_level,
+    get_clan_boss_hp_limit,
 )
+
+from core.clan.storage import boss_rewards
 
 
 # Clan update
@@ -129,6 +133,18 @@ def update_clan_boss_hp(guild_id: int, clan_id: int, hp_to_update: int) -> None:
     return
 
 
+def set_clan_boss_hp(guild_id: int, clan_id: int, hp_to_set: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE clans SET guild_boss_hp = ? WHERE guild_id = ? AND clan_id = ?"
+    values = (hp_to_set, guild_id, clan_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
 def update_clan_image(guild_id: int, clan_id: int, image: str) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
@@ -241,7 +257,7 @@ def update_server_clan_create_cost(guild_id: int, clan_creation_cost: int) -> No
 
 
 def update_server_clan_upgrade_attack_cost(
-    guild_id: int, upgrade_attack_cost: int
+        guild_id: int, upgrade_attack_cost: int
 ) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
@@ -255,7 +271,7 @@ def update_server_clan_upgrade_attack_cost(
 
 
 def update_server_clan_upgrade_limit_cost(
-    guild_id: int, upgrade_limit_cost: int
+        guild_id: int, upgrade_limit_cost: int
 ) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
@@ -305,7 +321,7 @@ def update_server_clan_upgrade_boss_cost(guild_id: int, upgrade_boss_cost: int) 
 
 
 def update_server_create_clan_channels(
-    guild_id: int, create_clan_channels: bool
+        guild_id: int, create_clan_channels: bool
 ) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
@@ -319,7 +335,7 @@ def update_server_create_clan_channels(
 
 
 def update_server_clan_voice_category(
-    guild_id: int, create_clan_channels: bool
+        guild_id: int, create_clan_channels: bool
 ) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
@@ -342,3 +358,42 @@ def delete_clan(guild_id: int, owner_id: int) -> None:
     cursor.close()
     db.close()
     return
+
+
+def accomplish_boss_rewards(guild_id: int, clan_id: int) -> tuple[int, int]:
+    boss_level = get_clan_guild_boss_level(guild_id, clan_id)
+    money_reward = random.randint(boss_rewards[boss_level]["money"]["min"], boss_rewards[boss_level]["money"]["max"])
+    exp_reward = random.randint(boss_rewards[boss_level]["exp"]["min"], boss_rewards[boss_level]["exp"]["max"])
+    update_clan_storage(guild_id, clan_id, money_reward)
+    update_clan_exp(guild_id, clan_id, exp_reward)
+    return money_reward, exp_reward
+
+
+def resurrect_boss(guild_id: int, clan_id: int) -> None:
+    hp_limit = get_clan_boss_hp_limit(guild_id, clan_id)
+    set_clan_boss_hp(guild_id, clan_id, hp_limit)
+    return
+
+
+def clan_level_up(guild_id, clan_id):
+    clan_exp = get_clan_exp(guild_id, clan_id)
+    clan_level = get_clan_level(guild_id, clan_id)
+    leveling_formula = round((17 * (clan_level ** 3)) + 11)
+    if clan_exp >= leveling_formula:
+        return True
+    else:
+        return False
+
+
+def calculate_level(guild_id: int, clan_id: int):
+    clan_exp = get_clan_exp(guild_id, clan_id)
+    clan_level = get_clan_level(guild_id, clan_id)
+    if clan_exp > 0:
+        leveling_formula = round((17 * (clan_level ** 3)) + 11)
+        while clan_level_up(guild_id, clan_id):
+            update_clan_exp(guild_id, clan_id, -leveling_formula)
+            update_clan_level(guild_id, clan_id, 1)
+            clan_level = get_clan_level(guild_id, clan_id)
+            leveling_formula = round((17 * (clan_level ** 3)) + 11)
+
+

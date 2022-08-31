@@ -380,6 +380,22 @@ class AutoModeration(commands.Cog):
                     ],
                     enabled=True,
                 )
+                message = get_msg_from_locale_by_key(
+                    interaction.guild.id,
+                    f"automod_{interaction.application_command.name}",
+                )
+                requested = get_msg_from_locale_by_key(
+                    interaction.guild.id, "requested_by"
+                )
+                await interaction.response.send_message(
+                    embed=construct_basic_embed(
+                        f"automod_{interaction.application_command.name}",
+                        f"{message}",
+                        f"{requested} {interaction.user}",
+                        interaction.user.display_avatar,
+                        interaction.guild.id,
+                    )
+                )
 
     @application_checks.bot_has_guild_permissions(manage_guild=True)
     @application_checks.has_permissions(manage_guild=True)

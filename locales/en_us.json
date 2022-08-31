@@ -973,5 +973,14 @@
     },
     "clan_invite_no": {
       "msg": "You refused the invitation in clan"
+    },
+    "clan_attack_boss": {
+      "msg": "You attacked clan boss with power:"
+    },
+    "clan_attack_boss_2": {
+      "msg": "After getting damage clan boss now have HP:"
+    },
+    "fatal_damage_clan_boss": {
+      "msg": "Clan boss died and dropped clan EXP and money in storage:"
     }
 }

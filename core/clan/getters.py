@@ -1,5 +1,7 @@
 import sqlite3
 
+from core.clan.storage import boss_hp
+
 
 # Clan getters section
 
@@ -322,3 +324,8 @@ def get_server_create_clan_channels(guild_id: int) -> bool:
 # Misc section consisting of all getters integrated together
 
 # _____________________________________
+
+
+def get_clan_boss_hp_limit(guild_id: int, clan_id: int):
+    boss_level = get_clan_guild_boss_level(guild_id, clan_id)
+    return boss_hp[boss_level]
