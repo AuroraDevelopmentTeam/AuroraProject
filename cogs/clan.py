@@ -1,15 +1,25 @@
+import random
 import sqlite3
 import types
 import datetime
 from typing import Union, Optional
 
+import cooldowns
 import nextcord
 from nextcord import Interaction, SlashOption
 from nextcord.ext import commands
 from nextcord.utils import get
 
+from core.clan.checks import boss_alive
 from core.clan.getters import *
-from core.clan.update import *
+from core.clan.update import update_clan_level, update_clan_exp, update_clan_storage, update_clan_boss_hp, \
+    update_user_clan_id, update_user_join_date, update_clan_color, update_clan_icon, update_clan_name, \
+    update_clan_icon_on_creation, update_server_create_clan_channels, update_server_clan_voice_category, \
+    update_server_clan_upgrade_attack_cost, update_server_clan_upgrade_limit_cost, update_clan_desc_on_creation, \
+    update_clan_description, update_clan_max_attack, update_clan_image, update_clan_boss_level, \
+    update_clan_min_attack, update_server_clan_change_icon_cost, update_clan_owner_id, update_server_clan_create_cost, \
+    update_server_clan_change_image_cost, resurrect_boss, update_server_clan_upgrade_boss_cost, calculate_level, \
+    accomplish_boss_rewards
 from core.clan.writers import write_clan, write_clan_on_start
 from core.money.getters import get_guild_currency_symbol, get_user_balance
 from core.money.updaters import update_user_balance
@@ -22,7 +32,8 @@ from core.locales.getters import (
     get_guild_locale,
 )
 from core.embeds import construct_basic_embed, DEFAULT_BOT_COLOR
-from core.errors import construct_error_not_enough_embed
+from core.errors import construct_error_not_enough_embed, construct_error_negative_value_embed
+from core.emojify import STAR, BOSS, WRITING, CALENDAR, TEAM, UPARROW, GEM
 
 
 async def yes_create(interaction: Interaction):
@@ -104,7 +115,7 @@ async def yes_create(interaction: Interaction):
     embed = nextcord.Embed(
         title=f"Клан",
         description=f"Восславьте **{name}**! Поздравляем вас основатель {interaction.user.mention}, "
-        f"прославьте имя своего клана, желаем вам удачи на вашем пути!",
+                    f"прославьте имя своего клана, желаем вам удачи на вашем пути!",
     )
     return await interaction.followup.send(embed=embed, view=view)
 
@@ -182,7 +193,7 @@ async def yes_show_me_full(interaction: Interaction):
     embed = nextcord.Embed(
         title=name,
         description=f"{desc}\n\n\nЕсли вас всё устраивает, то нажмите да, с вас будут списаны деньги, а клан будет "
-        f"создан, если вы передумали, то нажмите нет и процесс создания клана будет отменён.",
+                    f"создан, если вы передумали, то нажмите нет и процесс создания клана будет отменён.",
         color=nextcord.Color.from_rgb(*col),
     )
     embed.set_thumbnail(url=icon)
@@ -227,7 +238,7 @@ class ClanColorModal(nextcord.ui.Modal):
             col = col.to_rgb()
             embed = nextcord.Embed(
                 description=f"Был указан следующий цвет: {name}. "
-                f"Нажмите да, чтоб посмотреть конечный результат или нет, если хотите изменить цвет.",
+                            f"Нажмите да, чтоб посмотреть конечный результат или нет, если хотите изменить цвет.",
                 color=nextcord.Color.from_rgb(*col),
             )
             yes_button = create_button(
@@ -275,17 +286,18 @@ class ClanIconModal(nextcord.ui.Modal):
                 interaction.guild.id, interaction.user.id, name
             )
             embed = nextcord.Embed(
-                description=f"Была указана следующая иконка: **{name}**. Теперь необходимо указать цвет вашей гильдии в "
-                f"формате HEX кода. HEX-коды имеют следующий вид: #код и должны быть именно введены в "
-                f"подобном виде, иначе бот выдаст ошибку и процесс создания клана будет прекращён. Если вы "
-                f"абсолютно ничего не понимаете в HEX-кодах и желания гуглить нужный вам цвет у вас нет, "
-                f"то далее приводится список HEX-кодов основных цветов, просто скопируйте и вставьте ("
-                f"ОБЯЗАТЕЛЬНО! вместе с #).\nЧёрный - #000000\nСерый - #808080\nБелый - #FFFFFF\nСеребряный - "
-                f"#C0C0C0\nСиний - #0000FF\nТёмно-синий - #00008B\nЦиан - #00FFFF\nАквамарин - #7FFFD4\n"
-                f"Зелёный - #008000\nЛайм - #00FF00\nФиолетовый - #800080\nФуксия - #FF00FF\n"
-                f"Оливковый - #808000\nКрасный - #FF0000\nЗолотой - #FFD700\nЖелтый - #FFFF00\nОранжевый - "
-                f"#FFA500\nКоралловый - #F08080\nКликните на да, как будете готовы или кликните нет и "
-                f"поменяйте иконку. "
+                description=f"Была указана следующая иконка: **{name}**. Теперь необходимо указать цвет вашей гильдии в"
+                            f" формате HEX кода. HEX-коды имеют следующий вид: #код и должны быть именно введены в "
+                            f"подобном виде, иначе бот выдаст ошибку и процесс создания клана будет прекращён. Если вы "
+                            f"абсолютно ничего не понимаете в HEX-кодах и желания гуглить нужный вам цвет у вас нет, "
+                            f"то далее приводится список HEX-кодов основных цветов, просто скопируйте и вставьте ("
+                            f"ОБЯЗАТЕЛЬНО! вместе с #).\nЧёрный - #000000\nСерый - #808080\nБелый - "
+                            f"#FFFFFF\nСеребряный - "
+                            f"#C0C0C0\nСиний - #0000FF\nТёмно-синий - #00008B\nЦиан - #00FFFF\nАквамарин - #7FFFD4\n"
+                            f"Зелёный - #008000\nЛайм - #00FF00\nФиолетовый - #800080\nФуксия - #FF00FF\n"
+                            f"Оливковый - #808000\nКрасный - #FF0000\nЗолотой - #FFD700\nЖелтый - #FFFF00\nОранжевый - "
+                            f"#FFA500\nКоралловый - #F08080\nКликните на да, как будете готовы или кликните нет и "
+                            f"поменяйте иконку. "
             )
             embed.set_thumbnail(url=name)
             yes_button = create_button(
@@ -335,11 +347,11 @@ class ClanDescriptionModal(nextcord.ui.Modal):
             )
             embed = nextcord.Embed(
                 description=f"Было введено следующее описание: **{name}**. Теперь необходимо указать иконку гильдии в "
-                f"формате url ссылки, к примеру: "
-                f"**https://c.tenor.com/o656qFKDzeUAAAAM/rick-astley-never-gonna-give-you-up.gif**, "
-                f"ничего не мешает использовать в качестве иконки и png/jpg изображения, так и гифки, "
-                f"выбирайте то, что вам нравится."
-                f"Кликните на да, как будете готовы или переделайте описание нажав нет."
+                            f"формате url ссылки, к примеру: "
+                            f"**https://c.tenor.com/o656qFKDzeUAAAAM/rick-astley-never-gonna-give-you-up.gif**, "
+                            f"ничего не мешает использовать в качестве иконки и png/jpg изображения, так и гифки, "
+                            f"выбирайте то, что вам нравится."
+                            f"Кликните на да, как будете готовы или переделайте описание нажав нет."
             )
             embed.set_thumbnail(
                 url="https://c.tenor.com/o656qFKDzeUAAAAM/rick-astley-never-gonna-give-you-up.gif"
@@ -389,8 +401,8 @@ class NameModal(nextcord.ui.Modal):
             update_clan_name(interaction.guild.id, interaction.user.id, name)
             embed = nextcord.Embed(
                 description=f"Было введено следующее имя клана: **{name}**. Теперь введите описание для вашего клана, "
-                f"кликните на да, как будете готовы или прекратите процесс создания если передумали, "
-                f"нажав нет. "
+                            f"кликните на да, как будете готовы или прекратите процесс создания если передумали, "
+                            f"нажав нет. "
             )
             yes_button = create_button(
                 get_msg_from_locale_by_key(interaction.guild.id, "yes"),
@@ -417,18 +429,18 @@ class NameModal(nextcord.ui.Modal):
 
 class Clan:
     def __init__(
-        self,
-        description,
-        role_id,
-        level,
-        owner,
-        members,
-        members_limit,
-        storage,
-        create_date,
-        icon,
-        image,
-        guild_boss,
+            self,
+            description,
+            role_id,
+            level,
+            owner,
+            members,
+            members_limit,
+            storage,
+            create_date,
+            icon,
+            image,
+            guild_boss,
     ):
         self.description = description
         self.role_id = role_id
@@ -575,23 +587,24 @@ class ClanHandler(commands.Cog):
         color = color.replace("#", "")
         col = nextcord.Color(value=int(color, 16))
         col = col.to_rgb()
+        leveling_formula = round((17 * (clan_level ** 3)) + 11)
         embed = nextcord.Embed(
             title=f"{clan_name} - {interaction.user.name}",
-            description=f"**Описание клана**:\n{clan_description}",
+            description=f"{WRITING} **Описание клана**:\n{clan_description}",
             color=nextcord.Color.from_rgb(*col),
         )
         embed.set_thumbnail(url=clan_icon)
-        embed.add_field(name="Владелец", value=f"{clan_owner.mention}", inline=True)
-        embed.add_field(name="Участники", value=f"{len(members)}/{limit}", inline=True)
+        embed.add_field(name=f"{STAR} Владелец", value=f"{clan_owner.mention}", inline=True)
+        embed.add_field(name=f"{TEAM} Участники", value=f"{len(members)}/{limit}", inline=True)
         embed.add_field(name="Роль", value=f"{role.mention}", inline=True)
-        embed.add_field(name="Банк клана", value=f"{storage}", inline=True)
+        embed.add_field(name=f"{GEM} Банк клана", value=f"{storage}", inline=True)
         embed.add_field(
-            name="Уровень", value=f"**{clan_level}**\n{clan_exp}|28", inline=True
+            name="Уровень", value=f"{UPARROW} **{clan_level}**\n{clan_exp}|{leveling_formula}", inline=True
         )
-        embed.add_field(name="Дата основания", value=f"{created}", inline=True)
-        embed.add_field(name="Вы присоединились", value=f"{join_date}", inline=True)
+        embed.add_field(name=f"{CALENDAR} Дата основания", value=f"{created}", inline=True)
+        embed.add_field(name=f"{CALENDAR} Вы присоединились", value=f"{join_date}", inline=True)
         embed.add_field(
-            name="Клановый босс",
+            name=f"{BOSS} Клановый босс",
             value=f"Уровень: **{guild_boss}**\nHP: {guild_boss_hp}/{full_hp}",
             inline=False,
         )
@@ -603,22 +616,38 @@ class ClanHandler(commands.Cog):
 
     @__clan.subcommand(name="deposit", description="Deposit your money in clan bank")
     async def __clan_deposit(
-        self,
-        interaction: Interaction,
-        money: Optional[int] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            money: Optional[int] = SlashOption(required=True),
     ):
-        pass
+        if money <= 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
+        clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+        update_clan_storage(interaction.guild.id, clan_id, money)
+        update_user_balance(interaction.guild.id, interaction.user.id, -money)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
 
     @__clan.subcommand(name="leave", description="Leave from clan")
     async def __clan_leave(self, interaction: Interaction):
         pass
 
     @__clan.subcommand(name="kick", description="Disband clan")
-    async def __clan_disband(self, interaction: Interaction):
+    async def __clan_kick(self, interaction: Interaction):
         pass
 
     @__clan.subcommand(name="members", description="Disband clan")
-    async def __clan_disband(self, interaction: Interaction):
+    async def __clan_list_members(self, interaction: Interaction):
         pass
 
     @__clan.subcommand(name="disband", description="Disband clan")
@@ -627,9 +656,9 @@ class ClanHandler(commands.Cog):
 
     @__clan.subcommand(name="invite", description="Send invite in your clan to user")
     async def __clan_invite(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(required=True),
     ):
         clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
         clan_name = get_clan_name(interaction.guild.id, clan_id)
@@ -726,10 +755,41 @@ class ClanHandler(commands.Cog):
         )
 
     @__clan.subcommand(
-        name="attack_clan_boss", description="Send invite in your clan to user"
+        name="attack_boss", description="Attack guild boss once per 6 hours"
     )
+    @cooldowns.cooldown(1, 21600, bucket=cooldowns.SlashBucket.author)
     async def __clan_attack_clan_boss(self, interaction: Interaction):
-        pass
+        clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+        min_attack, max_attack = get_clan_min_attack(interaction.guild.id, clan_id), \
+                                 get_clan_max_attack(interaction.guild.id, clan_id)
+        attack_amount = random.randint(min_attack, max_attack)
+        update_clan_boss_hp(interaction.guild.id, clan_id, -attack_amount)
+        boss_hp_after_attack = get_clan_guild_boss_hp(interaction.guild.id, clan_id)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_{interaction.application_command.name}"
+        )
+        message_2 = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_{interaction.application_command.name}_2"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        description = f"{message} **{attack_amount}**\n{message_2} **{boss_hp_after_attack}**"
+        if not boss_alive(interaction.guild.id, clan_id):
+            money_added, exp_added = accomplish_boss_rewards(interaction.guild.id, clan_id)
+            dead_boss_message = get_msg_from_locale_by_key(
+                interaction.guild.id, "fatal_damage_clan_boss"
+            )
+            currency_symbool = get_guild_currency_symbol(interaction.guild.id)
+            description += f"\n{dead_boss_message}\n **{money_added}** {currency_symbool} , **{exp_added}** EXP"
+            resurrect_boss(interaction.guild.id, clan_id)
+            calculate_level(interaction.guild.id, clan_id)
+        embed = construct_basic_embed(
+            interaction.application_command.name,
+            description,
+            f"{requested} {interaction.user}",
+            interaction.user.display_avatar,
+            interaction.guild.id,
+        )
+        await interaction.response.send_message(embed=embed)
 
 
 def setup(client):

@@ -97,7 +97,6 @@ async def custom_shop_embed(
     col = x - 5
     for each in roles[x - 5 : x]:
         each = CustomRole(*list(each))
-
         col += 1
         objecta = nextcord.utils.get(inter.guild.roles, id=each.role_id)
         if objecta is None:

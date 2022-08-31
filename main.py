@@ -15,6 +15,8 @@ client = commands.Bot(
     activity=nextcord.Game(name=f"You cute! /help")
 )
 
+# test
+
 # REWRITE all database to one connect at bot init and working with cursors
 
 # ADD recursive method of cogs loading
