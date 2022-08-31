@@ -988,5 +988,13 @@
     },
     "clan_kick": {
       "msg": "You kicked from clan"
+    },
+    "music": {
+      "name": "music",
+      "description": "Controle music player"
+    },
+    "music_play": {
+      "name": "play",
+      "description": "Search and play music in voice chat"
     }
 }
