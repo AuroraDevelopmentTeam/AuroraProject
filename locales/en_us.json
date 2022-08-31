@@ -951,7 +951,7 @@
       "description": "custom roles shop"
     },
     "add-custom-shop": {
-      "name": "add role",
+      "name": "add-role",
       "description": "adding role to custom shop"
     },
     "clan_create": {
