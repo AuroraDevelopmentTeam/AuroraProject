@@ -7,7 +7,7 @@ from typing import Union, Optional
 import cooldowns
 import nextcord
 from nextcord import Interaction, SlashOption
-from nextcord.ext import commands
+from nextcord.ext import commands, menus
 from nextcord.utils import get
 
 from core.clan.checks import boss_alive
@@ -34,6 +34,36 @@ from core.locales.getters import (
 from core.embeds import construct_basic_embed, DEFAULT_BOT_COLOR
 from core.errors import construct_error_not_enough_embed, construct_error_negative_value_embed
 from core.emojify import STAR, BOSS, WRITING, CALENDAR, TEAM, UPARROW, GEM
+
+
+class ClanMembersList(menus.ListPageSource):
+    def __init__(self, data, guild_id):
+        self.guild_id = guild_id
+        super().__init__(data, per_page=6)
+
+    async def format_page(self, menu, entries) -> nextcord.Embed:
+        embed = nextcord.Embed(
+            title=localize_name(self.guild_id, "clan").capitalize(),
+            color=DEFAULT_BOT_COLOR,
+        )
+        for entry in entries:
+            embed.add_field(name=f"```{entry[0]}```", value=f"``Дата присоединения:`` {entry[1]}", inline=False)
+        embed.set_footer(text=f"{menu.current_page + 1}/{self.get_max_pages()}")
+        return embed
+
+
+class NoStopButtonMenuPages(menus.ButtonMenuPages, inherit_buttons=False):
+    def __init__(self, source, timeout=60):
+        super().__init__(source, timeout=timeout)
+
+        # Add the buttons we want
+        self.add_item(menus.MenuPaginationButton(emoji=self.FIRST_PAGE))
+        self.add_item(menus.MenuPaginationButton(emoji=self.PREVIOUS_PAGE))
+        self.add_item(menus.MenuPaginationButton(emoji=self.NEXT_PAGE))
+        self.add_item(menus.MenuPaginationButton(emoji=self.LAST_PAGE))
+
+        # Disable buttons that are unavailable to be pressed at the start
+        self._disable_unavailable_buttons()
 
 
 async def yes_create(interaction: Interaction):
@@ -673,7 +703,20 @@ class ClanHandler(commands.Cog):
 
     @__clan.subcommand(name="members", description="Disband clan")
     async def __clan_list_members(self, interaction: Interaction):
-        pass
+        clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+        clan_members = fetchall_clan_members(interaction.guild.id, clan_id)
+        members = []
+        for row in clan_members:
+            try:
+                member = await self.client.fetch_user(row[0])
+                member = member.name
+            except AttributeError:
+                member = "?"
+            members.append([member, row[1]])
+        pages = NoStopButtonMenuPages(
+            source=ClanMembersList(members, interaction.guild.id),
+        )
+        await pages.start(interaction=interaction)
 
     @__clan.subcommand(name="disband", description="Disband clan")
     async def __clan_disband(self, interaction: Interaction):

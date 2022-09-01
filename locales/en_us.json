@@ -996,5 +996,8 @@
     "music_play": {
       "name": "play",
       "description": "Search and play music in voice chat"
+    },
+    "clan": {
+      "name": "clan"
     }
 }

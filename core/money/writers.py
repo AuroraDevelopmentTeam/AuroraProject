@@ -27,7 +27,7 @@ def write_in_money_config_standart_values(guilds) -> None:
     return
 
 
-def write_in_money_standart_values(guilds) -> None:
+def write_in_money_standart_values(guilds: list) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     for guild in guilds:
