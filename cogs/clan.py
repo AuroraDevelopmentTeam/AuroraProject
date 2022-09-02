@@ -19,7 +19,7 @@ from core.clan.update import update_clan_level, update_clan_exp, update_clan_sto
     update_clan_description, update_clan_max_attack, update_clan_image, update_clan_boss_level, \
     update_clan_min_attack, update_server_clan_change_icon_cost, update_clan_owner_id, update_server_clan_create_cost, \
     update_server_clan_change_image_cost, resurrect_boss, update_server_clan_upgrade_boss_cost, calculate_level, \
-    accomplish_boss_rewards
+    accomplish_boss_rewards, delete_clan
 from core.clan.writers import write_clan, write_clan_on_start
 from core.money.getters import get_guild_currency_symbol, get_user_balance
 from core.money.updaters import update_user_balance
