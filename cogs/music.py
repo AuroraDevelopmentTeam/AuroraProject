@@ -11,6 +11,7 @@ from easy_pil import *
 from nextcord import Interaction, Permissions, SlashOption
 from nextcord.ext import commands
 from config import settings
+from core.ui.buttons import create_button, ViewAuthorCheck
 
 
 class Music(commands.Cog):
@@ -78,8 +79,9 @@ class Music(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        track = await wavelink.YouTubeTrack.search(query=search, return_first=True)
+        tracks = await wavelink.YouTubeTrack.search(query=search, return_first=False)
         #tracklist = await wavelink.YouTubeTrack.search(query=search)
+        """
         if not interaction.guild.voice_client:
             vc: wavelink.Player = await interaction.user.voice.channel.connect(
                 cls=wavelink.Player
@@ -106,7 +108,49 @@ class Music(commands.Cog):
                 interaction.user.display_avatar,
                 interaction.guild.id,
             )
-        await interaction.followup.send(embed=embed)
+        """
+        track_names = ""
+        for index, track in enumerate(tracks):
+            track_names += f"**{index+1})** `" + track.title + "`\n\n"
+            if index == 4:
+                break
+        embed = nextcord.Embed(
+                title="Select track",
+                description=f"Выберете один из трэков\n\n "
+                            f"{track_names}",
+            )
+        first_button = create_button(
+                "1️⃣",
+                False,
+                False,
+            )
+        second_button = create_button(
+                "2️⃣",
+                False,
+                False,
+            )
+        third_button = create_button(
+                "3️⃣",
+                False,
+                False,
+            )
+        four_button = create_button(
+                "4️⃣",
+                False,
+                False,
+            )
+        five_button = create_button(
+                "5️⃣",
+                False,
+                False,
+            )
+        view = ViewAuthorCheck(interaction.user)
+        view.add_item(first_button)
+        view.add_item(second_button)
+        view.add_item(third_button)
+        view.add_item(four_button)
+        view.add_item(five_button)
+        await interaction.followup.send(embed=embed, view=view)
 
     @__music.subcommand(
         name="stop",
