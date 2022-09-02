@@ -18,7 +18,7 @@ client = commands.Bot(
     activity=nextcord.Game(name=f"You cute! /help")
 )
 
-os.chdir('./Gjallarhorn')
+
 
 # test
 
