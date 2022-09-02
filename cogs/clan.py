@@ -10,7 +10,7 @@ from nextcord import Interaction, SlashOption
 from nextcord.ext import commands, menus
 from nextcord.utils import get
 
-from core.clan.checks import boss_alive
+from core.clan.checks import boss_alive, is_clan_owner, is_user_in_clan
 from core.clan.getters import *
 from core.clan.update import update_clan_level, update_clan_exp, update_clan_storage, update_clan_boss_hp, \
     update_user_clan_id, update_user_join_date, update_clan_color, update_clan_icon, update_clan_name, \
@@ -32,7 +32,8 @@ from core.locales.getters import (
     get_guild_locale,
 )
 from core.embeds import construct_basic_embed, DEFAULT_BOT_COLOR
-from core.errors import construct_error_not_enough_embed, construct_error_negative_value_embed
+from core.errors import construct_error_not_enough_embed, construct_error_negative_value_embed, \
+    construct_clan_error_embed
 from core.emojify import STAR, BOSS, WRITING, CALENDAR, TEAM, UPARROW, GEM
 
 
@@ -489,7 +490,10 @@ class ClanHandler(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @nextcord.slash_command(name="clan", description="User menu of creating clans")
+    @nextcord.slash_command(name="clan", description="User menu of creating clans",
+                            name_localizations=get_localized_name("clan"),
+                            description_localizations=get_localized_description("clan"),
+                            )
     async def __clan(self, interaction: Interaction):
         pass
 
@@ -592,7 +596,15 @@ class ClanHandler(commands.Cog):
 
     @__clan.subcommand(name="show", description="Displaying your clan")
     async def __clan_display(self, interaction: Interaction):
-        await interaction.response.defer()
+        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+            return await interaction.response.send_message(
+                embed=construct_clan_error_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_in_clan_error"
+                    ),
+                    self.client.user.avatar.url
+                )
+            )
         clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
         clan_description = get_clan_description(interaction.guild.id, clan_id)
         clan_name = get_clan_name(interaction.guild.id, clan_id)
@@ -638,7 +650,7 @@ class ClanHandler(commands.Cog):
             value=f"Уровень: **{guild_boss}**\nHP: {guild_boss_hp}/{full_hp}",
             inline=False,
         )
-        await interaction.followup.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
     @__clan.subcommand(name="shop", description="Sends your clan shop with upgrades")
     async def __clan_shop(self, interaction: Interaction):
@@ -650,6 +662,15 @@ class ClanHandler(commands.Cog):
             interaction: Interaction,
             money: Optional[int] = SlashOption(required=True),
     ):
+        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+            return await interaction.response.send_message(
+                embed=construct_clan_error_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_in_clan_error"
+                    ),
+                    self.client.user.avatar.url
+                )
+            )
         if money <= 0:
             return await interaction.response.send_message(
                 embed=construct_error_negative_value_embed(
@@ -679,10 +700,44 @@ class ClanHandler(commands.Cog):
 
     @__clan.subcommand(name="leave", description="Leave from clan")
     async def __clan_leave(self, interaction: Interaction):
-        pass
+        clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+        clan_name = get_clan_name(interaction.guild.id, clan_id)
+        update_user_clan_id(interaction.guild.id, interaction.user.id, 0)
+        update_user_join_date(interaction.guild.id, interaction.user.id, '0')
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"clan_{interaction.application_command.name}",
+                f"{message} **{clan_name}**",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
 
     @__clan.subcommand(name="kick", description="Kick user from clan")
     async def __clan_kick(self, interaction: Interaction, user: Optional[nextcord.Member]):
+        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+            return await interaction.response.send_message(
+                embed=construct_clan_error_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_in_clan_error"
+                    ),
+                    self.client.user.avatar.url
+                )
+            )
+        if not is_user_in_clan(interaction.guild.id, user.id):
+            return await interaction.response.send_message(
+                embed=construct_clan_error_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_in_clan_error"
+                    ),
+                    self.client.user.avatar.url
+                )
+            )
         clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
         clan_name = get_clan_name(interaction.guild.id, clan_id)
         update_user_clan_id(interaction.guild.id, user.id, 0)
@@ -701,8 +756,17 @@ class ClanHandler(commands.Cog):
             )
         )
 
-    @__clan.subcommand(name="members", description="Disband clan")
+    @__clan.subcommand(name="members", description="Listing all clan members")
     async def __clan_list_members(self, interaction: Interaction):
+        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+            return await interaction.response.send_message(
+                embed=construct_clan_error_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_in_clan_error"
+                    ),
+                    self.client.user.avatar.url
+                )
+            )
         clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
         clan_members = fetchall_clan_members(interaction.guild.id, clan_id)
         members = []
@@ -720,6 +784,15 @@ class ClanHandler(commands.Cog):
 
     @__clan.subcommand(name="disband", description="Disband clan")
     async def __clan_disband(self, interaction: Interaction):
+        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+            return await interaction.response.send_message(
+                embed=construct_clan_error_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_in_clan_error"
+                    ),
+                    self.client.user.avatar.url
+                )
+            )
         pass
 
     @__clan.subcommand(name="invite", description="Send invite in your clan to user")
@@ -728,6 +801,15 @@ class ClanHandler(commands.Cog):
             interaction: Interaction,
             user: Optional[nextcord.Member] = SlashOption(required=True),
     ):
+        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+            return await interaction.response.send_message(
+                embed=construct_clan_error_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_in_clan_error"
+                    ),
+                    self.client.user.avatar.url
+                )
+            )
         clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
         clan_name = get_clan_name(interaction.guild.id, clan_id)
         author = interaction.user
@@ -827,6 +909,15 @@ class ClanHandler(commands.Cog):
     )
     @cooldowns.cooldown(1, 21600, bucket=cooldowns.SlashBucket.author)
     async def __clan_attack_clan_boss(self, interaction: Interaction):
+        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+            return await interaction.response.send_message(
+                embed=construct_clan_error_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_in_clan_error"
+                    ),
+                    self.client.user.avatar.url
+                )
+            )
         clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
         min_attack, max_attack = get_clan_min_attack(interaction.guild.id, clan_id), \
                                  get_clan_max_attack(interaction.guild.id, clan_id)

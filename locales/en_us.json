@@ -998,7 +998,8 @@
       "description": "Search and play music in voice chat"
     },
     "clan": {
-      "name": "clan"
+      "name": "clan",
+      "description": "Prefix for clan commands"
     },
     "music_stop": {
       "name": "stop",
@@ -1007,5 +1008,13 @@
     "music_skip": {
       "name": "skip",
       "description": "Skip current track"
+    },
+    "clan_leave": {
+      "name": "leave",
+      "description": "Leave your clan",
+      "msg": "You left the clan"
+    },
+    "not_in_clan_error": {
+      "msg": "Aurora denied process of command execution. Reason: **You or indicated user in parameters not in clan.**\nYour command failed to successfully complete."
     }
 }
