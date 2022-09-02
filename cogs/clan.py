@@ -458,34 +458,6 @@ class NameModal(nextcord.ui.Modal):
             delete_clan(interaction.guild.id, interaction.user.id)
 
 
-class Clan:
-    def __init__(
-            self,
-            description,
-            role_id,
-            level,
-            owner,
-            members,
-            members_limit,
-            storage,
-            create_date,
-            icon,
-            image,
-            guild_boss,
-    ):
-        self.description = description
-        self.role_id = role_id
-        self.level = level
-        self.owner = owner
-        self.members = members
-        self.members_limit = members_limit
-        self.storage = storage
-        self.create_date = create_date
-        self.icon = icon
-        self.image = image
-        self.guild_boss = guild_boss
-
-
 class ClanHandler(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -793,7 +765,38 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url
                 )
             )
-        pass
+        clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+        clan_name = get_clan_name(interaction.guild.id, clan_id)
+        clan_channel = get_clan_channel(interaction.guild.id, clan_id)
+        try:
+            clan_channel = nextcord.utils.get(interaction.guild.channels, id=clan_channel)
+            await clan_channel.delete()
+        except:
+            pass
+        clan_role = get_clan_role(interaction.guild.id, clan_id)
+        try:
+            clan_role = nextcord.utils.get(interaction.guild.roles, id=clan_role)
+            await clan_role.delete()
+        except:
+            pass
+        clan_members = fetchall_clan_members(interaction.guild.id, clan_id)
+        for row in clan_members:
+            member_id = row[0]
+            update_user_clan_id(interaction.guild.id, member_id, 0)
+            update_user_join_date(interaction.guild.id, member_id, '0')
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"clan_{interaction.application_command.name}",
+                f"**{clan_name}** {message}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
 
     @__clan.subcommand(name="invite", description="Send invite in your clan to user")
     async def __clan_invite(

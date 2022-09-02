@@ -182,6 +182,17 @@ def get_clan_role(guild_id: int, clan_id: int) -> int:
     return clan_role
 
 
+def get_clan_channel(guild_id: int, clan_id: int) -> int:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    clan_channel = cursor.execute(
+        f"SELECT clan_voice_channel FROM clans WHERE guild_id = {guild_id} AND clan_id = {clan_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return clan_channel
+
+
 def get_owner_clan_id(guild_id: int, user_id: int) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()

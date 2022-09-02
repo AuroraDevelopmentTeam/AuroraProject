@@ -1016,5 +1016,11 @@
     },
     "not_in_clan_error": {
       "msg": "Aurora denied process of command execution. Reason: **You or indicated user in parameters not in clan.**\nYour command failed to successfully complete."
+    },
+    "clan_disband": {
+      "msg": "now disbanded, all members kicked from clan"
+    },
+    "already_in_clan_error": {
+      "msg": "Aurora denied process of command execution. Reason: **You or indicated user in parameters already in clan.**\nYour command failed to successfully complete."
     }
 }
