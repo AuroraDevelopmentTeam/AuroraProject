@@ -60,7 +60,13 @@ class Music(commands.Cog):
     async def __play_music(
         self,
         interaction: Interaction,
-        search: Optional[str] = SlashOption(required=True),
+        search: Optional[str] = SlashOption(
+            required=True,
+            description="search query or youtube link",
+            description_localizations={
+                "ru": "Поисковой запрос или ссылка YouTube"
+            },
+        ),
     ):
         await interaction.response.defer()
         user = interaction.user
