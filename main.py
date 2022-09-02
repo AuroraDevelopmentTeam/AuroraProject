@@ -18,6 +18,8 @@ client = commands.Bot(
     activity=nextcord.Game(name=f"You cute! /help")
 )
 
+os.chdir('./Gjallarhorn')
+
 # test
 
 # REWRITE all database to one connect at bot init and working with cursors

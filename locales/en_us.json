@@ -999,5 +999,13 @@
     },
     "clan": {
       "name": "clan"
+    },
+    "music_stop": {
+      "name": "stop",
+      "description": "Stop music and disconnect from channal"
+    },
+    "music_skip": {
+      "name": "skip",
+      "description": "Skip current track"
     }
 }
