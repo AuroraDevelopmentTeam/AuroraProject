@@ -138,8 +138,8 @@ class Music(commands.Cog):
         for track in tracks:
             title = textwrap.shorten(track.title, width=75, placeholder="...")
             duration = format_seconds_to_hhmmss(track.duration)
-            if duration[:2] == "00:":
-                duration = duration[2:]
+            if duration[:3] == "00:":
+                duration = duration[3:]
             auto.append(f"{title} ({duration})")
         await interaction.response.send_autocomplete(auto)
 
