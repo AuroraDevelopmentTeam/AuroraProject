@@ -12,6 +12,7 @@ from nextcord import Interaction, Permissions, SlashOption
 from nextcord.ext import commands
 from config import settings
 from core.ui.buttons import create_button, ViewAuthorCheck
+from core.utils import format_seconds_to_hhmmss
 
 
 class Music(commands.Cog):
@@ -123,14 +124,14 @@ class Music(commands.Cog):
             tracks = await wavelink.YouTubeTrack.search(query="music", return_first=False)
             auto = []
             for track in tracks:
-                auto.append(track.title)
+                auto.append(track.title + " (" + format_seconds_to_hhmmss(track.duration) + ")")
             await interaction.response.send_autocomplete(auto)
             return
         # Выводим треки по запросу search
         tracks = await wavelink.YouTubeTrack.search(query=search, return_first=False)
         auto = []
         for track in tracks:
-            auto.append(track.title)
+            auto.append(track.title + " (" + format_seconds_to_hhmmss(track.duration) + ")")
         await interaction.response.send_autocomplete(auto)
 
     @__music.subcommand(
