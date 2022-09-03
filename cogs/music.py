@@ -1,3 +1,4 @@
+import textwrap
 from typing import Optional
 
 import nextcord
@@ -124,14 +125,22 @@ class Music(commands.Cog):
             tracks = await wavelink.YouTubeTrack.search(query="music", return_first=False)
             auto = []
             for track in tracks:
-                auto.append(track.title + " (" + format_seconds_to_hhmmss(track.duration) + ")")
+                title = textwrap.shorten(track.title, width=75, placeholder="...")
+                duration = format_seconds_to_hhmmss(track.duration)
+                if duration[:3] == "00:":
+                    duration = duration[3:]
+                auto.append(f"{title} ({duration})")
             await interaction.response.send_autocomplete(auto)
             return
         # Выводим треки по запросу search
         tracks = await wavelink.YouTubeTrack.search(query=search, return_first=False)
         auto = []
         for track in tracks:
-            auto.append(track.title + " (" + format_seconds_to_hhmmss(track.duration) + ")")
+            title = textwrap.shorten(track.title, width=75, placeholder="...")
+            duration = format_seconds_to_hhmmss(track.duration)
+            if duration[:2] == "00:":
+                duration = duration[2:]
+            auto.append(f"{title} ({duration})")
         await interaction.response.send_autocomplete(auto)
 
     @__music.subcommand(
