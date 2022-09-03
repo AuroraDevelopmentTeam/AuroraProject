@@ -86,3 +86,11 @@ def construct_clan_error_embed(
     embed = construct_error_embed(description)
     embed.set_footer(icon_url=icon, text=f"error: ClanError")
     return embed
+
+def construct_error_no_voice_embed(description: str, icon: Asset) -> nextcord.Embed:
+    embed = construct_error_embed(description)
+    embed.set_footer(
+        icon_url=icon,
+        text=f"error: no voice\nstatus-code: #A403 ",
+    )
+    return embed

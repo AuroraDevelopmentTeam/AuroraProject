@@ -4,7 +4,7 @@ from typing import Optional
 import nextcord
 import wavelink
 from core.embeds import construct_basic_embed
-from core.errors import construct_error_bot_user_embed
+from core.errors import construct_error_bot_user_embed, construct_error_no_voice_embed
 from core.locales.getters import (get_localized_description,
                                   get_localized_name,
                                   get_msg_from_locale_by_key)
@@ -14,6 +14,8 @@ from nextcord.ext import commands
 from config import settings
 from core.ui.buttons import create_button, ViewAuthorCheck
 from core.utils import format_seconds_to_hhmmss
+from lib.vk_audio.VkAudio import VkAudio
+from lib.vk_audio.exc import *
 
 
 class Music(commands.Cog):
@@ -67,7 +69,7 @@ class Music(commands.Cog):
             required=True,
             description="search query or youtube link",
             description_localizations={
-                "ru": "Поисковой запрос или ссылка YouTube"
+                "ru": "Поисковой запрос или ссылка YouTube, VK, Spotify"
             },
         ),
          
@@ -85,27 +87,38 @@ class Music(commands.Cog):
         track = await wavelink.YouTubeTrack.search(query=search, return_first=True)
         #tracklist = await wavelink.YouTubeTrack.search(query=search)
         if not interaction.guild.voice_client:
-            vc: wavelink.Player = await interaction.user.voice.channel.connect(
-                cls=wavelink.Player
-            )
+                
+            try:
+                vc: wavelink.Player = await interaction.user.voice.channel.connect(
+                    cls=wavelink.Player
+                )
+            except:
+                embed=construct_error_no_voice_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "user_not_in_voice"),
+                    self.client.user.avatar.url,
+                )
+                await interaction.followup.send(embed=embed)
+                return
         else:
             vc: wavelink.Player = interaction.guild.voice_client
 
         if vc.is_playing():
             self.queue.put(track)
+            title = track.title
             embed = construct_basic_embed(
                 interaction.application_command.name,
-                "Added to queue ",#**" + vc.track.info.get('title') + "**\n in channal *" + interaction.user.voice.channel.name + "*",
+                "{title} added to queue ",
                 search,
                 interaction.user.display_avatar,
                 interaction.guild.id,
             )
         else:
             await vc.play(track)
-        
+            title = vc.track.info.get('title')
+            channal = interaction.user.voice.channel.name
             embed = construct_basic_embed(
                 interaction.application_command.name,
-                "Playing **" + vc.track.info.get('title') + "**\n in channal *" + interaction.user.voice.channel.name + "*",
+                f"Playing **{title}**\n in channal *{channal}*",
                 search,
                 interaction.user.display_avatar,
                 interaction.guild.id,
@@ -172,7 +185,7 @@ class Music(commands.Cog):
 
         embed = construct_basic_embed(
             interaction.application_command.name,
-            "Stopped **" + vc.track.info.get('title') + "**\n in channal *" + interaction.user.voice.channel.name + "*",
+            "Player stopped",
             vc.track.info.get('title'),
             interaction.user.display_avatar,
             interaction.guild.id,
@@ -210,10 +223,10 @@ class Music(commands.Cog):
             )
         else:
             vc: wavelink.Player = interaction.guild.voice_client
-
+        title = vc.track.info.get('title')
         embed = construct_basic_embed(
             interaction.application_command.name,
-            "Stopped **" + vc.track.info.get('title') + "**\n in channal *" + interaction.user.voice.channel.name + "*",
+            "Skipped **{title}**",
             vc.track.info.get('title'),
             interaction.user.display_avatar,
             interaction.guild.id,

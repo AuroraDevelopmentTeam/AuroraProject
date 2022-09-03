@@ -994,10 +994,6 @@
       "name": "включить",
       "description": "Найти и включить музыку в войс чат"
     },
-    "clan": {
-      "name": "клан",
-      "description": "Префикс для команд клана"
-    },
     "music_stop": {
       "name": "стоп",
       "description": "Выключить музыку и отключить бота от канала"
@@ -1005,6 +1001,13 @@
     "music_skip": {
       "name": "пропустить",
       "description": "Пропустить текущий трек"
+    },
+    "user_not_in_voice": {
+      "msg": "You are not in voice channal"
+    },
+    "clan": {
+      "name": "клан",
+      "description": "Префикс для команд клана"
     },
     "clan_leave": {
       "name": "покинуть",

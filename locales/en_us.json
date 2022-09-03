@@ -997,10 +997,6 @@
       "name": "play",
       "description": "Search and play music in voice chat"
     },
-    "clan": {
-      "name": "clan",
-      "description": "Prefix for clan commands"
-    },
     "music_stop": {
       "name": "stop",
       "description": "Stop music and disconnect from channal"
@@ -1008,6 +1004,13 @@
     "music_skip": {
       "name": "skip",
       "description": "Skip current track"
+    },
+    "user_not_in_voice": {
+      "msg": "You are not in voice channal"
+    },
+    "clan": {
+      "name": "clan",
+      "description": "Prefix for clan commands"
     },
     "clan_leave": {
       "name": "leave",
