@@ -1,3 +1,4 @@
+import textwrap
 from typing import Optional
 
 import nextcord
@@ -12,6 +13,7 @@ from nextcord import Interaction, Permissions, SlashOption
 from nextcord.ext import commands
 from config import settings
 from core.ui.buttons import create_button, ViewAuthorCheck
+from core.utils import format_seconds_to_hhmmss
 
 
 class Music(commands.Cog):
@@ -61,13 +63,14 @@ class Music(commands.Cog):
     async def __play_music(
         self,
         interaction: Interaction,
-        search: Optional[str] = SlashOption(
+        search: str = SlashOption(
             required=True,
             description="search query or youtube link",
             description_localizations={
                 "ru": "Поисковой запрос или ссылка YouTube"
             },
         ),
+         
     ):
         await interaction.response.defer()
         user = interaction.user
@@ -79,9 +82,8 @@ class Music(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        tracks = await wavelink.YouTubeTrack.search(query=search, return_first=False)
+        track = await wavelink.YouTubeTrack.search(query=search, return_first=True)
         #tracklist = await wavelink.YouTubeTrack.search(query=search)
-        """
         if not interaction.guild.voice_client:
             vc: wavelink.Player = await interaction.user.voice.channel.connect(
                 cls=wavelink.Player
@@ -108,49 +110,38 @@ class Music(commands.Cog):
                 interaction.user.display_avatar,
                 interaction.guild.id,
             )
-        """
-        track_names = ""
-        for index, track in enumerate(tracks):
-            track_names += f"**{index+1})** `" + track.title + "`\n\n"
-            if index == 4:
-                break
-        embed = nextcord.Embed(
-                title="Select track",
-                description=f"Выберете один из трэков\n\n "
-                            f"{track_names}",
-            )
-        first_button = create_button(
-                "1️⃣",
-                False,
-                False,
-            )
-        second_button = create_button(
-                "2️⃣",
-                False,
-                False,
-            )
-        third_button = create_button(
-                "3️⃣",
-                False,
-                False,
-            )
-        four_button = create_button(
-                "4️⃣",
-                False,
-                False,
-            )
-        five_button = create_button(
-                "5️⃣",
-                False,
-                False,
-            )
-        view = ViewAuthorCheck(interaction.user)
-        view.add_item(first_button)
-        view.add_item(second_button)
-        view.add_item(third_button)
-        view.add_item(four_button)
-        view.add_item(five_button)
-        await interaction.followup.send(embed=embed, view=view)
+        #track_names = ""
+        #for index, track in enumerate(tracks):
+        #    track_names += f"**{index+1})** `" + track.title + "`\n\n"
+        #    if index == 4:
+        #        break
+        
+        await interaction.followup.send(embed=embed)
+
+    @__play_music.on_autocomplete("search")
+    async def searchauto(self, interaction: Interaction, search: str):
+        if not search:
+            # По стандарту выводим треки по запросу music
+            tracks = await wavelink.YouTubeTrack.search(query="music", return_first=False)
+            auto = []
+            for track in tracks:
+                title = textwrap.shorten(track.title, width=75, placeholder="...")
+                duration = format_seconds_to_hhmmss(track.duration)
+                if duration[:3] == "00:":
+                    duration = duration[3:]
+                auto.append(f"{title} ({duration})")
+            await interaction.response.send_autocomplete(auto)
+            return
+        # Выводим треки по запросу search
+        tracks = await wavelink.YouTubeTrack.search(query=search, return_first=False)
+        auto = []
+        for track in tracks:
+            title = textwrap.shorten(track.title, width=75, placeholder="...")
+            duration = format_seconds_to_hhmmss(track.duration)
+            if duration[:3] == "00:":
+                duration = duration[3:]
+            auto.append(f"{title} ({duration})")
+        await interaction.response.send_autocomplete(auto)
 
     @__music.subcommand(
         name="stop",
