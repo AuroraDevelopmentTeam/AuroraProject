@@ -1022,5 +1022,27 @@
     },
     "already_in_clan_error": {
       "msg": "Aurora denied process of command execution. Reason: **You or indicated user in parameters already in clan.**\nYour command failed to successfully complete."
+    },
+    "not_clan_owner": {
+      "msg": "Aurora can't execute this command for you. Reason: **You are not clan owner.**"
+    },
+    "clan_shop": {
+      "name": "shop",
+      "description": "Shop of upgrades for clan"
+    },
+    "clan_shop_1": {
+      "msg": "Повышение лимита участников на 5"
+    },
+    "clan_shop_2": {
+      "msg": "Сменить/Поставить картинку в описании клана"
+    },
+    "clan_shop_3": {
+      "msg": "Сменить иконку клана"
+    },
+    "clan_shop_4": {
+      "msg": "Повысить урон, наносимый клановому боссу"
+    },
+    "clan_shop_5": {
+      "msg": "Повысить уровень кланового босса"
     }
 }

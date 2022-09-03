@@ -34,7 +34,7 @@ from core.locales.getters import (
 from core.embeds import construct_basic_embed, DEFAULT_BOT_COLOR
 from core.errors import construct_error_not_enough_embed, construct_error_negative_value_embed, \
     construct_clan_error_embed
-from core.emojify import STAR, BOSS, WRITING, CALENDAR, TEAM, UPARROW, GEM
+from core.emojify import STAR, BOSS, WRITING, CALENDAR, TEAM, UPARROW, GEM, SHOP
 
 
 class ClanMembersList(menus.ListPageSource):
@@ -128,6 +128,7 @@ async def yes_create(interaction: Interaction):
         voice_channel_id,
         color_to_table,
     )
+    clan_id = get_owner_clan_id(interaction.guild.id, interaction.user.id)
     update_user_clan_id(interaction.guild.id, interaction.user.id, clan_id)
     update_user_join_date(interaction.guild.id, interaction.user.id, timestamp)
     yes_button = create_button(
@@ -471,6 +472,15 @@ class ClanHandler(commands.Cog):
 
     @__clan.subcommand(name="create", description="Creating a clan")
     async def __clan_create(self, interaction: Interaction):
+        if is_user_in_clan(interaction.guild.id, interaction.user.id) is True:
+            return await interaction.response.send_message(
+                embed=construct_clan_error_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "already_in_clan_error"
+                    ),
+                    self.client.user.avatar.url
+                )
+            )
         create_cost = get_server_clan_create_cost(interaction.guild.id)
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < create_cost:
@@ -626,7 +636,18 @@ class ClanHandler(commands.Cog):
 
     @__clan.subcommand(name="shop", description="Sends your clan shop with upgrades")
     async def __clan_shop(self, interaction: Interaction):
-        pass
+        # повысить лимит участников/сменить, поставить картинку/сменить иконку/повысить урон/повысить уровень босса
+        embed = nextcord.Embed(
+            color=DEFAULT_BOT_COLOR,
+            title=f"{SHOP} {localize_name(interaction.guild.id, interaction.application_command.name).capitalize()}",
+        )
+        embed.add_field(name=f"```{get_msg_from_locale_by_key(interaction.guild.id, 'clan_shop_1')}```",
+                        value=f"```{get_msg_from_locale_by_key(interaction.guild.id, 'price')} "
+                              f"{get_server_clan_upgrade_limit_cost(interaction.guild.id)}```")
+
+
+        view = HelpMenuView(interaction.guild.id)
+        await interaction.response.send_message(embed=embed, view=view)
 
     @__clan.subcommand(name="deposit", description="Deposit your money in clan bank")
     async def __clan_deposit(
@@ -672,6 +693,15 @@ class ClanHandler(commands.Cog):
 
     @__clan.subcommand(name="leave", description="Leave from clan")
     async def __clan_leave(self, interaction: Interaction):
+        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+            return await interaction.response.send_message(
+                embed=construct_clan_error_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_in_clan_error"
+                    ),
+                    self.client.user.avatar.url
+                )
+            )
         clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
         clan_name = get_clan_name(interaction.guild.id, clan_id)
         update_user_clan_id(interaction.guild.id, interaction.user.id, 0)
@@ -706,6 +736,15 @@ class ClanHandler(commands.Cog):
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "not_in_clan_error"
+                    ),
+                    self.client.user.avatar.url
+                )
+            )
+        if not is_clan_owner(interaction.guild.id, interaction.user.id):
+            return await interaction.response.send_message(
+                embed=construct_clan_error_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_clan_owner"
                     ),
                     self.client.user.avatar.url
                 )
@@ -765,6 +804,15 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url
                 )
             )
+        if not is_clan_owner(interaction.guild.id, interaction.user.id):
+            return await interaction.response.send_message(
+                embed=construct_clan_error_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_clan_owner"
+                    ),
+                    self.client.user.avatar.url
+                )
+            )
         clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
         clan_name = get_clan_name(interaction.guild.id, clan_id)
         clan_channel = get_clan_channel(interaction.guild.id, clan_id)
@@ -809,6 +857,24 @@ class ClanHandler(commands.Cog):
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "not_in_clan_error"
+                    ),
+                    self.client.user.avatar.url
+                )
+            )
+        if is_user_in_clan(interaction.guild.id, user.id) is True:
+            return await interaction.response.send_message(
+                embed=construct_clan_error_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "already_in_clan_error"
+                    ),
+                    self.client.user.avatar.url
+                )
+            )
+        if not is_clan_owner(interaction.guild.id, interaction.user.id):
+            return await interaction.response.send_message(
+                embed=construct_clan_error_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_clan_owner"
                     ),
                     self.client.user.avatar.url
                 )
