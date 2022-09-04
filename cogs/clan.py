@@ -6,7 +6,7 @@ from typing import Union, Optional
 
 import cooldowns
 import nextcord
-from nextcord import Interaction, SlashOption
+from nextcord import Interaction, SlashOption, Permissions
 from nextcord.ext import commands, menus
 from nextcord.utils import get
 
@@ -549,6 +549,7 @@ class ClanHandler(commands.Cog):
         description="User menu of creating clans",
         name_localizations=get_localized_name("clan"),
         description_localizations=get_localized_description("clan"),
+        default_member_permissions=Permissions(send_messages=True),
     )
     async def __clan(self, interaction: Interaction):
         pass
