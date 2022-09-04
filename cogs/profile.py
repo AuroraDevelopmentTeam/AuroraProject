@@ -146,7 +146,6 @@ class UserProfiles(commands.Cog):
         interaction: Interaction,
         user: Optional[nextcord.Member] = SlashOption(required=False),
     ):
-        await interaction.response.defer()
         if user is None:
             user = interaction.user
         if user.bot:
