@@ -956,7 +956,7 @@
     },
     "clan_create": {
       "name": "create",
-      "description": "Create a clan with this command",
+      "description": "Create a clan",
       "msg": "Creating a clan is not cheap, if you really want to create clan be ready to pay your server currency in next amount:"
     },
     "yes": {
@@ -966,6 +966,8 @@
       "msg": "no"
     },
     "clan_invite": {
+      "name": "invite",
+      "description": "Send invite request to clan",
       "msg": "You was invited to clan:"
     },
     "clan_invite_yes": {
@@ -975,6 +977,8 @@
       "msg": "You refused the invitation in clan"
     },
     "clan_attack_boss": {
+      "name": "attack_boss",
+      "description": "Attack your clan boss",
       "msg": "You attacked clan boss with power:"
     },
     "clan_attack_boss_2": {
@@ -984,9 +988,13 @@
       "msg": "Clan boss died and dropped clan EXP and money in storage:"
     },
     "clan_deposit": {
+      "name": "deposit",
+      "description": "Deposit money in your clan bank",
       "msg": "You deposited money in clan bank"
     },
     "clan_kick": {
+      "name": "kick",
+      "description": "Kick user from your clan",
       "msg": "You kicked from clan"
     },
     "music": {
@@ -1018,6 +1026,8 @@
       "msg": "Aurora denied process of command execution. Reason: **You or indicated user in parameters not in clan.**\nYour command failed to successfully complete."
     },
     "clan_disband": {
+      "name": "disband",
+      "description": "Disband your clan, delete clan, kick all users from clan",
       "msg": "now disbanded, all members kicked from clan"
     },
     "already_in_clan_error": {
@@ -1031,18 +1041,41 @@
       "description": "Shop of upgrades for clan"
     },
     "clan_shop_1": {
-      "msg": "Повышение лимита участников на 5"
+      "msg": "Increase clan members limit on 5 members"
     },
     "clan_shop_2": {
-      "msg": "Сменить/Поставить картинку в описании клана"
+      "msg": "Change/Set image in clan description"
     },
     "clan_shop_3": {
-      "msg": "Сменить иконку клана"
+      "msg": "Change clan icon"
     },
     "clan_shop_4": {
-      "msg": "Повысить урон, наносимый клановому боссу"
+      "msg": "Upgrade damage dealed to clan boss"
     },
     "clan_shop_5": {
-      "msg": "Повысить уровень кланового босса"
+      "msg": "Level up clan boss"
+    },
+    "in_storage": {
+      "msg": "In bank storage:"
+    },
+    "clan_shop_limit_buy": {
+      "msg": "You buyed 'Increase clan members limit on 5 members'. Now limit: "
+    },
+    "clan_shop_boss_buy": {
+      "msg": "You buyed 'Level up clan boss'. Now boss level: "
+    },
+    "you_are_clan_owner": {
+      "msg": "Aurora can't execute this command for you. Reason: **You are clan owner.**"
+    },
+    "clan_shop_attack_buy": {
+      "msg": "You buyed 'Upgrade damage dealed to clan boss'. Now attack in range: "
+    },
+    "clan_members": {
+      "name": "members",
+      "description": "Show list of members in your clan"
+    },
+    "clan_show": {
+      "name": "show",
+      "description": "Show description menu of your clan"
     }
 }
