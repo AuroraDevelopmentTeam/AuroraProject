@@ -677,6 +677,7 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
         clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
         clan_description = get_clan_description(interaction.guild.id, clan_id)
         clan_name = get_clan_name(interaction.guild.id, clan_id)
@@ -716,7 +717,7 @@ class ClanHandler(commands.Cog):
             name=f"{TEAM} Участники", value=f"{len(members)}/{limit}", inline=True
         )
         embed.add_field(name="Роль", value=f"{role.mention}", inline=True)
-        embed.add_field(name=f"{GEM} Банк клана", value=f"{storage}", inline=True)
+        embed.add_field(name=f"{GEM} Банк клана", value=f"**{storage}** {currency_symbol}", inline=True)
         embed.add_field(
             name="Уровень",
             value=f"{UPARROW} **{clan_level}**\n{clan_exp}|{leveling_formula}",
@@ -955,6 +956,18 @@ class ClanHandler(commands.Cog):
                     money,
                 )
             )
+        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if balance < money:
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            return await interaction.response.send_message(
+                embed=construct_error_not_enough_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_enough_money_error"
+                    ),
+                    interaction.user.display_avatar,
+                    f"{msg} {balance}/{money}",
+                )
+            )
         clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
         update_clan_storage(interaction.guild.id, clan_id, money)
         update_user_balance(interaction.guild.id, interaction.user.id, -money)
@@ -1016,7 +1029,14 @@ class ClanHandler(commands.Cog):
                        description_localizations=get_localized_description("clan_kick"),
                        )
     async def __clan_kick(
-            self, interaction: Interaction, user: Optional[nextcord.Member]
+            self, interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
     ):
         if not is_user_in_clan(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
@@ -1169,7 +1189,13 @@ class ClanHandler(commands.Cog):
     async def __clan_invite(
             self,
             interaction: Interaction,
-            user: Optional[nextcord.Member] = SlashOption(required=True),
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
     ):
         if not is_user_in_clan(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
@@ -1304,6 +1330,7 @@ class ClanHandler(commands.Cog):
         name_localizations=get_localized_name("clan_attack_boss"),
         description_localizations=get_localized_description("clan_attack_boss"),
     )
+    @cooldowns.cooldown(1, 21600, bucket=cooldowns.SlashBucket.author)
     async def __clan_attack_clan_boss(self, interaction: Interaction):
         if not is_user_in_clan(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
@@ -1350,6 +1377,18 @@ class ClanHandler(commands.Cog):
             interaction.guild.id,
         )
         await interaction.response.send_message(embed=embed)
+
+    @nextcord.slash_command(
+        name="clan_config",
+        description="Clan configuration commands group",
+        default_member_permissions=Permissions(administrator=True),
+    )
+    async def __clan_config(self, interaction: Interaction):
+        pass
+
+    @__clan_config.subcommand(name="create_cost", description="Set cost of clan create on your server")
+    async def __clan_config_create_cost(self, interaction: Interaction, money: Optional[int]):
+        update_server_clan_create_cost(interaction.guild.id, money)
 
 
 def setup(client):
