@@ -62,7 +62,9 @@ class Information(commands.Cog):
         else:
             locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
         if guild.icon is None:  # Фикс команды при отсутствии у сервера иконки
-            embedicon = "https://ui-avatars.com/api/?name=" + f"{guild.name}".replace(" ", "+")
+            embedicon = "https://ui-avatars.com/api/?name=" + f"{guild.name}".replace(
+                " ", "+"
+            )
         else:
             embedicon = guild.icon
         embed = construct_long_embed(
@@ -100,15 +102,15 @@ class Information(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __user(
-            self,
-            interaction: Interaction,
-            user: Optional[nextcord.Member] = SlashOption(
-                required=True,
-                description="The discord's user, tag someone with @",
-                description_localizations={
-                    "ru": "Пользователь дискорда, укажите кого-то @"
-                },
-            ),
+        self,
+        interaction: Interaction,
+        user: Optional[nextcord.Member] = SlashOption(
+            required=True,
+            description="The discord's user, tag someone with @",
+            description_localizations={
+                "ru": "Пользователь дискорда, укажите кого-то @"
+            },
+        ),
     ):
         if user is None:
             return await interaction.response.send_message("no key value error 786")

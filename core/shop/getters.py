@@ -9,7 +9,7 @@ from core.dataclassesList import CustomRole
 
 class BuyButton(Button):
     def __init__(
-            self, label, interaction, role, emoji=None
+        self, label, interaction, role, emoji=None
     ):  # TODO make custom shop emojis for guilds
         super().__init__(label=label, style=nextcord.ButtonStyle.primary, emoji="🛒")
         self.interaction = interaction
@@ -27,7 +27,7 @@ class BuyButton(Button):
 
 class NextPageButton(Button):
     def __init__(
-            self, label, interaction, page, emoji=None, shop_filter="notnew"
+        self, label, interaction, page, emoji=None, shop_filter="notnew"
     ):  # filt = filter
         super().__init__(style=nextcord.ButtonStyle.secondary, emoji=emoji, row=3)
         self.interaction = interaction
@@ -57,17 +57,21 @@ class ShopLeave(Button):
         await interaction.delete_original_message()
 
 
-def get_custom_shop_roles_limit(guild_id: int) -> bool:  # TODO сделать чтобы создатель сервера мог регулировать лимит
+def get_custom_shop_roles_limit(
+    guild_id: int,
+) -> bool:  # TODO сделать чтобы создатель сервера мог регулировать лимит
     db = sqlite3.connect("./database/main.sqlite")
     cursor = db.cursor()
-    roles = cursor.execute("SELECT * FROM custom_shop WHERE guild_id = ?", (guild_id,)).fetchall()
-    if len(roles) >= 50: # в будущем можно будет увеличить
+    roles = cursor.execute(
+        "SELECT * FROM custom_shop WHERE guild_id = ?", (guild_id,)
+    ).fetchall()
+    if len(roles) >= 50:  # в будущем можно будет увеличить
         return True
     return False
 
 
 async def custom_shop_embed(
-        inter: Interaction, pagen: int = 1, order: str = "notnew"
+    inter: Interaction, pagen: int = 1, order: str = "notnew"
 ) -> Coroutine[Any, Any, tuple[nextcord.Embed, View]]:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
@@ -94,7 +98,8 @@ async def custom_shop_embed(
         highcost = True
     elif order == "lowcost":
         roles = cursor.execute(
-            f"SELECT * FROM custom_shop WHERE guild_id = {inter.guild.id} ORDER BY cost ASC").fetchall()
+            f"SELECT * FROM custom_shop WHERE guild_id = {inter.guild.id} ORDER BY cost ASC"
+        ).fetchall()
         lowcost = True
     cursor.close()
     db.close()
@@ -104,7 +109,7 @@ async def custom_shop_embed(
         pagescol += 1
     x = pagen * 5
     col = x - 5
-    for each in roles[x - 5: x]:
+    for each in roles[x - 5 : x]:
         each = CustomRole(*list(each))
         col += 1
         objecta = nextcord.utils.get(inter.guild.roles, id=each.role_id)

@@ -47,8 +47,8 @@ class Music(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __music(
-        self,
-        interaction: Interaction,
+            self,
+            interaction: Interaction,
     ):
         """
         This is the set slash command that will be the prefix of music commands.
@@ -61,16 +61,16 @@ class Music(commands.Cog):
         description_localizations=get_localized_description("music_play"),
     )
     async def __play_music(
-        self,
-        interaction: Interaction,
-        search: str = SlashOption(
-            required=True,
-            description="search query or youtube link",
-            description_localizations={
-                "ru": "Поисковой запрос или ссылка YouTube"
-            },
-        ),
-         
+            self,
+            interaction: Interaction,
+            search: str = SlashOption(
+                required=True,
+                description="search query or youtube link",
+                description_localizations={
+                    "ru": "Поисковой запрос или ссылка YouTube"
+                },
+            ),
+
     ):
         await interaction.response.defer()
         user = interaction.user
@@ -83,7 +83,7 @@ class Music(commands.Cog):
                 )
             )
         track = await wavelink.YouTubeTrack.search(query=search, return_first=True)
-        #tracklist = await wavelink.YouTubeTrack.search(query=search)
+        # tracklist = await wavelink.YouTubeTrack.search(query=search)
         if not interaction.guild.voice_client:
             vc: wavelink.Player = await interaction.user.voice.channel.connect(
                 cls=wavelink.Player
@@ -95,27 +95,29 @@ class Music(commands.Cog):
             self.queue.put(track)
             embed = construct_basic_embed(
                 interaction.application_command.name,
-                "Added to queue ",#**" + vc.track.info.get('title') + "**\n in channal *" + interaction.user.voice.channel.name + "*",
+                "Added to queue ",
+                # **" + vc.track.info.get('title') + "**\n in channal *" + interaction.user.voice.channel.name + "*",
                 search,
                 interaction.user.display_avatar,
                 interaction.guild.id,
             )
         else:
             await vc.play(track)
-        
+
             embed = construct_basic_embed(
                 interaction.application_command.name,
-                "Playing **" + vc.track.info.get('title') + "**\n in channal *" + interaction.user.voice.channel.name + "*",
+                "Playing **" + vc.track.info.get(
+                    'title') + "**\n in channal *" + interaction.user.voice.channel.name + "*",
                 search,
                 interaction.user.display_avatar,
                 interaction.guild.id,
             )
-        #track_names = ""
-        #for index, track in enumerate(tracks):
+        # track_names = ""
+        # for index, track in enumerate(tracks):
         #    track_names += f"**{index+1})** `" + track.title + "`\n\n"
         #    if index == 4:
         #        break
-        
+
         await interaction.followup.send(embed=embed)
 
     @__play_music.on_autocomplete("search")
@@ -149,8 +151,8 @@ class Music(commands.Cog):
         description_localizations=get_localized_description("music_stop"),
     )
     async def __stop_music(
-        self,
-        interaction: Interaction,
+            self,
+            interaction: Interaction,
     ):
         await interaction.response.defer()
         user = interaction.user
@@ -162,7 +164,7 @@ class Music(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        #tracklist = await wavelink.YouTubeTrack.search(query=search)
+        # tracklist = await wavelink.YouTubeTrack.search(query=search)
         if not interaction.guild.voice_client:
             vc: wavelink.Player = await interaction.user.voice.channel.connect(
                 cls=wavelink.Player
@@ -180,8 +182,7 @@ class Music(commands.Cog):
 
         await vc.stop()
         await vc.disconnect()
-        
-        
+
         await interaction.followup.send(embed=embed)
 
     @__music.subcommand(
@@ -190,8 +191,8 @@ class Music(commands.Cog):
         description_localizations=get_localized_description("music_skip"),
     )
     async def __skip_music(
-        self,
-        interaction: Interaction,
+            self,
+            interaction: Interaction,
     ):
         await interaction.response.defer()
         user = interaction.user
@@ -203,7 +204,7 @@ class Music(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        #tracklist = await wavelink.YouTubeTrack.search(query=search)
+        # tracklist = await wavelink.YouTubeTrack.search(query=search)
         if not interaction.guild.voice_client:
             vc: wavelink.Player = await interaction.user.voice.channel.connect(
                 cls=wavelink.Player
@@ -221,11 +222,9 @@ class Music(commands.Cog):
 
         await vc.stop()
         await vc.play(self.queue.get())
-        
-        
+
         await interaction.followup.send(embed=embed)
 
-    
 
 def setup(client):
     client.add_cog(Music(client))
