@@ -1,4 +1,7 @@
 import sqlite3
+import typing
+from typing import Type, Any
+
 from config import settings
 
 import nextcord
@@ -166,3 +169,45 @@ def write_member_in_badges(guild: nextcord.Guild, member: nextcord.Member) -> No
     cursor.close()
     db.close()
     return
+
+
+class PlatformType:
+    def __init__(self):
+        pass
+
+
+class MobilePlatform(PlatformType):
+    def __init__(self):
+        super().__init__()
+
+
+class DesktopPlatform(PlatformType):
+    def __init__(self):
+        super().__init__()
+
+
+def parse_status_to_int(status: nextcord.Status) -> int:
+    status_parse_to_int = {
+        nextcord.Status.offline: 0,
+        nextcord.Status.invisible: 0,
+        nextcord.Status.dnd: 1,
+        nextcord.Status.do_not_disturb: 1,
+        nextcord.Status.idle: 2,
+        nextcord.Status.online: 3,
+    }
+    return status_parse_to_int[status]
+
+
+def calculate_platform_type(
+    user: typing.Union[nextcord.User, nextcord.Member]
+) -> Type[PlatformType]:
+    desktop_status = parse_status_to_int(user.desktop_status)
+    browser_status = parse_status_to_int(user.web_status)
+    mobile_status = parse_status_to_int(user.mobile_status)
+    if (
+        mobile_status >= desktop_status
+        or mobile_status >= browser_status + desktop_status
+    ):
+        return MobilePlatform
+    else:
+        return DesktopPlatform

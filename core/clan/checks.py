@@ -1,6 +1,10 @@
 import sqlite3
 
-from core.clan.getters import get_user_clan_id, get_clan_owner_id, get_clan_guild_boss_hp
+from core.clan.getters import (
+    get_user_clan_id,
+    get_clan_owner_id,
+    get_clan_guild_boss_hp,
+)
 
 
 def is_user_in_clan(guild_id: int, user_id: int) -> bool:

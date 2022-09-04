@@ -37,5 +37,3 @@ def write_role_in_custom_shop(
     db.commit()
     cursor.close()
     db.close()
-
-

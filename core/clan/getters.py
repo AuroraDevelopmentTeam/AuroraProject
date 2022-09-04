@@ -1,6 +1,6 @@
 import sqlite3
 
-from core.clan.storage import boss_hp
+from core.clan.storage import boss_hp, upgrade_price_multipliers
 
 
 # Clan getters section
@@ -340,3 +340,13 @@ def get_server_create_clan_channels(guild_id: int) -> bool:
 def get_clan_boss_hp_limit(guild_id: int, clan_id: int):
     boss_level = get_clan_guild_boss_level(guild_id, clan_id)
     return boss_hp[boss_level]
+
+
+def get_upgrade_limit_multiplier(limit: int):
+    if limit >= 65:
+        limit = 65
+    return upgrade_price_multipliers["upgrade_limit"][limit]
+
+
+def get_boss_upgrade_multiplier(boss_level: int):
+    return upgrade_price_multipliers["boss_upgrade"][boss_level]

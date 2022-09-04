@@ -4,6 +4,7 @@ from easy_pil import *
 from PIL import Image
 from io import BytesIO
 
+import cooldowns
 import nextcord
 from nextcord.ext import commands, application_checks
 from nextcord import Interaction, SlashOption, Permissions
@@ -82,6 +83,7 @@ class Levels(commands.Cog):
         description_localizations=get_localized_description("level"),
         default_member_permissions=Permissions(send_messages=True),
     )
+    @cooldowns.cooldown(1, 5, bucket=cooldowns.SlashBucket.author)
     async def __level(
         self,
         interaction: Interaction,

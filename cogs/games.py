@@ -1,6 +1,7 @@
 from typing import Optional, Union
 import random
 
+import cooldowns
 import nextcord
 from nextcord.ext import commands
 from nextcord import Interaction, ButtonStyle, File, Permissions, SlashOption
@@ -178,6 +179,7 @@ class Games(commands.Cog):
         description_localizations=get_localized_description("blackjack"),
         default_member_permissions=Permissions(send_messages=True),
     )
+    @cooldowns.cooldown(1, 3, bucket=cooldowns.SlashBucket.author)
     async def __blackjack(
         self,
         interaction: Interaction,
@@ -458,6 +460,7 @@ class Games(commands.Cog):
         description_localizations=get_localized_description("slots"),
         default_member_permissions=Permissions(send_messages=True),
     )
+    @cooldowns.cooldown(1, 3, bucket=cooldowns.SlashBucket.author)
     async def __slots(
         self,
         interaction: Interaction,
@@ -528,6 +531,7 @@ class Games(commands.Cog):
         description_localizations=get_localized_description("gamble"),
         default_member_permissions=Permissions(send_messages=True),
     )
+    @cooldowns.cooldown(1, 3, bucket=cooldowns.SlashBucket.author)
     async def __gamble(
         self,
         interaction: Interaction,
@@ -592,6 +596,7 @@ class Games(commands.Cog):
         description_localizations=get_localized_description("wheel"),
         default_member_permissions=Permissions(send_messages=True),
     )
+    @cooldowns.cooldown(1, 3, bucket=cooldowns.SlashBucket.author)
     async def __wheel(
         self,
         interaction: Interaction,
@@ -651,6 +656,7 @@ class Games(commands.Cog):
         description_localizations=get_localized_description("duel"),
         default_member_permissions=Permissions(send_messages=True),
     )
+    @cooldowns.cooldown(1, 3, bucket=cooldowns.SlashBucket.author)
     async def __duel(
         self,
         interaction: Interaction,
