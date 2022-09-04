@@ -3,19 +3,20 @@ from typing import Optional
 
 import nextcord
 import wavelink
+from config import settings
 from core.embeds import construct_basic_embed
-from core.errors import construct_error_bot_user_embed, construct_error_no_voice_embed
+from core.errors import (construct_error_bot_user_embed,
+                         construct_error_no_voice_embed)
 from core.locales.getters import (get_localized_description,
                                   get_localized_name,
                                   get_msg_from_locale_by_key)
+from core.ui.buttons import ViewAuthorCheck, create_button
+from core.utils import format_seconds_to_hhmmss
 from easy_pil import *
+from lib.vk_audio.exc import *
+from lib.vk_audio.VkAudio import VkAudio
 from nextcord import Interaction, Permissions, SlashOption
 from nextcord.ext import commands
-from config import settings
-from core.ui.buttons import create_button, ViewAuthorCheck
-from core.utils import format_seconds_to_hhmmss
-from lib.vk_audio.VkAudio import VkAudio
-from lib.vk_audio.exc import *
 
 
 class Music(commands.Cog):

@@ -1,4 +1,5 @@
 import os
+from typing import Dict
 
 from vk_api import VkApi
 from json import loads
@@ -10,6 +11,8 @@ from lib.vk_audio.exc import *
 from discord import Embed, Color
 from os import mkdir, rmdir
 from os.path import exists
+from wavelink import Track
+
 
 
 class Audio:
@@ -74,12 +77,38 @@ class Audio:
     def __repr__(self):
         return f'{self.artist_name} - {self.name}'
 
+class VkTrack:
+    def __init__(self, name: str, artist: str, duration: int, uri: str, cover: str):
+        self.name = name
+        self.artist = artist
+        self.duration = duration
+        self.cover = cover
+        self.uri = uri
+
+class Playlist:
+    def __init__(self, data: Dict):
+        self.audios = []
+        self.data = data
+
+    def add(self, audio: VkTrack):
+        self.audios.append(audio)
+
+    def get_audios(self):
+        return self.audios
+
+    def get_data(self):
+        return self.data
+
+
 
 class VkAudio:
     _id = None
 
     def __init__(self, vk_sess: VkApi):
         self.vk_sess = vk_sess
+
+    
+
 
     def get_song_id_by_name(self, query_string: str) -> Audio:
         data = {'act': 'section',
@@ -90,7 +119,7 @@ class VkAudio:
         resp = self.vk_sess.http.post('https://vk.com/al_audio.php?act=section', data=data)
         assert resp.status_code == 200
         resp_json = loads(resp.text.strip('<!--'))
-
+        
         try:
             song_data = resp_json['payload'][1][1]['playlist']['list'][0]
         except TypeError:
@@ -98,6 +127,15 @@ class VkAudio:
 
         audio = Audio(song_data)
         return audio
+
+    def get_song_uri_by_audio(self, audio: Audio):
+        data = {"al": 1, "ids": audio.hash}
+        resp = self.vk_sess.http.post('https://vk.com/al_audio.php?act=reload_audio', data=data)
+        assert resp.status_code == 200
+
+        resp_json = loads(resp.text.strip('<!--'))
+        url = decode(self.user_id, resp_json['payload'][1][0][0][2])
+        return url
 
     def download_song_by_name(self, song_name) -> Audio:
         audio = self.get_song_id_by_name(song_name)
@@ -112,7 +150,7 @@ class VkAudio:
         resp_json = loads(resp.text.strip('<!--'))
         url = decode(self.user_id, resp_json['payload'][1][0][0][2]).rstrip('/index.m3u8')
         print(url)
-
+        """
         try:
             mkdir(audio.dir)
         except FileExistsError:
@@ -124,11 +162,11 @@ class VkAudio:
         assert resp.status_code == 200
         with open(f'{audio.dir}/key.pub', 'w') as f:
             f.write(resp.text)
-
+        """
         resp = requests.get(url + '/index.m3u8')
         assert resp.status_code == 200
         m3u8 = resp.text.split('\n')
-
+        """
         for index, string in enumerate(m3u8):
             if string.startswith('seg'):
                 resp = requests.get(f'{url}/{string}')
@@ -143,8 +181,36 @@ class VkAudio:
             f.write('\n'.join(m3u8))
 
         subprocess.call(f'/usr/bin/ffmpeg -y -allowed_extensions ALL -i {audio.dir}/index.m3u8 -c copy {audio.path}', shell=True)
-
+        """
         return audio
+
+    def parse_songs_in_playlist(self, uri: str) -> Playlist:
+        data = {'act': 'section',
+                'al': 1, 'claim': 0, "is_layer": 0,  # Какие-то параметры
+                'from_id': 482508709,
+                'is_loading_all': 1,
+                'is_preload': 0,
+                'offset': 0,
+                "owner_id": -147845620,
+                'playlist_id': 1643,
+                "type": 'playlist'}
+        resp = self.vk_sess.http.post('https://vk.com/al_audio.php?act=load_section', data=data)
+        assert resp.status_code == 200
+        resp_json = loads(resp.text.strip('<!--'))
+
+        try:
+            song_data = resp_json['payload'][1][0]
+        except TypeError:
+            raise AudioNotFoundException()
+
+        playlist_info = {"title": song_data['title'], "desc": song_data['description'], "author": song_data['authorName'], "cover": song_data['coverUrl']}
+        pl = Playlist(playlist_info)
+        for track in song_data['list']:
+            track_uri = self.get_song_uri_by_audio(Audio(track))
+            cover = str(track[14]).split(',')
+            vktrack = VkTrack(track[3], track[4], track[5], track_uri, cover[1])
+            pl.add(vktrack)
+        return pl
 
     @property
     def user_id(self):
