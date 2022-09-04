@@ -231,6 +231,7 @@ class Economics(commands.Cog):
         description_localizations=get_localized_description("balance"),
         default_member_permissions=Permissions(send_messages=True),
     )
+    @cooldowns.cooldown(1, 5, bucket=cooldowns.SlashBucket.author)
     async def __money(
             self,
             interaction: Interaction,
