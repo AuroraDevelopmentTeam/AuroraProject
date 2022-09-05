@@ -1080,5 +1080,29 @@
     "clan_show": {
       "name": "show",
       "description": "Show description menu of your clan"
+    },
+    "clan_config": {
+      "name": "clan_config",
+      "description": "Prefix command of configuration commands on your server"
+    },
+    "clan_config_create_cost": {
+      "name": "clan_create_cost",
+      "description": "Set create cost of clan on your server",
+      "msg": "Now cost of clan creation on your server is:"
+    },
+    "clan_config_upgrade_attack_cost": {
+      "name": "upgrade_attack_cost",
+      "description": "Set cost of upgrading attack in clan on your server",
+      "msg": "Now cost of clan attack upgrade on your server is:"
+    },
+    "clan_config_upgrade_limit_cost": {
+      "name": "upgrade_limit_cost",
+      "description": "Set cost of upgrading clan member limit for your server",
+      "msg": "Now cost of clan upgrading clan member limit:"
+    },
+    "clan_config_change_icon_cost": {
+      "name": "change_icon_cost",
+      "description": "Set cost of changing clan icon for your server",
+      "msg": "Now cost of clan icon changing:"
     }
 }
