@@ -364,12 +364,12 @@ def update_server_create_clan_channels(
 
 
 def update_server_clan_voice_category(
-    guild_id: int, create_clan_channels: bool
+    guild_id: int, clan_voice_category: int
 ) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
-    sql = "UPDATE clan_config SET create_clan_channels = ? WHERE guild_id = ?"
-    values = (create_clan_channels, guild_id)
+    sql = "UPDATE clan_config SET clan_voice_category = ? WHERE guild_id = ?"
+    values = (clan_voice_category, guild_id)
     cursor.execute(sql, values)
     db.commit()
     cursor.close()

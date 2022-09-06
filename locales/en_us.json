@@ -1104,5 +1104,25 @@
       "name": "change_icon_cost",
       "description": "Set cost of changing clan icon for your server",
       "msg": "Now cost of clan icon changing:"
+    },
+    "clan_config_change_image_cost": {
+      "name": "change_image_cost",
+      "description": "Set cost of changing clan image for your server",
+      "msg": "Now cost of clan image changing/setting:"
+    },
+    "clan_config_upgrade_boss_cost": {
+      "name": "upgrade_boss_cost",
+      "description": "Set basic cost of upgrading clan boss for your server",
+      "msg": "Now basic cost of boss level upgrade is:"
+    },
+    "clan_config_create_clan_channels": {
+      "name": "create_clan_channels",
+      "description": "Turn on/Turn off clan channels creation on your server when new guild created",
+      "msg": "Now clan channels creation on your server when new guild created:"
+    },
+    "clan_config_clan_voice_category": {
+      "name": "clan_voice_category",
+      "description": "Set category of clan voice channels",
+      "msg": "Now clan voice channels will be created in this category:"
     }
 }

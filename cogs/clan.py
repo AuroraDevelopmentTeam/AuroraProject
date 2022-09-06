@@ -1416,7 +1416,8 @@ class ClanHandler(commands.Cog):
         description_localizations=get_localized_description("clan_config_create_cost"),
     )
     async def __clan_config_create_cost(
-            self, interaction: Interaction, money: Optional[int]
+            self, interaction: Interaction,
+            money: Optional[int] = SlashOption(required=True)
     ):
         update_server_clan_create_cost(interaction.guild.id, money)
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
@@ -1428,8 +1429,8 @@ class ClanHandler(commands.Cog):
             embed=construct_basic_embed(
                 f"clan_config_{interaction.application_command.name}",
                 f"{message} **{money}** {currency_symbol}",
-                f"{requested} {author}",
-                author.display_avatar,
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
                 interaction.guild.id,
             )
         )
@@ -1441,7 +1442,8 @@ class ClanHandler(commands.Cog):
         description_localizations=get_localized_description("clan_config_upgrade_attack_cost"),
     )
     async def __clan_config_upgrade_attack_cost(
-            self, interaction: Interaction, money: Optional[int]
+            self, interaction: Interaction,
+            money: Optional[int] = SlashOption(required=True)
     ):
         update_server_clan_upgrade_attack_cost(interaction.guild.id, money)
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
@@ -1453,8 +1455,8 @@ class ClanHandler(commands.Cog):
             embed=construct_basic_embed(
                 f"clan_config_{interaction.application_command.name}",
                 f"{message} {money} {currency_symbol}",
-                f"{requested} {author}",
-                author.display_avatar,
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
                 interaction.guild.id,
             )
         )
@@ -1466,7 +1468,8 @@ class ClanHandler(commands.Cog):
         description_localizations=get_localized_description("clan_config_upgrade_limit_cost"),
     )
     async def __clan_config_upgrade_limit_cost(
-            self, interaction: Interaction, money: Optional[int]
+            self, interaction: Interaction,
+            money: Optional[int] = SlashOption(required=True)
     ):
         update_server_clan_upgrade_limit_cost(interaction.guild.id, money)
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
@@ -1478,8 +1481,8 @@ class ClanHandler(commands.Cog):
             embed=construct_basic_embed(
                 f"clan_config_{interaction.application_command.name}",
                 f"{message} {money} {currency_symbol}",
-                f"{requested} {author}",
-                author.display_avatar,
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
                 interaction.guild.id,
             )
         )
@@ -1491,7 +1494,8 @@ class ClanHandler(commands.Cog):
         description_localizations=get_localized_description("clan_config_change_icon_cost"),
     )
     async def __clan_config_change_icon_cost(
-            self, interaction: Interaction, money: Optional[int]
+            self, interaction: Interaction,
+            money: Optional[int] = SlashOption(required=True)
     ):
         update_server_clan_change_icon_cost(interaction.guild.id, money)
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
@@ -1503,11 +1507,124 @@ class ClanHandler(commands.Cog):
             embed=construct_basic_embed(
                 f"clan_config_{interaction.application_command.name}",
                 f"{message} {money} {currency_symbol}",
-                f"{requested} {author}",
-                author.display_avatar,
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
                 interaction.guild.id,
             )
         )
+
+    @__clan_config.subcommand(
+        name="change_image_cost",
+        description="Set cost of changing/setting clan image for your server",
+        name_localizations=get_localized_name("clan_config_change_image_cost"),
+        description_localizations=get_localized_description("clan_config_change_image_cost"),
+    )
+    async def __clan_config_change_image_cost(
+            self, interaction: Interaction,
+            money: Optional[int] = SlashOption(required=True)
+    ):
+        update_server_clan_change_image_cost(interaction.guild.id, money)
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"clan_config_{interaction.application_command.name}",
+                f"{message} {money} {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__clan_config.subcommand(
+        name="upgrade_boss_cost",
+        description="Set cost of upgrading clan member limit for your server",
+        name_localizations=get_localized_name("clan_config_upgrade_boss_cost"),
+        description_localizations=get_localized_description("clan_config_upgrade_boss_cost"),
+    )
+    async def __clan_config_upgrade_limit_cost(
+            self, interaction: Interaction,
+            money: Optional[int] = SlashOption(required=True)
+    ):
+        update_server_clan_upgrade_boss_cost(interaction.guild.id, money)
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"clan_config_{interaction.application_command.name}",
+                f"{message} {money} {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__clan_config.subcommand(
+        name="create_clan_channels",
+        description="Set state of creating clan channels on your server",
+        name_localizations=get_localized_name("clan_config_create_clan_channels"),
+        description_localizations=get_localized_description("clan_config_create_clan_channels"),
+    )
+    async def __clan_config_create_clan_channels(
+            self, interaction: Interaction,
+            enabled: Optional[bool] = SlashOption(required=True)
+    ):
+        update_server_create_clan_channels(interaction.guild.id, create_channels)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        if enabled is True:
+            enabled = get_msg_from_locale_by_key(
+                interaction.guild.id, "enabled"
+            )
+        else:
+            enabled = get_msg_from_locale_by_key(
+                interaction.guild.id, "disabled"
+            )
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"clan_config_{interaction.application_command.name}",
+                f"{message} {enabled}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__clan_config.subcommand(
+        name="clan_voice_category",
+        description="Set state of creating clan channels on your server",
+        name_localizations=get_localized_name("clan_config_clan_voice_category"),
+        description_localizations=get_localized_description("clan_config_clan_voice_category"),
+    )
+    async def __clan_config_clan_voice_category(
+            self, interaction: Interaction,
+            clan_voice_category: Optional[nextcord.abc.GuildChannel] = SlashOption(required=True)
+    ):
+        if isinstance(clan_voice_category, nextcord.CategoryChannel):
+            update_server_clan_voice_category(interaction.guild.id, clan_voice_category.id)
+            message = get_msg_from_locale_by_key(
+                interaction.guild.id, f"clan_config_{interaction.application_command.name}"
+            )
+            requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+            await interaction.response.send_message(
+                embed=construct_basic_embed(
+                    f"clan_config_{interaction.application_command.name}",
+                    f"{message} {clan_voice_category.mention}",
+                    f"{requested} {interaction.user}",
+                    interaction.user.display_avatar,
+                    interaction.guild.id,
+                )
+            )
+        else:
+            pass
 
 
 def setup(client):
