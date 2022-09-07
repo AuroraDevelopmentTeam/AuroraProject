@@ -1058,6 +1058,9 @@
     "clan_shop_5": {
       "msg": "Level up clan boss"
     },
+    "clan_shop_6": {
+      "msg": "Change clan color"
+    },
     "in_storage": {
       "msg": "In bank storage:"
     },
@@ -1124,5 +1127,10 @@
       "name": "clan_voice_category",
       "description": "Set category of clan voice channels",
       "msg": "Now clan voice channels will be created in this category:"
+    },
+    "clan_config_change_color_cost": {
+      "name": "change_color_cost",
+      "description": "Set cost of changing clan main color",
+      "msg": "Now cost of changing clan main color is:"
     }
 }

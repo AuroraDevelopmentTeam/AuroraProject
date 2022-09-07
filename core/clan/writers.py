@@ -28,10 +28,10 @@ def write_in_clan_config_standart_values(guilds) -> None:
             sql = (
                 "INSERT INTO clan_config(guild_id, create_cost, upgrade_attack_cost, "
                 "upgrade_limit_cost, change_icon_cost, change_image_cost, upgrade_boss_cost, create_clan_channels, "
-                "clan_voice_category) VALUES (?, ?, ?, ?, ?, "
-                "?, ?, ?, ?) "
+                "clan_voice_category, change_color_cost, change_name_cost) VALUES (?, ?, ?, ?, ?, "
+                "?, ?, ?, ?, ?, ?) "
             )
-            val = (guild.id, 100000, 500000, 1000000, 10000, 50000, 250000, True, 0)
+            val = (guild.id, 100000, 500000, 1000000, 10000, 50000, 250000, True, 0, 50000, 100000)
             cursor.execute(sql, val)
             db.commit()
     cursor.close()

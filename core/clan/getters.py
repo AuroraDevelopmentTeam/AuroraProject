@@ -253,6 +253,17 @@ def get_server_clan_create_cost(guild_id: int) -> int:
     return create_cost
 
 
+def get_server_clan_change_color_cost(guild_id: int) -> int:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    change_color_cost = cursor.execute(
+        f"SELECT change_color_cost FROM clan_config WHERE guild_id = {guild_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return change_color_cost
+
+
 def get_server_clan_upgrade_attack_cost(guild_id: int) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()

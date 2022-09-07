@@ -44,6 +44,7 @@ from core.clan.update import (
     delete_clan,
     update_clan_member_limit,
     redraw_shop_embed,
+    update_server_change_color_cost
 )
 from core.clan.writers import write_clan, write_clan_on_start
 from core.money.getters import get_guild_currency_symbol, get_user_balance
@@ -108,6 +109,8 @@ async def yes_create(interaction: Interaction):
     color = get_clan_color(interaction.guild.id, clan_id)
     color_to_table = color
     color = color.replace("#", "")
+    if color == "000000":
+        color = "010101"
     col = nextcord.Color(value=int(color, 16))
     col = col.to_rgb()
     name = get_clan_name(interaction.guild.id, clan_id)
@@ -121,7 +124,11 @@ async def yes_create(interaction: Interaction):
         interaction.guild.default_role: nextcord.PermissionOverwrite(
             connect=False, speak=False
         ),
-        role: nextcord.PermissionOverwrite(connect=True, speak=True),
+        role: nextcord.PermissionOverwrite(connect=True, speak=True, view_channel=True),
+        interaction.user: nextcord.PermissionOverwrite(
+            connect=True, speak=True, deafen_members=True, priority_speaker=True,
+            view_channel=True, manage_channels=True, mute_members=True
+        )
     }
     if create_channels is not False:
         clan_category = get_server_clan_voice_category(interaction.guild.id)
@@ -298,6 +305,39 @@ class ClanShopImageEntryField(nextcord.ui.Modal):
             image = self.url.value
             update_clan_image(interaction.guild.id, self.clan_id, image)
             await interaction.response.send_message(f"{self.url.value}")
+        except Exception as error:
+            print(error)
+
+
+class ClanShopColorEntryField(nextcord.ui.Modal):
+    def __init__(self, clan_id):
+        self.clan_id = clan_id
+        super().__init__(
+            "Clan Color",
+        )
+        self.color = nextcord.ui.TextInput(
+            label="Clan Color",
+            min_length=7,
+            max_length=7,
+            required=True,
+            placeholder="#ffffff",
+        )
+        self.add_item(self.color)
+
+    async def callback(self, interaction: Interaction):
+        try:
+            color = self.color.value
+            update_clan_color(interaction.guild.id, interaction.user.id, color)
+            clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+            role = get_clan_role(interaction.guild.id, clan_id)
+            role = nextcord.utils.get(interaction.guild.roles, id=role)
+            color = color.replace("#", "")
+            if color == "000000":
+                color = "010101"
+            col = nextcord.Color(value=int(color, 16))
+            col = col.to_rgb()
+            await role.edit(color=nextcord.Color.from_rgb(*col))
+            await interaction.response.send_message(f"#{color}")
         except Exception as error:
             print(error)
 
@@ -919,17 +959,32 @@ class ClanHandler(commands.Cog):
                 ),
             )
 
-        first_button = create_button("1", upgrade_clan_limit)
-        second_button = create_button("2", change_image)
-        third_button = create_button("3", change_icon)
-        fourth_button = create_button("4", upgrade_clan_attack)
-        fifth_button = create_button("5", upgrade_clan_boss)
+        async def change_clan_color(interaction: Interaction):
+            clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+            price = get_server_clan_change_color_cost(interaction.guild.id)
+            clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+            if clan_storage < price:
+                msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                return await interaction.response.send_message(
+                    embed=construct_error_not_enough_embed(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "not_enough_money_error"
+                        ),
+                        interaction.user.display_avatar,
+                        f"{msg} {clan_storage}/{price}",
+                    )
+                )
+            update_clan_storage(interaction.guild.id, clan_id, -price)
+            modal = ClanShopColorEntryField(clan_id)
+            await interaction.response.send_modal(modal)
+        buttons = [
+            create_button("1", upgrade_clan_limit), create_button("2", change_image),
+            create_button("3", change_icon), create_button("4", upgrade_clan_attack),
+            create_button("5", upgrade_clan_boss), create_button("6", change_clan_color)
+        ]
         view = ViewAuthorCheck(author=interaction.user)
-        view.add_item(first_button)
-        view.add_item(second_button)
-        view.add_item(third_button)
-        view.add_item(fourth_button)
-        view.add_item(fifth_button)
+        for button in buttons:
+            view.add_item(button)
         await interaction.response.send_message(embed=embed, view=view)
 
     @__clan.subcommand(
@@ -1419,6 +1474,16 @@ class ClanHandler(commands.Cog):
             self, interaction: Interaction,
             money: Optional[int] = SlashOption(required=True)
     ):
+        if money < 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         update_server_clan_create_cost(interaction.guild.id, money)
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
@@ -1445,6 +1510,16 @@ class ClanHandler(commands.Cog):
             self, interaction: Interaction,
             money: Optional[int] = SlashOption(required=True)
     ):
+        if money < 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         update_server_clan_upgrade_attack_cost(interaction.guild.id, money)
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
@@ -1471,6 +1546,16 @@ class ClanHandler(commands.Cog):
             self, interaction: Interaction,
             money: Optional[int] = SlashOption(required=True)
     ):
+        if money < 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         update_server_clan_upgrade_limit_cost(interaction.guild.id, money)
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
@@ -1497,6 +1582,16 @@ class ClanHandler(commands.Cog):
             self, interaction: Interaction,
             money: Optional[int] = SlashOption(required=True)
     ):
+        if money < 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         update_server_clan_change_icon_cost(interaction.guild.id, money)
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
@@ -1523,6 +1618,16 @@ class ClanHandler(commands.Cog):
             self, interaction: Interaction,
             money: Optional[int] = SlashOption(required=True)
     ):
+        if money < 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         update_server_clan_change_image_cost(interaction.guild.id, money)
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
@@ -1549,7 +1654,53 @@ class ClanHandler(commands.Cog):
             self, interaction: Interaction,
             money: Optional[int] = SlashOption(required=True)
     ):
+        if money < 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         update_server_clan_upgrade_boss_cost(interaction.guild.id, money)
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"clan_config_{interaction.application_command.name}",
+                f"{message} {money} {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__clan_config.subcommand(
+        name="change_color_cost",
+        description="Set cost of changing clan main color",
+        name_localizations=get_localized_name("clan_config_change_color_cost"),
+        description_localizations=get_localized_description("clan_config_change_color_cost"),
+    )
+    async def __clan_config_change_color_cost(
+            self, interaction: Interaction,
+            money: Optional[int] = SlashOption(required=True)
+    ):
+        if money < 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
+        update_server_change_color_cost(interaction.guild.id, money)
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_config_{interaction.application_command.name}"
@@ -1624,7 +1775,15 @@ class ClanHandler(commands.Cog):
                 )
             )
         else:
-            pass
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    clan_voice_category,
+                )
+            )
 
 
 def setup(client):
