@@ -1132,5 +1132,8 @@
       "name": "change_color_cost",
       "description": "Set cost of changing clan main color",
       "msg": "Now cost of changing clan main color is:"
+    },
+    "too_many_members": {
+      "msg": "Your clan have reached member limit, can't invite someone new"
     }
 }

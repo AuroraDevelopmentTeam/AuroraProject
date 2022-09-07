@@ -1308,6 +1308,16 @@ class ClanHandler(commands.Cog):
                 )
             )
         clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+        clan_members = fetchall_clan_members(interaction.guild.id, clan_id)
+        if len(clan_members) >= get_clan_member_limit(interaction.guild.id, clan_id):
+            embed = nextcord.Embed(
+                title="error",
+                description=get_msg_from_locale_by_key(
+                    interaction.guild.id, "already_like_noone"
+                ),
+                color=DEFAULT_BOT_COLOR,
+            )
+            return await interaction.response.send_message(embed=embed)
         clan_name = get_clan_name(interaction.guild.id, clan_id)
         author = interaction.user
 
