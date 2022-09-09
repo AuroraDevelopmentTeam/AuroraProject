@@ -5,3 +5,4 @@ __pycache__
 databases/main.sqlite
 lib/Lavalink/logs
 *.sqlite
+vk_config.v2.json
