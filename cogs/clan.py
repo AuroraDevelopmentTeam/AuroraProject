@@ -44,6 +44,7 @@ from core.clan.update import (
     delete_clan,
     update_clan_member_limit,
     redraw_shop_embed,
+    update_server_change_color_cost
 )
 from core.clan.writers import write_clan, write_clan_on_start
 from core.money.getters import get_guild_currency_symbol, get_user_balance
@@ -108,6 +109,8 @@ async def yes_create(interaction: Interaction):
     color = get_clan_color(interaction.guild.id, clan_id)
     color_to_table = color
     color = color.replace("#", "")
+    if color == "000000":
+        color = "010101"
     col = nextcord.Color(value=int(color, 16))
     col = col.to_rgb()
     name = get_clan_name(interaction.guild.id, clan_id)
@@ -121,7 +124,11 @@ async def yes_create(interaction: Interaction):
         interaction.guild.default_role: nextcord.PermissionOverwrite(
             connect=False, speak=False
         ),
-        role: nextcord.PermissionOverwrite(connect=True, speak=True),
+        role: nextcord.PermissionOverwrite(connect=True, speak=True, view_channel=True),
+        interaction.user: nextcord.PermissionOverwrite(
+            connect=True, speak=True, deafen_members=True, priority_speaker=True,
+            view_channel=True, manage_channels=True, mute_members=True
+        )
     }
     if create_channels is not False:
         clan_category = get_server_clan_voice_category(interaction.guild.id)
@@ -180,7 +187,7 @@ async def yes_create(interaction: Interaction):
     embed = nextcord.Embed(
         title=f"Клан",
         description=f"Восславьте **{name}**! Поздравляем вас основатель {interaction.user.mention}, "
-        f"прославьте имя своего клана, желаем вам удачи на вашем пути!",
+                    f"прославьте имя своего клана, желаем вам удачи на вашем пути!",
     )
     return await interaction.followup.send(embed=embed, view=view)
 
@@ -258,7 +265,7 @@ async def yes_show_me_full(interaction: Interaction):
     embed = nextcord.Embed(
         title=name,
         description=f"{desc}\n\n\nЕсли вас всё устраивает, то нажмите да, с вас будут списаны деньги, а клан будет "
-        f"создан, если вы передумали, то нажмите нет и процесс создания клана будет отменён.",
+                    f"создан, если вы передумали, то нажмите нет и процесс создания клана будет отменён.",
         color=nextcord.Color.from_rgb(*col),
     )
     embed.set_thumbnail(url=icon)
@@ -298,6 +305,39 @@ class ClanShopImageEntryField(nextcord.ui.Modal):
             image = self.url.value
             update_clan_image(interaction.guild.id, self.clan_id, image)
             await interaction.response.send_message(f"{self.url.value}")
+        except Exception as error:
+            print(error)
+
+
+class ClanShopColorEntryField(nextcord.ui.Modal):
+    def __init__(self, clan_id):
+        self.clan_id = clan_id
+        super().__init__(
+            "Clan Color",
+        )
+        self.color = nextcord.ui.TextInput(
+            label="Clan Color",
+            min_length=7,
+            max_length=7,
+            required=True,
+            placeholder="#ffffff",
+        )
+        self.add_item(self.color)
+
+    async def callback(self, interaction: Interaction):
+        try:
+            color = self.color.value
+            update_clan_color(interaction.guild.id, interaction.user.id, color)
+            clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+            role = get_clan_role(interaction.guild.id, clan_id)
+            role = nextcord.utils.get(interaction.guild.roles, id=role)
+            color = color.replace("#", "")
+            if color == "000000":
+                color = "010101"
+            col = nextcord.Color(value=int(color, 16))
+            col = col.to_rgb()
+            await role.edit(color=nextcord.Color.from_rgb(*col))
+            await interaction.response.send_message(f"#{color}")
         except Exception as error:
             print(error)
 
@@ -351,7 +391,7 @@ class ClanColorModal(nextcord.ui.Modal):
             col = col.to_rgb()
             embed = nextcord.Embed(
                 description=f"Был указан следующий цвет: {name}. "
-                f"Нажмите да, чтоб посмотреть конечный результат или нет, если хотите изменить цвет.",
+                            f"Нажмите да, чтоб посмотреть конечный результат или нет, если хотите изменить цвет.",
                 color=nextcord.Color.from_rgb(*col),
             )
             yes_button = create_button(
@@ -400,17 +440,17 @@ class ClanIconModal(nextcord.ui.Modal):
             )
             embed = nextcord.Embed(
                 description=f"Была указана следующая иконка: **{name}**. Теперь необходимо указать цвет вашей гильдии в"
-                f" формате HEX кода. HEX-коды имеют следующий вид: #код и должны быть именно введены в "
-                f"подобном виде, иначе бот выдаст ошибку и процесс создания клана будет прекращён. Если вы "
-                f"абсолютно ничего не понимаете в HEX-кодах и желания гуглить нужный вам цвет у вас нет, "
-                f"то далее приводится список HEX-кодов основных цветов, просто скопируйте и вставьте ("
-                f"ОБЯЗАТЕЛЬНО! вместе с #).\nЧёрный - #000000\nСерый - #808080\nБелый - "
-                f"#FFFFFF\nСеребряный - "
-                f"#C0C0C0\nСиний - #0000FF\nТёмно-синий - #00008B\nЦиан - #00FFFF\nАквамарин - #7FFFD4\n"
-                f"Зелёный - #008000\nЛайм - #00FF00\nФиолетовый - #800080\nФуксия - #FF00FF\n"
-                f"Оливковый - #808000\nКрасный - #FF0000\nЗолотой - #FFD700\nЖелтый - #FFFF00\nОранжевый - "
-                f"#FFA500\nКоралловый - #F08080\nКликните на да, как будете готовы или кликните нет и "
-                f"поменяйте иконку. "
+                            f" формате HEX кода. HEX-коды имеют следующий вид: #код и должны быть именно введены в "
+                            f"подобном виде, иначе бот выдаст ошибку и процесс создания клана будет прекращён. Если вы "
+                            f"абсолютно ничего не понимаете в HEX-кодах и желания гуглить нужный вам цвет у вас нет, "
+                            f"то далее приводится список HEX-кодов основных цветов, просто скопируйте и вставьте ("
+                            f"ОБЯЗАТЕЛЬНО! вместе с #).\nЧёрный - #000000\nСерый - #808080\nБелый - "
+                            f"#FFFFFF\nСеребряный - "
+                            f"#C0C0C0\nСиний - #0000FF\nТёмно-синий - #00008B\nЦиан - #00FFFF\nАквамарин - #7FFFD4\n"
+                            f"Зелёный - #008000\nЛайм - #00FF00\nФиолетовый - #800080\nФуксия - #FF00FF\n"
+                            f"Оливковый - #808000\nКрасный - #FF0000\nЗолотой - #FFD700\nЖелтый - #FFFF00\nОранжевый - "
+                            f"#FFA500\nКоралловый - #F08080\nКликните на да, как будете готовы или кликните нет и "
+                            f"поменяйте иконку. "
             )
             embed.set_thumbnail(url=name)
             yes_button = create_button(
@@ -460,11 +500,11 @@ class ClanDescriptionModal(nextcord.ui.Modal):
             )
             embed = nextcord.Embed(
                 description=f"Было введено следующее описание: **{name}**. Теперь необходимо указать иконку гильдии в "
-                f"формате url ссылки, к примеру: "
-                f"**https://c.tenor.com/o656qFKDzeUAAAAM/rick-astley-never-gonna-give-you-up.gif**, "
-                f"ничего не мешает использовать в качестве иконки и png/jpg изображения, так и гифки, "
-                f"выбирайте то, что вам нравится."
-                f"Кликните на да, как будете готовы или переделайте описание нажав нет."
+                            f"формате url ссылки, к примеру: "
+                            f"**https://c.tenor.com/o656qFKDzeUAAAAM/rick-astley-never-gonna-give-you-up.gif**, "
+                            f"ничего не мешает использовать в качестве иконки и png/jpg изображения, так и гифки, "
+                            f"выбирайте то, что вам нравится."
+                            f"Кликните на да, как будете готовы или переделайте описание нажав нет."
             )
             embed.set_thumbnail(
                 url="https://c.tenor.com/o656qFKDzeUAAAAM/rick-astley-never-gonna-give-you-up.gif"
@@ -514,8 +554,8 @@ class NameModal(nextcord.ui.Modal):
             update_clan_name(interaction.guild.id, interaction.user.id, name)
             embed = nextcord.Embed(
                 description=f"Было введено следующее имя клана: **{name}**. Теперь введите описание для вашего клана, "
-                f"кликните на да, как будете готовы или прекратите процесс создания если передумали, "
-                f"нажав нет. "
+                            f"кликните на да, как будете готовы или прекратите процесс создания если передумали, "
+                            f"нажав нет. "
             )
             yes_button = create_button(
                 get_msg_from_locale_by_key(interaction.guild.id, "yes"),
@@ -707,7 +747,7 @@ class ClanHandler(commands.Cog):
         color = color.replace("#", "")
         col = nextcord.Color(value=int(color, 16))
         col = col.to_rgb()
-        leveling_formula = round((17 * (clan_level**3)) + 11)
+        leveling_formula = round((17 * (clan_level ** 3)) + 11)
         embed = nextcord.Embed(
             title=f"{clan_name} - {interaction.user.name}",
             description=f"{WRITING} **Описание клана**:\n{clan_description}",
@@ -919,17 +959,32 @@ class ClanHandler(commands.Cog):
                 ),
             )
 
-        first_button = create_button("1", upgrade_clan_limit)
-        second_button = create_button("2", change_image)
-        third_button = create_button("3", change_icon)
-        fourth_button = create_button("4", upgrade_clan_attack)
-        fifth_button = create_button("5", upgrade_clan_boss)
+        async def change_clan_color(interaction: Interaction):
+            clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+            price = get_server_clan_change_color_cost(interaction.guild.id)
+            clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+            if clan_storage < price:
+                msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                return await interaction.response.send_message(
+                    embed=construct_error_not_enough_embed(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "not_enough_money_error"
+                        ),
+                        interaction.user.display_avatar,
+                        f"{msg} {clan_storage}/{price}",
+                    )
+                )
+            update_clan_storage(interaction.guild.id, clan_id, -price)
+            modal = ClanShopColorEntryField(clan_id)
+            await interaction.response.send_modal(modal)
+        buttons = [
+            create_button("1", upgrade_clan_limit), create_button("2", change_image),
+            create_button("3", change_icon), create_button("4", upgrade_clan_attack),
+            create_button("5", upgrade_clan_boss), create_button("6", change_clan_color)
+        ]
         view = ViewAuthorCheck(author=interaction.user)
-        view.add_item(first_button)
-        view.add_item(second_button)
-        view.add_item(third_button)
-        view.add_item(fourth_button)
-        view.add_item(fifth_button)
+        for button in buttons:
+            view.add_item(button)
         await interaction.response.send_message(embed=embed, view=view)
 
     @__clan.subcommand(
@@ -939,9 +994,9 @@ class ClanHandler(commands.Cog):
         description_localizations=get_localized_description("clan_deposit"),
     )
     async def __clan_deposit(
-        self,
-        interaction: Interaction,
-        money: Optional[int] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            money: Optional[int] = SlashOption(required=True),
     ):
         if not is_user_in_clan(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
@@ -1041,15 +1096,15 @@ class ClanHandler(commands.Cog):
         description_localizations=get_localized_description("clan_kick"),
     )
     async def __clan_kick(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
     ):
         if not is_user_in_clan(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
@@ -1208,15 +1263,15 @@ class ClanHandler(commands.Cog):
         description_localizations=get_localized_description("clan_invite"),
     )
     async def __clan_invite(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
     ):
         if not is_user_in_clan(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
@@ -1253,6 +1308,16 @@ class ClanHandler(commands.Cog):
                 )
             )
         clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+        clan_members = fetchall_clan_members(interaction.guild.id, clan_id)
+        if len(clan_members) >= get_clan_member_limit(interaction.guild.id, clan_id):
+            embed = nextcord.Embed(
+                title="error",
+                description=get_msg_from_locale_by_key(
+                    interaction.guild.id, "already_like_noone"
+                ),
+                color=DEFAULT_BOT_COLOR,
+            )
+            return await interaction.response.send_message(embed=embed)
         clan_name = get_clan_name(interaction.guild.id, clan_id)
         author = interaction.user
 
@@ -1403,27 +1468,332 @@ class ClanHandler(commands.Cog):
     @nextcord.slash_command(
         name="clan_config",
         description="Clan configuration commands group",
+        name_localizations=get_localized_name("clan_config"),
+        description_localizations=get_localized_description("clan_config"),
         default_member_permissions=Permissions(administrator=True),
     )
     async def __clan_config(self, interaction: Interaction):
         pass
 
     @__clan_config.subcommand(
-        name="create_cost", description="Set cost of clan create on your server"
+        name="create_cost", description="Set cost of clan create on your server",
+        name_localizations=get_localized_name("clan_config_create_cost"),
+        description_localizations=get_localized_description("clan_config_create_cost"),
     )
     async def __clan_config_create_cost(
-        self, interaction: Interaction, money: Optional[int]
+            self, interaction: Interaction,
+            money: Optional[int] = SlashOption(required=True)
     ):
+        if money < 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         update_server_clan_create_cost(interaction.guild.id, money)
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"clan_config_{interaction.application_command.name}",
+                f"{message} **{money}** {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
 
     @__clan_config.subcommand(
         name="upgrade_attack_cost",
-        description="Set cost of upgrading attack in clan for your " "server",
+        description="Set cost of upgrading attack in clan for your server",
+        name_localizations=get_localized_name("clan_config_upgrade_attack_cost"),
+        description_localizations=get_localized_description("clan_config_upgrade_attack_cost"),
     )
     async def __clan_config_upgrade_attack_cost(
-        self, interaction: Interaction, money: Optional[int]
+            self, interaction: Interaction,
+            money: Optional[int] = SlashOption(required=True)
     ):
+        if money < 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
         update_server_clan_upgrade_attack_cost(interaction.guild.id, money)
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"clan_config_{interaction.application_command.name}",
+                f"{message} {money} {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__clan_config.subcommand(
+        name="upgrade_limit_cost",
+        description="Set cost of upgrading clan member limit for your server",
+        name_localizations=get_localized_name("clan_config_upgrade_limit_cost"),
+        description_localizations=get_localized_description("clan_config_upgrade_limit_cost"),
+    )
+    async def __clan_config_upgrade_limit_cost(
+            self, interaction: Interaction,
+            money: Optional[int] = SlashOption(required=True)
+    ):
+        if money < 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
+        update_server_clan_upgrade_limit_cost(interaction.guild.id, money)
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"clan_config_{interaction.application_command.name}",
+                f"{message} {money} {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__clan_config.subcommand(
+        name="change_icon_cost",
+        description="Set cost of changing clan icon for your server",
+        name_localizations=get_localized_name("clan_config_change_icon_cost"),
+        description_localizations=get_localized_description("clan_config_change_icon_cost"),
+    )
+    async def __clan_config_change_icon_cost(
+            self, interaction: Interaction,
+            money: Optional[int] = SlashOption(required=True)
+    ):
+        if money < 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
+        update_server_clan_change_icon_cost(interaction.guild.id, money)
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"clan_config_{interaction.application_command.name}",
+                f"{message} {money} {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__clan_config.subcommand(
+        name="change_image_cost",
+        description="Set cost of changing/setting clan image for your server",
+        name_localizations=get_localized_name("clan_config_change_image_cost"),
+        description_localizations=get_localized_description("clan_config_change_image_cost"),
+    )
+    async def __clan_config_change_image_cost(
+            self, interaction: Interaction,
+            money: Optional[int] = SlashOption(required=True)
+    ):
+        if money < 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
+        update_server_clan_change_image_cost(interaction.guild.id, money)
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"clan_config_{interaction.application_command.name}",
+                f"{message} {money} {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__clan_config.subcommand(
+        name="upgrade_boss_cost",
+        description="Set cost of upgrading clan member limit for your server",
+        name_localizations=get_localized_name("clan_config_upgrade_boss_cost"),
+        description_localizations=get_localized_description("clan_config_upgrade_boss_cost"),
+    )
+    async def __clan_config_upgrade_limit_cost(
+            self, interaction: Interaction,
+            money: Optional[int] = SlashOption(required=True)
+    ):
+        if money < 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
+        update_server_clan_upgrade_boss_cost(interaction.guild.id, money)
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"clan_config_{interaction.application_command.name}",
+                f"{message} {money} {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__clan_config.subcommand(
+        name="change_color_cost",
+        description="Set cost of changing clan main color",
+        name_localizations=get_localized_name("clan_config_change_color_cost"),
+        description_localizations=get_localized_description("clan_config_change_color_cost"),
+    )
+    async def __clan_config_change_color_cost(
+            self, interaction: Interaction,
+            money: Optional[int] = SlashOption(required=True)
+    ):
+        if money < 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    money,
+                )
+            )
+        update_server_change_color_cost(interaction.guild.id, money)
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"clan_config_{interaction.application_command.name}",
+                f"{message} {money} {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__clan_config.subcommand(
+        name="create_clan_channels",
+        description="Set state of creating clan channels on your server",
+        name_localizations=get_localized_name("clan_config_create_clan_channels"),
+        description_localizations=get_localized_description("clan_config_create_clan_channels"),
+    )
+    async def __clan_config_create_clan_channels(
+            self, interaction: Interaction,
+            enabled: Optional[bool] = SlashOption(required=True)
+    ):
+        update_server_create_clan_channels(interaction.guild.id, create_channels)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"clan_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        if enabled is True:
+            enabled = get_msg_from_locale_by_key(
+                interaction.guild.id, "enabled"
+            )
+        else:
+            enabled = get_msg_from_locale_by_key(
+                interaction.guild.id, "disabled"
+            )
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"clan_config_{interaction.application_command.name}",
+                f"{message} {enabled}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__clan_config.subcommand(
+        name="clan_voice_category",
+        description="Set state of creating clan channels on your server",
+        name_localizations=get_localized_name("clan_config_clan_voice_category"),
+        description_localizations=get_localized_description("clan_config_clan_voice_category"),
+    )
+    async def __clan_config_clan_voice_category(
+            self, interaction: Interaction,
+            clan_voice_category: Optional[nextcord.abc.GuildChannel] = SlashOption(required=True)
+    ):
+        if isinstance(clan_voice_category, nextcord.CategoryChannel):
+            update_server_clan_voice_category(interaction.guild.id, clan_voice_category.id)
+            message = get_msg_from_locale_by_key(
+                interaction.guild.id, f"clan_config_{interaction.application_command.name}"
+            )
+            requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+            await interaction.response.send_message(
+                embed=construct_basic_embed(
+                    f"clan_config_{interaction.application_command.name}",
+                    f"{message} {clan_voice_category.mention}",
+                    f"{requested} {interaction.user}",
+                    interaction.user.display_avatar,
+                    interaction.guild.id,
+                )
+            )
+        else:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    clan_voice_category,
+                )
+            )
 
 
 def setup(client):

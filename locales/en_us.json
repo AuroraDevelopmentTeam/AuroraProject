@@ -1058,6 +1058,9 @@
     "clan_shop_5": {
       "msg": "Level up clan boss"
     },
+    "clan_shop_6": {
+      "msg": "Change clan color"
+    },
     "in_storage": {
       "msg": "In bank storage:"
     },
@@ -1080,5 +1083,57 @@
     "clan_show": {
       "name": "show",
       "description": "Show description menu of your clan"
+    },
+    "clan_config": {
+      "name": "clan_config",
+      "description": "Prefix command of configuration commands on your server"
+    },
+    "clan_config_create_cost": {
+      "name": "clan_create_cost",
+      "description": "Set create cost of clan on your server",
+      "msg": "Now cost of clan creation on your server is:"
+    },
+    "clan_config_upgrade_attack_cost": {
+      "name": "upgrade_attack_cost",
+      "description": "Set cost of upgrading attack in clan on your server",
+      "msg": "Now cost of clan attack upgrade on your server is:"
+    },
+    "clan_config_upgrade_limit_cost": {
+      "name": "upgrade_limit_cost",
+      "description": "Set cost of upgrading clan member limit for your server",
+      "msg": "Now cost of clan upgrading clan member limit:"
+    },
+    "clan_config_change_icon_cost": {
+      "name": "change_icon_cost",
+      "description": "Set cost of changing clan icon for your server",
+      "msg": "Now cost of clan icon changing:"
+    },
+    "clan_config_change_image_cost": {
+      "name": "change_image_cost",
+      "description": "Set cost of changing clan image for your server",
+      "msg": "Now cost of clan image changing/setting:"
+    },
+    "clan_config_upgrade_boss_cost": {
+      "name": "upgrade_boss_cost",
+      "description": "Set basic cost of upgrading clan boss for your server",
+      "msg": "Now basic cost of boss level upgrade is:"
+    },
+    "clan_config_create_clan_channels": {
+      "name": "create_clan_channels",
+      "description": "Turn on/Turn off clan channels creation on your server when new guild created",
+      "msg": "Now clan channels creation on your server when new guild created:"
+    },
+    "clan_config_clan_voice_category": {
+      "name": "clan_voice_category",
+      "description": "Set category of clan voice channels",
+      "msg": "Now clan voice channels will be created in this category:"
+    },
+    "clan_config_change_color_cost": {
+      "name": "change_color_cost",
+      "description": "Set cost of changing clan main color",
+      "msg": "Now cost of changing clan main color is:"
+    },
+    "too_many_members": {
+      "msg": "Your clan have reached member limit, can't invite someone new"
     }
 }

@@ -22,6 +22,7 @@ from core.clan.getters import (
     get_boss_upgrade_multiplier,
     get_clan_member_limit,
     get_user_clan_id,
+    get_server_clan_change_color_cost
 )
 from core.locales.getters import get_msg_from_locale_by_key, localize_name
 from core.emojify import SHOP
@@ -363,13 +364,27 @@ def update_server_create_clan_channels(
     return
 
 
-def update_server_clan_voice_category(
-    guild_id: int, create_clan_channels: bool
+def update_server_change_color_cost(
+    guild_id: int, change_color_cost: int
 ) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
-    sql = "UPDATE clan_config SET create_clan_channels = ? WHERE guild_id = ?"
-    values = (create_clan_channels, guild_id)
+    sql = "UPDATE clan_config SET change_color_cost = ? WHERE guild_id = ?"
+    values = (change_color_cost, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_server_clan_voice_category(
+    guild_id: int, clan_voice_category: int
+) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE clan_config SET clan_voice_category = ? WHERE guild_id = ?"
+    values = (clan_voice_category, guild_id)
     cursor.execute(sql, values)
     db.commit()
     cursor.close()
@@ -490,6 +505,17 @@ def redraw_shop_embed(interaction: nextcord.Interaction) -> nextcord.Embed:
         name=f"```   {get_msg_from_locale_by_key(interaction.guild.id, 'price')}   ```",
         value=f"``` "
         f"{get_server_clan_upgrade_boss_cost(interaction.guild.id) * get_boss_upgrade_multiplier(get_clan_guild_boss_level(interaction.guild.id, get_user_clan_id(interaction.guild.id, interaction.user.id)))}```",
+        inline=True,
+    )
+    embed.add_field(name="```#.  ```", value="```6. ```", inline=True)
+    embed.add_field(
+        name="```                 Имя Товара                 ```",
+        value=f"```{get_msg_from_locale_by_key(interaction.guild.id, 'clan_shop_6')}```",
+        inline=True,
+    )
+    embed.add_field(
+        name=f"```   {get_msg_from_locale_by_key(interaction.guild.id, 'price')}   ```",
+        value=f"``` {get_server_clan_change_color_cost(interaction.guild.id)}```",
         inline=True,
     )
     return embed
