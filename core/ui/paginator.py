@@ -124,6 +124,7 @@ class Dropdown(nextcord.ui.Select):
                         interaction.guild, interaction.user, disabled=True
                     ),
                 )
+            msg = get_msg_from_locale_by_key(self.guild.id, "shop")
             embed.add_field(
                 name="Shop",
                 value=f"{msg} {self.role_list[int(self.values[0]) - 1].mention}",

@@ -52,7 +52,7 @@ def create_slots_embed(
     name = name.capitalize()
     users_balance = get_user_balance(guild_id, user_id)
     additional_row = spin_slots()
-    additional_row_2 = slots_row
+    additional_row_2 = spin_slots()
     embed = nextcord.Embed(
         color=DEFAULT_BOT_COLOR,
         description=f"**{name}**\n{game_state}\n"
