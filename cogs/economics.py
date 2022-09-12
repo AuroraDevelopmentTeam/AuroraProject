@@ -657,7 +657,7 @@ class Economics(commands.Cog):
                         if inter.user == interaction.user:
                             await inter.response.defer()
                             await inter.delete_original_message()
-                            if get_custom_shop_roles_limit():
+                            if get_custom_shop_roles_limit(inter.guild.id):
                                 return await inter.send(
                                     "В магазине достигнут лимит ролей - 50!",
                                     delete_after=5,
