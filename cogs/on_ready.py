@@ -64,6 +64,8 @@ from core.clan.writers import (
     write_in_clan_members_standart_values,
     write_in_clan_config_standart_values,
 )
+from core.voice.create import create_voice_private_config_table
+from core.voice.writers import write_in_voice_private_config_standart_values
 
 
 class OnReadyListener(commands.Cog):
@@ -124,6 +126,8 @@ class OnReadyListener(commands.Cog):
         create_clan_config_table()
         write_in_clan_config_standart_values(guilds)
         write_in_clan_members_standart_values(guilds)
+        create_voice_private_config_table()
+        write_in_voice_private_config_standart_values(guilds)
         print(len(self.client.guilds))
         for guild in self.client.guilds:
             print(f"{guild.name} - {(len(guild.members))}")
