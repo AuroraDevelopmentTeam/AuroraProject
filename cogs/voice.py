@@ -7,6 +7,52 @@ from nextcord.abc import GuildChannel
 
 from core.voice.updaters import update_voice_creation_room
 from core.voice.getters import get_voice_creation_room
+from core.voice.create import create_button_menu_embed
+
+
+class VoiceMenuButtonsView(nextcord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=0)
+
+    @nextcord.ui.button(label="", emoji="🖊️")
+    async def _name(self, button: nextcord.ui.button, interaction: nextcord.MessageInteraction):
+        pass
+
+    @nextcord.ui.button(label="", emoji="👥")
+    async def _users(self, button: nextcord.ui.button, interaction: nextcord.MessageInteraction):
+        pass
+
+    @nextcord.ui.button(label="", emoji="🔒")
+    async def _lock(self, button: nextcord.ui.button, interaction: nextcord.MessageInteraction):
+        pass
+
+    @nextcord.ui.button(label="", emoji="🔓")
+    async def _unlock(self, button: nextcord.ui.button, interaction: nextcord.MessageInteraction):
+        pass
+
+    @nextcord.ui.button(label="", emoji="🚪")
+    async def _kick(self, button: nextcord.ui.button, interaction: nextcord.MessageInteraction):
+        pass
+
+    @nextcord.ui.button(label="", emoji="✔")
+    async def _add(self, button: nextcord.ui.button, interaction: nextcord.MessageInteraction):
+        pass
+
+    @nextcord.ui.button(label="", emoji="❌")
+    async def _remove(self, button: nextcord.ui.button, interaction: nextcord.MessageInteraction):
+        pass
+
+    @nextcord.ui.button(label="", emoji="🔉")
+    async def _unmute(self, button: nextcord.ui.button, interaction: nextcord.MessageInteraction):
+        pass
+
+    @nextcord.ui.button(label="", emoji="🔇")
+    async def _mute(self, button: nextcord.ui.button, interaction: nextcord.MessageInteraction):
+        pass
+
+    @nextcord.ui.button(label="", emoji="👑")
+    async def _korona(self, button: nextcord.ui.button, interaction: nextcord.MessageInteraction):
+        pass
 
 
 class UserVoiceHandler(commands.Cog):
@@ -44,6 +90,10 @@ class UserVoiceHandler(commands.Cog):
             await interaction.response.send_message('done')
         else:
             pass
+
+    @__voice_private_config.subcommand(name="menu_invoke", description="invoke button menu for voice rooms")
+    async def ____voice_creation_channel_menu_invoke(self, interaction: Interaction):
+        await interaction.response.send_message(embed=create_button_menu_embed(), view=VoiceMenuButtonsView())
 
 
 def setup(client):
