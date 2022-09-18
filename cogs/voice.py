@@ -70,15 +70,29 @@ class UserVoiceHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        server_voice_creation_room = get_voice_creation_room(after.channel.guild.id)
+        try:
+            server_voice_creation_room = get_voice_creation_room(after.channel.guild.id)
+        except AttributeError:
+            server_voice_creation_room = get_voice_creation_room(before.channel.guild.id)
         if member.bot:
             return
         if server_voice_creation_room == 0:
             return
         if after.channel and after.channel.id == server_voice_creation_room:
+            overwrites = {
+                interaction.guild.default_role: nextcord.PermissionOverwrite(
+                    connect=False,
+                ),
+                role: nextcord.PermissionOverwrite(connect=True, speak=True, view_channel=True),
+                member: nextcord.PermissionOverwrite(
+                    connect=True, speak=True, deafen_members=True, priority_speaker=True,
+                    view_channel=True, manage_channels=True, mute_members=True, move_members=True, stream=True,
+                )
+            }
             channel = await member.guild.create_voice_channel(
                 name=f"{member}",
-                category=after.channel.category
+                category=after.channel.category,
+                overwrites=overwrites
             )
             await member.move_to(channel=channel)
             self.voice_rooms[channel.id] = member.id
@@ -88,9 +102,13 @@ class UserVoiceHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_interaction(self, interaction: Interaction):
+        if not interaction.user.voice:
+            return
+        if interaction.user.voice.channel.id not in self.voice_rooms:
+            return
         try:
             custom_id = interaction.data["custom_id"]
-            react_on_private_room_menu_button(self.client, interaction, custom_id)
+            await react_on_private_room_menu_button(self.client, interaction, custom_id, interaction.user.voice.channel)
         except KeyError:
             pass
 
