@@ -29,7 +29,9 @@ class VoiceRoomName(nextcord.ui.Modal):
                 description=f"{YES}",
                 colour=DEFAULT_BOT_COLOR), ephemeral=True)
         except:
-            pass
+            await interaction.response.send_message(embed=nextcord.Embed(
+                description=f"{NO}",
+                colour=DEFAULT_BOT_COLOR), ephemeral=True)
 
 
 class VoiceRoomLimit(nextcord.ui.Modal):
@@ -105,7 +107,6 @@ def create_button_reaction_embed(custom_id: str) -> nextcord.Embed:
                         "операции.",
             colour=DEFAULT_BOT_COLOR
         )
-        return embed
     elif custom_id == 'private_room:users':
         embed = nextcord.Embed(
             title="Изменение лимита пользователей",
@@ -113,19 +114,59 @@ def create_button_reaction_embed(custom_id: str) -> nextcord.Embed:
                         ", у вас есть 30 секунд на выполнение операции.",
             colour=DEFAULT_BOT_COLOR
         )
-        return embed
     elif custom_id == 'private_room:kick':
         embed = nextcord.Embed(
             title="Кик пользователей с комната",
-            description="Напишите сообщением ниже упоминания **@Пользователя**, "
+            description="Напишите сообщением ниже упоминание **@Пользователя**, "
                         "находящегося с вами в комнате, которого вы хотите кикнуть",
             colour=DEFAULT_BOT_COLOR
         )
-        return embed
+    elif custom_id == 'private_room:add':
+        embed = nextcord.Embed(
+            title="Добавить пользователя в комнату",
+            description="Напишите сообщением ниже упоминание **@Пользователя**, "
+                        "чтобы разрешить ему заходить в вашу комнату",
+            colour=DEFAULT_BOT_COLOR
+        )
+    elif custom_id == 'private_room:remove':
+        embed = nextcord.Embed(
+            title="Запретить пользователю вход в комнату",
+            description="Напишите сообщением ниже упоминание **@Пользователя**, "
+                        "чтобы запретить ему заходить в вашу комнату",
+            colour=DEFAULT_BOT_COLOR
+        )
+    elif custom_id == 'private_room:unmute':
+        embed = nextcord.Embed(
+            title="Разрешить пользователю говорить",
+            description="Напишите сообщением ниже упоминание **@Пользователя**, "
+                        "чтобы разрешить ему говорить в вашей комнате",
+            colour=DEFAULT_BOT_COLOR
+        )
+    elif custom_id == 'private_room:mute':
+        embed = nextcord.Embed(
+            title="Запретить пользователю говорить",
+            description="Напишите сообщением ниже упоминание **@Пользователя**, "
+                        "чтобы запретить ему говорить в вашей комнате",
+            colour=DEFAULT_BOT_COLOR
+        )
+    elif custom_id == 'private_room:leadership':
+        embed = nextcord.Embed(
+            title="Передать пользователю управление комнатой",
+            description="Напишите сообщением ниже упоминание **@Пользователя**, "
+                        "чтобы передать ему управление комнатой",
+            colour=DEFAULT_BOT_COLOR
+        )
+    else:
+        embed = nextcord.Embed(
+            title="0",
+            description="error, no custom_id",
+            colour=DEFAULT_BOT_COLOR
+        )
+    return embed
 
 
 async def react_on_private_room_menu_button(client, interaction: nextcord.Interaction,
-                                            custom_id: str, voice_room: nextcord.VoiceChannel):
+                                            custom_id: str, voice_room: nextcord.VoiceChannel, voices: dict):
     if custom_id == "private_room:name":
         modal = VoiceRoomName("name", voice_room)
         await interaction.response.send_modal(modal)
@@ -133,29 +174,118 @@ async def react_on_private_room_menu_button(client, interaction: nextcord.Intera
         modal = VoiceRoomLimit("limit", voice_room)
         await interaction.response.send_modal(modal)
     elif custom_id == 'private_room:lock':
-        await voice_room.set_permissions(
-            interaction.guild.default_role,
-            connect=False
-        )
-        await interaction.response.send_message(embed=nextcord.Embed(
-            description=f"{LOCK}\n{YES}",
-            colour=DEFAULT_BOT_COLOR), ephemeral=True)
+        try:
+            await voice_room.set_permissions(
+                interaction.guild.default_role,
+                connect=False
+            )
+            await interaction.response.send_message(embed=nextcord.Embed(
+                description=f"{LOCK}\n{YES}",
+                colour=DEFAULT_BOT_COLOR), ephemeral=True)
+        except:
+            await interaction.response.send_message(embed=nextcord.Embed(
+                description=f"{LOCK}\n{NO}",
+                colour=DEFAULT_BOT_COLOR), ephemeral=True)
     elif custom_id == 'private_room:unlock':
-        await voice_room.set_permissions(
-            interaction.guild.default_role,
-            connect=True
-        )
-        await interaction.response.send_message(embed=nextcord.Embed(
-            description=f"{UNLOCK}\n{YES}",
-            colour=DEFAULT_BOT_COLOR), ephemeral=True)
+        try:
+            await voice_room.set_permissions(
+                interaction.guild.default_role,
+                connect=True
+            )
+            await interaction.response.send_message(embed=nextcord.Embed(
+                description=f"{UNLOCK}\n{YES}",
+                colour=DEFAULT_BOT_COLOR), ephemeral=True)
+        except:
+            await interaction.response.send_message(embed=nextcord.Embed(
+                description=f"{UNLOCK}\n{NO}",
+                colour=DEFAULT_BOT_COLOR), ephemeral=True)
     elif custom_id == 'private_room:kick':
         await interaction.response.send_message(embed=create_button_reaction_embed(custom_id), ephemeral=True)
         msg = await client.wait_for("message", check=lambda message: message.author == interaction.user, timeout=30)
-        if len(msg.mentions):
-            for user in msg.mentions:
-                if user.voice.channel == voice_room:
-                    await user.move_to(channel=None)
-        await msg.add_reaction(YES)
+        try:
+            if len(msg.mentions):
+                for user in msg.mentions:
+                    if user.voice.channel == voice_room:
+                        await user.move_to(channel=None)
+            await msg.add_reaction(YES)
+        except:
+            await msg.add_reaction(NO)
+        await msg.delete(delay=5)
+    elif custom_id == 'private_room:add':
+        await interaction.response.send_message(embed=create_button_reaction_embed(custom_id), ephemeral=True)
+        msg = await client.wait_for("message", check=lambda message: message.author == interaction.user, timeout=30)
+        try:
+            if len(msg.mentions):
+                for user in msg.mentions:
+                    await voice_room.set_permissions(
+                        user,
+                        connect=True
+                    )
+            await msg.add_reaction(YES)
+        except:
+            await msg.add_reaction(NO)
+        await msg.delete(delay=5)
+    elif custom_id == 'private_room:remove':
+        await interaction.response.send_message(embed=create_button_reaction_embed(custom_id), ephemeral=True)
+        msg = await client.wait_for("message", check=lambda message: message.author == interaction.user, timeout=30)
+        try:
+            if len(msg.mentions):
+                for user in msg.mentions:
+                    await voice_room.set_permissions(
+                        user,
+                        connect=False
+                    )
+            await msg.add_reaction(YES)
+        except:
+            await msg.add_reaction(NO)
+        await msg.delete(delay=5)
+    elif custom_id == 'private_room:unmute':
+        await interaction.response.send_message(embed=create_button_reaction_embed(custom_id), ephemeral=True)
+        msg = await client.wait_for("message", check=lambda message: message.author == interaction.user, timeout=30)
+        try:
+            if len(msg.mentions):
+                for user in msg.mentions:
+                    await voice_room.set_permissions(
+                        user,
+                        speak=True
+                    )
+            await msg.add_reaction(YES)
+        except:
+            await msg.add_reaction(NO)
+        await msg.delete(delay=5)
+    elif custom_id == 'private_room:mute':
+        await interaction.response.send_message(embed=create_button_reaction_embed(custom_id), ephemeral=True)
+        msg = await client.wait_for("message", check=lambda message: message.author == interaction.user, timeout=30)
+        try:
+            if len(msg.mentions):
+                for user in msg.mentions:
+                    await voice_room.set_permissions(
+                        user,
+                        speak=False
+                    )
+            await msg.add_reaction(YES)
+        except:
+            await msg.add_reaction(NO)
+        await msg.delete(delay=5)
+    elif custom_id == 'private_room:leadership':
+        await interaction.response.send_message(embed=create_button_reaction_embed(custom_id), ephemeral=True)
+        msg = await client.wait_for("message", check=lambda message: message.author == interaction.user, timeout=15)
+        try:
+            if len(msg.mentions):
+                voices[voice_room.id] = msg.mentions[0].id
+                await voice_room.set_permissions(
+                    msg.mentions[0],
+                    connect=True, speak=True, deafen_members=True, priority_speaker=True,
+                    view_channel=True, manage_channels=True, mute_members=True, move_members=True, stream=True,
+                )
+                await voice_room.set_permissions(
+                    interaction.user,
+                    connect=True, speak=True, deafen_members=False, priority_speaker=False,
+                    view_channel=True, manage_channels=False, mute_members=False, move_members=False, stream=True,
+                )
+                await msg.add_reaction(YES)
+        except:
+            await msg.add_reaction(NO)
         await msg.delete(delay=5)
     else:
         pass

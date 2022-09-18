@@ -80,10 +80,9 @@ class UserVoiceHandler(commands.Cog):
             return
         if after.channel and after.channel.id == server_voice_creation_room:
             overwrites = {
-                interaction.guild.default_role: nextcord.PermissionOverwrite(
+                member.guild.default_role: nextcord.PermissionOverwrite(
                     connect=False,
                 ),
-                role: nextcord.PermissionOverwrite(connect=True, speak=True, view_channel=True),
                 member: nextcord.PermissionOverwrite(
                     connect=True, speak=True, deafen_members=True, priority_speaker=True,
                     view_channel=True, manage_channels=True, mute_members=True, move_members=True, stream=True,
@@ -96,6 +95,7 @@ class UserVoiceHandler(commands.Cog):
             )
             await member.move_to(channel=channel)
             self.voice_rooms[channel.id] = member.id
+            print(self.voice_rooms)
         if before.channel and before.channel.id in self.voice_rooms and not len(before.channel.members):
             await before.channel.delete()
             del self.voice_rooms[before.channel.id]
@@ -106,9 +106,12 @@ class UserVoiceHandler(commands.Cog):
             return
         if interaction.user.voice.channel.id not in self.voice_rooms:
             return
+        if interaction.user.id != self.voice_rooms[interaction.user.voice.channel.id]:
+            return
         try:
             custom_id = interaction.data["custom_id"]
-            await react_on_private_room_menu_button(self.client, interaction, custom_id, interaction.user.voice.channel)
+            await react_on_private_room_menu_button(self.client, interaction, custom_id,
+                                                    interaction.user.voice.channel, self.voice_rooms)
         except KeyError:
             pass
 
