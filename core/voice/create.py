@@ -175,7 +175,6 @@ async def react_on_private_room_menu_button(client, interaction: nextcord.Intera
         return await interaction.response.send_modal(modal)
     elif custom_id == 'private_room:lock':
         try:
-            interaction.response.defer()
             await voice_room.set_permissions(
                 interaction.guild.default_role,
                 connect=False
@@ -189,7 +188,6 @@ async def react_on_private_room_menu_button(client, interaction: nextcord.Intera
                 colour=DEFAULT_BOT_COLOR), ephemeral=True)
     elif custom_id == 'private_room:unlock':
         try:
-            interaction.response.defer()
             await voice_room.set_permissions(
                 interaction.guild.default_role,
                 connect=True
@@ -202,7 +200,7 @@ async def react_on_private_room_menu_button(client, interaction: nextcord.Intera
                 description=f"{UNLOCK}\n{NO}",
                 colour=DEFAULT_BOT_COLOR), ephemeral=True)
     elif custom_id == 'private_room:kick':
-        interaction.response.defer()
+        await interaction.response.defer()
         await interaction.followup.send(embed=create_button_reaction_embed(custom_id), ephemeral=True)
         msg = await client.wait_for("message", check=lambda message: message.author == interaction.user, timeout=30)
         try:
@@ -215,7 +213,6 @@ async def react_on_private_room_menu_button(client, interaction: nextcord.Intera
             await msg.add_reaction(NO)
         await msg.delete(delay=5)
     elif custom_id == 'private_room:add':
-        interaction.response.defer()
         await interaction.followup.send(embed=create_button_reaction_embed(custom_id), ephemeral=True)
         msg = await client.wait_for("message", check=lambda message: message.author == interaction.user, timeout=30)
         try:
@@ -230,7 +227,6 @@ async def react_on_private_room_menu_button(client, interaction: nextcord.Intera
             await msg.add_reaction(NO)
         await msg.delete(delay=5)
     elif custom_id == 'private_room:remove':
-        interaction.response.defer()
         await interaction.followup.send(embed=create_button_reaction_embed(custom_id), ephemeral=True)
         msg = await client.wait_for("message", check=lambda message: message.author == interaction.user, timeout=30)
         try:
@@ -245,7 +241,6 @@ async def react_on_private_room_menu_button(client, interaction: nextcord.Intera
             await msg.add_reaction(NO)
         await msg.delete(delay=5)
     elif custom_id == 'private_room:unmute':
-        interaction.response.defer()
         await interaction.followup.send(embed=create_button_reaction_embed(custom_id), ephemeral=True)
         msg = await client.wait_for("message", check=lambda message: message.author == interaction.user, timeout=30)
         try:
@@ -260,7 +255,6 @@ async def react_on_private_room_menu_button(client, interaction: nextcord.Intera
             await msg.add_reaction(NO)
         await msg.delete(delay=5)
     elif custom_id == 'private_room:mute':
-        interaction.response.defer()
         await interaction.followup.send(embed=create_button_reaction_embed(custom_id), ephemeral=True)
         msg = await client.wait_for("message", check=lambda message: message.author == interaction.user, timeout=30)
         try:
@@ -275,7 +269,6 @@ async def react_on_private_room_menu_button(client, interaction: nextcord.Intera
             await msg.add_reaction(NO)
         await msg.delete(delay=5)
     elif custom_id == 'private_room:leadership':
-        interaction.response.defer()
         await interaction.followup.send(embed=create_button_reaction_embed(custom_id), ephemeral=True)
         msg = await client.wait_for("message", check=lambda message: message.author == interaction.user, timeout=15)
         try:
