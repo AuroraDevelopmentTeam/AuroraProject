@@ -5,8 +5,8 @@ from nextcord import Interaction, SlashOption, VoiceChannel, Permissions
 from nextcord.ext import commands
 from nextcord.abc import GuildChannel
 
-from core.voice.updaters import update_voice_creation_room
-from core.voice.getters import get_voice_creation_room
+from core.voice.updaters import update_voice_creation_room, update_voice_controller_msg
+from core.voice.getters import get_voice_creation_room, get_voice_controller_msg
 from core.voice.create import create_button_menu_embed, react_on_private_room_menu_button
 from core.emojify import TEAM, LOCK, UNLOCK, PEN, KICK, YES, NO, CROWN, MUTE, MICROPHONE
 
@@ -95,7 +95,6 @@ class UserVoiceHandler(commands.Cog):
             )
             await member.move_to(channel=channel)
             self.voice_rooms[channel.id] = member.id
-            print(self.voice_rooms)
         if before.channel and before.channel.id in self.voice_rooms and not len(before.channel.members):
             await before.channel.delete()
             del self.voice_rooms[before.channel.id]
@@ -107,6 +106,11 @@ class UserVoiceHandler(commands.Cog):
         if interaction.user.voice.channel.id not in self.voice_rooms:
             return
         if interaction.user.id != self.voice_rooms[interaction.user.voice.channel.id]:
+            return
+        message = get_voice_controller_msg(interaction.guild.id)
+        if message == 0:
+            return
+        if interaction.message.id != message:
             return
         try:
             custom_id = interaction.data["custom_id"]
@@ -131,8 +135,10 @@ class UserVoiceHandler(commands.Cog):
             pass
 
     @__voice_private_config.subcommand(name="menu_invoke", description="invoke button menu for voice rooms")
-    async def ____voice_creation_channel_menu_invoke(self, interaction: Interaction):
-        await interaction.response.send_message(embed=create_button_menu_embed(), view=VoiceMenuButtonsView())
+    async def __voice_creation_channel_menu_invoke(self, interaction: Interaction):
+        message = await interaction.send(embed=create_button_menu_embed(), view=VoiceMenuButtonsView())
+        message = await message.fetch()
+        update_voice_controller_msg(interaction.guild.id, message.id)
 
 
 def setup(client):

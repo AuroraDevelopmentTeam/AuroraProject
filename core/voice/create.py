@@ -82,7 +82,7 @@ def create_voice_private_config_table() -> None:
 def create_button_menu_embed() -> nextcord.Embed:
     embed = nextcord.Embed(
         title="Управление приватной комнатой",
-        description=f"""\n
+        description=f"""
         {PEN} - **изменить** название комнаты\n
         {TEAM} - **изменить** кол-во слотов\n
         {LOCK} - **закрыть** комнату для всех\n
@@ -92,7 +92,7 @@ def create_button_menu_embed() -> nextcord.Embed:
         {NO} - **забрать доступ пользователю** в комнату\n
         {MICROPHONE} - **размутить** пользователя\n
         {MUTE} - **замутить** пользователя\n
-        {CROWN} - **передать владение** комнатой\n
+        {CROWN} - **передать владение** комнатой
     """,
         colour=DEFAULT_BOT_COLOR
     )
