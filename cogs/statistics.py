@@ -6,6 +6,7 @@ from datetime import timedelta
 import nextcord
 from nextcord.ext import commands
 from nextcord import Interaction, Permissions, SlashOption
+from nextcord.abc import GuildChannel
 
 from core.stats.updaters import (
     update_user_messages_counter,
@@ -158,6 +159,12 @@ class StatisticsCounter(commands.Cog):
                 interaction.guild.id,
             )
         )
+
+    @nextcord.slash_command(name="messages_counter_channel")
+    async def __messages_counter_channel(self, interaction: Interaction,
+                                         channel: Optional[GuildChannel] = SlashOption(required=True),
+                                         state: Optional[bool] = SlashOption(required=True)):
+        pass
 
     @nextcord.slash_command(
         name="messages_counter",

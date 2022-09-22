@@ -46,3 +46,18 @@ def get_guild_messages_state(guild_id: int) -> bool:
     cursor.close()
     db.close()
     return bool(messages_state)
+
+
+def get_channel_level_state(guild_id: int, channel_id: int) -> bool:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    state = cursor.execute(
+        f"SELECT enabled FROM level_channels_config WHERE guild_id = {guild_id} AND channel_id = {channel_id}"
+    ).fetchone()
+    cursor.close()
+    db.close()
+    if state is None:
+        return True
+    else:
+        state = state[0]
+        return bool(state)

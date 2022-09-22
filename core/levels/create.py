@@ -32,3 +32,16 @@ def create_level_config_table() -> None:
     cursor.close()
     db.close()
     return
+
+
+def create_level_channels_config_table() -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    cursor.execute(
+        f"""CREATE TABLE IF NOT EXISTS level_channels_config (
+        guild_id INTEGER, channel_id INTEGER, enabled BOOL)"""
+    )
+    db.commit()
+    cursor.close()
+    db.close()
+    return
