@@ -17,7 +17,9 @@ from core.stats.getters import (
     get_user_join_time,
     get_user_time_in_voice,
     get_user_messages_counter,
+    get_channel_stats_state,
 )
+from core.stats.writers import write_channel_in_config
 from core.money.getters import (
     get_voice_minutes_for_income,
     get_guild_min_max_voice_income,
@@ -54,7 +56,8 @@ class StatisticsCounter(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: nextcord.Message):
         if not message.author.bot:
-            update_user_messages_counter(message.guild.id, message.author.id, 1)
+            if get_channel_stats_state(message.guild.id, message.channel.id) is True:
+                update_user_messages_counter(message.guild.id, message.author.id, 1)
             if get_channel_income_state(message.guild.id, message.channel.id) is False:
                 return
 
@@ -163,8 +166,28 @@ class StatisticsCounter(commands.Cog):
     @nextcord.slash_command(name="messages_counter_channel")
     async def __messages_counter_channel(self, interaction: Interaction,
                                          channel: Optional[GuildChannel] = SlashOption(required=True),
-                                         state: Optional[bool] = SlashOption(required=True)):
-        pass
+                                         enabled: Optional[bool] = SlashOption(required=True)):
+        write_channel_in_config(interaction.guild.id, channel.id, enabled)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"income_{interaction.application_command.name}"
+        )
+        message_2 = get_msg_from_locale_by_key(
+            interaction.guild.id, f"income_{interaction.application_command.name}_2"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        if enabled is True:
+            enabled = get_msg_from_locale_by_key(interaction.guild.id, "enabled")
+        else:
+            enabled = get_msg_from_locale_by_key(interaction.guild.id, "disabled")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} {channel.mention} {message_2} **{enabled}**",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
 
     @nextcord.slash_command(
         name="messages_counter",

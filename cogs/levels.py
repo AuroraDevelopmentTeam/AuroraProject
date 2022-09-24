@@ -6,6 +6,7 @@ from io import BytesIO
 
 import cooldowns
 import nextcord
+from nextcord.abc import GuildChannel
 from nextcord.ext import commands, application_checks
 from nextcord import Interaction, SlashOption, Permissions
 
@@ -19,6 +20,7 @@ from core.levels.getters import (
     get_user_level,
     get_min_max_exp,
     get_guild_messages_state,
+    get_channel_level_state
 )
 from core.levels.updaters import (
     update_user_exp,
@@ -50,6 +52,8 @@ class Levels(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
+            return
+        if get_channel_level_state(message.guild.id, message.channel.id) is False:
             return
         elif self.level_up(message.guild.id, message.author.id):
             update_user_level(message.guild.id, message.author.id, 1)

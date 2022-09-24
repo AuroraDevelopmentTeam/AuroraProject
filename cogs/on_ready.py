@@ -17,7 +17,7 @@ from core.money.writers import (
     write_in_money_config_standart_values,
     write_in_chat_money_standart_values,
 )
-from core.levels.create import create_level_table, create_level_config_table
+from core.levels.create import create_level_table, create_level_config_table, create_level_channels_config_table
 from core.levels.writers import (
     write_in_levels_standart_values,
     write_in_levels_config_standart_values,
@@ -41,7 +41,7 @@ from core.honor.create import create_honor_table
 from core.honor.writers import write_in_honor_standart_values
 from core.profiles.create import create_profiles_table
 from core.profiles.writers import write_in_profiles_standart_values
-from core.stats.create import create_stats_table
+from core.stats.create import create_stats_table, create_stats_channels_config_table
 from core.stats.writers import write_in_stats_standart_values
 from core.badges.create import create_badges_table
 from core.badges.writers import write_in_badges_standart_values
@@ -137,6 +137,8 @@ class OnReadyListener(commands.Cog):
                 f"Пользователи: {len(self.client.users)}"
             )
         )
+        create_stats_channels_config_table()
+        create_level_channels_config_table()
 
 
 def setup(client):
