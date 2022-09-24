@@ -163,16 +163,19 @@ class StatisticsCounter(commands.Cog):
             )
         )
 
-    @nextcord.slash_command(name="messages_counter_channel")
+    @nextcord.slash_command(name="messages_counter_channel",
+                            name_localizations=get_localized_name("messages_counter_channel"),
+                            description_localizations=get_localized_description("messages_counter_channel"),
+                            )
     async def __messages_counter_channel(self, interaction: Interaction,
                                          channel: Optional[GuildChannel] = SlashOption(required=True),
                                          enabled: Optional[bool] = SlashOption(required=True)):
         write_channel_in_config(interaction.guild.id, channel.id, enabled)
         message = get_msg_from_locale_by_key(
-            interaction.guild.id, f"income_{interaction.application_command.name}"
+            interaction.guild.id, f"{interaction.application_command.name}"
         )
         message_2 = get_msg_from_locale_by_key(
-            interaction.guild.id, f"income_{interaction.application_command.name}_2"
+            interaction.guild.id, f"{interaction.application_command.name}_2"
         )
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         if enabled is True:

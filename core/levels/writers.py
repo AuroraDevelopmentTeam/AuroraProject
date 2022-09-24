@@ -39,3 +39,14 @@ def write_in_levels_standart_values(guilds) -> None:
     cursor.close()
     db.close()
     return
+
+
+def write_channel_in_config(guild_id: int, channel_id: int, enabled: bool) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "INSERT INTO level_channels_config(guild_id, channel_id, enabled) VALUES (?, ?, ?)"
+    val = (guild_id, channel_id, enabled)
+    cursor.execute(sql, val)
+    db.commit()
+    cursor.close()
+    db.close()

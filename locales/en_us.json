@@ -1135,5 +1135,21 @@
     },
     "too_many_members": {
       "msg": "Your clan have reached member limit, can't invite someone new"
+    },
+    "messages_counter_channel": {
+      "msg": "For channel",
+      "name": "message_counter_channel",
+      "description": "Turn on/Turn off message counting in channel"
+    },
+    "messages_counter_channel_2": {
+      "msg": "message counter state now is: "
+    },
+    "leveling_channel": {
+      "msg": "For channel",
+      "name": "leveling_channel",
+      "description": "Turn on/Turn off exp gain in channel"
+    },
+    "leveling_channel_2": {
+      "msg": "possibility to gain exp in channel now: "
     }
 }

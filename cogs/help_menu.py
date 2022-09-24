@@ -468,6 +468,11 @@ class HelpSelectMenuRU(nextcord.ui.Select):
                 description="Меню помощи по разделу 'Кланы'",
                 emoji="🏰",
             ),
+            nextcord.SelectOption(
+                label="Голосовые каналы",
+                description="Меню помощи по разделу 'Голосовые каналы'",
+                emoji="🎙️",
+            ),
         ]
         super().__init__(
             placeholder="Выберите раздел, команды которого вы хотите увидеть",
@@ -765,6 +770,19 @@ class HelpSelectMenuRU(nextcord.ui.Select):
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/1019251405103575050/1023085370394558535/4.gif"
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        elif self.values[0] == 'Голосовые каналы':
+            embed = nextcord.Embed(
+                color=DEFAULT_BOT_COLOR,
+                title="🎙️ Голосовые каналы",
+                description="`/voice_private_config voice_creation_channel` — Установить голосовой канал при заходе в "
+                            "который в той же категории будут создаваться приватные голосовые каналы\n "
+                "`/voice_private_config menu_invoke` — Вызвать бесконечное кнопочное меню для управления голосовыми "
+                            "каналами и их настройки\n "
+            )
+            embed.set_image(
+                url="https://cdn.discordapp.com/attachments/1019251405103575050/1023214654564094062/98999738.jpg"
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
 

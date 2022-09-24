@@ -28,6 +28,7 @@ from core.levels.updaters import (
     set_user_exp_to_zero,
     set_user_level,
 )
+from core.levels.writers import write_channel_in_config
 from core.embeds import construct_basic_embed
 from core.errors import (
     construct_error_negative_value_embed,
@@ -334,11 +335,34 @@ class Levels(commands.Cog):
             )
         )
 
-    @nextcord.slash_command(name="leveling_channel")
+    @nextcord.slash_command(name="leveling_channel",
+                            name_localizations=get_localized_name("leveling_channel"),
+                            description_localizations=get_localized_description("leveling_channel"),
+                            )
     async def __leveling_channel(self, interaction: Interaction,
                                  channel: Optional[GuildChannel] = SlashOption(required=True),
-                                 state: Optional[bool] = SlashOption(required=True)):
-        pass
+                                 enabled: Optional[bool] = SlashOption(required=True)):
+        write_channel_in_config(interaction.guild.id, channel.id, enabled)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"{interaction.application_command.name}"
+        )
+        message_2 = get_msg_from_locale_by_key(
+            interaction.guild.id, f"{interaction.application_command.name}_2"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        if enabled is True:
+            enabled = get_msg_from_locale_by_key(interaction.guild.id, "enabled")
+        else:
+            enabled = get_msg_from_locale_by_key(interaction.guild.id, "disabled")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} {channel.mention} {message_2} **{enabled}**",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
 
 
 def setup(client):
