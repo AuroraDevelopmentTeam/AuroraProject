@@ -28,13 +28,14 @@ from core.levels.updaters import (
     set_user_exp_to_zero,
     set_user_level,
 )
+from core.auto.roles.getters import get_lesser_lvl_roles_list
 from core.levels.writers import write_channel_in_config
 from core.embeds import construct_basic_embed
 from core.errors import (
     construct_error_negative_value_embed,
     construct_error_bot_user_embed,
 )
-from core.auto.roles.getters import check_level_autorole, get_server_level_autorole
+from core.auto.roles.getters import check_level_autorole, get_server_level_autorole, get_autorole_lvl_deletion_state
 
 
 class Levels(commands.Cog):
@@ -62,8 +63,16 @@ class Levels(commands.Cog):
             user_level = get_user_level(message.guild.id, message.author.id)
             if check_level_autorole(message.guild.id, user_level) is True:
                 role = get_server_level_autorole(message.guild.id, user_level)
-                role = nextcord.utils.get(channel.guild.roles, id=role)
+                role = nextcord.utils.get(message.guild.roles, id=role)
                 await message.author.add_roles(role)
+                if get_autorole_lvl_deletion_state(message.guild.id) is True:
+                    roles_list = get_lesser_lvl_roles_list(message.guild.id, user_level)
+                    for rolee in roles_list:
+                        try:
+                            role = nextcord.utils.get(channel.guild.roles, id=rolee[0])
+                            await message.author.remove_roles(role)
+                        except:
+                            pass
             if get_guild_messages_state(message.guild.id) is True:
                 user_level = get_user_level(message.guild.id, message.author.id)
                 msg = get_msg_from_locale_by_key(message.guild.id, "level_up")
@@ -213,6 +222,14 @@ class Levels(commands.Cog):
                     role = get_server_level_autorole(interaction.guild.id, user_level)
                     role = nextcord.utils.get(interaction.guild.roles, id=role)
                     await user.add_roles(role)
+                    if get_autorole_lvl_deletion_state(interaction.guild.id) is True:
+                        roles_list = get_lesser_lvl_roles_list(interaction.guild.id, user_level)
+                        for rolee in roles_list:
+                            try:
+                                role = nextcord.utils.get(interaction.guild.roles, id=rolee[0])
+                                await user.remove_roles(role)
+                            except:
+                                pass
                 leveling_formula = round((7 * (user_level ** 2)) + 58)
         msg = get_msg_from_locale_by_key(
             interaction.guild.id, interaction.application_command.name

@@ -68,12 +68,14 @@ def write_autorole_for_reaction(
 ) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
-    sql = "INSERT INTO reaction_autorole (guild_id, channel_id, message_id, reaction, autorole_id, is_custom) VALUES (?, ?, ?, ?, ?, ?) "
+    sql = "INSERT INTO reaction_autorole (guild_id, channel_id, message_id, reaction, autorole_id, is_custom) VALUES " \
+          "(?, ?, ?, ?, ?, ?) "
     val = (guild_id, channel_id, message_id, reaction, role.id, is_custom)
     cursor.execute(sql, val)
     db.commit()
     cursor.close()
     db.close()
+    return
 
 
 def delete_autorole_for_reaction(guild_id: int, role: nextcord.Role) -> None:
@@ -84,3 +86,16 @@ def delete_autorole_for_reaction(guild_id: int, role: nextcord.Role) -> None:
     db.commit()
     cursor.close()
     db.close()
+    return
+
+
+def update_autorole_lvl_deletion_state(guild_id: int, enabled: bool) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE autorole_bool SET remove_lvl_roles = ? WHERE guild_id = ?"
+    val = (enabled, guild_id)
+    cursor.execute(sql, val)
+    db.commit()
+    cursor.close()
+    db.close()
+    return

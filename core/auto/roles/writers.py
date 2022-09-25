@@ -29,3 +29,19 @@ def write_in_levelroles_value(guild_id, level, role_id):
     cursor.close()
     db.close()
     return
+
+
+def write_in_autoroles_bool_standart_values(guilds) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    for guild in guilds:
+        if is_guild_id_in_table("autorole_bool", guild.id) is False:
+            sql = (
+                "INSERT INTO autorole_bool(guild_id, remove_lvl_roles) VALUES (?, ?)"
+            )
+            val = (guild.id, False)
+            cursor.execute(sql, val)
+            db.commit()
+    cursor.close()
+    db.close()
+    return

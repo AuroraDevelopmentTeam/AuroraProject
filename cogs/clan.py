@@ -7,7 +7,7 @@ from typing import Union, Optional
 import cooldowns
 import nextcord
 from nextcord import Interaction, SlashOption, Permissions
-from nextcord.ext import commands, menus
+from nextcord.ext import commands, menus, application_checks
 from nextcord.utils import get
 
 from core.clan.checks import boss_alive, is_clan_owner, is_user_in_clan
@@ -600,6 +600,8 @@ class ClanHandler(commands.Cog):
         name_localizations=get_localized_name("clan_create"),
         description_localizations=get_localized_description("clan_create"),
     )
+    @application_checks.bot_has_guild_permissions(manage_channels=True)
+    @application_checks.bot_has_guild_permissions(manage_roles=True)
     async def __clan_create(self, interaction: Interaction):
         if is_user_in_clan(interaction.guild.id, interaction.user.id) is True:
             return await interaction.response.send_message(

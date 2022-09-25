@@ -27,14 +27,14 @@ def get_server_autorole_id(guild_id: int) -> int:
 
 
 def get_server_reaction_autorole(
-    guild_id: int, channel_id: int, message_id: int, reaction: str
+        guild_id: int, channel_id: int, message_id: int, reaction: str
 ) -> list[int]:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     list_of_autoroles = []
     for row in cursor.execute(
-        f"SELECT autorole_id FROM reaction_autorole WHERE guild_id = {guild_id} AND channel_id = {channel_id} AND "
-        f"message_id = {message_id} AND reaction = '{reaction}'"
+            f"SELECT autorole_id FROM reaction_autorole WHERE guild_id = {guild_id} AND channel_id = {channel_id} AND "
+            f"message_id = {message_id} AND reaction = '{reaction}'"
     ):
         list_of_autoroles.append(row[0])
     cursor.close()
@@ -101,3 +101,23 @@ def list_reaction_autoroles(guild_id: int):
     cursor.close()
     db.close()
     return rows
+
+
+def get_autorole_lvl_deletion_state(guild_id: int) -> bool:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    remove_lvl_roles = cursor.execute(
+        f"SELECT remove_lvl_roles FROM autorole_bool WHERE guild_id = {guild_id}"
+    ).fetchone()
+    cursor.close()
+    db.close()
+    return bool(remove_lvl_roles)
+
+
+def get_lesser_lvl_roles_list(guild_id: int, level: int) -> list:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    all_roles = cursor.execute(
+        f"SELECT autorole_id FROM autoroles_level WHERE level < {level} AND guild_id = {guild_id}"
+    ).fetchall()
+    return all_roles

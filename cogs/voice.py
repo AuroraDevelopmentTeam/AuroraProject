@@ -1,14 +1,17 @@
 from typing import Optional
+import sys
 
 import nextcord
 from nextcord import Interaction, SlashOption, VoiceChannel, Permissions
-from nextcord.ext import commands
+from nextcord.ext import commands, application_checks
 from nextcord.abc import GuildChannel
 
+from core.locales.getters import get_localized_name, get_localized_description, get_msg_from_locale_by_key
 from core.voice.updaters import update_voice_creation_room, update_voice_controller_msg
 from core.voice.getters import get_voice_creation_room, get_voice_controller_msg
 from core.voice.create import create_button_menu_embed, react_on_private_room_menu_button
 from core.emojify import TEAM, LOCK, UNLOCK, PEN, KICK, YES, NO, CROWN, MUTE, MICROPHONE
+from core.embeds import construct_basic_embed
 
 
 class VoiceMenuButtonsView(nextcord.ui.View):
@@ -110,7 +113,10 @@ class UserVoiceHandler(commands.Cog):
         message = get_voice_controller_msg(interaction.guild.id)
         if message == 0:
             return
-        if interaction.message.id != message:
+        try:
+            if interaction.message.id != message:
+                return
+        except AttributeError:
             return
         try:
             custom_id = interaction.data["custom_id"]
@@ -121,24 +127,58 @@ class UserVoiceHandler(commands.Cog):
 
     @nextcord.slash_command(name="voice_private_config", description="configuration of voice channels",
                             default_member_permissions=Permissions(administrator=True),
+                            name_localizations=get_localized_name(
+                                "voice_private_config"),
                             )
+    @application_checks.bot_has_guild_permissions(manage_channels=True)
     async def __voice_private_config(self, interaction: Interaction):
         pass
 
-    @__voice_private_config.subcommand(name="voice_creation_channel")
+    @__voice_private_config.subcommand(name="voice_creation_channel",
+                                       name_localizations=get_localized_name(
+                                           "voice_private_config_voice_creation_channel"),
+                                       description_localizations=get_localized_description(
+                                           "voice_private_config_voice_creation_channel"),
+                                       )
     async def __voice_creation_channel_set(self, interaction: Interaction,
                                            channel: Optional[GuildChannel] = SlashOption(required=True), ):
         if isinstance(channel, VoiceChannel):
             update_voice_creation_room(interaction.guild.id, channel.id)
-            await interaction.response.send_message('done')
+            message = get_msg_from_locale_by_key(
+                interaction.guild.id, f"voice_private_config_{interaction.application_command.name}"
+            )
+            requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+            await interaction.response.send_message(
+                embed=construct_basic_embed(
+                    f"voice_private_config_{interaction.application_command.name}",
+                    f"{message} **{channel.mention}**",
+                    f"{requested} {interaction.user}",
+                    interaction.user.display_avatar,
+                    interaction.guild.id,
+                )
+            )
         else:
             pass
 
-    @__voice_private_config.subcommand(name="menu_invoke", description="invoke button menu for voice rooms")
+    @__voice_private_config.subcommand(name="menu_invoke", description="invoke button menu for voice rooms",
+                                       name_localizations=get_localized_name(
+                                           "voice_private_config_menu_invoke"),
+                                       description_localizations=get_localized_description(
+                                           "voice_private_config_menu_invoke"),
+                                       )
     async def __voice_creation_channel_menu_invoke(self, interaction: Interaction):
         message = await interaction.send(embed=create_button_menu_embed(), view=VoiceMenuButtonsView())
         message = await message.fetch()
         update_voice_controller_msg(interaction.guild.id, message.id)
+
+    @nextcord.slash_command("kill_process", guild_ids=[1006113954331885648])
+    async def __kill(self, interaction: Interaction):
+        if interaction.user.id == 314618320093577217:
+            await interaction.response.send_message('ok')
+            for room in self.voice_rooms:
+                channel = nextcord.utils.get(self.client.get_all_channels(), id=room)
+                await channel.delete()
+            sys.exit()
 
 
 def setup(client):

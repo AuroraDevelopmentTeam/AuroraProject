@@ -3,9 +3,7 @@ import sqlite3
 
 def get_user_balance(guild_id: int, user_id: int) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
-    print(db)
     cursor = db.cursor()
-    print(cursor)
     balance = cursor.execute(
         f"SELECT balance FROM money WHERE guild_id = {guild_id} AND user_id = {user_id}"
     ).fetchone()[0]

@@ -1151,5 +1151,22 @@
     },
     "leveling_channel_2": {
       "msg": "possibility to gain exp in channel now: "
+    },
+    "autorole_remove_previous_lvl_roles": {
+      "msg": "State of automatic removal of previous autoroles for level:",
+      "name": "remove_previous_lvl_roles",
+      "description": "Turn on/off automatic removal of previous autoroles for level"
+    },
+    "voice_private_config_voice_creation_channel": {
+      "msg": "Now private voice channels will be created on enter in this voice channel:",
+      "name": "voice_creation_channel",
+      "description": "Set channel for creating private voice channels"
+    },
+    "voice_private_config_menu_invoke": {
+      "name": "menu_invoke",
+      "description": "Invokes setting menu for voice channels menu"
+    },
+    "voice_private_config": {
+      "name": "voice_private_config"
     }
 }

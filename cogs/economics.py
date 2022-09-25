@@ -599,6 +599,7 @@ class Economics(commands.Cog):
         name_localizations=get_localized_name("add-custom-shop"),
         description_localizations=get_localized_description("add-custom-shop"),
         default_member_permissions=Permissions(send_messages=True),
+        guild_ids=[1006113954331885648],
     )
     async def __add_custom_shop(
         self,
@@ -701,6 +702,7 @@ class Economics(commands.Cog):
         name_localizations=get_localized_name("custom-shop"),
         description_localizations=get_localized_description("custom-shop"),
         default_member_permissions=Permissions(send_messages=True),
+        guild_ids=[1006113954331885648],
     )
     async def __custom_shop(self, interaction: Interaction):
         # await interaction.send("Загружаем магазин...")

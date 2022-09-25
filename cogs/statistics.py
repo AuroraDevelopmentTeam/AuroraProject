@@ -37,7 +37,8 @@ from core.locales.getters import (
 from core.embeds import construct_basic_embed
 from core.levels.getters import get_user_level, get_min_max_exp, get_user_exp
 from core.levels.updaters import update_user_level, update_user_exp
-from core.auto.roles.getters import check_level_autorole, get_server_level_autorole
+from core.auto.roles.getters import check_level_autorole, get_server_level_autorole, get_autorole_lvl_deletion_state, \
+    get_lesser_lvl_roles_list
 
 
 class StatisticsCounter(commands.Cog):
@@ -118,6 +119,14 @@ class StatisticsCounter(commands.Cog):
                             )
                             role = nextcord.utils.get(member.guild.roles, id=role)
                             await member.add_roles(role)
+                            if get_autorole_lvl_deletion_state(member.guild.id) is True:
+                                roles_list = get_lesser_lvl_roles_list(member.guild.id, user_level)
+                                for rolee in roles_list:
+                                    try:
+                                        role = nextcord.utils.get(member.guild.roles, id=rolee[0])
+                                        await member.remove_roles(role)
+                                    except:
+                                        pass
                         leveling_formula = round((7 * (user_level**2)) + 58)
 
         elif before.channel is None and after.channel is not None:

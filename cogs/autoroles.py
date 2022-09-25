@@ -15,6 +15,8 @@ from core.auto.roles.getters import (
     list_level_autoroles,
     list_reaction_autoroles,
     check_reaction_autorole,
+    get_autorole_lvl_deletion_state,
+    get_lesser_lvl_roles_list,
 )
 from core.auto.roles.updaters import (
     delete_autorole_for_reaction,
@@ -24,6 +26,7 @@ from core.auto.roles.updaters import (
     delete_autorole_for_level,
     set_autoroles_state,
     update_autorole,
+    update_autorole_lvl_deletion_state,
 )
 from core.embeds import DEFAULT_BOT_COLOR, construct_basic_embed
 from core.locales.getters import (
@@ -531,6 +534,28 @@ class Autorole(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
+
+    @__autorole.subcommand(
+        name="remove_previous_lvl_roles",
+        name_localizations=get_localized_name("autorole_remove_previous_lvl_roles"),
+        description_localizations=get_localized_description("autorole_remove_previous_lvl_roles"),
+    )
+    async def __autoroles_remove_lvl_roles(self, interaction: Interaction,
+                                           remove: Optional[bool] = SlashOption(required=True)):
+        update_autorole_lvl_deletion_state(interaction.guild.id, remove)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"autorole_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"autorole_{interaction.application_command.name}",
+                f"{message} **{remove}**",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
 
 
 def setup(client):

@@ -1,7 +1,7 @@
 pillow>=8.4.0
 easy-pil>=0.1.6
 fonttools>=4.33.3
-nextcord>=2.0.0
+nextcord>=2.2.0
 nextcord-ext-menus
 python-dotenv~=0.20.0
 function-cooldowns
