@@ -1,6 +1,6 @@
 import sqlite3
 
-from core.clan.storage import boss_hp
+from core.clan.storage import boss_hp, upgrade_price_multipliers
 
 
 # Clan getters section
@@ -182,6 +182,17 @@ def get_clan_role(guild_id: int, clan_id: int) -> int:
     return clan_role
 
 
+def get_clan_channel(guild_id: int, clan_id: int) -> int:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    clan_channel = cursor.execute(
+        f"SELECT clan_voice_channel FROM clans WHERE guild_id = {guild_id} AND clan_id = {clan_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return clan_channel
+
+
 def get_owner_clan_id(guild_id: int, user_id: int) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
@@ -240,6 +251,17 @@ def get_server_clan_create_cost(guild_id: int) -> int:
     cursor.close()
     db.close()
     return create_cost
+
+
+def get_server_clan_change_color_cost(guild_id: int) -> int:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    change_color_cost = cursor.execute(
+        f"SELECT change_color_cost FROM clan_config WHERE guild_id = {guild_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return change_color_cost
 
 
 def get_server_clan_upgrade_attack_cost(guild_id: int) -> int:
@@ -329,3 +351,13 @@ def get_server_create_clan_channels(guild_id: int) -> bool:
 def get_clan_boss_hp_limit(guild_id: int, clan_id: int):
     boss_level = get_clan_guild_boss_level(guild_id, clan_id)
     return boss_hp[boss_level]
+
+
+def get_upgrade_limit_multiplier(limit: int):
+    if limit >= 65:
+        limit = 65
+    return upgrade_price_multipliers["upgrade_limit"][limit]
+
+
+def get_boss_upgrade_multiplier(boss_level: int):
+    return upgrade_price_multipliers["boss_upgrade"][boss_level]

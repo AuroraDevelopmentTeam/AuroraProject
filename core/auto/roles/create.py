@@ -38,3 +38,15 @@ def create_reaction_autorole_table() -> None:
     cursor.close()
     db.close()
     return
+
+
+def create_bool_controller() -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    cursor.execute(
+        f"""CREATE TABLE IF NOT EXISTS autorole_bool (guild_id, remove_lvl_roles BOOL)"""
+    )
+    db.commit()
+    cursor.close()
+    db.close()
+    return

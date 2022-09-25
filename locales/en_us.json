@@ -956,7 +956,7 @@
     },
     "clan_create": {
       "name": "create",
-      "description": "Create a clan with this command",
+      "description": "Create a clan",
       "msg": "Creating a clan is not cheap, if you really want to create clan be ready to pay your server currency in next amount:"
     },
     "yes": {
@@ -966,6 +966,8 @@
       "msg": "no"
     },
     "clan_invite": {
+      "name": "invite",
+      "description": "Send invite request to clan",
       "msg": "You was invited to clan:"
     },
     "clan_invite_yes": {
@@ -975,6 +977,8 @@
       "msg": "You refused the invitation in clan"
     },
     "clan_attack_boss": {
+      "name": "attack_boss",
+      "description": "Attack your clan boss",
       "msg": "You attacked clan boss with power:"
     },
     "clan_attack_boss_2": {
@@ -982,5 +986,187 @@
     },
     "fatal_damage_clan_boss": {
       "msg": "Clan boss died and dropped clan EXP and money in storage:"
+    },
+    "clan_deposit": {
+      "name": "deposit",
+      "description": "Deposit money in your clan bank",
+      "msg": "You deposited money in clan bank"
+    },
+    "clan_kick": {
+      "name": "kick",
+      "description": "Kick user from your clan",
+      "msg": "You kicked from clan"
+    },
+    "music": {
+      "name": "music",
+      "description": "Controle music player"
+    },
+    "music_play": {
+      "name": "play",
+      "description": "Search and play music in voice chat"
+    },
+    "music_stop": {
+      "name": "stop",
+      "description": "Stop music and disconnect from channal"
+    },
+    "music_skip": {
+      "name": "skip",
+      "description": "Skip current track"
+    },
+    "user_not_in_voice": {
+      "msg": "You are not in voice channal"
+    },
+    "clan": {
+      "name": "clan",
+      "description": "Prefix for clan commands"
+    },
+    "clan_leave": {
+      "name": "leave",
+      "description": "Leave your clan",
+      "msg": "You left the clan"
+    },
+    "not_in_clan_error": {
+      "msg": "Aurora denied process of command execution. Reason: **You or indicated user in parameters not in clan.**\nYour command failed to successfully complete."
+    },
+    "clan_disband": {
+      "name": "disband",
+      "description": "Disband your clan, delete clan, kick all users from clan",
+      "msg": "now disbanded, all members kicked from clan"
+    },
+    "already_in_clan_error": {
+      "msg": "Aurora denied process of command execution. Reason: **You or indicated user in parameters already in clan.**\nYour command failed to successfully complete."
+    },
+    "not_clan_owner": {
+      "msg": "Aurora can't execute this command for you. Reason: **You are not clan owner.**"
+    },
+    "clan_shop": {
+      "name": "shop",
+      "description": "Shop of upgrades for clan"
+    },
+    "clan_shop_1": {
+      "msg": "Increase clan members limit on 5 members"
+    },
+    "clan_shop_2": {
+      "msg": "Change/Set image in clan description"
+    },
+    "clan_shop_3": {
+      "msg": "Change clan icon"
+    },
+    "clan_shop_4": {
+      "msg": "Upgrade damage dealed to clan boss"
+    },
+    "clan_shop_5": {
+      "msg": "Level up clan boss"
+    },
+    "clan_shop_6": {
+      "msg": "Change clan color"
+    },
+    "in_storage": {
+      "msg": "In bank storage:"
+    },
+    "clan_shop_limit_buy": {
+      "msg": "You buyed 'Increase clan members limit on 5 members'. Now limit: "
+    },
+    "clan_shop_boss_buy": {
+      "msg": "You buyed 'Level up clan boss'. Now boss level: "
+    },
+    "you_are_clan_owner": {
+      "msg": "Aurora can't execute this command for you. Reason: **You are clan owner.**"
+    },
+    "clan_shop_attack_buy": {
+      "msg": "You buyed 'Upgrade damage dealed to clan boss'. Now attack in range: "
+    },
+    "clan_members": {
+      "name": "members",
+      "description": "Show list of members in your clan"
+    },
+    "clan_show": {
+      "name": "show",
+      "description": "Show description menu of your clan"
+    },
+    "clan_config": {
+      "name": "clan_config",
+      "description": "Prefix command of configuration commands on your server"
+    },
+    "clan_config_create_cost": {
+      "name": "clan_create_cost",
+      "description": "Set create cost of clan on your server",
+      "msg": "Now cost of clan creation on your server is:"
+    },
+    "clan_config_upgrade_attack_cost": {
+      "name": "upgrade_attack_cost",
+      "description": "Set cost of upgrading attack in clan on your server",
+      "msg": "Now cost of clan attack upgrade on your server is:"
+    },
+    "clan_config_upgrade_limit_cost": {
+      "name": "upgrade_limit_cost",
+      "description": "Set cost of upgrading clan member limit for your server",
+      "msg": "Now cost of clan upgrading clan member limit:"
+    },
+    "clan_config_change_icon_cost": {
+      "name": "change_icon_cost",
+      "description": "Set cost of changing clan icon for your server",
+      "msg": "Now cost of clan icon changing:"
+    },
+    "clan_config_change_image_cost": {
+      "name": "change_image_cost",
+      "description": "Set cost of changing clan image for your server",
+      "msg": "Now cost of clan image changing/setting:"
+    },
+    "clan_config_upgrade_boss_cost": {
+      "name": "upgrade_boss_cost",
+      "description": "Set basic cost of upgrading clan boss for your server",
+      "msg": "Now basic cost of boss level upgrade is:"
+    },
+    "clan_config_create_clan_channels": {
+      "name": "create_clan_channels",
+      "description": "Turn on/Turn off clan channels creation on your server when new guild created",
+      "msg": "Now clan channels creation on your server when new guild created:"
+    },
+    "clan_config_clan_voice_category": {
+      "name": "clan_voice_category",
+      "description": "Set category of clan voice channels",
+      "msg": "Now clan voice channels will be created in this category:"
+    },
+    "clan_config_change_color_cost": {
+      "name": "change_color_cost",
+      "description": "Set cost of changing clan main color",
+      "msg": "Now cost of changing clan main color is:"
+    },
+    "too_many_members": {
+      "msg": "Your clan have reached member limit, can't invite someone new"
+    },
+    "messages_counter_channel": {
+      "msg": "For channel",
+      "name": "message_counter_channel",
+      "description": "Turn on/Turn off message counting in channel"
+    },
+    "messages_counter_channel_2": {
+      "msg": "message counter state now is: "
+    },
+    "leveling_channel": {
+      "msg": "For channel",
+      "name": "leveling_channel",
+      "description": "Turn on/Turn off exp gain in channel"
+    },
+    "leveling_channel_2": {
+      "msg": "possibility to gain exp in channel now: "
+    },
+    "autorole_remove_previous_lvl_roles": {
+      "msg": "State of automatic removal of previous autoroles for level:",
+      "name": "remove_previous_lvl_roles",
+      "description": "Turn on/off automatic removal of previous autoroles for level"
+    },
+    "voice_private_config_voice_creation_channel": {
+      "msg": "Now private voice channels will be created on enter in this voice channel:",
+      "name": "voice_creation_channel",
+      "description": "Set channel for creating private voice channels"
+    },
+    "voice_private_config_menu_invoke": {
+      "name": "menu_invoke",
+      "description": "Invokes setting menu for voice channels menu"
+    },
+    "voice_private_config": {
+      "name": "voice_private_config"
     }
 }

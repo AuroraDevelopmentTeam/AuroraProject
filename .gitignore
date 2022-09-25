@@ -3,4 +3,6 @@ venv
 __pycache__
 .env
 databases/main.sqlite
+lib/Lavalink/logs
 *.sqlite
+vk_config.v2.json

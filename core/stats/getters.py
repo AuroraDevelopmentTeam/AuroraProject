@@ -32,3 +32,18 @@ def get_user_join_time(guild_id: int, user_id: int) -> str:
     cursor.close()
     db.close()
     return join_time
+
+
+def get_channel_stats_state(guild_id: int, channel_id: int) -> bool:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    state = cursor.execute(
+        f"SELECT enabled FROM stats_channels_config WHERE guild_id = {guild_id} AND channel_id = {channel_id}"
+    ).fetchone()
+    cursor.close()
+    db.close()
+    if state is None:
+        return True
+    else:
+        state = state[0]
+        return bool(state)

@@ -17,7 +17,7 @@ from core.money.writers import (
     write_in_money_config_standart_values,
     write_in_chat_money_standart_values,
 )
-from core.levels.create import create_level_table, create_level_config_table
+from core.levels.create import create_level_table, create_level_config_table, create_level_channels_config_table
 from core.levels.writers import (
     write_in_levels_standart_values,
     write_in_levels_config_standart_values,
@@ -26,7 +26,7 @@ from core.welcomers.create import create_welcomers_config
 from core.welcomers.writers import write_in_welcomers_config_standart_values
 from core.warns.create import create_warns_table
 from core.auto.roles.create import create_autoroles_table
-from core.auto.roles.writers import write_in_autoroles_standart_values
+from core.auto.roles.writers import write_in_autoroles_standart_values, write_in_autoroles_bool_standart_values
 from core.marriage.create import create_marriage_table, create_gifts_table
 from core.marriage.writers import (
     write_in_marriage_standart_values,
@@ -41,7 +41,7 @@ from core.honor.create import create_honor_table
 from core.honor.writers import write_in_honor_standart_values
 from core.profiles.create import create_profiles_table
 from core.profiles.writers import write_in_profiles_standart_values
-from core.stats.create import create_stats_table
+from core.stats.create import create_stats_table, create_stats_channels_config_table
 from core.stats.writers import write_in_stats_standart_values
 from core.badges.create import create_badges_table
 from core.badges.writers import write_in_badges_standart_values
@@ -52,6 +52,7 @@ from core.tickets.writers import write_in_tickets_config_standart_values
 from core.auto.roles.create import (
     create_reaction_autorole_table,
     create_level_autorole_table,
+    create_bool_controller
 )
 from core.auto.mod.create import create_mod_word_table, create_mod_config_table
 from core.auto.mod.writers import write_in_mod_config_standart_values
@@ -64,6 +65,8 @@ from core.clan.writers import (
     write_in_clan_members_standart_values,
     write_in_clan_config_standart_values,
 )
+from core.voice.create import create_voice_private_config_table
+from core.voice.writers import write_in_voice_private_config_standart_values
 
 
 class OnReadyListener(commands.Cog):
@@ -124,6 +127,12 @@ class OnReadyListener(commands.Cog):
         create_clan_config_table()
         write_in_clan_config_standart_values(guilds)
         write_in_clan_members_standart_values(guilds)
+        create_voice_private_config_table()
+        write_in_voice_private_config_standart_values(guilds)
+        create_stats_channels_config_table()
+        create_level_channels_config_table()
+        create_bool_controller()
+        write_in_autoroles_bool_standart_values(guilds)
         print(len(self.client.guilds))
         for guild in self.client.guilds:
             print(f"{guild.name} - {(len(guild.members))}")

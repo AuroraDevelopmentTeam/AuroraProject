@@ -61,9 +61,15 @@ class Information(commands.Cog):
             locale.setlocale(locale.LC_ALL, "ru_RU.UTF-8")
         else:
             locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
+        if guild.icon is None:  # Фикс команды при отсутствии у сервера иконки
+            embedicon = "https://ui-avatars.com/api/?name=" + f"{guild.name}".replace(
+                " ", "+"
+            )
+        else:
+            embedicon = guild.icon
         embed = construct_long_embed(
             f"{guild.name}:",
-            guild.icon,
+            embedicon,  # Тут был guild.icon
             f"{requested} {interaction.user}",
             interaction.user.display_avatar,
             names_of_embed_fields,

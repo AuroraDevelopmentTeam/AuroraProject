@@ -55,6 +55,9 @@ class ErrorHandler(commands.Cog):
             msg = get_msg_from_locale_by_key(interaction.guild.id, "TimeoutError")
             embed = nextcord.Embed(description=f"{msg}", color=DEFAULT_BOT_COLOR)
             return await interaction.send(embed=embed)
+        elif isinstance(error, nextcord.HTTPException):
+            print(error.response.headers)
+            print(error.response.raw_headers)
         else:
             raise error
 

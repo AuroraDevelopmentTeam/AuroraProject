@@ -19,7 +19,7 @@ ACHIEVMENTS_DESCRIPTION = {
     "badge_1": "Уникальный значок Разработчика бота Аврора",
     "badge_2": "Уникальный значок участника команды бота Аврора",
     "badge_3": "Ну точно человек на сервере не первый день! Проведите в голосовых каналах сервера 100 часов, "
-               "напишите 1000 сообщений и достигните 10 уровня.",
+    "напишите 1000 сообщений и достигните 10 уровня.",
     "badge_4": "Накопите свой первый миллион валюты!",
     "badge_5": "Достигните 5-го уровня чести у бота Аврора!",
     "badge_6": "Уникальный значок пользователей-тестировщиков Авроры",
@@ -28,10 +28,10 @@ ACHIEVMENTS_DESCRIPTION = {
     "badge_9": "Будьте с кем-нибудь парочкой!",
 }
 
-OUR_TEAM = [int(i) for i in os.getenv("team").split(' ')]
+OUR_TEAM = [int(i) for i in os.getenv("team").split(" ")]
 
-DEVELOPERS = [int(i) for i in os.getenv("developers").split(' ')]
+DEVELOPERS = [int(i) for i in os.getenv("developers").split(" ")]
 
-TESTERS = [int(i) for i in os.getenv("testers").split(' ')]
+TESTERS = [int(i) for i in os.getenv("testers").split(" ")]
 
-BUG_HUNTERS = [int(i) for i in os.getenv("bug_hunters").split(' ')]
+BUG_HUNTERS = [int(i) for i in os.getenv("bug_hunters").split(" ")]

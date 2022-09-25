@@ -57,6 +57,19 @@ class ShopLeave(Button):
         await interaction.delete_original_message()
 
 
+def get_custom_shop_roles_limit(
+    guild_id: int,
+) -> bool:  # TODO сделать чтобы создатель сервера мог регулировать лимит
+    db = sqlite3.connect("./database/main.sqlite")
+    cursor = db.cursor()
+    roles = cursor.execute(
+        "SELECT * FROM custom_shop WHERE guild_id = ?", (guild_id,)
+    ).fetchall()
+    if len(roles) >= 50:  # в будущем можно будет увеличить
+        return True
+    return False
+
+
 async def custom_shop_embed(
     inter: Interaction, pagen: int = 1, order: str = "notnew"
 ) -> Coroutine[Any, Any, tuple[nextcord.Embed, View]]:
@@ -85,7 +98,8 @@ async def custom_shop_embed(
         highcost = True
     elif order == "lowcost":
         roles = cursor.execute(
-            f"SELECT * FROM custom_shop WHERE guild_id = {inter.guild.id} ORDER BY cost ASC").fetchall()
+            f"SELECT * FROM custom_shop WHERE guild_id = {inter.guild.id} ORDER BY cost ASC"
+        ).fetchall()
         lowcost = True
     cursor.close()
     db.close()

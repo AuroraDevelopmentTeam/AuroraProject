@@ -3,6 +3,9 @@ import nextcord
 from nextcord.ext import commands
 from dotenv import load_dotenv
 from config import settings
+import logging
+
+logging.basicConfig(level=logging.WARNING)
 
 load_dotenv()
 

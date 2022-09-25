@@ -9,7 +9,6 @@ def parse_timeouts(guild_members) -> list:
     timeouts = []
     for member in guild_members:
         if member.timeout is not None:
-            print(member.timeout)
             try:
                 if member.timeout > nextcord.utils.utcnow():
                     estimated_time = member.timeout - nextcord.utils.utcnow()

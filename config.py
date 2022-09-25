@@ -22,4 +22,7 @@ settings = {
     "default_profile_avatar_form": "circle",
     "default_logs_enabled": True,
     "default_custom_shop_create_role": 2000,
+    "lava_host": "127.0.0.1",
+    "lava_port": 2333,
+    "lava_password": "secretpassword",
 }

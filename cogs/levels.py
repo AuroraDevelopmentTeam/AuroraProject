@@ -4,7 +4,9 @@ from easy_pil import *
 from PIL import Image
 from io import BytesIO
 
+import cooldowns
 import nextcord
+from nextcord.abc import GuildChannel
 from nextcord.ext import commands, application_checks
 from nextcord import Interaction, SlashOption, Permissions
 
@@ -18,6 +20,7 @@ from core.levels.getters import (
     get_user_level,
     get_min_max_exp,
     get_guild_messages_state,
+    get_channel_level_state
 )
 from core.levels.updaters import (
     update_user_exp,
@@ -25,12 +28,14 @@ from core.levels.updaters import (
     set_user_exp_to_zero,
     set_user_level,
 )
+from core.auto.roles.getters import get_lesser_lvl_roles_list
+from core.levels.writers import write_channel_in_config
 from core.embeds import construct_basic_embed
 from core.errors import (
     construct_error_negative_value_embed,
     construct_error_bot_user_embed,
 )
-from core.auto.roles.getters import check_level_autorole, get_server_level_autorole
+from core.auto.roles.getters import check_level_autorole, get_server_level_autorole, get_autorole_lvl_deletion_state
 
 
 class Levels(commands.Cog):
@@ -40,7 +45,7 @@ class Levels(commands.Cog):
     def level_up(self, guild_id, user_id):
         user_exp = get_user_exp(guild_id, user_id)
         user_level = get_user_level(guild_id, user_id)
-        leveling_formula = round((7 * (user_level**2)) + 58)
+        leveling_formula = round((7 * (user_level ** 2)) + 58)
         if user_exp >= leveling_formula:
             return True
         else:
@@ -50,21 +55,31 @@ class Levels(commands.Cog):
     async def on_message(self, message):
         if message.author.bot:
             return
+        if get_channel_level_state(message.guild.id, message.channel.id) is False:
+            return
         elif self.level_up(message.guild.id, message.author.id):
             update_user_level(message.guild.id, message.author.id, 1)
             set_user_exp_to_zero(message.guild.id, message.author.id)
             user_level = get_user_level(message.guild.id, message.author.id)
             if check_level_autorole(message.guild.id, user_level) is True:
                 role = get_server_level_autorole(message.guild.id, user_level)
-                role = nextcord.utils.get(channel.guild.roles, id=role)
+                role = nextcord.utils.get(message.guild.roles, id=role)
                 await message.author.add_roles(role)
+                if get_autorole_lvl_deletion_state(message.guild.id) is True:
+                    roles_list = get_lesser_lvl_roles_list(message.guild.id, user_level)
+                    for rolee in roles_list:
+                        try:
+                            role = nextcord.utils.get(channel.guild.roles, id=rolee[0])
+                            await message.author.remove_roles(role)
+                        except:
+                            pass
             if get_guild_messages_state(message.guild.id) is True:
                 user_level = get_user_level(message.guild.id, message.author.id)
                 msg = get_msg_from_locale_by_key(message.guild.id, "level_up")
                 embed = construct_basic_embed(
                     f"{message.author}",
                     f"{msg}",
-                    f"{user_level}:" f"0/{round((7 * (user_level**2)) + 58)}",
+                    f"{user_level}:" f"0/{round((7 * (user_level ** 2)) + 58)}",
                     message.author.display_avatar,
                     message.guild.id,
                 )
@@ -82,10 +97,11 @@ class Levels(commands.Cog):
         description_localizations=get_localized_description("level"),
         default_member_permissions=Permissions(send_messages=True),
     )
+    @cooldowns.cooldown(1, 5, bucket=cooldowns.SlashBucket.author)
     async def __level(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(required=False),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(required=False),
     ):
         if user is None:
             user = interaction.user
@@ -99,7 +115,7 @@ class Levels(commands.Cog):
         await interaction.response.defer()
         user_exp = get_user_exp(interaction.guild.id, user.id)
         user_level = get_user_level(interaction.guild.id, user.id)
-        exp_to_next_level = round((7 * (user_level**2)) + 58)
+        exp_to_next_level = round((7 * (user_level ** 2)) + 58)
         percentage = int(((user_exp * 100) / exp_to_next_level))
         background = Editor(Canvas((900, 300), color="#141414"))
         avatar = BytesIO()
@@ -153,22 +169,22 @@ class Levels(commands.Cog):
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __add_exp(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
-        exp_points: Optional[int] = SlashOption(
-            required=True,
-            description="Number of experience points to add",
-            description_localizations={
-                "ru": "Количество очков опыта, которые необходимо добавить"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
+            exp_points: Optional[int] = SlashOption(
+                required=True,
+                description="Number of experience points to add",
+                description_localizations={
+                    "ru": "Количество очков опыта, которые необходимо добавить"
+                },
+            ),
     ):
         if user.bot:
             return await interaction.response.send_message(
@@ -192,7 +208,7 @@ class Levels(commands.Cog):
         user_level = get_user_level(interaction.guild.id, user.id)
         user_exp = get_user_exp(interaction.guild.id, user.id)
         if user_exp > 0:
-            leveling_formula = round((7 * (user_level**2)) + 58)
+            leveling_formula = round((7 * (user_level ** 2)) + 58)
             while self.level_up(interaction.guild.id, interaction.user.id):
                 update_user_exp(
                     interaction.guild.id,
@@ -206,7 +222,15 @@ class Levels(commands.Cog):
                     role = get_server_level_autorole(interaction.guild.id, user_level)
                     role = nextcord.utils.get(interaction.guild.roles, id=role)
                     await user.add_roles(role)
-                leveling_formula = round((7 * (user_level**2)) + 58)
+                    if get_autorole_lvl_deletion_state(interaction.guild.id) is True:
+                        roles_list = get_lesser_lvl_roles_list(interaction.guild.id, user_level)
+                        for rolee in roles_list:
+                            try:
+                                role = nextcord.utils.get(interaction.guild.roles, id=rolee[0])
+                                await user.remove_roles(role)
+                            except:
+                                pass
+                leveling_formula = round((7 * (user_level ** 2)) + 58)
         msg = get_msg_from_locale_by_key(
             interaction.guild.id, interaction.application_command.name
         )
@@ -233,22 +257,22 @@ class Levels(commands.Cog):
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __remove_exp(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
-        exp_points: Optional[int] = SlashOption(
-            required=True,
-            description="Number of experience points to add",
-            description_localizations={
-                "ru": "Количество очков опыта, которые необходимо добавить"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
+            exp_points: Optional[int] = SlashOption(
+                required=True,
+                description="Number of experience points to add",
+                description_localizations={
+                    "ru": "Количество очков опыта, которые необходимо добавить"
+                },
+            ),
     ):
         if user.bot:
             return await interaction.response.send_message(
@@ -295,15 +319,15 @@ class Levels(commands.Cog):
     )
     @application_checks.has_permissions(manage_guild=True)
     async def __reset_level(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
     ):
         if user.bot:
             return await interaction.response.send_message(
@@ -322,6 +346,35 @@ class Levels(commands.Cog):
             embed=construct_basic_embed(
                 interaction.application_command.name,
                 f"{msg} {user.mention}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @nextcord.slash_command(name="leveling_channel",
+                            name_localizations=get_localized_name("leveling_channel"),
+                            description_localizations=get_localized_description("leveling_channel"),
+                            )
+    async def __leveling_channel(self, interaction: Interaction,
+                                 channel: Optional[GuildChannel] = SlashOption(required=True),
+                                 enabled: Optional[bool] = SlashOption(required=True)):
+        write_channel_in_config(interaction.guild.id, channel.id, enabled)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"{interaction.application_command.name}"
+        )
+        message_2 = get_msg_from_locale_by_key(
+            interaction.guild.id, f"{interaction.application_command.name}_2"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        if enabled is True:
+            enabled = get_msg_from_locale_by_key(interaction.guild.id, "enabled")
+        else:
+            enabled = get_msg_from_locale_by_key(interaction.guild.id, "disabled")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} {channel.mention} {message_2} **{enabled}**",
                 f"{requested} {interaction.user}",
                 interaction.user.display_avatar,
                 interaction.guild.id,

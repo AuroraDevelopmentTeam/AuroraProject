@@ -146,16 +146,17 @@ class UserProfiles(commands.Cog):
         interaction: Interaction,
         user: Optional[nextcord.Member] = SlashOption(required=False),
     ):
-        await interaction.response.defer()
+
         if user is None:
             user = interaction.user
         if user.bot:
-            return await interaction.followup.send(
+            return await interaction.response.send_message(
                 embed=construct_error_bot_user_embed(
                     get_msg_from_locale_by_key(interaction.guild.id, "bot_user_error"),
                     self.client.user.avatar.url,
                 )
             )
+        await interaction.response.defer()
         check_badges(interaction.guild.id, user)
         background = Editor(f"./assets/without_badges.png")
         avatar = BytesIO()
