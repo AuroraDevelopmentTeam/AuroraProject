@@ -12,6 +12,7 @@ from core.voice.getters import get_voice_creation_room, get_voice_controller_msg
 from core.voice.create import create_button_menu_embed, react_on_private_room_menu_button
 from core.emojify import TEAM, LOCK, UNLOCK, PEN, KICK, YES, NO, CROWN, MUTE, MICROPHONE
 from core.embeds import construct_basic_embed
+from core.errors import construct_error_negative_value_embed
 
 
 class VoiceMenuButtonsView(nextcord.ui.View):
@@ -158,8 +159,15 @@ class UserVoiceHandler(commands.Cog):
                 )
             )
         else:
-            pass
-
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    channel,
+                )
+            )
     @__voice_private_config.subcommand(name="menu_invoke", description="invoke button menu for voice rooms",
                                        name_localizations=get_localized_name(
                                            "voice_private_config_menu_invoke"),
