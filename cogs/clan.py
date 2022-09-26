@@ -1662,7 +1662,7 @@ class ClanHandler(commands.Cog):
         name_localizations=get_localized_name("clan_config_upgrade_boss_cost"),
         description_localizations=get_localized_description("clan_config_upgrade_boss_cost"),
     )
-    async def __clan_config_upgrade_limit_cost(
+    async def __clan_config_upgrade_boss_cost(
             self, interaction: Interaction,
             money: Optional[int] = SlashOption(required=True)
     ):
