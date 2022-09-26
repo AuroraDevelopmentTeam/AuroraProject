@@ -104,6 +104,16 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 description="Help menu 'Autoroles' section",
                 emoji="😊",
             ),
+            nextcord.SelectOption(
+                label="Clans",
+                description="Help menu 'Clans' section",
+                emoji="🏰",
+            ),
+            nextcord.SelectOption(
+                label="Voice Channels",
+                description="Help menu 'Voice Channels' section",
+                emoji="🎙️",
+            ),
         ]
         super().__init__(
             placeholder="Choose section commands you want to view",
@@ -372,6 +382,50 @@ class HelpSelectMenuENG(nextcord.ui.Select):
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1011291356267810907/2.gif"
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        elif self.values[0] == "Clans":
+            embed = nextcord.Embed(
+                color=DEFAULT_BOT_COLOR,
+                title="🏰 Clans",
+                description="`/clan create` — Меню создания клана \n"
+                "`/clan show` — Показать профиль вашего клана\n"
+                "`/clan shop` — Магазин клана\n"
+                "`/clan deposit` — Положить деньги в банк клана\n"
+                "`/clan leave` — Покинуть клан\n"
+                "`/clan kick` — Выгнать участника из клана\n"
+                "`/clan members` — Список участников клана\n"
+                "`/clan disband` — Расформировать клан\n"
+                "`/clan invite` — Пригласить пользователя в клан\n"
+                "`/clan attack_boss` — Атаковать кланового босса\n"
+                "`/clan_config create_cost` — Установить цену создания клана на сервере\n"
+                "`/clan_config upgrade_attack_cost` — Установить цену повышения атаки по боссу участников клана на "
+                            "сервере\n "
+                "`/clan_config upgrade_limit_cost` — Установить базовую цену повышения лимита участников клана на "
+                            "сервере\n "
+                "`/clan_config change_icon_cost` — Установить цену смены иконки клана на сервере\n"
+                "`/clan_config change_image_cost` — Установить цену установки/смены баннера-изображения клана\n"
+                "`/clan_config upgrade_boss_cost` — Установить базовую цену повышения уровня кланового босса\n"
+                "`/clan_config change_color_cost` — Установить базовую цену смены цвета клана\n"
+                "`/clan_config create_clan_channels` — Включить/Выключить создание клановых голосовых комнат\n"
+                "`/clan_config clan_voice_category` — Установить категорию в которой будут создаваться клановые "
+                            "голосовые комнаты\n "
+            )
+            embed.set_image(
+                url="https://cdn.discordapp.com/attachments/1019251405103575050/1023085370394558535/4.gif"
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        elif self.values[0] == 'Voice Channels':
+            embed = nextcord.Embed(
+                color=DEFAULT_BOT_COLOR,
+                title="🎙️ Voice Channels",
+                description="`/voice_private_config voice_creation_channel` — Установить голосовой канал при заходе в "
+                            "который в той же категории будут создаваться приватные голосовые каналы\n "
+                "`/voice_private_config menu_invoke` — Вызвать бесконечное кнопочное меню для управления голосовыми "
+                            "каналами и их настройки\n "
+            )
+            embed.set_image(
+                url="https://cdn.discordapp.com/attachments/1019251405103575050/1023214654564094062/98999738.jpg"
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
 
