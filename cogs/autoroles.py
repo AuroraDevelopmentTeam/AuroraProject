@@ -17,7 +17,7 @@ from core.auto.roles.getters import (
     check_reaction_autorole,
     get_autorole_lvl_deletion_state,
     get_lesser_lvl_roles_list,
-    get_marriage_autorole,
+    get_server_marriage_autorole,
 )
 from core.auto.roles.updaters import (
     delete_autorole_for_reaction,

@@ -123,7 +123,7 @@ def get_lesser_lvl_roles_list(guild_id: int, level: int) -> list:
     return all_roles
 
 
-def get_marriage_autorole(guild_id: int) -> int:
+def get_server_marriage_autorole(guild_id: int) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     marriage_autorole = cursor.execute(

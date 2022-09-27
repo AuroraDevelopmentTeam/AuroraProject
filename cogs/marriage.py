@@ -47,6 +47,7 @@ from core.locales.getters import (
     get_guild_locale,
     localize_name,
 )
+from core.auto.roles.getters import get_server_marriage_autorole
 from core.parsers import parse_likes, parse_user_gifts
 from core.embeds import DEFAULT_BOT_COLOR
 from core.errors import (
@@ -182,6 +183,14 @@ class Marriage(commands.Cog):
             date = timestamp.strftime(date_format)
             marry_users(interaction.guild.id, author.id, pair.id, date)
             update_user_balance(interaction.guild.id, author.id, -10000)
+            marriage_autorole = get_server_marriage_autorole(interaction.guild.id)
+            if marriage_autorole != 0:
+                try:
+                    role = nextcord.utils.get(interaction.guild.roles, id=marriage_autorole)
+                    await author.add_roles(role)
+                    await pair.add_roles(role)
+                except:
+                    pass
             yes_button = create_button(
                 get_msg_from_locale_by_key(interaction.guild.id, "yes"), False, True
             )
@@ -273,6 +282,14 @@ class Marriage(commands.Cog):
             )
         pair_id = get_user_pair_id(interaction.guild.id, interaction.user.id)
         pair = await self.client.fetch_user(pair_id)
+        marriage_autorole = get_server_marriage_autorole(interaction.guild.id)
+        if marriage_autorole != 0:
+            try:
+                role = nextcord.utils.get(interaction.guild.roles, id=marriage_autorole)
+                await interaction.user.remove_roles(role)
+                await pair.remove_roles(role)
+            except:
+                pass
         if pair is None:
             pair = get_msg_from_locale_by_key(interaction.guild.id, "unknown_user")
         else:
