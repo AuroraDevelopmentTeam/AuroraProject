@@ -48,6 +48,17 @@ def update_autorole_for_level(guild_id: int, role: nextcord.Role, level: int) ->
     db.close()
 
 
+def update_autorole_on_marriage(guild_id: int, role: nextcord.Role) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE autoroles_marriage SET autorole_id = ? WHERE guild_id = ?"
+    val = (role.id, guild_id)
+    cursor.execute(sql, val)
+    db.commit()
+    cursor.close()
+    db.close()
+
+
 def delete_autorole_for_level(guild_id: int, level: int) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()

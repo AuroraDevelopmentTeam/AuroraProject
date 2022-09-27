@@ -1168,5 +1168,10 @@
     },
     "voice_private_config": {
       "name": "voice_private_config"
+    },
+    "autorole_on_marriage": {
+      "msg": "Now this role will be given on marriage:",
+      "name": "on_marriage",
+      "description": "Set autorole on marriage, which will be given to couple members on marriage and removed on divorce"
     }
 }

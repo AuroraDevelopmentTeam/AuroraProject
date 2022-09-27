@@ -121,3 +121,14 @@ def get_lesser_lvl_roles_list(guild_id: int, level: int) -> list:
         f"SELECT autorole_id FROM autoroles_level WHERE level < {level} AND guild_id = {guild_id}"
     ).fetchall()
     return all_roles
+
+
+def get_marriage_autorole(guild_id: int) -> int:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    marriage_autorole = cursor.execute(
+        f"SELECT autorole_id FROM autoroles_marriage WHERE guild_id = {guild_id}"
+    ).fetchone()
+    cursor.close()
+    db.close()
+    return marriage_autorole

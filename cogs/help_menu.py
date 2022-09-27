@@ -359,7 +359,8 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 "`/autorole display_for_level` — Show all autoroles for level\n"
                 "`/autorole add_on_reaction` — Add autorole for reaction on message\n"
                 "`/autorole remove_on_reaction` — Remove autorole for reaction on message\n"
-                "`/autorole display_on_reaction` — Show all autoroles for reaction on message",
+                "`/autorole display_on_reaction` — Show all autoroles for reaction on message"
+                "`/autorole remove_previous_lvl_roles` — Включить автоматическое снятие прошлых ролей за уровень",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006610055589793862/Genshin-Impact-Ero"
@@ -772,7 +773,8 @@ class HelpSelectMenuRU(nextcord.ui.Select):
                 "`/autorole display_for_level` — Показать все автороли за уровень\n"
                 "`/autorole add_on_reaction` — Добавить автороль за реакцию на сообщение\n"
                 "`/autorole remove_on_reaction` — Убрать автороль за реакцию на сообщение\n"
-                "`/autorole display_on_reaction` — Показать все автороли за реакции на сообщение",
+                "`/autorole display_on_reaction` — Показать все автороли за реакции на сообщение"
+                "`/autorole remove_previous_lvl_roles` — Включить автоматическое снятие прошлых ролей за уровень",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006610055589793862/Genshin-Impact-Ero"
