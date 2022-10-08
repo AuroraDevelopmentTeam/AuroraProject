@@ -69,10 +69,10 @@ class Levels(commands.Cog):
                     roles_list = get_lesser_lvl_roles_list(message.guild.id, user_level)
                     for rolee in roles_list:
                         try:
-                            role = nextcord.utils.get(channel.guild.roles, id=rolee[0])
+                            role = nextcord.utils.get(message.author.guild.roles, id=rolee[0])
                             await message.author.remove_roles(role)
-                        except:
-                            pass
+                        except Exception as error:
+                            print(error)
             if get_guild_messages_state(message.guild.id) is True:
                 user_level = get_user_level(message.guild.id, message.author.id)
                 msg = get_msg_from_locale_by_key(message.guild.id, "level_up")
