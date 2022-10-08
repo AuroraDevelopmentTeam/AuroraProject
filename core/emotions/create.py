@@ -70,3 +70,15 @@ def create_emotion_embed(
     embed.set_image(url=random.choice(gifs))
     embed.set_footer(text=moji, icon_url=author.display_avatar)
     return embed
+
+
+def create_emotions_cost_table() -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    cursor.execute(
+        """CREATE TABLE IF NOT EXISTS emotions_cost (guild_id INTEGER, emotions_for_money_state BOOL, cost INTEGER) """
+    )
+    db.commit()
+    cursor.close()
+    db.close()
+    return

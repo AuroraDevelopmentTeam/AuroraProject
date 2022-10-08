@@ -24,7 +24,20 @@ def create_marriage_table() -> None:
     cursor.execute(
         f"""CREATE TABLE IF NOT EXISTS marriage (
         guild_id INTEGER, user_id INTEGER, pair_id INTEGER, like_id INTEGER, 
-        divorces INTEGER, love_description TEXT, date TEXT, family_money INTEGER)"""
+        divorces INTEGER, love_description TEXT, date TEXT, family_money INTEGER, loveroom_expire INTEGER)"""
+    )
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def create_marriage_config_table() -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    cursor.execute(
+        f"""CREATE TABLE IF NOT EXISTS marriage_config (
+        guild_id INTEGER, enable_loverooms BOOL, marriage_price INTEGER, month_loveroom_price INTEGER)"""
     )
     db.commit()
     cursor.close()
@@ -48,7 +61,7 @@ def create_gifts_table() -> None:
 
 
 def create_marry_embed(
-    name: str, guild_id: int, author: nextcord.Member, pair: nextcord.Member
+        name: str, guild_id: int, author: nextcord.Member, pair: nextcord.Member
 ) -> nextcord.Embed:
     embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
     marry = get_msg_from_locale_by_key(guild_id, name)
@@ -62,7 +75,7 @@ def create_marry_embed(
 
 
 def create_marry_yes_embed(
-    guild_id: int, author: nextcord.Member, pair: nextcord.Member
+        guild_id: int, author: nextcord.Member, pair: nextcord.Member
 ) -> nextcord.Embed:
     embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
     marry = get_msg_from_locale_by_key(guild_id, f"marry_yes")
@@ -76,7 +89,7 @@ def create_marry_yes_embed(
 
 
 def create_marry_no_embed(
-    guild_id: int, author: nextcord.Member, pair: nextcord.Member
+        guild_id: int, author: nextcord.Member, pair: nextcord.Member
 ) -> nextcord.Embed:
     embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
     marry = get_msg_from_locale_by_key(guild_id, f"marry_no")
@@ -104,7 +117,7 @@ def create_love_card(avatar_1, avatar_2) -> nextcord.File:
 
 
 def create_love_profile_embed(
-    name: str, guild_id: int, user: nextcord.Member, pair: nextcord.Member
+        name: str, guild_id: int, user: nextcord.Member, pair: nextcord.Member
 ) -> nextcord.Embed:
     embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
     love_description = get_user_love_description(guild_id, user.id)
