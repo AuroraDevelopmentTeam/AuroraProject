@@ -509,7 +509,7 @@
       "msg": "Now you like this user:"
     },
     "unlike": {
-      "name": "like",
+      "name": "unlike",
       "description": "Change person that you like to noone",
       "msg": "Now there are no any person you like"
     },

@@ -209,7 +209,7 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 "`/remove_exp` — Take experience\n`/reset_level` — Reset level and experience\n"
                 "`/set level` — Set level to user\n`/set min_max_exp` — Set minimal and maximal "
                 "experience gain\n "
-                "`/set level_up_messages` — Turn on/off messages about level up"
+                "`/set level_up_messages` — Turn on/off messages about level up\n"
                 "`/leveling_channel` — Enable / disable the experience gain and the ability to level up in the channel",
             )
             embed.set_image(
@@ -224,7 +224,8 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 "`/lovedescription` — Set new description to couple profile\n`/lovedeposit` — Put money "
                 "in family bank\n "
                 "`/divorce` — Divorce\n`/waifu` — Waifu profile\n"
-                "`/like` — Set user you like",
+                "`/like` — Set user you like\n`/unlike` — Set like parameter to noone"
+                "\n`/gifts` — Gift for waifu marketplace\n`/gift` — Gift something to someone",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006598206966202368/Aduare-Pixel-Gif"
@@ -241,7 +242,7 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 "Change welcome embed message\n"
                 "`/set goodbye_channel` — Set goodbye messages channel\n`/set goodbye_message_type` — "
                 "Set goodbye messages type\n"
-                "/set goodbye_message_state — Turn on/off goodbye messages\n/set goodbye_embed — "
+                "`/set goodbye_message_state` — Turn on/off goodbye messages\n`/set goodbye_embed` — "
                 "Change goodbye embed message",
             )
             embed.set_image(
@@ -639,7 +640,8 @@ class HelpSelectMenuRU(nextcord.ui.Select):
                 "`/lovedescription` — Описание профиля пары\n`/lovedeposit` — Положить деньги на семейный "
                 "счёт\n "
                 "`/divorce` — Развод\n`/waifu` — Профиль вайфу\n"
-                "`/like` — Указать пользователя который нравится",
+                "`/like` — Указать пользователя который нравится\n`/unlike` — Больше никто не нравится"
+                "\n`/gifts` — Магазин подарков\n`/gift` — Подарить подарок",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006598206966202368/Aduare-Pixel-Gif"
