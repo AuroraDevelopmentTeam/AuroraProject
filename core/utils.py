@@ -89,10 +89,10 @@ def write_member_in_honor(member: nextcord.Member) -> None:
     cursor = db.cursor()
     if not member.bot:
         if (
-            cursor.execute(
-                f"SELECT user_id FROM honor WHERE user_id = {member.id}"
-            ).fetchone()
-            is None
+                cursor.execute(
+                    f"SELECT user_id FROM honor WHERE user_id = {member.id}"
+                ).fetchone()
+                is None
         ):
             sql = (
                 "INSERT INTO honor(user_id, honor_level, honor_points) VALUES (?, ?, ?)"
@@ -110,10 +110,10 @@ def write_member_in_profiles(guild: nextcord.Guild, member: nextcord.Member) -> 
     description = get_msg_from_locale_by_key(guild.id, "default_profile_description")
     if not member.bot:
         if (
-            cursor.execute(
-                f"SELECT user_id FROM profiles WHERE user_id = {member.id}"
-            ).fetchone()
-            is None
+                cursor.execute(
+                    f"SELECT user_id FROM profiles WHERE user_id = {member.id}"
+                ).fetchone()
+                is None
         ):
             sql = "INSERT INTO profiles(user_id, description, avatar_form) VALUES (?, ?, ?)"
             val = (
@@ -171,6 +171,20 @@ def write_member_in_badges(guild: nextcord.Guild, member: nextcord.Member) -> No
     return
 
 
+def write_member_in_clan(guild: nextcord.Guild, member: nextcord.Member) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    if not member.bot:
+        if is_user_in_table("clan_members", guild.id, member.id) is False:
+            sql = "INSERT INTO clan_members(guild_id, user_id, clan_id, join_date) VALUES (?, ?, ?, ?)"
+            val = (guild.id, member.id, 0, "0")
+            cursor.execute(sql, val)
+            db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
 class PlatformType:
     def __init__(self):
         pass
@@ -199,14 +213,14 @@ def parse_status_to_int(status: nextcord.Status) -> int:
 
 
 def calculate_platform_type(
-    user: typing.Union[nextcord.User, nextcord.Member]
+        user: typing.Union[nextcord.User, nextcord.Member]
 ) -> Type[PlatformType]:
     desktop_status = parse_status_to_int(user.desktop_status)
     browser_status = parse_status_to_int(user.web_status)
     mobile_status = parse_status_to_int(user.mobile_status)
     if (
-        mobile_status >= desktop_status
-        or mobile_status >= browser_status + desktop_status
+            mobile_status >= desktop_status
+            or mobile_status >= browser_status + desktop_status
     ):
         return MobilePlatform
     else:
