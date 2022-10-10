@@ -40,6 +40,7 @@ from core.loggers.create import create_loggers_table
 from core.loggers.writers import write_in_loggers_standart_values
 from core.tickets.create import create_tickets_config_table
 from core.tickets.writers import write_in_tickets_config_standart_values
+from core.clan.writers import write_in_clan_members_standart_values
 from core.utils import (
     write_member_in_gifts,
     write_member_in_badges,
@@ -49,6 +50,7 @@ from core.utils import (
     write_member_in_stats,
     write_member_in_honor,
     write_member_in_money,
+    write_member_in_clan,
 )
 
 
@@ -68,6 +70,7 @@ class OnMemberListener(commands.Cog):
         write_member_in_profiles(guild, member)
         write_member_in_stats(guild, member)
         write_member_in_badges(guild, member)
+        write_member_in_clan(guild, member)
 
 
 def setup(client):
