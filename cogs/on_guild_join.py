@@ -51,6 +51,7 @@ from core.auto.roles.create import create_reaction_autorole_table
 from core.auto.mod.writers import write_in_mod_config_standart_values
 from core.voice.writers import write_in_voice_private_config_standart_values
 from core.clan.writers import write_in_clan_members_standart_values, write_in_clan_config_standart_values
+from core.emotions.writers import write_in_emotions_cost_standart_values
 
 
 class OnGuildListener(commands.Cog):
@@ -84,6 +85,7 @@ class OnGuildListener(commands.Cog):
         write_in_clan_members_standart_values(guilds)
         write_in_autoroles_bool_standart_values(guilds)
         write_in_autoroles_marriage_standart_values(guilds)
+        write_in_emotions_cost_standart_values(guilds)
         print(len(self.client.guilds))
         for guild in self.client.guilds:
             print(f"{guild.name} - {(len(guild.members))}")

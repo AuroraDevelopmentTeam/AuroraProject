@@ -71,6 +71,8 @@ from core.clan.writers import (
 )
 from core.voice.create import create_voice_private_config_table
 from core.voice.writers import write_in_voice_private_config_standart_values
+from core.emotions.create import create_emotions_cost_table
+from core.emotions.writers import write_in_emotions_cost_standart_values
 
 
 class OnReadyListener(commands.Cog):
@@ -139,6 +141,8 @@ class OnReadyListener(commands.Cog):
         write_in_autoroles_bool_standart_values(guilds)
         create_marriage_autorole_table()
         write_in_autoroles_marriage_standart_values(guilds)
+        create_emotions_cost_table()
+        write_in_emotions_cost_standart_values(guilds)
         print(len(self.client.guilds))
         for guild in self.client.guilds:
             print(f"{guild.name} - {(len(guild.members))}")

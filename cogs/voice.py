@@ -168,6 +168,7 @@ class UserVoiceHandler(commands.Cog):
                     channel,
                 )
             )
+
     @__voice_private_config.subcommand(name="menu_invoke", description="invoke button menu for voice rooms",
                                        name_localizations=get_localized_name(
                                            "voice_private_config_menu_invoke"),

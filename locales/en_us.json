@@ -1173,5 +1173,22 @@
       "msg": "Now this role will be given on marriage:",
       "name": "on_marriage",
       "description": "Set autorole on marriage, which will be given to couple members on marriage and removed on divorce"
+    },
+    "you_charged": {
+      "msg": "Written off from balance:"
+    },
+    "emotion_config": {
+      "name": "emotion_config",
+      "description": "Set up settings for emotions on your server"
+    },
+    "emotion_config_set_emotion_cost": {
+      "name": "set_emotion_cost",
+      "description": "Set cost of using emotion command on your server",
+      "msg": "Now cost of using emotion is: "
+    },
+    "emotion_config_enable_paid_emotions": {
+      "name": "enable_paid_emotions",
+      "description": "Turn on/turn off paid emotions with your server currency",
+      "msg": "For paid emotions now i use this state:"
     }
 }
