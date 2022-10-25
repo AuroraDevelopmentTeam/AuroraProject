@@ -161,11 +161,21 @@ class StatisticsCounter(commands.Cog):
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"{interaction.application_command.name}"
         )
+        voice_members = set()
+        for voice_channel in interaction.guild.voice_channels:
+            for member in voice_channel.members:
+                voice_members.add(member.id)
+        message_2 = get_msg_from_locale_by_key(
+            interaction.guild.id, f"{interaction.application_command.name}_peoples"
+        )
+        number_of_people_in_voice = len(voice_members)
+        number_of_people_on_server = len(interaction.guild.members)
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         await interaction.response.send_message(
             embed=construct_basic_embed(
                 interaction.application_command.name,
-                f"{user.mention} {message} **{format_seconds_to_hhmmss(voice_time)}**",
+                f"{user.mention} {message} **{format_seconds_to_hhmmss(voice_time)}**\n"
+                f"{message_2} **{number_of_people_in_voice}/{number_of_people_on_server}**",
                 f"{requested} {interaction.user}",
                 interaction.user.display_avatar,
                 interaction.guild.id,

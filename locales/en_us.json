@@ -1190,5 +1190,8 @@
       "name": "enable_paid_emotions",
       "description": "Turn on/turn off paid emotions with your server currency",
       "msg": "For paid emotions now i use this state:"
+    },
+    "online_peoples": {
+      "msg": "In server voice channels right now:"
     }
 }
