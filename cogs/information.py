@@ -102,15 +102,15 @@ class Information(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __user(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
     ):
         if user is None:
             return await interaction.response.send_message("no key value error 786")
@@ -144,6 +144,40 @@ class Information(commands.Cog):
         )
         await interaction.response.send_message(embed=embed)
 
+    @nextcord.slash_command(name="about_aurora",
+                            description="Sends all information about Aurora bot",
+                            name_localizations=get_localized_name("about_aurora"),
+                            description_localizations=get_localized_description("about_aurora"),
+                            default_member_permissions=Permissions(send_messages=True),
+                            )
+    async def __about_aurora(self, interaction: Interaction):
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        names_of_embed_fields = get_keys_value_in_locale(
+            interaction.guild.id, interaction.application_command.name
+        )
+        embed = construct_long_embed(
+            f"{self.client.user}:",
+            self.client.user.avatar.url,
+            f"{requested} {interaction.user}",
+            interaction.user.display_avatar,
+            names_of_embed_fields,
+            [
+                f"```\n{len(self.client.users)} 🧍```",
+                f"```{len(self.client.guilds)}```",
+                f"```{self.client.user.id}```",
+                f"```{psutil.cpu_percent()}```",
+                f"```{psutil.virtual_memory().percent}```",
+                f"```{psutil.virtual_memory().available * 100 / psutil.virtual_memory().total}```",
+                f"```{self.client.ws.shard_id}```",
+                f"```{self.client.status}```",
+                f"{nextcord.utils.format_dt(self.client.user.created_at)}",
+                f"```Python 3.10.4```",
+                f"```Nextcord```",
+                f"[GitHub](https://github.com/AuroraDevelopmentTeam)",
+            ],
+            True,
+        )
+        await interaction.response.send_message(embed=embed)
 
 def setup(client):
     client.add_cog(Information(client))

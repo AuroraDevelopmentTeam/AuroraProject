@@ -1193,5 +1193,21 @@
     },
     "online_peoples": {
       "msg": "In server voice channels right now:"
-    }
+    },
+    "about_aurora": {
+      "name": "about_aurora",
+      "description": "Sends all information about Aurora bot",
+      "user_count": "Aurorа bot Users:",
+      "guild_count": "Guilds using Aurorа:",
+      "id": "Aurora ID:",
+      "cpu_percent": "CPU Usage %",
+      "virtual_memory": "Memory Usage %",
+      "available_memory": "Available Memory %",
+      "websocket": "Websocket:",
+      "client_status": "Aurora status:",
+      "client_created_at": "Aurora created at",
+      "language": "Development language",
+      "library": "Discord API wrapper:",
+      "github": "GitHub:"
+  }
 }

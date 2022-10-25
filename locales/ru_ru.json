@@ -1190,5 +1190,21 @@
     },
     "online_peoples": {
       "msg": "В голосовых каналах сервера сейчас находится следующее количество человек:"
-    }
+    },
+    "about_aurora": {
+      "name": "об_авроре",
+      "description": "Отправляет информацию о боте Аврора",
+      "user_count": "Пользователи Авроры:",
+      "guild_count": "Серверов использующих Аврору:",
+      "id": "ID Авроры:",
+      "cpu_percent": "Нагрузка ЦПУ %",
+      "virtual_memory": "Занято памяти %",
+      "available_memory": "Доступно памяти %",
+      "websocket": "Вебсокет:",
+      "client_status": "Статус бота:",
+      "client_created_at": "Дата создания:",
+      "language": "Язык разработки:",
+      "library": "Discord API wrapper:",
+      "github": "GitHub:"
+  }
 }
