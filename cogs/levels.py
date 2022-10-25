@@ -353,8 +353,10 @@ class Levels(commands.Cog):
         )
 
     @nextcord.slash_command(name="leveling_channel",
+                            description="Turn on or turn off exp gain in channel",
                             name_localizations=get_localized_name("leveling_channel"),
                             description_localizations=get_localized_description("leveling_channel"),
+                            default_member_permissions=Permissions(administrator=True)
                             )
     async def __leveling_channel(self, interaction: Interaction,
                                  channel: Optional[GuildChannel] = SlashOption(required=True),
