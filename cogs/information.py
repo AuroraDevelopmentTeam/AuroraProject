@@ -179,5 +179,6 @@ class Information(commands.Cog):
         )
         await interaction.response.send_message(embed=embed)
 
+
 def setup(client):
     client.add_cog(Information(client))

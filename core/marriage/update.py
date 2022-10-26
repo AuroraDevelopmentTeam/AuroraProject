@@ -141,12 +141,60 @@ def update_user_family_money(guild_id: int, user_id: int, amount: int) -> None:
 
 
 def update_couple_family_money(
-    guild_id: int, user_id: int, pair_id: int, amount: int
+        guild_id: int, user_id: int, pair_id: int, amount: int
 ) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     update_user_family_money(guild_id, user_id, amount)
     update_user_family_money(guild_id, pair_id, amount)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_marriage_config_enable_loverooms(guild_id: int, loveroom_state: bool) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = f"UPDATE marriage_config SET enable_loverooms = ? WHERE guild_id = ?"
+    values = (loveroom_state, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_marriage_config_marriage_price(guild_id: int, marriage_price: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = f"UPDATE marriage_config SET marriage_price = ? WHERE guild_id = ?"
+    values = (marriage_price, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_marriage_config_month_loveroom_price(guild_id: int, month_loveroom_price: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = f"UPDATE marriage_config SET month_loveroom_price = ? WHERE guild_id = ?"
+    values = (month_loveroom_price, guild_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_marriage_config_loveroom_category(guild_id: int, loveroom_category: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = f"UPDATE marriage_config SET loveroom_category = ? WHERE guild_id = ?"
+    values = (loveroom_category, guild_id)
+    cursor.execute(sql, values)
     db.commit()
     cursor.close()
     db.close()

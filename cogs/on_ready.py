@@ -73,6 +73,7 @@ from core.voice.create import create_voice_private_config_table
 from core.voice.writers import write_in_voice_private_config_standart_values
 from core.emotions.create import create_emotions_cost_table
 from core.emotions.writers import write_in_emotions_cost_standart_values
+from core.marriage.create import add_column
 
 
 class OnReadyListener(commands.Cog):

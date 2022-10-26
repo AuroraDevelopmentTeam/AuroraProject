@@ -36,8 +36,8 @@ def create_marriage_config_table() -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     cursor.execute(
-        f"""CREATE TABLE IF NOT EXISTS marriage_config (
-        guild_id INTEGER, enable_loverooms BOOL, marriage_price INTEGER, month_loveroom_price INTEGER)"""
+        f"""CREATE TABLE IF NOT EXISTS marriage_config ( guild_id INTEGER, enable_loverooms BOOL, marriage_price 
+        INTEGER, month_loveroom_price INTEGER, loveroom_category INTEGER) """
     )
     db.commit()
     cursor.close()
@@ -55,6 +55,32 @@ def create_gifts_table() -> None:
         gift_10 INTEGER, gift_price INTEGER)"""
     )
     db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def add_column(guilds) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    cursor.execute(
+        """ALTER TABLE marriage 
+        ADD COLUMN 'loveroom_expire' 'integer'"""
+    )
+    db.commit()
+    for guild in guilds:
+        for member in guild.members:
+            if not member.bot:
+                if is_user_in_table("marriage", guild.id, member.id) is True:
+                    sql = (
+                        "INSERT INTO marriage(loveroom_expire) VALUES (?)"
+                            )
+                    val = tuple(0)
+                    cursor.execute(sql, val)
+                    db.commit()
+        cursor.close()
+        db.close()
+        return
     cursor.close()
     db.close()
     return
