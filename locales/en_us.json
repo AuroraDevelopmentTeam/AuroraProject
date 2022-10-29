@@ -1209,5 +1209,9 @@
       "language": "Development language",
       "library": "Discord API wrapper:",
       "github": "GitHub:"
+  },
+  "marriage_config": {
+    "name": "marriage_config",
+    "description": "Prefix command for marriage settings"
   }
 }

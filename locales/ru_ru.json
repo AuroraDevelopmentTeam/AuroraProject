@@ -1206,5 +1206,9 @@
       "language": "Язык разработки:",
       "library": "Discord API wrapper:",
       "github": "GitHub:"
+  },
+    "marriage_config": {
+    "name": "свадьбы_конфиг",
+    "description": "Префиксная команда для настройки конфигураций свадеб на вашем сервере"
   }
 }

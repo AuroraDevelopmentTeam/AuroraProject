@@ -9,6 +9,7 @@ import nextcord
 from nextcord import Interaction, SlashOption, Permissions
 from nextcord.ext import commands
 from nextcord.utils import get
+from nextcord.abc import GuildChannel
 
 from core.locales.getters import get_localized_name, get_localized_description
 from core.checkers import is_married
@@ -32,6 +33,10 @@ from core.marriage.getters import (
     GIFT_NAMES,
     GIFT_EMOJIS,
     GIFT_PRICES,
+    get_marriage_config_enable_loverooms,
+    get_marriage_config_marriage_price,
+    get_marriage_config_loveroom_category,
+    get_marriage_config_month_loveroom_price,
 )
 from core.marriage.update import (
     update_user_like,
@@ -39,6 +44,10 @@ from core.marriage.update import (
     update_user_gift_price,
     update_user_love_description,
     update_couple_family_money,
+    update_marriage_config_enable_loverooms,
+    update_marriage_config_loveroom_category,
+    update_marriage_config_marriage_price,
+    update_marriage_config_month_loveroom_price,
 )
 from core.embeds import construct_basic_embed
 from core.ui.buttons import create_button, ViewAuthorCheck, View
@@ -87,21 +96,21 @@ class Marriage(commands.Cog):
     @nextcord.slash_command(
         name="marry",
         description="send marriage request to @User, "
-        "if marriage will be success you will pay 10000 currency on server",
+                    "if marriage will be success you will pay 10000 currency on server",
         name_localizations=get_localized_name("marry"),
         description_localizations=get_localized_description("marry"),
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __marry(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
     ):
         if user.bot:
             return await interaction.response.send_message(
@@ -229,7 +238,7 @@ class Marriage(commands.Cog):
     @nextcord.slash_command(
         name="loveprofile",
         description="sends your couple love card in chat with some "
-        "information about couple!",
+                    "information about couple!",
         name_localizations=get_localized_name("loveprofile"),
         description_localizations=get_localized_description("loveprofile"),
         default_member_permissions=Permissions(send_messages=True),
@@ -317,15 +326,15 @@ class Marriage(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __waifu(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=False,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=False,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
     ):
         if user is None:
             user = interaction.user
@@ -406,15 +415,15 @@ class Marriage(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __like(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
     ):
         if user == interaction.user:
             return await interaction.response.send_message(
@@ -514,46 +523,46 @@ class Marriage(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __gift(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
-        gift: str = SlashOption(
-            name="picker",
-            choices={
-                f"1. Carrot 🥕": "gift_1",
-                f"2. Teddy Bear 🧸": "gift_2",
-                f"3. Cookie 🍪": "gift_3",
-                f"4. Lolipop 🍭": "gift_4",
-                f"5. Flower 🌸": "gift_5",
-                f"6. Scarf 🧣": "gift_6",
-                f"7. Cake 🎂": "gift_7",
-                f"8. Panda 🐼": "gift_8",
-                f"9. Duck 🦆": "gift_9",
-                f"10. Cat 🐱": "gift_10",
-            },
-            choice_localizations={
-                "ru": {
-                    f"1. Морковка 🥕": "gift_1",
-                    f"2. Мишка 🧸": "gift_2",
-                    f"3. Печенька 🍪": "gift_3",
-                    f"4. Лолипоп 🍭": "gift_4",
-                    f"5. Цветочек 🌸": "gift_5",
-                    f"6. Шарфик 🧣": "gift_6",
-                    f"7. Тортик 🎂": "gift_7",
-                    f"8. Панда 🐼": "gift_8",
-                    f"9. Утка 🦆": "gift_9",
-                    f"10. Кошка 🐱": "gift_10",
-                }
-            },
-            required=True,
-        ),
-        amount: Optional[int] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
+            gift: str = SlashOption(
+                name="picker",
+                choices={
+                    f"1. Carrot 🥕": "gift_1",
+                    f"2. Teddy Bear 🧸": "gift_2",
+                    f"3. Cookie 🍪": "gift_3",
+                    f"4. Lolipop 🍭": "gift_4",
+                    f"5. Flower 🌸": "gift_5",
+                    f"6. Scarf 🧣": "gift_6",
+                    f"7. Cake 🎂": "gift_7",
+                    f"8. Panda 🐼": "gift_8",
+                    f"9. Duck 🦆": "gift_9",
+                    f"10. Cat 🐱": "gift_10",
+                },
+                choice_localizations={
+                    "ru": {
+                        f"1. Морковка 🥕": "gift_1",
+                        f"2. Мишка 🧸": "gift_2",
+                        f"3. Печенька 🍪": "gift_3",
+                        f"4. Лолипоп 🍭": "gift_4",
+                        f"5. Цветочек 🌸": "gift_5",
+                        f"6. Шарфик 🧣": "gift_6",
+                        f"7. Тортик 🎂": "gift_7",
+                        f"8. Панда 🐼": "gift_8",
+                        f"9. Утка 🦆": "gift_9",
+                        f"10. Кошка 🐱": "gift_10",
+                    }
+                },
+                required=True,
+            ),
+            amount: Optional[int] = SlashOption(required=True),
     ):
         if amount < 1:
             return await interaction.response.send_message(
@@ -621,9 +630,9 @@ class Marriage(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __lovedescription(
-        self,
-        interaction: Interaction,
-        description: Optional[str] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            description: Optional[str] = SlashOption(required=True),
     ):
         if is_married(interaction.guild.id, interaction.user.id) is False:
             return await interaction.response.send_message(
@@ -659,9 +668,9 @@ class Marriage(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __lovedeposit(
-        self,
-        interaction: Interaction,
-        amount: Optional[int] = SlashOption(required=True),
+            self,
+            interaction: Interaction,
+            amount: Optional[int] = SlashOption(required=True),
     ):
         if is_married(interaction.guild.id, interaction.user.id) is False:
             return await interaction.response.send_message(
@@ -711,6 +720,126 @@ class Marriage(commands.Cog):
                 interaction.application_command.name,
                 f"__**{amount}**__ {currency_symbol} {message}",
                 f"{requested} {interaction.user}\n{msg} {balance}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @nextcord.slash_command(name="marriage_config",
+                            name_localizations=get_localized_name("marriage_config"),
+                            description_localizations=get_localized_description("marriage_config"),
+                            default_member_permissions=Permissions(administrator=True),
+                            )
+    async def __marriage_config(self, interaction: Interaction):
+        pass
+
+    @__marriage_config.subcommand(name="enable_loverooms")
+    async def __marriage_config_enable_loverooms(self, interaction: Interaction,
+                                                 enable_loverooms: Optional[bool] = SlashOption(required=True)):
+        update_marriage_config_enable_loverooms(interaction.guild.id, enable_loverooms)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"marriage_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        if enable_loverooms is True:
+            enable_loverooms = get_msg_from_locale_by_key(
+                interaction.guild.id, "enabled"
+            )
+        else:
+            enable_loverooms = get_msg_from_locale_by_key(
+                interaction.guild.id, "disabled"
+            )
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"marriage_config_{interaction.application_command.name}",
+                f"{message} **{enable_loverooms}**",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__marriage_config.subcommand(name="marriage_price")
+    async def __marriage_config_marriage_price(self, interaction: Interaction,
+                                               marriage_price: Optional[int] = SlashOption(required=True)):
+        if marriage_price <= 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    marriage_price,
+                )
+            )
+        update_marriage_config_marriage_price(interaction.guild.id, marriage_price)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"marriage_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"marriage_config_{interaction.application_command.name}",
+                f"{message} **{marriage_price}** {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__marriage_config.subcommand(name="month_loveroom_price")
+    async def __marriage_config_marriage_price(self, interaction: Interaction,
+                                               month_loveroom_price: Optional[int] = SlashOption(required=True)):
+        if month_loveroom_price <= 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    month_loveroom_price,
+                )
+            )
+        update_marriage_config_month_loveroom_price(interaction.guild.id, month_loveroom_price)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"marriage_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"marriage_config_{interaction.application_command.name}",
+                f"{message} **{month_loveroom_price}** {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__marriage_config.subcommand(name="loveroom_category")
+    async def __marriage_config_marriage_price(self, interaction: Interaction,
+                                               loveroom_category: Optional[GuildChannel] = SlashOption(required=True)):
+        if not isinstance(loveroom_category, nextcord.CategoryChannel):
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    loveroom_category,
+                )
+            )
+        update_marriage_config_loveroom_category(interaction.guild.id, loveroom_category.id)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"marriage_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"marriage_config_{interaction.application_command.name}",
+                f"{message} {loveroom_category.mention}",
+                f"{requested} {interaction.user}",
                 interaction.user.display_avatar,
                 interaction.guild.id,
             )
