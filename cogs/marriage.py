@@ -733,7 +733,10 @@ class Marriage(commands.Cog):
     async def __marriage_config(self, interaction: Interaction):
         pass
 
-    @__marriage_config.subcommand(name="enable_loverooms")
+    @__marriage_config.subcommand(name="enable_loverooms",
+                                  name_localizations=get_localized_name("marriage_config_enable_loverooms"),
+                                  description_localizations=get_localized_description("marriage_config_enable_loverooms"),
+                                  )
     async def __marriage_config_enable_loverooms(self, interaction: Interaction,
                                                  enable_loverooms: Optional[bool] = SlashOption(required=True)):
         update_marriage_config_enable_loverooms(interaction.guild.id, enable_loverooms)
@@ -759,7 +762,10 @@ class Marriage(commands.Cog):
             )
         )
 
-    @__marriage_config.subcommand(name="marriage_price")
+    @__marriage_config.subcommand(name="marriage_price",
+                                  name_localizations=get_localized_name("marriage_config_marriage_price"),
+                                  description_localizations=get_localized_description("marriage_config_marriage_price"),
+                                  )
     async def __marriage_config_marriage_price(self, interaction: Interaction,
                                                marriage_price: Optional[int] = SlashOption(required=True)):
         if marriage_price <= 0:
@@ -788,8 +794,11 @@ class Marriage(commands.Cog):
             )
         )
 
-    @__marriage_config.subcommand(name="month_loveroom_price")
-    async def __marriage_config_marriage_price(self, interaction: Interaction,
+    @__marriage_config.subcommand(name="month_loveroom_price",
+                                  name_localizations=get_localized_name("marriage_config_month_loveroom_price"),
+                                  description_localizations=get_localized_description("marriage_config_month_loveroom_price"),
+                                  )
+    async def __marriage_config_month_loveroom_price(self, interaction: Interaction,
                                                month_loveroom_price: Optional[int] = SlashOption(required=True)):
         if month_loveroom_price <= 0:
             return await interaction.response.send_message(
@@ -817,8 +826,12 @@ class Marriage(commands.Cog):
             )
         )
 
-    @__marriage_config.subcommand(name="loveroom_category")
-    async def __marriage_config_marriage_price(self, interaction: Interaction,
+    @__marriage_config.subcommand(name="loveroom_category",
+                                  name_localizations=get_localized_name("marriage_config_loveroom_category"),
+                                  description_localizations=get_localized_description(
+                                      "marriage_config_loveroom_category"),
+                                  )
+    async def __marriage_config_loveroom_category(self, interaction: Interaction,
                                                loveroom_category: Optional[GuildChannel] = SlashOption(required=True)):
         if not isinstance(loveroom_category, nextcord.CategoryChannel):
             return await interaction.response.send_message(

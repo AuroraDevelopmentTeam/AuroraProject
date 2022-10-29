@@ -31,10 +31,11 @@ from core.auto.roles.writers import (
     write_in_autoroles_bool_standart_values,
     write_in_autoroles_marriage_standart_values
 )
-from core.marriage.create import create_marriage_table, create_gifts_table
+from core.marriage.create import create_marriage_table, create_gifts_table, create_marriage_config_table
 from core.marriage.writers import (
     write_in_marriage_standart_values,
     write_in_gifts_standart_values,
+    write_in_marriage_config_standart_values,
 )
 from core.shop.create import create_shop_table, create_custom_shop_table
 from core.goodbyes.create import create_goodbye_config
@@ -144,6 +145,8 @@ class OnReadyListener(commands.Cog):
         write_in_autoroles_marriage_standart_values(guilds)
         create_emotions_cost_table()
         write_in_emotions_cost_standart_values(guilds)
+        create_marriage_config_table()
+        write_in_marriage_config_standart_values(guilds)
         print(len(self.client.guilds))
         for guild in self.client.guilds:
             print(f"{guild.name} - {(len(guild.members))}")

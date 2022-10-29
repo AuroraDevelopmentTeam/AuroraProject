@@ -1,6 +1,6 @@
 import sqlite3
 
-from core.checkers import is_user_in_table
+from core.checkers import is_user_in_table, is_guild_id_in_table
 
 
 def write_in_marriage_standart_values(guilds) -> None:
@@ -26,16 +26,14 @@ def write_in_marriage_config_standart_values(guilds) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     for guild in guilds:
-        for member in guild.members:
-            if not member.bot:
-                if is_user_in_table("marriage_config", guild.id, member.id) is False:
-                    sql = (
-                        "INSERT INTO marriage_config(guild_id, enable_loverooms, marriage_price, "
-                        "month_loveroom_price) VALUES (?, ?, ?, ?) "
-                    )
-                    val = (guild.id, member.id, 0, 0, 0, "0", "0", 0, 0)
-                    cursor.execute(sql, val)
-                    db.commit()
+        if is_guild_id_in_table("marriage_config", guild.id) is False:
+            sql = (
+                "INSERT INTO marriage_config(guild_id, enable_loverooms, marriage_price, "
+                "month_loveroom_price, loveroom_category) VALUES (?, ?, ?, ?, ?) "
+            )
+            val = (guild.id, True, 10000, 40000, 0)
+            cursor.execute(sql, val)
+            db.commit()
     cursor.close()
     db.close()
     return

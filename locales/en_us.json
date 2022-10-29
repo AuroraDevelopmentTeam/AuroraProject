@@ -1210,8 +1210,28 @@
       "library": "Discord API wrapper:",
       "github": "GitHub:"
   },
-  "marriage_config": {
-    "name": "marriage_config",
-    "description": "Prefix command for marriage settings"
+    "marriage_config": {
+      "name": "marriage_config",
+      "description": "Prefix command for marriage settings"
+  },
+    "marriage_config_enable_loverooms": {
+      "name": "enable_loverooms",
+      "description": "Turn on/turn off loverooms creation",
+      "msg": "The next state for loveroom now is activated:"
+  },
+    "marriage_config_marriage_price": {
+      "name": "marriage_price",
+      "description": "Set wedding process price on your server",
+      "msg": "Now on server marriage price is:"
+  },
+    "marriage_config_month_loveroom_price": {
+      "name": "month_loveroom_price",
+      "description": "Set price of renting private couple loveroom for month",
+      "msg": "Set next price of renting private couple loveroom for month:"
+  },
+    "marriage_config_loveroom_category": {
+      "name": "loveroom_category",
+      "description": "Set category for loveroom creating",
+      "msg": "Set next category for loveroom creating:"
   }
 }
