@@ -243,11 +243,11 @@
     },
     "marry": {
       "name": "marry",
-      "description": "Send marriage request to @User, if marriage will be success you will pay 10000 currency on server",
+      "description": "Send marriage request to @User, if marriage will be success you will pay currency on server:",
       "msg": "offers you his hand and heart forever"
     },
     "marry_answer": {
-      "msg": "\n\n**What will be your answer?**\nYou have a whole minute to make a decision. **10,000** will be charged from the account of the person who offered wedding if wedding will be succesful"
+      "msg": "\n\n**What will be your answer?**\nYou have a whole minute to make a decision. From balance of the person who offered wedding if wedding will be successful will be charged:"
     },
     "marry_yes": {
       "msg": "Successful wedding"

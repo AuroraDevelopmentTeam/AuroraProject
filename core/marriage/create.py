@@ -13,6 +13,7 @@ from core.marriage.getters import (
     get_user_love_description,
     get_user_marry_date,
     get_family_money,
+    get_marriage_config_marriage_price,
 )
 from core.money.getters import get_guild_currency_symbol
 from core.emojify import *
@@ -92,9 +93,11 @@ def create_marry_embed(
     embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
     marry = get_msg_from_locale_by_key(guild_id, name)
     marry_answer = get_msg_from_locale_by_key(guild_id, f"{name}_answer")
+    currency_symbol = get_guild_currency_symbol(guild_id)
+    marriage_price = get_marriage_config_marriage_price(guild_id)
     embed.add_field(
         name=f"{MARRY} {name.capitalize()}",
-        value=f"{author.mention} {marry} {pair.mention} {marry_answer}",
+        value=f"{author.mention} {marry} {pair.mention} {marry_answer} **{marriage_price}** {currency_symbol}",
         inline=False,
     )
     return embed

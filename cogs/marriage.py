@@ -147,7 +147,8 @@ class Marriage(commands.Cog):
                 )
             )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
-        if balance < 10000:
+        marriage_price = get_marriage_config_marriage_price(interaction.guild.id)
+        if balance < marriage_price:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             return await interaction.response.send_message(
                 embed=construct_error_not_enough_embed(
@@ -155,7 +156,7 @@ class Marriage(commands.Cog):
                         interaction.guild.id, "not_enough_money_error"
                     ),
                     interaction.user.display_avatar,
-                    f"{msg} {balance}/10000",
+                    f"{msg} {balance}/{marriage_price}",
                 )
             )
         author = interaction.user
@@ -191,15 +192,12 @@ class Marriage(commands.Cog):
             timestamp = datetime.now()
             date = timestamp.strftime(date_format)
             marry_users(interaction.guild.id, author.id, pair.id, date)
-            update_user_balance(interaction.guild.id, author.id, -10000)
+            update_user_balance(interaction.guild.id, author.id, -marriage_price)
             marriage_autorole = get_server_marriage_autorole(interaction.guild.id)
             if marriage_autorole != 0:
-                try:
-                    role = nextcord.utils.get(interaction.guild.roles, id=marriage_autorole)
-                    await author.add_roles(role)
-                    await pair.add_roles(role)
-                except:
-                    pass
+                role = nextcord.utils.get(interaction.guild.roles, id=marriage_autorole[0])
+                await author.add_roles(role)
+                await pair.add_roles(role)
             yes_button = create_button(
                 get_msg_from_locale_by_key(interaction.guild.id, "yes"), False, True
             )
@@ -290,24 +288,21 @@ class Marriage(commands.Cog):
                 )
             )
         pair_id = get_user_pair_id(interaction.guild.id, interaction.user.id)
-        pair = await self.client.fetch_user(pair_id)
+        pair = await interaction.guild.fetch_member(pair_id)
+        divorce_users(interaction.guild.id, interaction.user.id, pair_id)
         marriage_autorole = get_server_marriage_autorole(interaction.guild.id)
         if marriage_autorole != 0:
-            try:
-                role = nextcord.utils.get(interaction.guild.roles, id=marriage_autorole)
-                await interaction.user.remove_roles(role)
-                await pair.remove_roles(role)
-            except:
-                pass
-        if pair is None:
-            pair = get_msg_from_locale_by_key(interaction.guild.id, "unknown_user")
-        else:
-            pair = pair.mention
-        divorce_users(interaction.guild.id, interaction.user.id, pair_id)
+            role = nextcord.utils.get(interaction.guild.roles, id=marriage_autorole[0])
+            await interaction.user.remove_roles(role)
+            await pair.remove_roles(role)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, interaction.application_command.name
         )
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        if pair is None:
+            pair = get_msg_from_locale_by_key(interaction.guild.id, "unknown_user")
+        else:
+            pair = pair.mention
         await interaction.response.send_message(
             embed=construct_basic_embed(
                 interaction.application_command.name,
