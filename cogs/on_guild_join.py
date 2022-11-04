@@ -86,13 +86,16 @@ class OnGuildListener(commands.Cog):
         write_in_autoroles_bool_standart_values(guilds)
         write_in_autoroles_marriage_standart_values(guilds)
         write_in_emotions_cost_standart_values(guilds)
+        users = 0
         print(len(self.client.guilds))
         for guild in self.client.guilds:
-            print(f"{guild.name} - {(len(guild.members))}")
+            guild = await self.client.fetch_guild(guild.id)
+            print(f"{guild.name} - {guild.approximate_member_count}")
+            users += guild.approximate_member_count
         await self.client.change_presence(
             activity=nextcord.Game(
-                name=f"/help - Ты милый!\n"
-                f"Пользователи: {len(self.client.users)}\n Сервера: {len(self.client.guilds)}"
+                name=f"You cute! /help\nСервера: {len(guilds)}\n"
+                f"Пользователи: {users}"
             )
         )
 

@@ -11,10 +11,16 @@ load_dotenv()
 
 token = os.getenv("token")
 
+intents = nextcord.Intents.default()
+intents.members = False
+intents.presences = True
+intents.messages = True
+intents.message_content = True
+
 client = commands.Bot(
     command_prefix=settings["PREFIX"],
     case_insensitive=True,
-    intents=nextcord.Intents.all(),
+    intents=intents,
     activity=nextcord.Game(name=f"You cute! /help")
 )
 

@@ -147,13 +147,16 @@ class OnReadyListener(commands.Cog):
         write_in_emotions_cost_standart_values(guilds)
         create_marriage_config_table()
         write_in_marriage_config_standart_values(guilds)
+        users = 0
         print(len(self.client.guilds))
         for guild in self.client.guilds:
-            print(f"{guild.name} - {(len(guild.members))}")
+            guild = await self.client.fetch_guild(guild.id)
+            print(f"{guild.name} - {guild.approximate_member_count}")
+            users += guild.approximate_member_count
         await self.client.change_presence(
             activity=nextcord.Game(
                 name=f"You cute! /help\nСервера: {len(guilds)}\n"
-                f"Пользователи: {len(self.client.users)}"
+                f"Пользователи: {users}"
             )
         )
 

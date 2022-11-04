@@ -182,7 +182,7 @@ class AutoModeration(commands.Cog):
                     try:
                         await message.author.send(
                             get_msg_from_locale_by_key(
-                                member.guild.id, "forbidden_nickname"
+                                message.author.guild.id, "forbidden_nickname"
                             )
                         )
                         await message.guild.kick(message.author)

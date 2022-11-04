@@ -67,6 +67,8 @@ class Information(commands.Cog):
             )
         else:
             embedicon = guild.icon
+        guild = await self.client.fetch_guild(interaction.guild.id)
+        users = guild.approximate_member_count
         embed = construct_long_embed(
             f"{guild.name}:",
             embedicon,  # Тут был guild.icon
@@ -74,7 +76,7 @@ class Information(commands.Cog):
             interaction.user.display_avatar,
             names_of_embed_fields,
             [
-                f"```\n{guild.member_count}\n{len(guild.humans)} 🧍 {len(guild.bots)} 🤖\n```",
+                f"```\n{users} 🧍\n```",
                 f"```{guild.owner.name}```",
                 f"```{len(guild.emojis)}```",
                 f"```{guild.created_at.strftime('%a, %d %b %Y')}```",
@@ -155,6 +157,11 @@ class Information(commands.Cog):
         names_of_embed_fields = get_keys_value_in_locale(
             interaction.guild.id, interaction.application_command.name
         )
+        users = 0
+        print(len(self.client.guilds))
+        for guild in self.client.guilds:
+            guild = await self.client.fetch_guild(guild.id)
+            users += guild.approximate_member_count
         embed = construct_long_embed(
             f"{self.client.user}:",
             self.client.user.avatar.url,
@@ -162,7 +169,7 @@ class Information(commands.Cog):
             interaction.user.display_avatar,
             names_of_embed_fields,
             [
-                f"```\n{len(self.client.users)} 🧍```",
+                f"```\n{users} 🧍```",
                 f"```{len(self.client.guilds)}```",
                 f"```{self.client.user.id}```",
                 f"```{psutil.cpu_percent()}```",

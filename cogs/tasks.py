@@ -38,7 +38,7 @@ class TasksCog(commands.Cog):
         else:
             return
 
-    @tasks.loop(seconds=5)
+    @tasks.loop(hours=12)
     async def give_roles_money(self):
         db = sqlite3.connect("./databases/main.sqlite")
         cursor = db.cursor()
@@ -51,7 +51,7 @@ class TasksCog(commands.Cog):
             return
         for row in rows:
             try:
-                guild = self.client.get_guild(row[2])
+                guild = await self.client.fetch_guild(row[2])
                 role = nextcord.utils.get(guild.roles, id=row[0])
             except:
                 continue

@@ -91,9 +91,11 @@ class Autorole(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-
         channel = await self.client.fetch_channel(payload.channel_id)
-        member = payload.member
+        guild = payload.guild_id
+        guild = self.client.get_guild(guild)
+        member = payload.user_id
+        member = await guild.fetch_member(member)
         if member.bot:
             return
         if get_server_autorole_state(member.guild.id) is False:
@@ -127,8 +129,10 @@ class Autorole(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
         channel = await self.client.fetch_channel(payload.channel_id)
+        guild = payload.guild_id
+        guild = self.client.get_guild(guild)
         member = payload.user_id
-        member = nextcord.utils.get(channel.guild.members, id=member)
+        member = await guild.fetch_member(member)
         if member.bot:
             return
         if get_server_autorole_state(member.guild.id) is False:
