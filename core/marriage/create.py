@@ -25,7 +25,8 @@ def create_marriage_table() -> None:
     cursor.execute(
         f"""CREATE TABLE IF NOT EXISTS marriage (
         guild_id INTEGER, user_id INTEGER, pair_id INTEGER, like_id INTEGER, 
-        divorces INTEGER, love_description TEXT, date TEXT, family_money INTEGER, loveroom_expire INTEGER)"""
+        divorces INTEGER, love_description TEXT, date TEXT, family_money INTEGER, loveroom_expire INTEGER, 
+        loveroom_id INTEGER)"""
     )
     db.commit()
     cursor.close()
@@ -74,9 +75,9 @@ def add_column(guilds) -> None:
             if not member.bot:
                 if is_user_in_table("marriage", guild.id, member.id) is True:
                     sql = (
-                        "INSERT INTO marriage(loveroom_expire) VALUES (?)"
+                        "INSERT INTO marriage(loveroom_expire, loveroom_id) VALUES (?, ?)"
                             )
-                    val = tuple(0)
+                    val = (0, 0)
                     cursor.execute(sql, val)
                     db.commit()
         cursor.close()

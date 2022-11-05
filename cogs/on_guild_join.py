@@ -94,7 +94,7 @@ class OnGuildListener(commands.Cog):
             users += guild.approximate_member_count
         await self.client.change_presence(
             activity=nextcord.Game(
-                name=f"You cute! /help\nСервера: {len(guilds)}\n"
+                name=f"You cute! /help\nСервера: {len(self.client.guilds)}\n"
                 f"Пользователи: {users}"
             )
         )

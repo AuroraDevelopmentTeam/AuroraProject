@@ -37,6 +37,9 @@ from core.marriage.getters import (
     get_marriage_config_marriage_price,
     get_marriage_config_loveroom_category,
     get_marriage_config_month_loveroom_price,
+    get_user_loveroom_expire_date,
+    get_user_loveroom_id,
+    get_family_money,
 )
 from core.marriage.update import (
     update_user_like,
@@ -48,6 +51,8 @@ from core.marriage.update import (
     update_marriage_config_loveroom_category,
     update_marriage_config_marriage_price,
     update_marriage_config_month_loveroom_price,
+    update_user_loveroom_expire_date,
+    update_user_loveroom_id,
 )
 from core.embeds import construct_basic_embed
 from core.ui.buttons import create_button, ViewAuthorCheck, View
@@ -196,8 +201,9 @@ class Marriage(commands.Cog):
             marriage_autorole = get_server_marriage_autorole(interaction.guild.id)
             if marriage_autorole != 0:
                 role = nextcord.utils.get(interaction.guild.roles, id=marriage_autorole[0])
-                await author.add_roles(role)
-                await pair.add_roles(role)
+                if role != 0:
+                    await author.add_roles(role)
+                    await pair.add_roles(role)
             yes_button = create_button(
                 get_msg_from_locale_by_key(interaction.guild.id, "yes"), False, True
             )
@@ -293,8 +299,12 @@ class Marriage(commands.Cog):
         marriage_autorole = get_server_marriage_autorole(interaction.guild.id)
         if marriage_autorole != 0:
             role = nextcord.utils.get(interaction.guild.roles, id=marriage_autorole[0])
-            await interaction.user.remove_roles(role)
-            await pair.remove_roles(role)
+            if role != 0:
+                try:
+                    await interaction.user.remove_roles(role)
+                    await pair.remove_roles(role)
+                except Exception as error:
+                    print(error)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, interaction.application_command.name
         )
@@ -730,7 +740,8 @@ class Marriage(commands.Cog):
 
     @__marriage_config.subcommand(name="enable_loverooms",
                                   name_localizations=get_localized_name("marriage_config_enable_loverooms"),
-                                  description_localizations=get_localized_description("marriage_config_enable_loverooms"),
+                                  description_localizations=get_localized_description(
+                                      "marriage_config_enable_loverooms"),
                                   )
     async def __marriage_config_enable_loverooms(self, interaction: Interaction,
                                                  enable_loverooms: Optional[bool] = SlashOption(required=True)):
@@ -791,10 +802,11 @@ class Marriage(commands.Cog):
 
     @__marriage_config.subcommand(name="month_loveroom_price",
                                   name_localizations=get_localized_name("marriage_config_month_loveroom_price"),
-                                  description_localizations=get_localized_description("marriage_config_month_loveroom_price"),
+                                  description_localizations=get_localized_description(
+                                      "marriage_config_month_loveroom_price"),
                                   )
     async def __marriage_config_month_loveroom_price(self, interaction: Interaction,
-                                               month_loveroom_price: Optional[int] = SlashOption(required=True)):
+                                                     month_loveroom_price: Optional[int] = SlashOption(required=True)):
         if month_loveroom_price <= 0:
             return await interaction.response.send_message(
                 embed=construct_error_negative_value_embed(
@@ -827,7 +839,8 @@ class Marriage(commands.Cog):
                                       "marriage_config_loveroom_category"),
                                   )
     async def __marriage_config_loveroom_category(self, interaction: Interaction,
-                                               loveroom_category: Optional[GuildChannel] = SlashOption(required=True)):
+                                                  loveroom_category: Optional[GuildChannel] = SlashOption(
+                                                      required=True)):
         if not isinstance(loveroom_category, nextcord.CategoryChannel):
             return await interaction.response.send_message(
                 embed=construct_error_negative_value_embed(
@@ -848,6 +861,48 @@ class Marriage(commands.Cog):
                 f"marriage_config_{interaction.application_command.name}",
                 f"{message} {loveroom_category.mention}",
                 f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @nextcord.slash_command(name="loveroom_create")
+    async def __loveroom_create(self, interaction: Interaction):
+        if is_married(interaction.guild.id, interaction.user.id) is False:
+            return await interaction.response.send_message(
+                embed=construct_error_not_married_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_married_error"
+                    ),
+                    self.client.user.avatar.url,
+                )
+            )
+        pair_id = get_user_pair_id(interaction.guild.id, interaction.user.id)
+        pair = await interaction.guild.fetch_member(pair_id)
+        loverooms_state = get_marriage_config_enable_loverooms(interaction.guild.id)
+        print(loverooms_state)
+        loveroom_category = nextcord.utils.get(interaction.guild.channels,
+                                               id=get_marriage_config_loveroom_category(interaction.guild.id))
+        loveroom_price = get_marriage_config_month_loveroom_price(interaction.guild.id)
+        update_couple_family_money(interaction.guild.id, interaction.user.id, pair_id, -loveroom_price)
+        loveroom = await interaction.guild.create_voice_channel(category=loveroom_category,
+                                                                name=f"{interaction.user.name} 🤍 {pair.name}")
+        update_user_loveroom_id(interaction.guild.id, interaction.user.id, loveroom.id)
+        update_user_loveroom_id(interaction.guild.id, pair_id, loveroom.id)
+
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        on_family_balance = get_msg_from_locale_by_key(
+            interaction.guild.id, f"on_family_balance"
+        )
+        family_balance = get_family_money(interaction.guild.id, interaction.user.id)
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                f"{interaction.application_command.name}",
+                f"{loveroom.mention} {message}",
+                f"{requested} {interaction.user}\n{on_family_balance} {family_balance}",
                 interaction.user.display_avatar,
                 interaction.guild.id,
             )

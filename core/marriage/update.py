@@ -46,6 +46,30 @@ def update_user_marriage_date(guild_id: int, user_id: int, date) -> None:
     return
 
 
+def update_user_loveroom_expire_date(guild_id: int, user_id: int, loveroom_expire_date: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE marriage SET loveroom_expire = ? WHERE guild_id = ? AND user_id = ?"
+    values = (loveroom_expire_date, guild_id, user_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def update_user_loveroom_id(guild_id: int, user_id: int, loveroom_id: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = "UPDATE marriage SET loveroom_id = ? WHERE guild_id = ? AND user_id = ?"
+    values = (loveroom_id, guild_id, user_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
 def marry_users(guild_id: int, user_id: int, pair_id: int, date):
     default_love_description = get_msg_from_locale_by_key(
         guild_id, "default_love_description"

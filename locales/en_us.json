@@ -1233,5 +1233,13 @@
       "name": "loveroom_category",
       "description": "Set category for loveroom creating",
       "msg": "Set next category for loveroom creating:"
-  }
+  },
+    "loveroom_create": {
+      "name": "loveroom_create",
+      "description": "Create or rule your couple loveroom",
+      "msg": "Loveroom on one month"
+    },
+    "on_family_balance": {
+      "msg": "Couple balance:"
+    }
 }

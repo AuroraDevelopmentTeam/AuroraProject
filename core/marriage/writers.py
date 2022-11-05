@@ -12,9 +12,9 @@ def write_in_marriage_standart_values(guilds) -> None:
                 if is_user_in_table("marriage", guild.id, member.id) is False:
                     sql = (
                         "INSERT INTO marriage(guild_id, user_id, pair_id, like_id, divorces, love_description, "
-                        "date, family_money, loveroom_expire) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                        "date, family_money, loveroom_expire, loveroom_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                     )
-                    val = (guild.id, member.id, 0, 0, 0, "0", "0", 0, 0)
+                    val = (guild.id, member.id, 0, 0, 0, "0", "0", 0, 0, 0)
                     cursor.execute(sql, val)
                     db.commit()
     cursor.close()
