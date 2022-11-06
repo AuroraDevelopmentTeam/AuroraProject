@@ -885,8 +885,23 @@ class Marriage(commands.Cog):
                                                id=get_marriage_config_loveroom_category(interaction.guild.id))
         loveroom_price = get_marriage_config_month_loveroom_price(interaction.guild.id)
         update_couple_family_money(interaction.guild.id, interaction.user.id, pair_id, -loveroom_price)
+        overwrites = {
+            interaction.guild.default_role: nextcord.PermissionOverwrite(
+                connect=False,
+            ),
+            interaction.user: nextcord.PermissionOverwrite(
+                connect=True, speak=True, deafen_members=True, priority_speaker=True,
+                view_channel=True, manage_channels=True, mute_members=True, move_members=True, stream=True,
+            ),
+            pair: nextcord.PermissionOverwrite(
+                connect=True, speak=True, deafen_members=True, priority_speaker=True,
+                view_channel=True, manage_channels=True, mute_members=True, move_members=True, stream=True,
+            )
+        }
         loveroom = await interaction.guild.create_voice_channel(category=loveroom_category,
-                                                                name=f"{interaction.user.name} 🤍 {pair.name}")
+                                                                name=f"{interaction.user.name} 🤍 {pair.name}",
+                                                                user_limit=2,
+                                                                overwrites=overwrites)
         update_user_loveroom_id(interaction.guild.id, interaction.user.id, loveroom.id)
         update_user_loveroom_id(interaction.guild.id, pair_id, loveroom.id)
 

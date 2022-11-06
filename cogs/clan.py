@@ -869,7 +869,7 @@ class ClanHandler(commands.Cog):
                     )
                 )
             boss_level = get_clan_guild_boss_level(interaction.guild.id, clan_id)
-            if boss_level == 6:
+            if boss_level == 10:
                 return await interaction.response.send_message("max level")
             update_clan_storage(interaction.guild.id, clan_id, -price)
             update_clan_boss_level(interaction.guild.id, clan_id, 1)
