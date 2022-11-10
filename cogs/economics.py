@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional, Union, Coroutine, Any
+from typing import Optional, Union, Coroutine, Any, List
 from io import BytesIO
 import sqlite3
 

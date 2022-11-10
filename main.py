@@ -12,7 +12,7 @@ load_dotenv()
 token = os.getenv("token")
 
 intents = nextcord.Intents.default()
-intents.members = True
+intents.members = False
 intents.presences = True
 intents.messages = True
 intents.message_content = True

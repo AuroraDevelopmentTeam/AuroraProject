@@ -89,9 +89,12 @@ class OnGuildListener(commands.Cog):
         users = 0
         print(len(self.client.guilds))
         for guild in self.client.guilds:
-            guild = await self.client.fetch_guild(guild.id)
-            print(f"{guild.name} - {guild.approximate_member_count}")
-            users += guild.approximate_member_count
+            try:
+                guild = await self.client.fetch_guild(guild.id)
+                print(f"{guild.name} - {guild.approximate_member_count}")
+                users += guild.approximate_member_count
+            except Exception as error:
+                print(error)
         await self.client.change_presence(
             activity=nextcord.Game(
                 name=f"You cute! /help\nСервера: {len(self.client.guilds)}\n"
