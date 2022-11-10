@@ -185,8 +185,11 @@ class UserVoiceHandler(commands.Cog):
         if interaction.user.id == 314618320093577217:
             await interaction.response.send_message('ok')
             for room in self.voice_rooms:
-                channel = nextcord.utils.get(self.client.get_all_channels(), id=room)
-                await channel.delete()
+                try:
+                    channel = nextcord.utils.get(self.client.get_all_channels(), id=room)
+                    await channel.delete()
+                except Exception as error:
+                    print(error)
             sys.exit()
 
 
