@@ -492,7 +492,7 @@ def redraw_shop_embed(interaction: nextcord.Interaction) -> nextcord.Embed:
     )
     embed.add_field(
         name=f"```   {get_msg_from_locale_by_key(interaction.guild.id, 'price')}   ```",
-        value=f"``` {get_server_clan_upgrade_attack_cost(interaction.guild.id)}```",
+        value=f"``` {round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/get_clan_min_attack(interaction.guild.id, get_user_clan_id(interaction.guild.id, interaction.user.id))))/100)}```",
         inline=True,
     )
     embed.add_field(name="```#.  ```", value="```5. ```", inline=True)
