@@ -59,8 +59,6 @@ class TicTacToeButton(nextcord.ui.Button["TicTacToe"]):
 
                 view.stop()
 
-
-
         view.clear_items()
 
         for x in range(3):

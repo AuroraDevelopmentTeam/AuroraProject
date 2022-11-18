@@ -1,5 +1,6 @@
 from typing import Optional, Union
 import random
+import datetime
 
 import cooldowns
 import nextcord
@@ -50,6 +51,7 @@ from core.money.getters import get_user_balance, get_guild_currency_symbol
 from core.errors import (
     construct_error_negative_value_embed,
     construct_error_not_enough_embed,
+    construct_error_command_is_active
 )
 from core.embeds import DEFAULT_BOT_COLOR
 from core.emojify import SWORD
@@ -171,6 +173,7 @@ class DuelStartEng(nextcord.ui.View):
 
 class Games(commands.Cog):
     def __init__(self, client):
+        self.users = dict()
         self.client = client
 
     @nextcord.slash_command(
@@ -223,6 +226,20 @@ class Games(commands.Cog):
         deal_starting_cards(player_hand, dealer_hand, deck)
         global turn
         turn = 1
+        timestamp = datetime.datetime.now().timestamp()
+        user = self.users.get(interaction.user.id, None)
+        if user is None:
+            self.users.update({interaction.user.id: timestamp})
+        if user is not None:
+            if timestamp-user < 120:
+                return await interaction.followup.send(
+                    embed=construct_error_command_is_active(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "command_is_active_error"
+                        ),
+                        interaction.user.display_avatar,
+                    )
+                )
 
         async def hit_callback(interaction: Interaction):
             global turn
@@ -244,6 +261,7 @@ class Games(commands.Cog):
                     guild_id=interaction.guild.id,
                 )
                 view = create_final_view(interaction.guild.id)
+                self.users.pop(interaction.user.id)
                 await interaction.message.edit(embed=embed, view=view)
             else:
                 turn_msg = get_msg_from_locale_by_key(interaction.guild.id, "turn")
@@ -278,6 +296,7 @@ class Games(commands.Cog):
                         guild_id=interaction.guild.id,
                     )
                     view = create_final_view(interaction.guild.id)
+                    self.users.pop(interaction.user.id)
                     await interaction.message.edit(embed=embed, view=view)
             if 17 <= dealer_hand.get_value() <= 21:
                 if dealer_hand.get_value() > player_hand.get_value():
@@ -298,6 +317,7 @@ class Games(commands.Cog):
                         guild_id=interaction.guild.id,
                     )
                     view = create_final_view(interaction.guild.id)
+                    self.users.pop(interaction.user.id)
                     await interaction.message.edit(embed=embed, view=view)
                 elif dealer_hand.get_value() == player_hand.get_value():
                     draw = get_msg_from_locale_by_key(interaction.guild.id, "draw")
@@ -309,6 +329,7 @@ class Games(commands.Cog):
                         guild_id=interaction.guild.id,
                     )
                     view = create_final_view(interaction.guild.id)
+                    self.users.pop(interaction.user.id)
                     await interaction.message.edit(embed=embed, view=view)
                 else:
                     update_user_balance(interaction.guild.id, interaction.user.id, bet)
@@ -328,6 +349,7 @@ class Games(commands.Cog):
                         guild_id=interaction.guild.id,
                     )
                     view = create_final_view(interaction.guild.id)
+                    self.users.pop(interaction.user.id)
                     await interaction.message.edit(embed=embed, view=view)
 
         async def dealer_blackjack_callback(interaction: Interaction):
@@ -341,6 +363,7 @@ class Games(commands.Cog):
                     guild_id=interaction.guild.id,
                 )
                 view = create_final_view(interaction.guild.id)
+                self.users.pop(interaction.user.id)
                 await interaction.message.edit(embed=embed, view=view)
             else:
                 update_user_balance(
@@ -360,6 +383,7 @@ class Games(commands.Cog):
                     guild_id=interaction.guild.id,
                 )
                 view = create_final_view(interaction.guild.id)
+                self.users.pop(interaction.user.id)
                 await interaction.message.edit(embed=embed, view=view)
 
         async def one_to_one_callback(interaction: Interaction):
@@ -379,6 +403,7 @@ class Games(commands.Cog):
                 guild_id=interaction.guild.id,
             )
             view = create_final_view(interaction.guild.id)
+            self.users.pop(interaction.user.id)
             await interaction.message.edit(embed=embed, view=view)
 
         if check_for_blackjack(player_hand):
@@ -417,6 +442,7 @@ class Games(commands.Cog):
                     guild_id=interaction.guild.id,
                 )
                 view = create_final_view(interaction.guild.id)
+                self.users.pop(interaction.user.id)
                 await interaction.followup.send(embed=embed, view=view)
         else:
             if check_for_blackjack(dealer_hand):
@@ -435,6 +461,7 @@ class Games(commands.Cog):
                     guild_id=interaction.guild.id,
                 )
                 view = create_final_view(interaction.guild.id)
+                self.users.pop(interaction.user.id)
                 await interaction.followup.send(embed=embed, view=view)
             else:
                 hit_msg = get_msg_from_locale_by_key(interaction.guild.id, "hit")

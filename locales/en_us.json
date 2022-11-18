@@ -1241,5 +1241,8 @@
     },
     "on_family_balance": {
       "msg": "Couple balance:"
+    },
+    "command_is_active_error": {
+      "msg": "Aurora denied process of command execution due to __**command is already active**__\nYour command failed to successfully complete."
     }
 }
