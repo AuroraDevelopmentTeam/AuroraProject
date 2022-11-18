@@ -17,6 +17,7 @@ from core.auto.roles.getters import (
     check_reaction_autorole,
     get_autorole_lvl_deletion_state,
     get_lesser_lvl_roles_list,
+    get_server_marriage_autorole,
 )
 from core.auto.roles.updaters import (
     delete_autorole_for_reaction,
@@ -27,6 +28,7 @@ from core.auto.roles.updaters import (
     set_autoroles_state,
     update_autorole,
     update_autorole_lvl_deletion_state,
+    update_autorole_on_marriage,
 )
 from core.embeds import DEFAULT_BOT_COLOR, construct_basic_embed
 from core.locales.getters import (
@@ -89,9 +91,11 @@ class Autorole(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-
         channel = await self.client.fetch_channel(payload.channel_id)
-        member = payload.member
+        guild = payload.guild_id
+        guild = self.client.get_guild(guild)
+        member = payload.user_id
+        member = await guild.fetch_member(member)
         if member.bot:
             return
         if get_server_autorole_state(member.guild.id) is False:
@@ -125,8 +129,10 @@ class Autorole(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
         channel = await self.client.fetch_channel(payload.channel_id)
+        guild = payload.guild_id
+        guild = self.client.get_guild(guild)
         member = payload.user_id
-        member = nextcord.utils.get(channel.guild.members, id=member)
+        member = await guild.fetch_member(member)
         if member.bot:
             return
         if get_server_autorole_state(member.guild.id) is False:
@@ -540,6 +546,7 @@ class Autorole(commands.Cog):
         name_localizations=get_localized_name("autorole_remove_previous_lvl_roles"),
         description_localizations=get_localized_description("autorole_remove_previous_lvl_roles"),
     )
+    @application_checks.bot_has_guild_permissions(manage_roles=True)
     async def __autoroles_remove_lvl_roles(self, interaction: Interaction,
                                            remove: Optional[bool] = SlashOption(required=True)):
         update_autorole_lvl_deletion_state(interaction.guild.id, remove)
@@ -556,6 +563,37 @@ class Autorole(commands.Cog):
                 interaction.guild.id,
             )
         )
+
+    @__autorole.subcommand(
+        name="on_marriage",
+        name_localizations=get_localized_name("autorole_on_marriage"),
+        description_localizations=get_localized_description("autorole_on_marriage"),
+    )
+    @application_checks.bot_has_guild_permissions(manage_roles=True)
+    async def __autorole_on_marriage(self, interaction: Interaction,
+                                     role: Optional[nextcord.Role] = SlashOption(required=True)):
+        try:
+            update_autorole_on_marriage(interaction.guild.id, role)
+            message = get_msg_from_locale_by_key(
+                interaction.guild.id, f"autorole_{interaction.application_command.name}"
+            )
+            requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+            await interaction.response.send_message(
+                embed=construct_basic_embed(
+                    f"autorole_{interaction.application_command.name}",
+                    f"{message} **{role.mention}**",
+                    f"{requested} {interaction.user}",
+                    interaction.user.display_avatar,
+                    interaction.guild.id,
+                )
+            )
+        except nextcord.Forbidden:
+            return await interaction.response.send_message(
+                embed=construct_error_forbidden_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "forbidden_error"),
+                    self.client.user.avatar.url,
+                )
+            )
 
 
 def setup(client):

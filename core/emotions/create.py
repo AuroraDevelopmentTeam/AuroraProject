@@ -1,19 +1,23 @@
 import random
 
+import sqlite3
 import nextcord
 
 from core.locales.getters import get_msg_from_locale_by_key
 from core.embeds import DEFAULT_BOT_COLOR
+from core.money.getters import get_user_balance
 
 
 def create_emotion_embed(
-    guild_id: int,
-    emotion_name: str,
-    emotion_type: str,
-    author: nextcord.Member,
-    gifs: list,
-    user: nextcord.Member = None,
-    author_msg: str = None,
+        guild_id: int,
+        emotion_name: str,
+        emotion_type: str,
+        author: nextcord.Member,
+        gifs: list,
+        is_free: bool = True,
+        cost=0,
+        user: nextcord.Member = None,
+        author_msg: str = None,
 ) -> nextcord.Embed:
     emotion_name = get_msg_from_locale_by_key(guild_id, f"emotion_{emotion_name}")
     if user is not None:
@@ -68,5 +72,24 @@ def create_emotion_embed(
             description = description + f"\n{author_msg}"
     embed = nextcord.Embed(color=DEFAULT_BOT_COLOR, description=description)
     embed.set_image(url=random.choice(gifs))
-    embed.set_footer(text=moji, icon_url=author.display_avatar)
+    if is_free is True:
+        footer = f"{moji}"
+    else:
+        msg = get_msg_from_locale_by_key(guild_id, "you_charged")
+        bal_msg = get_msg_from_locale_by_key(guild_id, "on_balance")
+        balance = get_user_balance(guild_id, author.id)
+        footer = f"{moji}\n{msg} -{cost}\n{bal_msg} {balance}"
+    embed.set_footer(text=footer, icon_url=author.display_avatar)
     return embed
+
+
+def create_emotions_cost_table() -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    cursor.execute(
+        """CREATE TABLE IF NOT EXISTS emotions_cost (guild_id INTEGER, emotions_for_money_state BOOL, cost INTEGER) """
+    )
+    db.commit()
+    cursor.close()
+    db.close()
+    return

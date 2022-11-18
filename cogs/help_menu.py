@@ -104,6 +104,16 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 description="Help menu 'Autoroles' section",
                 emoji="😊",
             ),
+            nextcord.SelectOption(
+                label="Clans",
+                description="Help menu 'Clans' section",
+                emoji="🏰",
+            ),
+            nextcord.SelectOption(
+                label="Voice Channels",
+                description="Help menu 'Voice Channels' section",
+                emoji="🎙️",
+            ),
         ]
         super().__init__(
             placeholder="Choose section commands you want to view",
@@ -199,7 +209,8 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 "`/remove_exp` — Take experience\n`/reset_level` — Reset level and experience\n"
                 "`/set level` — Set level to user\n`/set min_max_exp` — Set minimal and maximal "
                 "experience gain\n "
-                "`/set level_up_messages` — Turn on/off messages about level up",
+                "`/set level_up_messages` — Turn on/off messages about level up\n"
+                "`/leveling_channel` — Enable / disable the experience gain and the ability to level up in the channel",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006597709660172419/1.gif"
@@ -213,7 +224,8 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 "`/lovedescription` — Set new description to couple profile\n`/lovedeposit` — Put money "
                 "in family bank\n "
                 "`/divorce` — Divorce\n`/waifu` — Waifu profile\n"
-                "`/like` — Set user you like",
+                "`/like` — Set user you like\n`/unlike` — Set like parameter to noone"
+                "\n`/gifts` — Gift for waifu marketplace\n`/gift` — Gift something to someone",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006598206966202368/Aduare-Pixel-Gif"
@@ -230,7 +242,7 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 "Change welcome embed message\n"
                 "`/set goodbye_channel` — Set goodbye messages channel\n`/set goodbye_message_type` — "
                 "Set goodbye messages type\n"
-                "/set goodbye_message_state — Turn on/off goodbye messages\n/set goodbye_embed — "
+                "`/set goodbye_message_state` — Turn on/off goodbye messages\n`/set goodbye_embed` — "
                 "Change goodbye embed message",
             )
             embed.set_image(
@@ -283,7 +295,8 @@ class HelpSelectMenuENG(nextcord.ui.Select):
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
                 title="💎 Thanks for Nitro Boost",
-                description="`/set nitro_channel` — Set channel to send respect and thanks on nitro boost\n`/set nitro_embed` "
+                description="`/set nitro_channel` — Set channel to send respect and thanks on nitro boost\n`/set "
+                            "nitro_embed` "
                 "— Edit on nitro message\n "
                 "`/set nitro_messages_state` — Turn on or turn off nitro boost messages",
             )
@@ -322,7 +335,8 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 color=DEFAULT_BOT_COLOR,
                 title="📈 Statistics",
                 description="`/online` — Check your online in voice channels\n"
-                "`/messages_counter` — Check your message counter",
+                "`/messages_counter` — Check your message counter\n"
+                "`/messages_counter_channel` — Enable or disable counting of messages in a channel",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006609404428308560/swire-arknights.gif"
@@ -349,7 +363,8 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 "`/autorole display_for_level` — Show all autoroles for level\n"
                 "`/autorole add_on_reaction` — Add autorole for reaction on message\n"
                 "`/autorole remove_on_reaction` — Remove autorole for reaction on message\n"
-                "`/autorole display_on_reaction` — Show all autoroles for reaction on message",
+                "`/autorole display_on_reaction` — Show all autoroles for reaction on message"
+                "`/autorole remove_previous_lvl_roles` — Enable automatic removal of previous roles per level",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006610055589793862/Genshin-Impact-Ero"
@@ -372,6 +387,50 @@ class HelpSelectMenuENG(nextcord.ui.Select):
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1011291356267810907/2.gif"
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        elif self.values[0] == "Clans":
+            embed = nextcord.Embed(
+                color=DEFAULT_BOT_COLOR,
+                title="🏰 Clans",
+                description="`/clan create` — Меню создания клана \n"
+                "`/clan show` — Show your clan's profile\n"
+                "`/clan shop` — Clan shop\n"
+                "`/clan deposit` — Deposit money in the clan's bank\n"
+                "`/clan leave` — Leave from clan\n"
+                "`/clan kick` — Kick user from clan\n"
+                "`/clan members` — List all clan members\n"
+                "`/clan disband` — Disband(delete clan and kick all members from clan) your clan\n"
+                "`/clan invite` — Invite user to clan\n"
+                "`/clan attack_boss` — Attack the clan boss\n"
+                "`/clan_config create_cost` — Set the cost of creating a clan on the server\n"
+                "`/clan_config upgrade_attack_cost` — Set the price of increased attack on the boss of clan members "
+                            "on your server\n "
+                "`/clan_config upgrade_limit_cost` — Set the base price for increasing the limit of clan members on "
+                            "your server\n"
+                "`/clan_config change_icon_cost` — Set the cost of changing the clan icon on your server\n"
+                "`/clan_config change_image_cost` — Set the price for installing/changing the banner-image of the "
+                            "clan\n "
+                "`/clan_config upgrade_boss_cost` — Set the base cost of leveling up the clan boss\n"
+                "`/clan_config change_color_cost` — Set base price for clan color change\n"
+                "`/clan_config create_clan_channels` — Enable/Disable the creation of clan voice rooms\n"
+                "`/clan_config clan_voice_category` — Set the category in which clan voice rooms will be created\n",
+            )
+            embed.set_image(
+                url="https://cdn.discordapp.com/attachments/1019251405103575050/1023085370394558535/4.gif"
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        elif self.values[0] == 'Voice Channels':
+            embed = nextcord.Embed(
+                color=DEFAULT_BOT_COLOR,
+                title="🎙️ Voice Channels",
+                description="`/voice_private_config voice_creation_channel` — Set voice channel when user entering "
+                            "in this channel, in the same category bot will create private voice channel for user\n "
+                "`/voice_private_config menu_invoke` — Call up an button menu to control voice "
+                            "channels and set their settings\n "
+            )
+            embed.set_image(
+                url="https://cdn.discordapp.com/attachments/1019251405103575050/1023214654564094062/98999738.jpg"
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -581,7 +640,8 @@ class HelpSelectMenuRU(nextcord.ui.Select):
                 "`/lovedescription` — Описание профиля пары\n`/lovedeposit` — Положить деньги на семейный "
                 "счёт\n "
                 "`/divorce` — Развод\n`/waifu` — Профиль вайфу\n"
-                "`/like` — Указать пользователя который нравится",
+                "`/like` — Указать пользователя который нравится\n`/unlike` — Больше никто не нравится"
+                "\n`/gifts` — Магазин подарков\n`/gift` — Подарить подарок",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006598206966202368/Aduare-Pixel-Gif"
@@ -718,7 +778,8 @@ class HelpSelectMenuRU(nextcord.ui.Select):
                 "`/autorole display_for_level` — Показать все автороли за уровень\n"
                 "`/autorole add_on_reaction` — Добавить автороль за реакцию на сообщение\n"
                 "`/autorole remove_on_reaction` — Убрать автороль за реакцию на сообщение\n"
-                "`/autorole display_on_reaction` — Показать все автороли за реакции на сообщение",
+                "`/autorole display_on_reaction` — Показать все автороли за реакции на сообщение"
+                "`/autorole remove_previous_lvl_roles` — Включить автоматическое снятие прошлых ролей за уровень",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006610055589793862/Genshin-Impact-Ero"

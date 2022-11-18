@@ -167,12 +167,44 @@ def create_button_reaction_embed(custom_id: str) -> nextcord.Embed:
 
 async def react_on_private_room_menu_button(client, interaction: nextcord.Interaction,
                                             custom_id: str, voice_room: nextcord.VoiceChannel, voices: dict):
+    try:
+        await interaction.response.defer()
+    except:
+        pass
     if custom_id == "private_room:name":
-        modal = VoiceRoomName("name", voice_room)
-        return await interaction.response.send_modal(modal)
+        await interaction.followup.send(embed=create_button_reaction_embed(custom_id), ephemeral=True)
+        msg = await client.wait_for("message", check=lambda message: message.author == interaction.user, timeout=30)
+        try:
+            if 1 < len(msg.content) < 99:
+                try:
+                    await voice_room.edit(
+                        name=msg.content
+                    )
+                    await msg.add_reaction(YES)
+                except Exception as error:
+                    print(error)
+                    msg.add_reaction(NO)
+        except Exception as error:
+            print(error)
+            await msg.add_reaction(NO)
+        await msg.delete(delay=5)
     elif custom_id == 'private_room:users':
-        modal = VoiceRoomLimit("limit", voice_room)
-        return await interaction.response.send_modal(modal)
+        await interaction.followup.send(embed=create_button_reaction_embed(custom_id), ephemeral=True)
+        msg = await client.wait_for("message", check=lambda message: message.author == interaction.user, timeout=30)
+        message = msg
+        try:
+            msg = int(msg.content)
+            if 1 < msg < 99:
+                try:
+                    await voice_room.edit(
+                        user_limit=msg
+                    )
+                    await message.add_reaction(YES)
+                except:
+                    message.add_reaction(NO)
+        except:
+            await message.add_reaction(NO)
+        await message.delete(delay=5)
     elif custom_id == 'private_room:lock':
         try:
             await voice_room.set_permissions(
@@ -183,7 +215,7 @@ async def react_on_private_room_menu_button(client, interaction: nextcord.Intera
                 description=f"{LOCK}\n{YES}",
                 colour=DEFAULT_BOT_COLOR), ephemeral=True)
         except:
-            await interaction.response.send_message(embed=nextcord.Embed(
+            await interaction.followup.send(embed=nextcord.Embed(
                 description=f"{LOCK}\n{NO}",
                 colour=DEFAULT_BOT_COLOR), ephemeral=True)
     elif custom_id == 'private_room:unlock':
@@ -196,11 +228,10 @@ async def react_on_private_room_menu_button(client, interaction: nextcord.Intera
                 description=f"{UNLOCK}\n{YES}",
                 colour=DEFAULT_BOT_COLOR), ephemeral=True)
         except:
-            await interaction.response.send_message(embed=nextcord.Embed(
+            await interaction.followup.send(embed=nextcord.Embed(
                 description=f"{UNLOCK}\n{NO}",
                 colour=DEFAULT_BOT_COLOR), ephemeral=True)
     elif custom_id == 'private_room:kick':
-        await interaction.response.defer()
         await interaction.followup.send(embed=create_button_reaction_embed(custom_id), ephemeral=True)
         msg = await client.wait_for("message", check=lambda message: message.author == interaction.user, timeout=30)
         try:

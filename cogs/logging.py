@@ -4,8 +4,6 @@ from nextcord.ext import commands
 from core.embeds import construct_log
 from core.loggers.getters import get_logging_channel, get_logging_state
 
-LOGGING_CHANNEL_TESTING_ID = 999598199444607016
-
 
 class EventsLogging(commands.Cog):
     def __init__(self, client):
@@ -201,7 +199,7 @@ class EventsLogging(commands.Cog):
             )
 
             logging_channel = self.client.get_channel(
-                get_logging_channele(role.guild.id)
+                get_logging_channel(role.guild.id)
             )
 
             await logging_channel.send(

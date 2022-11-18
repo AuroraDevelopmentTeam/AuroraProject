@@ -20,7 +20,11 @@ from core.welcomers.create import create_welcomers_config
 from core.welcomers.writers import write_in_welcomers_config_standart_values
 from core.warns.create import create_warns_table
 from core.auto.roles.create import create_autoroles_table
-from core.auto.roles.writers import write_in_autoroles_standart_values, write_in_autoroles_bool_standart_values
+from core.auto.roles.writers import (
+    write_in_autoroles_standart_values,
+    write_in_autoroles_bool_standart_values,
+    write_in_autoroles_marriage_standart_values
+)
 from core.marriage.create import create_marriage_table, create_gifts_table
 from core.marriage.writers import (
     write_in_marriage_standart_values,
@@ -47,6 +51,7 @@ from core.auto.roles.create import create_reaction_autorole_table
 from core.auto.mod.writers import write_in_mod_config_standart_values
 from core.voice.writers import write_in_voice_private_config_standart_values
 from core.clan.writers import write_in_clan_members_standart_values, write_in_clan_config_standart_values
+from core.emotions.writers import write_in_emotions_cost_standart_values
 
 
 class OnGuildListener(commands.Cog):
@@ -79,13 +84,21 @@ class OnGuildListener(commands.Cog):
         write_in_clan_config_standart_values(guilds)
         write_in_clan_members_standart_values(guilds)
         write_in_autoroles_bool_standart_values(guilds)
+        write_in_autoroles_marriage_standart_values(guilds)
+        write_in_emotions_cost_standart_values(guilds)
+        users = 0
         print(len(self.client.guilds))
         for guild in self.client.guilds:
-            print(f"{guild.name} - {(len(guild.members))}")
+            try:
+                guild = await self.client.fetch_guild(guild.id)
+                print(f"{guild.name} - {guild.approximate_member_count}")
+                users += guild.approximate_member_count
+            except Exception as error:
+                print(error)
         await self.client.change_presence(
             activity=nextcord.Game(
-                name=f"/help - Ты милый!\n"
-                f"Пользователи: {len(self.client.users)}\n Сервера: {len(self.client.guilds)}"
+                name=f"You cute! /help\nСервера: {len(self.client.guilds)}\n"
+                f"Пользователи: {users}"
             )
         )
 

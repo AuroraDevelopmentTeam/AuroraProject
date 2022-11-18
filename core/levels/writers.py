@@ -1,6 +1,7 @@
 import sqlite3
 from core.checkers import is_guild_id_in_table, is_user_in_table
 from config import settings
+from core.levels.getters import get_channel_level_state
 
 
 def write_in_levels_config_standart_values(guilds) -> None:
@@ -44,9 +45,20 @@ def write_in_levels_standart_values(guilds) -> None:
 def write_channel_in_config(guild_id: int, channel_id: int, enabled: bool) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
-    sql = "INSERT INTO level_channels_config(guild_id, channel_id, enabled) VALUES (?, ?, ?)"
-    val = (guild_id, channel_id, enabled)
-    cursor.execute(sql, val)
+    if enabled is True:
+        if get_channel_level_state(guild_id, channel_id) is False:
+            try:
+                sql = f"DELETE FROM level_channels_config WHERE guild_id = {guild_id} AND channel_id = {channel_id}"
+                cursor.execute(sql)
+                db.commit()
+            except:
+                pass
+        else:
+            pass
+    else:
+        sql = "INSERT INTO level_channels_config(guild_id, channel_id, enabled) VALUES (?, ?, ?)"
+        val = (guild_id, channel_id, enabled)
+        cursor.execute(sql, val)
     db.commit()
     cursor.close()
     db.close()

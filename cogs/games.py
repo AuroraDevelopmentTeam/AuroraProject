@@ -1,5 +1,6 @@
 from typing import Optional, Union
 import random
+import datetime
 
 import cooldowns
 import nextcord
@@ -13,6 +14,7 @@ from core.locales.getters import (
     get_msg_from_locale_by_key,
     get_guild_locale,
 )
+from core.games.ttt import TicTacToe
 from core.games.blackjack import (
     Hand,
     Deck,
@@ -49,6 +51,7 @@ from core.money.getters import get_user_balance, get_guild_currency_symbol
 from core.errors import (
     construct_error_negative_value_embed,
     construct_error_not_enough_embed,
+    construct_error_command_is_active
 )
 from core.embeds import DEFAULT_BOT_COLOR
 from core.emojify import SWORD
@@ -73,7 +76,7 @@ class DuelEndRu(nextcord.ui.View):
 
 class DuelStartRu(nextcord.ui.View):
     def __init__(
-        self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int]
+            self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int]
     ):
         self.author = author
         self.bet = bet
@@ -128,7 +131,7 @@ class DuelEndEng(nextcord.ui.View):
 
 class DuelStartEng(nextcord.ui.View):
     def __init__(
-        self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int]
+            self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int]
     ):
         self.author = author
         self.bet = bet
@@ -170,6 +173,7 @@ class DuelStartEng(nextcord.ui.View):
 
 class Games(commands.Cog):
     def __init__(self, client):
+        self.users = dict()
         self.client = client
 
     @nextcord.slash_command(
@@ -181,15 +185,15 @@ class Games(commands.Cog):
     )
     @cooldowns.cooldown(1, 3, bucket=cooldowns.SlashBucket.author)
     async def __blackjack(
-        self,
-        interaction: Interaction,
-        bet: Optional[int] = SlashOption(
-            required=True,
-            description="Number of money you bet in game",
-            description_localizations={
-                "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            bet: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money you bet in game",
+                description_localizations={
+                    "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
+                },
+            ),
     ):
         await interaction.response.defer()
         if bet <= 0:
@@ -222,6 +226,20 @@ class Games(commands.Cog):
         deal_starting_cards(player_hand, dealer_hand, deck)
         global turn
         turn = 1
+        timestamp = datetime.datetime.now().timestamp()
+        user = self.users.get(interaction.user.id, None)
+        if user is None:
+            self.users.update({interaction.user.id: timestamp})
+        if user is not None:
+            if timestamp-user < 120:
+                return await interaction.followup.send(
+                    embed=construct_error_command_is_active(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "command_is_active_error"
+                        ),
+                        interaction.user.display_avatar,
+                    )
+                )
 
         async def hit_callback(interaction: Interaction):
             global turn
@@ -243,6 +261,7 @@ class Games(commands.Cog):
                     guild_id=interaction.guild.id,
                 )
                 view = create_final_view(interaction.guild.id)
+                self.users.pop(interaction.user.id)
                 await interaction.message.edit(embed=embed, view=view)
             else:
                 turn_msg = get_msg_from_locale_by_key(interaction.guild.id, "turn")
@@ -277,6 +296,7 @@ class Games(commands.Cog):
                         guild_id=interaction.guild.id,
                     )
                     view = create_final_view(interaction.guild.id)
+                    self.users.pop(interaction.user.id)
                     await interaction.message.edit(embed=embed, view=view)
             if 17 <= dealer_hand.get_value() <= 21:
                 if dealer_hand.get_value() > player_hand.get_value():
@@ -297,6 +317,7 @@ class Games(commands.Cog):
                         guild_id=interaction.guild.id,
                     )
                     view = create_final_view(interaction.guild.id)
+                    self.users.pop(interaction.user.id)
                     await interaction.message.edit(embed=embed, view=view)
                 elif dealer_hand.get_value() == player_hand.get_value():
                     draw = get_msg_from_locale_by_key(interaction.guild.id, "draw")
@@ -308,6 +329,7 @@ class Games(commands.Cog):
                         guild_id=interaction.guild.id,
                     )
                     view = create_final_view(interaction.guild.id)
+                    self.users.pop(interaction.user.id)
                     await interaction.message.edit(embed=embed, view=view)
                 else:
                     update_user_balance(interaction.guild.id, interaction.user.id, bet)
@@ -327,6 +349,7 @@ class Games(commands.Cog):
                         guild_id=interaction.guild.id,
                     )
                     view = create_final_view(interaction.guild.id)
+                    self.users.pop(interaction.user.id)
                     await interaction.message.edit(embed=embed, view=view)
 
         async def dealer_blackjack_callback(interaction: Interaction):
@@ -340,6 +363,7 @@ class Games(commands.Cog):
                     guild_id=interaction.guild.id,
                 )
                 view = create_final_view(interaction.guild.id)
+                self.users.pop(interaction.user.id)
                 await interaction.message.edit(embed=embed, view=view)
             else:
                 update_user_balance(
@@ -359,6 +383,7 @@ class Games(commands.Cog):
                     guild_id=interaction.guild.id,
                 )
                 view = create_final_view(interaction.guild.id)
+                self.users.pop(interaction.user.id)
                 await interaction.message.edit(embed=embed, view=view)
 
         async def one_to_one_callback(interaction: Interaction):
@@ -378,6 +403,7 @@ class Games(commands.Cog):
                 guild_id=interaction.guild.id,
             )
             view = create_final_view(interaction.guild.id)
+            self.users.pop(interaction.user.id)
             await interaction.message.edit(embed=embed, view=view)
 
         if check_for_blackjack(player_hand):
@@ -416,6 +442,7 @@ class Games(commands.Cog):
                     guild_id=interaction.guild.id,
                 )
                 view = create_final_view(interaction.guild.id)
+                self.users.pop(interaction.user.id)
                 await interaction.followup.send(embed=embed, view=view)
         else:
             if check_for_blackjack(dealer_hand):
@@ -434,6 +461,7 @@ class Games(commands.Cog):
                     guild_id=interaction.guild.id,
                 )
                 view = create_final_view(interaction.guild.id)
+                self.users.pop(interaction.user.id)
                 await interaction.followup.send(embed=embed, view=view)
             else:
                 hit_msg = get_msg_from_locale_by_key(interaction.guild.id, "hit")
@@ -462,15 +490,15 @@ class Games(commands.Cog):
     )
     @cooldowns.cooldown(1, 3, bucket=cooldowns.SlashBucket.author)
     async def __slots(
-        self,
-        interaction: Interaction,
-        bet: Optional[int] = SlashOption(
-            required=True,
-            description="Number of money you bet in game",
-            description_localizations={
-                "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            bet: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money you bet in game",
+                description_localizations={
+                    "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
+                },
+            ),
     ):
         if bet <= 0:
             return await interaction.response.send_message(
@@ -533,15 +561,15 @@ class Games(commands.Cog):
     )
     @cooldowns.cooldown(1, 3, bucket=cooldowns.SlashBucket.author)
     async def __gamble(
-        self,
-        interaction: Interaction,
-        bet: Optional[int] = SlashOption(
-            required=True,
-            description="Number of money you bet in game",
-            description_localizations={
-                "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            bet: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money you bet in game",
+                description_localizations={
+                    "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
+                },
+            ),
     ):
         if bet <= 0:
             return await interaction.response.send_message(
@@ -598,15 +626,15 @@ class Games(commands.Cog):
     )
     @cooldowns.cooldown(1, 3, bucket=cooldowns.SlashBucket.author)
     async def __wheel(
-        self,
-        interaction: Interaction,
-        bet: Optional[int] = SlashOption(
-            required=True,
-            description="Number of money you bet in game",
-            description_localizations={
-                "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            bet: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money you bet in game",
+                description_localizations={
+                    "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
+                },
+            ),
     ):
         if bet <= 0:
             return await interaction.response.send_message(
@@ -658,15 +686,15 @@ class Games(commands.Cog):
     )
     @cooldowns.cooldown(1, 3, bucket=cooldowns.SlashBucket.author)
     async def __duel(
-        self,
-        interaction: Interaction,
-        bet: Optional[int] = SlashOption(
-            required=True,
-            description="Number of money you bet in game",
-            description_localizations={
-                "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            bet: Optional[int] = SlashOption(
+                required=True,
+                description="Number of money you bet in game",
+                description_localizations={
+                    "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
+                },
+            ),
     ):
         if bet <= 0:
             return await interaction.response.send_message(
@@ -693,7 +721,7 @@ class Games(commands.Cog):
         embed = nextcord.Embed(
             title=f"{SWORD} {localize_name(interaction.guild.id, 'duel').capitalize()}",
             description=f"{interaction.user.mention} {get_msg_from_locale_by_key(interaction.guild.id, 'duel')} **{bet}** "
-            f"{get_guild_currency_symbol(interaction.guild.id)}",
+                        f"{get_guild_currency_symbol(interaction.guild.id)}",
             color=DEFAULT_BOT_COLOR,
         )
         if get_guild_locale(interaction.guild.id) == "ru_ru":
@@ -704,6 +732,10 @@ class Games(commands.Cog):
             await interaction.response.send_message(
                 embed=embed, view=DuelStartEng(interaction.user, bet)
             )
+
+    @nextcord.slash_command(name="ttt_test")
+    async def _ttt_test(self, interaction: Interaction):
+        await interaction.send("Tic Tac Toe: X goes first", view=TicTacToe())
 
 
 def setup(client):

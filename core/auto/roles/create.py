@@ -27,6 +27,18 @@ def create_level_autorole_table() -> None:
     return
 
 
+def create_marriage_autorole_table() -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    cursor.execute(
+        f"""CREATE TABLE IF NOT EXISTS autoroles_marriage ( guild_id INTERGER, autorole_id INTERGER)"""
+    )
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
 def create_reaction_autorole_table() -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()

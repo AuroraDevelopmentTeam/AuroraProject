@@ -50,6 +50,7 @@ from core.utils import (
     write_member_in_stats,
     write_member_in_honor,
     write_member_in_money,
+    write_member_in_clan,
 )
 
 
@@ -70,6 +71,7 @@ class OnMessageListener(commands.Cog):
         write_member_in_profiles(guild, member)
         write_member_in_stats(guild, member)
         write_member_in_badges(guild, member)
+        write_member_in_clan(guild, member)
 
 
 def setup(client):

@@ -744,7 +744,7 @@ class ClanHandler(commands.Cog):
         color = get_clan_color(interaction.guild.id, clan_id)
         clan_icon = get_clan_icon(interaction.guild.id, clan_id)
         clan_owner = get_clan_owner_id(interaction.guild.id, clan_id)
-        clan_owner = nextcord.utils.get(interaction.guild.members, id=clan_owner)
+        clan_owner = await interaction.guild.fetch_member(clan_owner)
         clan_image = get_clan_image(interaction.guild.id, clan_id)
         color = color.replace("#", "")
         col = nextcord.Color(value=int(color, 16))
@@ -869,7 +869,7 @@ class ClanHandler(commands.Cog):
                     )
                 )
             boss_level = get_clan_guild_boss_level(interaction.guild.id, clan_id)
-            if boss_level == 6:
+            if boss_level == 10:
                 return await interaction.response.send_message("max level")
             update_clan_storage(interaction.guild.id, clan_id, -price)
             update_clan_boss_level(interaction.guild.id, clan_id, 1)
@@ -928,7 +928,14 @@ class ClanHandler(commands.Cog):
 
         async def upgrade_clan_attack(interaction: Interaction):
             clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-            price = get_server_clan_upgrade_attack_cost(interaction.guild.id)
+            min_attack = get_clan_min_attack(interaction.guild.id, clan_id)
+            price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100)
+            """
+            add_price = 2/min_attack
+            some_price = 100/add_price
+            some_some_price = some_price/100
+            price += some_some_price
+            """
             clan_storage = get_clan_storage(interaction.guild.id, clan_id)
             if clan_storage < price:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
@@ -941,25 +948,401 @@ class ClanHandler(commands.Cog):
                         f"{msg} {clan_storage}/{price}",
                     )
                 )
-            attack_to_add = random.randint(1, 5)
-            update_clan_storage(interaction.guild.id, clan_id, -price)
-            update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
-            update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
-            message = get_msg_from_locale_by_key(
-                interaction.guild.id, f"clan_shop_attack_buy"
-            )
-            min = get_clan_min_attack(interaction.guild.id, clan_id)
-            max = get_clan_max_attack(interaction.guild.id, clan_id)
-            requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-            await interaction.response.send_message(
-                embed=construct_basic_embed(
-                    f"clan_shop_attack_buy",
-                    f"{message} **{min} - {max}**",
-                    f"{requested} {interaction.user}",
-                    interaction.user.display_avatar,
-                    interaction.guild.id,
-                ),
-            )
+
+            async def upgrade_attack_1(interaction: Interaction):
+                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+                min = get_clan_min_attack(interaction.guild.id, clan_id)
+                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100)
+                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                if clan_storage < price:
+                    msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                    return await interaction.response.send_message(
+                        embed=construct_error_not_enough_embed(
+                            get_msg_from_locale_by_key(
+                                interaction.guild.id, "not_enough_money_error"
+                            ),
+                            interaction.user.display_avatar,
+                            f"{msg} {clan_storage}/{price}",
+                        )
+                    )
+                attack_to_add = random.randint(1, 5)
+                update_clan_storage(interaction.guild.id, clan_id, -price)
+                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                message = get_msg_from_locale_by_key(
+                    interaction.guild.id, f"clan_shop_attack_buy"
+                )
+                min = get_clan_min_attack(interaction.guild.id, clan_id)
+                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+                in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                storage = get_clan_storage(interaction.guild.id, clan_id)
+                await interaction.response.send_message(
+                    embed=construct_basic_embed(
+                        f"clan_shop_attack_buy",
+                        f"{message} **{min} - {max}**",
+                        f"{requested} {interaction.user}\n"
+                        f"{in_storage} {storage}",
+                        interaction.user.display_avatar,
+                        interaction.guild.id,
+                    ),
+                )
+
+            async def upgrade_attack_10(interaction: Interaction):
+                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 10
+                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                if clan_storage < price:
+                    msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                    return await interaction.response.send_message(
+                        embed=construct_error_not_enough_embed(
+                            get_msg_from_locale_by_key(
+                                interaction.guild.id, "not_enough_money_error"
+                            ),
+                            interaction.user.display_avatar,
+                            f"{msg} {clan_storage}/{price}",
+                        )
+                    )
+                attack_to_add = random.randint(1, 5) * 10
+                update_clan_storage(interaction.guild.id, clan_id, -price)
+                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                message = get_msg_from_locale_by_key(
+                    interaction.guild.id, f"clan_shop_attack_buy"
+                )
+                min = get_clan_min_attack(interaction.guild.id, clan_id)
+                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+                in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                storage = get_clan_storage(interaction.guild.id, clan_id)
+                await interaction.response.send_message(
+                    embed=construct_basic_embed(
+                        f"clan_shop_attack_buy",
+                        f"{message} **{min} - {max}**",
+                        f"{requested} {interaction.user}\n"
+                        f"{in_storage} {storage}",
+                        interaction.user.display_avatar,
+                        interaction.guild.id,
+                    ),
+                )
+
+            async def upgrade_attack_100(interaction: Interaction):
+                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 100
+                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                if clan_storage < price:
+                    msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                    return await interaction.response.send_message(
+                        embed=construct_error_not_enough_embed(
+                            get_msg_from_locale_by_key(
+                                interaction.guild.id, "not_enough_money_error"
+                            ),
+                            interaction.user.display_avatar,
+                            f"{msg} {clan_storage}/{price}",
+                        )
+                    )
+                attack_to_add = random.randint(1, 5) * 100
+                update_clan_storage(interaction.guild.id, clan_id, -price)
+                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                message = get_msg_from_locale_by_key(
+                    interaction.guild.id, f"clan_shop_attack_buy"
+                )
+                min = get_clan_min_attack(interaction.guild.id, clan_id)
+                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+                in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                storage = get_clan_storage(interaction.guild.id, clan_id)
+                await interaction.response.send_message(
+                    embed=construct_basic_embed(
+                        f"clan_shop_attack_buy",
+                        f"{message} **{min} - {max}**",
+                        f"{requested} {interaction.user}\n"
+                        f"{in_storage} {storage}",
+                        interaction.user.display_avatar,
+                        interaction.guild.id,
+                    ),
+                )
+
+            async def upgrade_attack_1000(interaction: Interaction):
+                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 1000
+                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                if clan_storage < price:
+                    msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                    return await interaction.response.send_message(
+                        embed=construct_error_not_enough_embed(
+                            get_msg_from_locale_by_key(
+                                interaction.guild.id, "not_enough_money_error"
+                            ),
+                            interaction.user.display_avatar,
+                            f"{msg} {clan_storage}/{price}",
+                        )
+                    )
+                attack_to_add = random.randint(1, 5) * 1000
+                update_clan_storage(interaction.guild.id, clan_id, -price)
+                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                message = get_msg_from_locale_by_key(
+                    interaction.guild.id, f"clan_shop_attack_buy"
+                )
+                min = get_clan_min_attack(interaction.guild.id, clan_id)
+                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+                in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                storage = get_clan_storage(interaction.guild.id, clan_id)
+                await interaction.response.send_message(
+                    embed=construct_basic_embed(
+                        f"clan_shop_attack_buy",
+                        f"{message} **{min} - {max}**",
+                        f"{requested} {interaction.user}\n"
+                        f"{in_storage} {storage}",
+                        interaction.user.display_avatar,
+                        interaction.guild.id,
+                    ),
+                )
+
+            async def upgrade_attack_10000(interaction: Interaction):
+                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 10000
+                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                if clan_storage < price:
+                    msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                    return await interaction.response.send_message(
+                        embed=construct_error_not_enough_embed(
+                            get_msg_from_locale_by_key(
+                                interaction.guild.id, "not_enough_money_error"
+                            ),
+                            interaction.user.display_avatar,
+                            f"{msg} {clan_storage}/{price}",
+                        )
+                    )
+                attack_to_add = random.randint(1, 5) * 10000
+                update_clan_storage(interaction.guild.id, clan_id, -price)
+                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                message = get_msg_from_locale_by_key(
+                    interaction.guild.id, f"clan_shop_attack_buy"
+                )
+                min = get_clan_min_attack(interaction.guild.id, clan_id)
+                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+                in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                storage = get_clan_storage(interaction.guild.id, clan_id)
+                await interaction.response.send_message(
+                    embed=construct_basic_embed(
+                        f"clan_shop_attack_buy",
+                        f"{message} **{min} - {max}**",
+                        f"{requested} {interaction.user}\n"
+                        f"{in_storage} {storage}",
+                        interaction.user.display_avatar,
+                        interaction.guild.id,
+                    ),
+                )
+
+            async def upgrade_attack_100000(interaction: Interaction):
+                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 100000
+                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                if clan_storage < price:
+                    msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                    return await interaction.response.send_message(
+                        embed=construct_error_not_enough_embed(
+                            get_msg_from_locale_by_key(
+                                interaction.guild.id, "not_enough_money_error"
+                            ),
+                            interaction.user.display_avatar,
+                            f"{msg} {clan_storage}/{price}",
+                        )
+                    )
+                attack_to_add = random.randint(1, 5) * 100000
+                update_clan_storage(interaction.guild.id, clan_id, -price)
+                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                message = get_msg_from_locale_by_key(
+                    interaction.guild.id, f"clan_shop_attack_buy"
+                )
+                min = get_clan_min_attack(interaction.guild.id, clan_id)
+                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+                in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                storage = get_clan_storage(interaction.guild.id, clan_id)
+                await interaction.response.send_message(
+                    embed=construct_basic_embed(
+                        f"clan_shop_attack_buy",
+                        f"{message} **{min} - {max}**",
+                        f"{requested} {interaction.user}\n"
+                        f"{in_storage} {storage}",
+                        interaction.user.display_avatar,
+                        interaction.guild.id,
+                    ),
+                )
+
+            async def upgrade_attack_1000000(interaction: Interaction):
+                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 1000000
+                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                if clan_storage < price:
+                    msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                    return await interaction.response.send_message(
+                        embed=construct_error_not_enough_embed(
+                            get_msg_from_locale_by_key(
+                                interaction.guild.id, "not_enough_money_error"
+                            ),
+                            interaction.user.display_avatar,
+                            f"{msg} {clan_storage}/{price}",
+                        )
+                    )
+                attack_to_add = random.randint(1, 5) * 1000000
+                update_clan_storage(interaction.guild.id, clan_id, -price)
+                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                message = get_msg_from_locale_by_key(
+                    interaction.guild.id, f"clan_shop_attack_buy"
+                )
+                min = get_clan_min_attack(interaction.guild.id, clan_id)
+                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+                in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                storage = get_clan_storage(interaction.guild.id, clan_id)
+                await interaction.response.send_message(
+                    embed=construct_basic_embed(
+                        f"clan_shop_attack_buy",
+                        f"{message} **{min} - {max}**",
+                        f"{requested} {interaction.user}\n"
+                        f"{in_storage} {storage}",
+                        interaction.user.display_avatar,
+                        interaction.guild.id,
+                    ),
+                )
+
+            async def upgrade_attack_10000000(interaction: Interaction):
+                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 10000000
+                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                if clan_storage < price:
+                    msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                    return await interaction.response.send_message(
+                        embed=construct_error_not_enough_embed(
+                            get_msg_from_locale_by_key(
+                                interaction.guild.id, "not_enough_money_error"
+                            ),
+                            interaction.user.display_avatar,
+                            f"{msg} {clan_storage}/{price}",
+                        )
+                    )
+                attack_to_add = random.randint(1, 5) * 10000000
+                update_clan_storage(interaction.guild.id, clan_id, -price)
+                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                message = get_msg_from_locale_by_key(
+                    interaction.guild.id, f"clan_shop_attack_buy"
+                )
+                min = get_clan_min_attack(interaction.guild.id, clan_id)
+                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+                in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                storage = get_clan_storage(interaction.guild.id, clan_id)
+                await interaction.response.send_message(
+                    embed=construct_basic_embed(
+                        f"clan_shop_attack_buy",
+                        f"{message} **{min} - {max}**",
+                        f"{requested} {interaction.user}\n"
+                        f"{in_storage} {storage}",
+                        interaction.user.display_avatar,
+                        interaction.guild.id,
+                    ),
+                )
+
+            async def upgrade_attack_100000000(interaction: Interaction):
+                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 100000000
+                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                if clan_storage < price:
+                    msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                    return await interaction.response.send_message(
+                        embed=construct_error_not_enough_embed(
+                            get_msg_from_locale_by_key(
+                                interaction.guild.id, "not_enough_money_error"
+                            ),
+                            interaction.user.display_avatar,
+                            f"{msg} {clan_storage}/{price}",
+                        )
+                    )
+                attack_to_add = random.randint(1, 5) * 100000000
+                update_clan_storage(interaction.guild.id, clan_id, -price)
+                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                message = get_msg_from_locale_by_key(
+                    interaction.guild.id, f"clan_shop_attack_buy"
+                )
+                min = get_clan_min_attack(interaction.guild.id, clan_id)
+                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+                in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                storage = get_clan_storage(interaction.guild.id, clan_id)
+                await interaction.response.send_message(
+                    embed=construct_basic_embed(
+                        f"clan_shop_attack_buy",
+                        f"{message} **{min} - {max}**",
+                        f"{requested} {interaction.user}\n"
+                        f"{in_storage} {storage}",
+                        interaction.user.display_avatar,
+                        interaction.guild.id,
+                    ),
+                )
+
+            async def upgrade_attack_1000000000(interaction: Interaction):
+                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 1000000000
+                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                if clan_storage < price:
+                    msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                    return await interaction.response.send_message(
+                        embed=construct_error_not_enough_embed(
+                            get_msg_from_locale_by_key(
+                                interaction.guild.id, "not_enough_money_error"
+                            ),
+                            interaction.user.display_avatar,
+                            f"{msg} {clan_storage}/{price}",
+                        )
+                    )
+                attack_to_add = random.randint(1, 5) * 1000000000
+                update_clan_storage(interaction.guild.id, clan_id, -price)
+                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                message = get_msg_from_locale_by_key(
+                    interaction.guild.id, f"clan_shop_attack_buy"
+                )
+                min = get_clan_min_attack(interaction.guild.id, clan_id)
+                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+                in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
+                storage = get_clan_storage(interaction.guild.id, clan_id)
+                await interaction.response.send_message(
+                    embed=construct_basic_embed(
+                        f"clan_shop_attack_buy",
+                        f"{message} **{min} - {max}**",
+                        f"{requested} {interaction.user}\n"
+                        f"{in_storage} {storage}",
+                        interaction.user.display_avatar,
+                        interaction.guild.id,
+                    ),
+                )
+
+            embed = nextcord.Embed(color=DEFAULT_BOT_COLOR, title="Покупка атаки")
+            buttons = [
+                create_button("1", upgrade_attack_1), create_button("10", upgrade_attack_10),
+                create_button("100", upgrade_attack_100), create_button("1000", upgrade_attack_1000),
+                create_button("10000", upgrade_attack_10000), create_button("100000", upgrade_attack_100000),
+                create_button("1000000", upgrade_attack_1000000), create_button("10000000", upgrade_attack_10000000),
+                create_button("100000000", upgrade_attack_100000000),
+                create_button("1000000000", upgrade_attack_1000000000)
+            ]
+            view = ViewAuthorCheck(author=interaction.user)
+            for button in buttons:
+                view.add_item(button)
+            await interaction.response.send_message(embed=embed, view=view)
 
         async def change_clan_color(interaction: Interaction):
             clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
@@ -979,6 +1362,7 @@ class ClanHandler(commands.Cog):
             update_clan_storage(interaction.guild.id, clan_id, -price)
             modal = ClanShopColorEntryField(clan_id)
             await interaction.response.send_modal(modal)
+
         buttons = [
             create_button("1", upgrade_clan_limit), create_button("2", change_image),
             create_button("3", change_icon), create_button("4", upgrade_clan_attack),
@@ -1662,7 +2046,7 @@ class ClanHandler(commands.Cog):
         name_localizations=get_localized_name("clan_config_upgrade_boss_cost"),
         description_localizations=get_localized_description("clan_config_upgrade_boss_cost"),
     )
-    async def __clan_config_upgrade_limit_cost(
+    async def __clan_config_upgrade_boss_cost(
             self, interaction: Interaction,
             money: Optional[int] = SlashOption(required=True)
     ):

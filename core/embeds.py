@@ -4,6 +4,8 @@ from config import settings
 from nextcord.ext import commands
 from core.locales.getters import get_msg_from_locale_by_key, localize_name
 from core.emojify import CLOCK
+from core.utils import MobilePlatform, DesktopPlatform, calculate_platform_type
+from core.locales.getters import get_guild_locale
 
 DEFAULT_BOT_COLOR = settings["default_color"]
 
@@ -49,6 +51,22 @@ def construct_long_embed(
     if len(name_list) == len(value_list):
         for name, value in zip(name_list, value_list):
             embed.add_field(name=name, value=value, inline=inline)
+    return embed
+
+
+def construct_leaderboard_embed(guild_id: int, leaderboard_name: str, value: str, user_list: list[nextcord.Member],
+                                values_list: list[str]) -> nextcord.Embed:
+    embed = nextcord.Embed(color=DEFAULT_BOT_COLOR, title=leaderboard_name)
+    counter = 0
+    if get_guild_locale(guild_id) == "ru_ru":
+        field_names = ["#.", "Никнейм", value]
+    else:
+        field_names = ["#.", "Nickname", value]
+    for i in range(len(user_list)):
+        counter += 1
+        embed.add_field(name=field_names[0], value=counter)
+        embed.add_field(name=field_names[1], value=user_list[i])
+        embed.add_field(name=field_names[2], value=values_list[i])
     return embed
 
 

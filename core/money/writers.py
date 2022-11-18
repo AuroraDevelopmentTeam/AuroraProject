@@ -3,6 +3,7 @@ import nextcord
 from core.checkers import is_guild_id_in_table, is_user_in_table
 import json
 from config import settings
+from core.money.getters import get_channel_income_state
 
 
 def write_in_money_config_standart_values(guilds) -> None:
@@ -72,9 +73,20 @@ def delete_role_from_income(guild_id: int, role: nextcord.Role) -> None:
 def write_channel_in_config(guild_id: int, channel_id: int, enabled: bool) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
-    sql = "INSERT INTO money_channels_config(guild_id, channel_id, enabled) VALUES (?, ?, ?)"
-    val = (guild_id, channel_id, enabled)
-    cursor.execute(sql, val)
+    if enabled is True:
+        if get_channel_income_state(guild_id, channel_id) is False:
+            try:
+                sql = f"DELETE FROM money_channels_config WHERE guild_id = {guild_id} AND channel_id = {channel_id}"
+                cursor.execute(sql)
+                db.commit()
+            except:
+                pass
+        else:
+            pass
+    else:
+        sql = "INSERT INTO money_channels_config(guild_id, channel_id, enabled) VALUES (?, ?, ?)"
+        val = (guild_id, channel_id, enabled)
+        cursor.execute(sql, val)
     db.commit()
     cursor.close()
     db.close()

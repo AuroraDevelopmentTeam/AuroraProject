@@ -98,6 +98,28 @@ def get_user_marry_date(guild_id: int, user_id: int) -> str:
     return date
 
 
+def get_user_loveroom_expire_date(guild_id: int, user_id: int) -> str:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    loveroom_expire_date = cursor.execute(
+        f"SELECT loveroom_expire FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return loveroom_expire_date
+
+
+def get_user_loveroom_id(guild_id: int, user_id: int) -> str:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    loveroom_id = cursor.execute(
+        f"SELECT loveroom_id FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return loveroom_id
+
+
 def get_family_money(guild_id: int, user_id: int) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
@@ -140,3 +162,48 @@ def get_user_gift_counter(guild_id: int, user_id: int, gift: str) -> int:
     cursor.close()
     db.close()
     return gift_count
+
+
+def get_marriage_config_enable_loverooms(guild_id) -> bool:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    enable_loverooms = cursor.execute(
+        f"SELECT enable_loverooms FROM marriage_config WHERE guild_id = {guild_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return bool(enable_loverooms)
+
+
+def get_marriage_config_marriage_price(guild_id) -> int:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    marriage_price = cursor.execute(
+        f"SELECT marriage_price FROM marriage_config WHERE guild_id = {guild_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return marriage_price
+
+
+def get_marriage_config_month_loveroom_price(guild_id) -> int:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    month_loveroom_price = cursor.execute(
+        f"SELECT month_loveroom_price FROM marriage_config WHERE guild_id = {guild_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return month_loveroom_price
+
+
+def get_marriage_config_loveroom_category(guild_id) -> int:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    loveroom_category = cursor.execute(
+        f"SELECT loveroom_category FROM marriage_config WHERE guild_id = {guild_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return loveroom_category
+

@@ -67,6 +67,8 @@ class Information(commands.Cog):
             )
         else:
             embedicon = guild.icon
+        guild = await self.client.fetch_guild(interaction.guild.id)
+        users = guild.approximate_member_count
         embed = construct_long_embed(
             f"{guild.name}:",
             embedicon,  # Тут был guild.icon
@@ -74,7 +76,7 @@ class Information(commands.Cog):
             interaction.user.display_avatar,
             names_of_embed_fields,
             [
-                f"```\n{guild.member_count}\n{len(guild.humans)} 🧍 {len(guild.bots)} 🤖\n```",
+                f"```\n{users} 🧍\n```",
                 f"```{guild.owner.name}```",
                 f"```{len(guild.emojis)}```",
                 f"```{guild.created_at.strftime('%a, %d %b %Y')}```",
@@ -102,15 +104,15 @@ class Information(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __user(
-        self,
-        interaction: Interaction,
-        user: Optional[nextcord.Member] = SlashOption(
-            required=True,
-            description="The discord's user, tag someone with @",
-            description_localizations={
-                "ru": "Пользователь дискорда, укажите кого-то @"
-            },
-        ),
+            self,
+            interaction: Interaction,
+            user: Optional[nextcord.Member] = SlashOption(
+                required=True,
+                description="The discord's user, tag someone with @",
+                description_localizations={
+                    "ru": "Пользователь дискорда, укажите кого-то @"
+                },
+            ),
     ):
         if user is None:
             return await interaction.response.send_message("no key value error 786")
@@ -139,6 +141,46 @@ class Information(commands.Cog):
                 f"```{user.nick}```",
                 f"```{len(user.roles)}```",
                 f"{activity}",
+            ],
+            True,
+        )
+        await interaction.response.send_message(embed=embed)
+
+    @nextcord.slash_command(name="about_aurora",
+                            description="Sends all information about Aurora bot",
+                            name_localizations=get_localized_name("about_aurora"),
+                            description_localizations=get_localized_description("about_aurora"),
+                            default_member_permissions=Permissions(send_messages=True),
+                            )
+    async def __about_aurora(self, interaction: Interaction):
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        names_of_embed_fields = get_keys_value_in_locale(
+            interaction.guild.id, interaction.application_command.name
+        )
+        users = 0
+        print(len(self.client.guilds))
+        for guild in self.client.guilds:
+            guild = await self.client.fetch_guild(guild.id)
+            users += guild.approximate_member_count
+        embed = construct_long_embed(
+            f"{self.client.user}:",
+            self.client.user.avatar.url,
+            f"{requested} {interaction.user}",
+            interaction.user.display_avatar,
+            names_of_embed_fields,
+            [
+                f"```\n{users} 🧍```",
+                f"```{len(self.client.guilds)}```",
+                f"```{self.client.user.id}```",
+                f"```{psutil.cpu_percent()}```",
+                f"```{psutil.virtual_memory().percent}```",
+                f"```{psutil.virtual_memory().available * 100 / psutil.virtual_memory().total}```",
+                f"```{self.client.ws.shard_id}```",
+                f"```{self.client.status}```",
+                f"{nextcord.utils.format_dt(self.client.user.created_at)}",
+                f"```Python 3.10.4```",
+                f"```Nextcord```",
+                f"[GitHub](https://github.com/AuroraDevelopmentTeam)",
             ],
             True,
         )

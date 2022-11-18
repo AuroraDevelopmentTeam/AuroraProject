@@ -243,11 +243,11 @@
     },
     "marry": {
       "name": "marry",
-      "description": "Send marriage request to @User, if marriage will be success you will pay 10000 currency on server",
+      "description": "Send marriage request to @User, if marriage will be success you will pay currency on server:",
       "msg": "offers you his hand and heart forever"
     },
     "marry_answer": {
-      "msg": "\n\n**What will be your answer?**\nYou have a whole minute to make a decision. **10,000** will be charged from the account of the person who offered wedding if wedding will be succesful"
+      "msg": "\n\n**What will be your answer?**\nYou have a whole minute to make a decision. From balance of the person who offered wedding if wedding will be successful will be charged:"
     },
     "marry_yes": {
       "msg": "Successful wedding"
@@ -509,7 +509,7 @@
       "msg": "Now you like this user:"
     },
     "unlike": {
-      "name": "like",
+      "name": "unlike",
       "description": "Change person that you like to noone",
       "msg": "Now there are no any person you like"
     },
@@ -1168,5 +1168,81 @@
     },
     "voice_private_config": {
       "name": "voice_private_config"
+    },
+    "autorole_on_marriage": {
+      "msg": "Now this role will be given on marriage:",
+      "name": "on_marriage",
+      "description": "Set autorole on marriage, which will be given to couple members on marriage and removed on divorce"
+    },
+    "you_charged": {
+      "msg": "Written off from balance:"
+    },
+    "emotion_config": {
+      "name": "emotion_config",
+      "description": "Set up settings for emotions on your server"
+    },
+    "emotion_config_set_emotion_cost": {
+      "name": "set_emotion_cost",
+      "description": "Set cost of using emotion command on your server",
+      "msg": "Now cost of using emotion is: "
+    },
+    "emotion_config_enable_paid_emotions": {
+      "name": "enable_paid_emotions",
+      "description": "Turn on/turn off paid emotions with your server currency",
+      "msg": "For paid emotions now i use this state:"
+    },
+    "online_peoples": {
+      "msg": "In server voice channels right now:"
+    },
+    "about_aurora": {
+      "name": "about_aurora",
+      "description": "Sends all information about Aurora bot",
+      "user_count": "Aurorа bot Users:",
+      "guild_count": "Guilds using Aurorа:",
+      "id": "Aurora ID:",
+      "cpu_percent": "CPU Usage %",
+      "virtual_memory": "Memory Usage %",
+      "available_memory": "Available Memory %",
+      "websocket": "Websocket:",
+      "client_status": "Aurora status:",
+      "client_created_at": "Aurora created at",
+      "language": "Development language",
+      "library": "Discord API wrapper:",
+      "github": "GitHub:"
+  },
+    "marriage_config": {
+      "name": "marriage_config",
+      "description": "Prefix command for marriage settings"
+  },
+    "marriage_config_enable_loverooms": {
+      "name": "enable_loverooms",
+      "description": "Turn on/turn off loverooms creation",
+      "msg": "The next state for loveroom now is activated:"
+  },
+    "marriage_config_marriage_price": {
+      "name": "marriage_price",
+      "description": "Set wedding process price on your server",
+      "msg": "Now on server marriage price is:"
+  },
+    "marriage_config_month_loveroom_price": {
+      "name": "month_loveroom_price",
+      "description": "Set price of renting private couple loveroom for month",
+      "msg": "Set next price of renting private couple loveroom for month:"
+  },
+    "marriage_config_loveroom_category": {
+      "name": "loveroom_category",
+      "description": "Set category for loveroom creating",
+      "msg": "Set next category for loveroom creating:"
+  },
+    "loveroom_create": {
+      "name": "loveroom_create",
+      "description": "Create or rule your couple loveroom",
+      "msg": "Loveroom on one month"
+    },
+    "on_family_balance": {
+      "msg": "Couple balance:"
+    },
+    "command_is_active_error": {
+      "msg": "Aurora denied process of command execution due to __**command is already active**__\nYour command failed to successfully complete."
     }
 }
