@@ -310,7 +310,7 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 color=DEFAULT_BOT_COLOR,
                 title="🎟️ Tickets",
                 description="`/setup_tickets` — Setup tickets\n`/set ticket_category` — "
-                "Set category channel for tickets\n/set ticket_archive — Set archive category for "
+                "Set category channel for tickets\n`/set ticket_archive` — Set archive category for "
                 "tickets\n "
                 "`/set ticket_support` — Set role for ticket moderator",
             )
@@ -725,7 +725,7 @@ class HelpSelectMenuRU(nextcord.ui.Select):
                 color=DEFAULT_BOT_COLOR,
                 title="🎟️ Тикеты",
                 description="`/setup_tickets` — Установить каналы и категории тикетов\n`/set ticket_category` — "
-                "Установить категорию для тикетов\n/set ticket_archive — Установить категорию - архив для "
+                "Установить категорию для тикетов\n`/set ticket_archive` — Установить категорию - архив для "
                 "тикетов\n "
                 "`/set ticket_support` — Установить роль модератора тикетов",
             )

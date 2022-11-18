@@ -62,16 +62,17 @@ class OnMessageListener(commands.Cog):
     async def on_message(self, message: nextcord.Message):
         guild = message.guild
         member = message.author
-        write_member_in_money(guild, member)
-        write_member_in_levels(guild, member)
-        write_member_in_profiles(guild, member)
-        write_member_in_marriage(guild, member)
-        write_member_in_gifts(guild, member)
-        write_member_in_honor(member)
-        write_member_in_profiles(guild, member)
-        write_member_in_stats(guild, member)
-        write_member_in_badges(guild, member)
-        write_member_in_clan(guild, member)
+        if not message.author.bot:
+            write_member_in_money(guild, member)
+            write_member_in_levels(guild, member)
+            write_member_in_profiles(guild, member)
+            write_member_in_marriage(guild, member)
+            write_member_in_gifts(guild, member)
+            write_member_in_honor(member)
+            write_member_in_profiles(guild, member)
+            write_member_in_stats(guild, member)
+            write_member_in_badges(guild, member)
+            write_member_in_clan(guild, member)
 
 
 def setup(client):

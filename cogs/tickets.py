@@ -17,6 +17,7 @@ from core.tickets.getters import (
 )
 from core.tickets.updaters import update_ticket_archive, update_ticket_category
 from core.embeds import DEFAULT_BOT_COLOR
+from core.errors import construct_error_command_is_active
 
 
 class TicketDisabledEng(nextcord.ui.View):
@@ -134,31 +135,48 @@ class Tickets(commands.Cog):
                 support_role = nextcord.utils.get(
                     interaction.guild.roles, id=get_ticket_support(interaction.guild.id)
                 )
-                overwrites = {
-                    interaction.guild.default_role: nextcord.PermissionOverwrite(
-                        read_messages=False
-                    ),
-                    interaction.user: nextcord.PermissionOverwrite(read_messages=True),
-                    support_role: nextcord.PermissionOverwrite(read_messages=True),
-                }
+                if support_role is not None:
+                    overwrites = {
+                        interaction.guild.default_role: nextcord.PermissionOverwrite(
+                            read_messages=False
+                        ),
+                        interaction.user: nextcord.PermissionOverwrite(read_messages=True),
+                        support_role: nextcord.PermissionOverwrite(read_messages=True),
+                    }
+                else:
+                    overwrites = {
+                        interaction.guild.default_role: nextcord.PermissionOverwrite(
+                            read_messages=False
+                        ),
+                        interaction.user: nextcord.PermissionOverwrite(read_messages=True),
+                    }
                 tickets_category = get_ticket_category(interaction.guild.id)
                 category_channel = nextcord.utils.get(
                     interaction.guild.categories, id=tickets_category
                 )
-                channel = await category_channel.create_text_channel(
-                    f"{interaction.user.name}-ticket", overwrites=overwrites
-                )
+                for channel in category_channel.channels:
+                    if str(channel.name.casefold()) == f"{str(interaction.user.name.casefold())}":
+                        embed = construct_error_command_is_active(
+                            get_msg_from_locale_by_key(
+                                interaction.guild.id, "command_is_active_error"
+                            ),
+                            interaction.user.display_avatar,
+                        )
+                        return await interaction.followup.send(embed=embed, ephemeral=True)
+                channel = await interaction.guild.create_text_channel(name=f"{interaction.user.name}",
+                                                                      category=category_channel,
+                                                                      overwrites=overwrites)
                 embed = nextcord.Embed(
                     title=get_msg_from_locale_by_key(interaction.guild.id, "ticket"),
                     description=f"{get_msg_from_locale_by_key(interaction.guild.id, 'ticket_now_is_created')} "
-                    f"{channel.mention}",
+                                f"{channel.mention}",
                     color=DEFAULT_BOT_COLOR,
                 )
                 await msg.edit(embed=embed)
                 embed = nextcord.Embed(
                     title=get_msg_from_locale_by_key(interaction.guild.id, "ticket"),
                     description=f"{interaction.user.mention} "
-                    f"{get_msg_from_locale_by_key(interaction.guild.id, 'created_ticket')}",
+                                f"{get_msg_from_locale_by_key(interaction.guild.id, 'created_ticket')}",
                     color=DEFAULT_BOT_COLOR,
                 )
                 if get_guild_locale(interaction.guild.id) == "ru_ru":
@@ -210,11 +228,11 @@ class Tickets(commands.Cog):
         default_member_permissions=Permissions(administrator=True),
     )
     async def __setup_tickets(
-        self,
-        interaction: Interaction,
-        create_mode: str = SlashOption(
-            name="picker", choices={"auto": "auto", "self": "self"}, required=True
-        ),
+            self,
+            interaction: Interaction,
+            create_mode: str = SlashOption(
+                name="picker", choices={"auto": "auto", "self": "self"}, required=True
+            ),
     ):
         await interaction.response.defer()
         embed = nextcord.Embed(
