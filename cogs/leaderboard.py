@@ -47,7 +47,9 @@ class Leaderboard(commands.Cog):
         cursor.close()
         db.close()
         for row in rows:
-            user = await self.client.fetch_user(row[0])
+            user = self.client.get_user(row[0])
+            if user is None:
+                user = await self.client.fetch_user(row[0])
             money.append([user.mention, row[1]])
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
@@ -80,7 +82,9 @@ class Leaderboard(commands.Cog):
         cursor.close()
         db.close()
         for row in rows:
-            user = await self.client.fetch_user(row[0])
+            user = self.client.get_user(row[0])
+            if user is None:
+                user = await self.client.fetch_user(row[0])
             levels.append([user.mention, row[1]])
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         embed = construct_top_embed(
@@ -111,7 +115,9 @@ class Leaderboard(commands.Cog):
         cursor.close()
         db.close()
         for row in rows:
-            user = await self.client.fetch_user(row[0])
+            user = self.client.get_user(row[0])
+            if user is None:
+                user = await self.client.fetch_user(row[0])
             levels.append([user.mention, row[1]])
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
@@ -144,7 +150,9 @@ class Leaderboard(commands.Cog):
         cursor.close()
         db.close()
         for row in rows:
-            user = await self.client.fetch_user(row[0])
+            user = self.client.get_user(row[0])
+            if user is None:
+                user = await self.client.fetch_user(row[0])
             levels.append([user.mention, format_seconds_to_hhmmss(row[1])])
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         embed = construct_top_embed(
@@ -173,7 +181,9 @@ class Leaderboard(commands.Cog):
         cursor.close()
         db.close()
         for row in rows:
-            user = await self.client.fetch_user(row[0])
+            user = self.client.get_user(row[0])
+            if user is None:
+                user = await self.client.fetch_user(row[0])
             levels.append([user.mention, row[1]])
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         embed = construct_top_embed(
