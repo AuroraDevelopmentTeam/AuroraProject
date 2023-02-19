@@ -29,6 +29,7 @@ from core.marriage.create import create_marriage_table, create_gifts_table
 from core.marriage.writers import (
     write_in_marriage_standart_values,
     write_in_gifts_standart_values,
+    write_in_marriage_config_standart_values,
 )
 from core.shop.create import create_shop_table
 from core.goodbyes.create import create_goodbye_config
@@ -86,6 +87,7 @@ class OnGuildListener(commands.Cog):
         write_in_autoroles_bool_standart_values(guilds)
         write_in_autoroles_marriage_standart_values(guilds)
         write_in_emotions_cost_standart_values(guilds)
+        write_in_marriage_config_standart_values(guilds)
         users = 0
         print(len(self.client.guilds))
         for guild in self.client.guilds:
