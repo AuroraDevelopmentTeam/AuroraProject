@@ -881,9 +881,23 @@ class Marriage(commands.Cog):
         pair = await interaction.guild.fetch_member(pair_id)
         loverooms_state = get_marriage_config_enable_loverooms(interaction.guild.id)
         print(loverooms_state)
+        if loverooms_state:
+            return await interaction.response.send_message(
+                embed=construct_error_not_married_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "loveroom_existing"),
+                    self.client.user.avatar.url
+                )
+            )
         loveroom_category = nextcord.utils.get(interaction.guild.channels,
                                                id=get_marriage_config_loveroom_category(interaction.guild.id))
         loveroom_price = get_marriage_config_month_loveroom_price(interaction.guild.id)
+        bal = get_family_money(interaction.guild.id, interaction.user.id)
+        if bal < loveroom_price:
+            return await interaction.response.send_message(
+                embed=construct_error_not_married_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "on_loveroom_money_error"),
+                    self.client.user.avatar.url,
+            ))
         update_couple_family_money(interaction.guild.id, interaction.user.id, pair_id, -loveroom_price)
         overwrites = {
             interaction.guild.default_role: nextcord.PermissionOverwrite(

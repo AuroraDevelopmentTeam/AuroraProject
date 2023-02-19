@@ -1242,6 +1242,12 @@
     "on_family_balance": {
       "msg": "Couple balance:"
     },
+    "on_loveroom_money_error": {
+      "msg": "You don't have enough money on your family balance to create loveroom"
+    },
+    "loveroom_existing": {
+      "msg": "You already have loveroom"
+    },
     "command_is_active_error": {
       "msg": "Aurora denied process of command execution due to __**command is already active**__\nYour command failed to successfully complete."
     }
