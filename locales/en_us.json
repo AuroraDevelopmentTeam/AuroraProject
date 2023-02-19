@@ -427,7 +427,7 @@
     },
     "leaderboard": {
       "name": "leaderboard",
-      "description": "leaderboard commands"
+      "description": "leaderboard command"
     },
     "leaderboard_level": {
       "name": "level",
