@@ -28,6 +28,7 @@ from core.money.getters import (
     get_guild_starting_balance,
     get_guild_payday_amount,
     list_income_roles,
+    get_all_users,
 )
 from core.money.writers import (
     write_role_in_income,
@@ -334,9 +335,10 @@ class Economics(commands.Cog):
     )
     async def __economics(self, interaction: Interaction):
         starting_balance = get_guild_starting_balance(interaction.guild.id)
-        for member in interaction.guild.members:
-            if not member.bot:
-                set_user_balance(interaction.guild.id, member.id, starting_balance)
+        all_users = get_all_users(interaction.guild.id)
+        print(all_users)
+        for user_id in all_users:
+            set_user_balance(interaction.guild.id, user_id, starting_balance)
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"reset_{interaction.application_command.name}"
