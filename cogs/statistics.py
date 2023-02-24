@@ -79,13 +79,13 @@ class StatisticsCounter(commands.Cog):
 
         if before.channel is not None and after.channel is None:
             join_time = get_user_join_time(member.guild.id, member.id)
+            join_time = int(join_time)
             if join_time != "0":
-                voice_leave_time = datetime.datetime.now().time().strftime("%H:%M:%S")
-                calculate_time = abs(
-                    datetime.datetime.strptime(voice_leave_time, "%H:%M:%S")
-                    - datetime.datetime.strptime(join_time, "%H:%M:%S")
-                )
-                second_in_voice = abs(calculate_time.total_seconds())
+                voice_leave_time = int(datetime.datetime.now().timestamp())
+                calculate_time = voice_leave_time-join_time
+                print(calculate_time)
+                second_in_voice = calculate_time
+                print(second_in_voice)
                 update_user_join_time(member.guild.id, member.id, "0")
                 update_user_time_in_voice(member.guild.id, member.id, second_in_voice)
 
@@ -130,7 +130,7 @@ class StatisticsCounter(commands.Cog):
                         leveling_formula = round((7 * (user_level**2)) + 58)
 
         elif before.channel is None and after.channel is not None:
-            join_time = datetime.datetime.now().time().strftime("%H:%M:%S")
+            join_time = str(int(datetime.datetime.now().timestamp()))
             update_user_join_time(member.guild.id, member.id, join_time)
         else:
             pass

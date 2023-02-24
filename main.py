@@ -11,11 +11,7 @@ load_dotenv()
 
 token = os.getenv("token")
 
-intents = nextcord.Intents.default()
-intents.members = False
-intents.presences = True
-intents.messages = True
-intents.message_content = True
+intents = nextcord.Intents.all()
 
 client = commands.Bot(
     command_prefix=settings["PREFIX"],
