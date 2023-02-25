@@ -202,8 +202,11 @@ class Marriage(commands.Cog):
             if marriage_autorole != 0:
                 role = nextcord.utils.get(interaction.guild.roles, id=marriage_autorole[0])
                 if role != 0:
-                    await author.add_roles(role)
-                    await pair.add_roles(role)
+                    try:
+                        await author.add_roles(role)
+                        await pair.add_roles(role)
+                    except Exception as err:
+                        print(err)
             yes_button = create_button(
                 get_msg_from_locale_by_key(interaction.guild.id, "yes"), False, True
             )

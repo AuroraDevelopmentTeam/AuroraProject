@@ -1250,5 +1250,11 @@
     },
     "command_is_active_error": {
       "msg": "Aurora denied process of command execution due to __**command is already active**__\nYour command failed to successfully complete."
+    },
+    "ttt_turn_o": {
+      "msg": "It is now O's turn"
+    },
+    "ttt_turn_x": {
+      "msg": "It is now X's turn"
     }
 }

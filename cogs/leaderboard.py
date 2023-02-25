@@ -15,24 +15,22 @@ from core.utils import format_seconds_to_hhmmss
 
 DEFAULT_BOT_COLOR = settings["default_color"]
 
+
 class LeaderBoardButtons(nextcord.ui.View):
     def __init__(self, client, interaction):
-        self.client = client 
+        self.client = client
         self.interaction = interaction
         super().__init__(timeout=30)
-        
-        
+
     async def on_timeout(self):
         for child in self.children:
             child.disabled = True
         message = await self.interaction.original_message()
         await message.edit(view=self)
-        
-        
+
     async def interaction_check(self, interaction: nextcord.Interaction) -> bool:
         return interaction.user == self.interaction.user
-    
-    
+
     @nextcord.ui.button(label="Баланс")
     async def _balance_top(self, button, interaction):
         db = sqlite3.connect("./databases/main.sqlite")
@@ -51,19 +49,18 @@ class LeaderBoardButtons(nextcord.ui.View):
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         embed = construct_top_embed(
-          self.interaction.application_command.name,
-          money,
-          f"{requested} {interaction.user}",
-          interaction.user.display_avatar,
-          currency_symbol,
+            self.interaction.application_command.name,
+            money,
+            f"{requested} {interaction.user}",
+            interaction.user.display_avatar,
+            currency_symbol,
         )
         embed.set_image(
             "https://cdn.discordapp.com/attachments/772385814483173398/1002913553373732945/a6d84a1408a1e5a2.gif"
         )
         embed.set_thumbnail(url=interaction.user.avatar.url)
         await interaction.response.edit_message(embed=embed)
-    
-    
+
     @nextcord.ui.button(label="Голосовая активность")
     async def _voice_top(self, button, interaction):
         db = sqlite3.connect("./databases/main.sqlite")
@@ -117,7 +114,7 @@ class LeaderBoardButtons(nextcord.ui.View):
         )
         embed.set_thumbnail(url=interaction.user.avatar.url)
         await interaction.response.edit_message(embed=embed)
-        
+
     @nextcord.ui.button(label="Топ по сообщениям")
     async def _messages_top(self, button, interaction):
         db = sqlite3.connect("./databases/main.sqlite")
@@ -145,7 +142,7 @@ class LeaderBoardButtons(nextcord.ui.View):
         )
         embed.set_thumbnail(url=interaction.user.avatar.url)
         await interaction.response.edit_message(embed=embed)
-    
+
     @nextcord.ui.button(label="Топ вайфу")
     async def _waifu_top(self, button, interaction):
         db = sqlite3.connect("./databases/main.sqlite")
@@ -172,10 +169,11 @@ class LeaderBoardButtons(nextcord.ui.View):
         )
         embed.set_image(
             url="https://media.discordapp.net/attachments/525436099200417792/880565982953873448/ezgif-7-14708239185a.gif"
-        )        
+        )
         embed.set_thumbnail(url=interaction.user.avatar.url)
         await interaction.response.edit_message(embed=embed)
-        
+
+
 class Leaderboard(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -184,7 +182,6 @@ class Leaderboard(commands.Cog):
         name="leaderboard",
         description="Leaderboard slash command that will be the prefix of leaderboard commands.",
         name_localizations=get_localized_name("leaderboard"),
-        guild_ids=[1011711747461238827],
         description_localizations=get_localized_description("leaderboard"),
         default_member_permissions=Permissions(send_messages=True),
     )
@@ -192,7 +189,7 @@ class Leaderboard(commands.Cog):
         """
         This is the set slash command that will be the prefix of leaderboard commands.
         """
-        
+
         db = sqlite3.connect("./databases/main.sqlite")
         cursor = db.cursor()
         money = []
@@ -209,18 +206,17 @@ class Leaderboard(commands.Cog):
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         embed = construct_top_embed(
-          interaction.application_command.name,
-          money,
-          f"{requested} {interaction.user}",
-          interaction.user.display_avatar,
-          currency_symbol,
+            interaction.application_command.name,
+            money,
+            f"{requested} {interaction.user}",
+            interaction.user.display_avatar,
+            currency_symbol,
         )
         embed.set_image(
             "https://cdn.discordapp.com/attachments/772385814483173398/1002913553373732945/a6d84a1408a1e5a2.gif"
         )
         embed.set_thumbnail(url=interaction.user.avatar.url)
         await interaction.response.send_message(embed=embed, view=LeaderBoardButtons(self.client, interaction))
-
 
 
 def setup(client):

@@ -20,6 +20,9 @@ class TicTacToeButton(nextcord.ui.Button["TicTacToe"]):
         if view.current_player == view.X:
             self.view.board[self.x][self.y] = view.X
             view.current_player = view.O
+            content = get_msg_from_locale_by_key(
+                interaction.guild.id, "not_married_error"
+            )
             content = "It is now O's turn"
         else:
             self.view.board[self.x][self.y] = view.O
@@ -162,53 +165,28 @@ class TicTacToe(nextcord.ui.View):
 
         return None
 
-    def evaluate(self):
-        b = self.board
-
-        # Checking for Rows for X or O victory.
-        for row in range(3):
-            if b[row][0] == b[row][1] and b[row][1] == b[row][2]:
-                if b[row][0] == self.X:
-                    return 10
-                elif b[row][0] == self.O:
-                    return -10
-
-        # Checking for Columns for X or O victory.
-        for col in range(3):
-
-            if b[0][col] == b[1][col] and b[1][col] == b[2][col]:
-
-                if b[0][col] == self.O:
-                    return 10
-                elif b[0][col] == self.X:
-                    return -10
-
-        # Checking for Diagonals for X or O victory.
-        if b[0][0] == b[1][1] and b[1][1] == b[2][2]:
-
-            if b[0][0] == self.X:
-                return 10
-            elif b[0][0] == self.O:
+    def eval(self):
+        winner = self.check_board_winner()
+        if winner is not None:
+            if winner == self.X:
                 return -10
-
-        if b[0][2] == b[1][1] and b[1][1] == b[2][0]:
-
-            if b[0][2] == self.X:
+            elif winner == self.O:
                 return 10
-            elif b[0][2] == self.O:
-                return -10
-
-        # Else if none of them have won then return 0
-        return 0
+            else:
+                return 0
 
     def minimax(self, depth, isMax):
-        score = self.evaluate()
+        score = self.eval()
         if score == 10:
             return score
 
+        # If Minimizer has won the game return his/her
+        # evaluated score
         if score == -10:
             return score
 
+        # If there are no more moves and no winner then
+        # it is a tie
         if not self.is_moves_left():
             return 0
 
@@ -217,8 +195,8 @@ class TicTacToe(nextcord.ui.View):
             for i in range(3):
                 for j in range(3):
                     if self.board[i][j] == 0:
-                        self.board[i][j] = self.X
-                        best = max(best, self.minimax(depth + 1, not isMax))
+                        self.board[i][j] = 1
+                        best = max(best, self.minimax(depth=depth+1, isMax=(not isMax)))
                         self.board[i][j] = 0
             return best
         else:
@@ -226,22 +204,25 @@ class TicTacToe(nextcord.ui.View):
             for i in range(3):
                 for j in range(3):
                     if self.board[i][j] == 0:
-                        self.board[i][j] = self.O
-                        best = max(best, self.minimax(depth + 1, not isMax))
+                        self.board[i][j] = -1
+                        best = min(best, self.minimax(depth=depth+1, isMax=(not isMax)))
                         self.board[i][j] = 0
             return best
 
     def find_best_move(self):
-        global bestVal
-        best_val = -1000
-        best_move = (-1, -1)
+        bestVal = -1000
+        bestMove = (-1, -1)
         for i in range(3):
             for j in range(3):
                 if self.board[i][j] == 0:
                     self.board[i][j] = 1
-                    move_val = self.minimax(0, False)
+                    moveVal = self.minimax(0, False)
                     self.board[i][j] = 0
-                    if move_val > best_val:
-                        best_move = (i, j)
-                        best_val = move_val
-        return best_move
+                    if moveVal > bestVal:
+                        bestMove = (i, j)
+                        bestVal = moveVal
+
+        return bestMove
+
+
+

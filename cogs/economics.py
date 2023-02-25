@@ -334,9 +334,9 @@ class Economics(commands.Cog):
         description_localizations=get_localized_description("reset_economics"),
     )
     async def __economics(self, interaction: Interaction):
+        await interaction.response.defer()
         starting_balance = get_guild_starting_balance(interaction.guild.id)
         all_users = get_all_users(interaction.guild.id)
-        print(all_users)
         for user_id in all_users:
             set_user_balance(interaction.guild.id, user_id, starting_balance)
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
@@ -344,7 +344,7 @@ class Economics(commands.Cog):
             interaction.guild.id, f"reset_{interaction.application_command.name}"
         )
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-        await interaction.response.send_message(
+        await interaction.followup.send(
             embed=construct_basic_embed(
                 interaction.application_command.name,
                 f"{message} **{starting_balance}** {currency_symbol}",

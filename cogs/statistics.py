@@ -83,9 +83,7 @@ class StatisticsCounter(commands.Cog):
             if join_time != "0":
                 voice_leave_time = int(datetime.datetime.now().timestamp())
                 calculate_time = voice_leave_time-join_time
-                print(calculate_time)
                 second_in_voice = calculate_time
-                print(second_in_voice)
                 update_user_join_time(member.guild.id, member.id, "0")
                 update_user_time_in_voice(member.guild.id, member.id, second_in_voice)
 

@@ -126,7 +126,12 @@ def list_income_roles(guild_id: int):
 def get_all_users(guild_id: int) -> list[tuple[int]]:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
-    rows = cursor.execute("SELECT user_id FROM money WHERE guild_id = ?", (guild_id,)).fetchall()[0]
+    rows = cursor.execute(
+        f"SELECT user_id FROM money WHERE guild_id = {guild_id}"
+    ).fetchall()
+    rows_list = []
+    for row in rows:
+        rows_list.append(row[0])
     cursor.close()
     db.close()
-    return list(rows)
+    return rows_list
