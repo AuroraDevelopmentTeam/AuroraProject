@@ -733,16 +733,16 @@ class Games(commands.Cog):
                 embed=embed, view=DuelStartEng(interaction.user, bet)
             )
 
-    @nextcord.slash_command(name="ttt_test")
-    async def _ttt_test(self, interaction: Interaction,
-                        bet: Optional[int] = SlashOption(
-                            required=True,
-                            description="Number of money you bet in game",
-                            description_localizations={
-                                "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
-                            },
-                        )
-                        ):
+    @nextcord.slash_command(name="ttt")
+    async def __ttt(self, interaction: Interaction,
+                    bet: Optional[int] = SlashOption(
+                        required=True,
+                        description="Number of money you bet in game",
+                        description_localizations={
+                            "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
+                        },
+                    )
+                    ):
         if bet <= 0:
             return await interaction.response.send_message(
                 embed=construct_error_negative_value_embed(
@@ -774,6 +774,406 @@ class Games(commands.Cog):
             interaction.guild.id,
         )
         await interaction.send(embed=embed, view=TicTacToe(author=interaction.user, bet=bet))
+
+    @nextcord.slash_command(name='hangman')
+    async def __hangman(self, interaction: Interaction):
+        author = interaction.user
+        member_id = str(author.id)
+        word_list = ['питон',
+                     'анаконда',
+                     'змея',
+                     'сова',
+                     'мышь',
+                     'пчела',
+                     'шершень',
+                     'собака',
+                     'хорек',
+                     'кошка',
+                     'афалина',
+                     'баран',
+                     'нерпа',
+                     'бабуин',
+                     'аплодонтия',
+                     'вол',
+                     'верблюд',
+                     'ремнезуб',
+                     'бегемот',
+                     'барсук',
+                     'белка',
+                     'гиббон',
+                     'белуха',
+                     'медведь',
+                     'бизон',
+                     'бобер',
+                     'муравьед',
+                     'кенгуру',
+                     'валлаби',
+                     'бонго',
+                     'буйвол',
+                     'гиена',
+                     'бурозубка',
+                     'бурундук',
+                     'викунья',
+                     'мангуст',
+                     'волк',
+                     'вомбат',
+                     'выхухоль',
+                     'газель',
+                     'гамадрил',
+                     'гепард',
+                     'геренук',
+                     'мартышка',
+                     'песец',
+                     'кит',
+                     'горилла',
+                     'зебра',
+                     'тапир',
+                     'гринда',
+                     'гуанако',
+                     'горностай',
+                     'дельфин',
+                     'жираф',
+                     'дикдик',
+                     'кабан',
+                     'дзерен',
+                     'осел',
+                     'динго',
+                     'кенгуру',
+                     'норка',
+                     'долгопят',
+                     'еж',
+                     'зубр',
+                     'ирбис',
+                     'тигр',
+                     'какомицли',
+                     'капибара',
+                     'игрунка',
+                     'бегемот',
+                     'кашалот',
+                     'коала',
+                     'козел',
+                     'корова',
+                     'свинья',
+                     'косуля',
+                     'крыса',
+                     'лев',
+                     'леопард',
+                     'гепард',
+                     'летяга',
+                     'лось',
+                     'лошадь',
+                     'конь',
+                     'морж',
+                     'овца',
+                     'ондатра',
+                     'песчанка',
+                     'пони',
+                     'рысь',
+                     'лисица',
+                     'лиса',
+                     'антилопа',
+                     'сайгак',
+                     'соня',
+                     'ленивец',
+                     'шимпанзе',
+                     'ягуар',
+                     'як',
+                     'шиншилла',
+                     'акула',
+                     'чайка',
+                     'скумбрия',
+                     'змееящерица',
+                     'ястреб',
+                     'варан',
+                     'журавль',
+                     'лев',
+                     'тигр',
+                     'бабочка',
+                     'геккон',
+                     'барсук',
+                     'щука',
+                     'гепард',
+                     'волк',
+                     'буйвол',
+                     'бурундук',
+                     'снегирь',
+                     'крыса',
+                     'альбатрос',
+                     'черепаха',
+                     'акула',
+                     'жаба',
+                     'лягушка',
+                     'пищуха',
+                     'кряква',
+                     'утка',
+                     'утконос',
+                     'пиранья',
+                     'пиранга',
+                     'аист',
+                     'уж',
+                     'сом',
+                     'осетр',
+                     'соня',
+                     'жираф',
+                     'дрозд',
+                     'лемминг',
+                     'пенелопа',
+                     'свиристель',
+                     'свистун',
+                     'клещ',
+                     'медведь',
+                     'осел',
+                     'газель',
+                     'хамелеон',
+                     'дикобраз',
+                     'ястреб',
+                     'голубь',
+                     'воробей',
+                     'ворона',
+                     'сорока',
+                     'рысь',
+                     'пума',
+                     'бабуин',
+                     'стриж',
+                     'тюлень',
+                     'опоссум',
+                     'орлан',
+                     'попугай',
+                     'певун',
+                     'баклан',
+                     'удод',
+                     'тля',
+                     'моль',
+                     'выдра',
+                     'колибри',
+                     'гну',
+                     'бизон',
+                     'древолаз',
+                     'шелкопряд',
+                     'блоха',
+                     'вошь',
+                     'свинья',
+                     'кабан',
+                     'свин',
+                     'хомяк',
+                     'лань',
+                     'кролик',
+                     'антилопа',
+                     'леопард',
+                     'какаду',
+                     'конь',
+                     'муравьед',
+                     'вилорог',
+                     'сельдь',
+                     'ослик',
+                     'ночница',
+                     'саламандра',
+                     'филин',
+                     'сова',
+                     'гадюка',
+                     'морж',
+                     'дятел',
+                     'петух',
+                     'курица',
+                     'осьминог',
+                     'краб',
+                     'креветка',
+                     'лягушка',
+                     'бабочка',
+                     'глухарь',
+                     'гусь',
+                     'кенгуру',
+                     'аноа',
+                     'тритон',
+                     'карась',
+                     'аист',
+                     'бык',
+                     'дзерен',
+                     'синица',
+                     'удав',
+                     'бегемот',
+                     'суслик',
+                     'шпрот',
+                     'енот',
+                     'трясогузка',
+                     'медосос',
+                     'окунь',
+                     'нетопырь',
+                     'цапля',
+                     'кукушка',
+                     'рогоклюв',
+                     'фазан',
+                     'сипуха',
+                     'зубр',
+                     'кит',
+                     'игуана']
+        guesses = 0
+        word = random.choice(word_list)
+        word_list = list(word)
+        blanks = ("◆" * len(word))
+        blanks_list = list(blanks)
+        unbox_blank = (' '.join(blanks_list))
+        new_blanks_list = list(blanks)
+        guess_list = []
+        guess_list_unbox = (', '.join(guess_list))
+        embed_formatter = nextcord.Embed(
+            color=nextcord.Colour.dark_purple()
+        )
+        embed_formatter.set_author(name='Виселица')
+        hangman_picture_1 = """```
+              _______
+             |/      |
+             |      
+             |      
+             |       
+             |
+             |
+            _|___```"""
+
+        hangman_picture_5 = """```
+              _______
+             |/      |
+             |      (_)
+             |      \|/
+             |       |
+             |
+             |
+            _|___```"""
+        hangman_picture_4 = """```
+              _______
+             |/      |
+             |      (_)
+             |      \|/
+             |
+             |
+             |
+            _|___```"""
+        hangman_picture_3 = """```
+              _______
+             |/      |
+             |      (_)
+             |      \|
+             |
+             |
+             |
+            _|___```"""
+        hangman_picture_2 = """```
+              _______
+             |/      |
+             |      (_)
+             |
+             |
+             |
+             |
+            _|___```"""
+        hangman_picture_6 = """```
+              _______
+             |/      |
+             |      (_)
+             |      \|/
+             |       |
+             |      /
+             |
+            _|___```"""
+        hangman_picture_7 = """```
+              _______
+             |/      |
+             |      (_)
+             |      \|/
+             |       |
+             |      / \\
+             |
+            _|___```"""
+        image = 'шо'
+
+        embed_formatter.add_field(name='Животные', value=image)
+        embed_formatter.add_field(name='Информация', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+        embed_formatter.set_footer(text=str(guess_list_unbox))
+        while guesses < 7:
+            embed_formatter.clear_fields()
+            if guesses == 0:
+                image = hangman_picture_1
+                embed_formatter.add_field(name='Животные', value=image)
+                embed_formatter.add_field(name='Информация', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+                embed_formatter.set_footer(text=str(guess_list_unbox))
+            if guesses == 1:
+                image = hangman_picture_2
+                embed_formatter.add_field(name='Животные', value=image)
+                embed_formatter.add_field(name='Информация', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+                embed_formatter.set_footer(text=str(guess_list_unbox))
+            if guesses == 2:
+                image = hangman_picture_3
+                embed_formatter.add_field(name='Животные', value=image)
+                embed_formatter.add_field(name='Информация', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+                embed_formatter.set_footer(text=str(guess_list_unbox))
+            if guesses == 3:
+                image = hangman_picture_4
+                embed_formatter.add_field(name='Животные', value=image)
+                embed_formatter.add_field(name='Информация', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+                embed_formatter.set_footer(text=str(guess_list_unbox))
+            if guesses == 4:
+                image = hangman_picture_5
+                embed_formatter.add_field(name='Животные', value=image)
+                embed_formatter.add_field(name='Информация', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+                embed_formatter.set_footer(text=str(guess_list_unbox))
+            if guesses == 5:
+                image = hangman_picture_6
+                embed_formatter.add_field(name='Животные', value=image)
+                embed_formatter.add_field(name='Информация', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+                embed_formatter.set_footer(text=str(guess_list_unbox))
+            if guesses == 6:
+                image = hangman_picture_7
+                embed_formatter.add_field(name='Животные', value=image)
+                embed_formatter.add_field(name='Информация', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+                embed_formatter.set_footer(text=str(guess_list_unbox))
+            await interaction.send(embed=embed_formatter)
+
+            russian_symbols = {'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р',
+                               'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ь', 'ы', 'э', 'ю', 'я'}
+
+            def check(author):
+                def inner_check(message):
+                    return message.author == author and message.content.casefold() in russian_symbols
+
+                return inner_check
+
+            guess = await self.client.wait_for('message', check=check(interaction.user), timeout=120)
+            if len(guess.content) > 1 and guess.content != word:
+                await interaction.send('Хватит жульничать')
+                guesses -= 1
+            if guess.content == " ":
+                await interaction.send("Эй, ты не хочешь играть чтоле? Давай пиши подходящие буквы!")
+            if guess.content in guess_list:
+                await interaction.send(f"Ты уже использовал данный символ!")
+            else:
+                if len(guess.content) == 1:
+                    guess.content = guess.content.casefold()
+                    guess_list.append(guess.content)
+                    guess_list_unbox = (', '.join(guess_list))
+                i = 0
+                while i < len(word):
+                    if guess.content == word[i]:
+                        new_blanks_list[i] = word_list[i]
+                    i = i + 1
+
+                if new_blanks_list == blanks_list:
+                    guesses = guesses + 1
+
+                if word_list != blanks_list:
+                    blanks_list = new_blanks_list[:]
+                    unbox_blank = (' '.join(blanks_list))
+
+                    if word_list == blanks_list or guess.content.casefold() == word:
+                        embed_formatter.clear_fields()
+                        embed_formatter.add_field(name='Животные', value=image)
+                        embed_formatter.add_field(name='Информация',
+                                                  value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+                        embed_formatter.set_footer(text=str(guess_list_unbox))
+                        await interaction.send(embed=embed_formatter)
+                        await interaction.send(f'победа')
+                        break
+        if guesses == 7:
+            await interaction.send(f'Вы проиграли! Правильное слово: {word}')
 
 
 def setup(client):
