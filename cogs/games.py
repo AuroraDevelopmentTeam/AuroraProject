@@ -53,7 +53,7 @@ from core.errors import (
     construct_error_not_enough_embed,
     construct_error_command_is_active
 )
-from core.embeds import DEFAULT_BOT_COLOR
+from core.embeds import DEFAULT_BOT_COLOR, construct_basic_embed
 from core.emojify import SWORD
 
 MULTIPLIERS_FOR_TWO_ROWS = [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]
@@ -231,7 +231,7 @@ class Games(commands.Cog):
         if user is None:
             self.users.update({interaction.user.id: timestamp})
         if user is not None:
-            if timestamp-user < 120:
+            if timestamp - user < 120:
                 return await interaction.followup.send(
                     embed=construct_error_command_is_active(
                         get_msg_from_locale_by_key(
@@ -734,8 +734,46 @@ class Games(commands.Cog):
             )
 
     @nextcord.slash_command(name="ttt_test")
-    async def _ttt_test(self, interaction: Interaction):
-        await interaction.send("Tic Tac Toe: X goes first", view=TicTacToe())
+    async def _ttt_test(self, interaction: Interaction,
+                        bet: Optional[int] = SlashOption(
+                            required=True,
+                            description="Number of money you bet in game",
+                            description_localizations={
+                                "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
+                            },
+                        )
+                        ):
+        if bet <= 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    bet,
+                )
+            )
+        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if balance < bet:
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            return await interaction.response.send_message(
+                embed=construct_error_not_enough_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_enough_money_error"
+                    ),
+                    interaction.user.display_avatar,
+                    f"{msg} {balance}",
+                )
+            )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        embed = construct_basic_embed(
+            "O | ☓",
+            f"_ _",
+            f"{requested} {interaction.user}",
+            interaction.user.display_avatar,
+            interaction.guild.id,
+        )
+        await interaction.send(embed=embed, view=TicTacToe(author=interaction.user, bet=bet))
 
 
 def setup(client):
