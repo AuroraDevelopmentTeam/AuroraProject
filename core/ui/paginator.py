@@ -105,8 +105,6 @@ class Dropdown(nextcord.ui.Select):
                         interaction.guild, interaction.user, disabled=True
                     ),
                 )
-            print(self.role_list[int(self.values[0]) - 1])
-            print(self.role_list)
             await interaction.user.add_roles(
                 self.role_list[int(self.values[0]) - 1]
             )

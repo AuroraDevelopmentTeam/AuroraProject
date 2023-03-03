@@ -51,7 +51,7 @@ class TasksCog(commands.Cog):
             return
         for row in rows:
             try:
-                guild = await self.client.fetch_guild(row[2])
+                guild = self.client.get_guild(row[2])
                 role = nextcord.utils.get(guild.roles, id=row[0])
             except:
                 continue
