@@ -74,7 +74,10 @@ class AutoModeration(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: nextcord.Member):
-        word_detect = get_server_word_detect(member.guild.id)
+        try:
+            word_detect = get_server_word_detect(member.guild.id)
+        except TypeError:
+            return
         if word_detect is False:
             return
         mod_words = None
@@ -149,7 +152,10 @@ class AutoModeration(commands.Cog):
             or message.author.guild_permissions.manage_guild is True
         ):
             return
-        word_detect = get_server_word_detect(message.guild.id)
+        try:
+            word_detect = get_server_word_detect(message.guild.id)
+        except TypeError:
+            return
         if word_detect is False:
             return
         mod_words = None

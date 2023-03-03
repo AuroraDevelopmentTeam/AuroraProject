@@ -191,7 +191,10 @@ class EventsLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_role_create(self, role):
-        if get_logging_channel(role.guild.id) == 0:
+        try:
+            if get_logging_channel(role.guild.id) == 0:
+                return
+        except TypeError:
             return
         if get_logging_state(role.guild.id) is False:
             return
