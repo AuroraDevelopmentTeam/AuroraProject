@@ -55,7 +55,6 @@ class TasksCog(commands.Cog):
                 role = nextcord.utils.get(guild.roles, id=row[0])
             except:
                 continue
-            print(guild, role)
             if role is not None:
                 for member in guild.members:
                     if not member.bot:

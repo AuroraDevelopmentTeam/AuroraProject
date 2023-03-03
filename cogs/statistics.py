@@ -65,12 +65,19 @@ class StatisticsCounter(commands.Cog):
             message_counter = get_user_messages_counter(
                 message.guild.id, message.author.id
             )
-            messages_for_money = get_msg_cooldown(message.guild.id)
+            try:
+                messages_for_money = get_msg_cooldown(message.guild.id)
+            except TypeError:
+                messages_for_money = 10
+                pass
             if message_counter % messages_for_money == 0:
-                min, max = get_guild_min_max_msg_income(message.guild.id)
-                update_user_balance(
-                    message.guild.id, message.author.id, random.randint(min, max)
-                )
+                try:
+                    min, max = get_guild_min_max_msg_income(message.guild.id)
+                    update_user_balance(
+                        message.guild.id, message.author.id, random.randint(min, max)
+                    )
+                except TypeError:
+                    pass
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
@@ -80,7 +87,7 @@ class StatisticsCounter(commands.Cog):
         if before.channel is not None and after.channel is None:
             join_time = get_user_join_time(member.guild.id, member.id)
             join_time = int(join_time)
-            if join_time != "0":
+            if join_time != 0:
                 voice_leave_time = int(datetime.datetime.now().timestamp())
                 calculate_time = voice_leave_time-join_time
                 second_in_voice = calculate_time
