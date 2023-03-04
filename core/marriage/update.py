@@ -138,12 +138,36 @@ def update_user_gift_count(guild_id: int, user_id: int, gift: str, amount: int) 
     return
 
 
+def set_user_gift_count(guild_id: int, user_id: int, gift: str, amount: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = f"UPDATE gifts SET {gift} = ? WHERE guild_id = ? AND user_id = ?"
+    values = (amount, guild_id, user_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
 def update_user_gift_price(guild_id: int, user_id: int, price: int) -> None:
     gift_price = get_user_gifts_price(guild_id, user_id)
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     sql = f"UPDATE gifts SET gift_price = ? WHERE guild_id = ? AND user_id = ?"
     values = (gift_price + price, guild_id, user_id)
+    cursor.execute(sql, values)
+    db.commit()
+    cursor.close()
+    db.close()
+    return
+
+
+def set_user_gift_price(guild_id: int, user_id: int, price: int) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    sql = f"UPDATE gifts SET gift_price = ? WHERE guild_id = ? AND user_id = ?"
+    values = (price, guild_id, user_id)
     cursor.execute(sql, values)
     db.commit()
     cursor.close()

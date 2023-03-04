@@ -1256,5 +1256,21 @@
     },
     "ttt_turn_x": {
       "msg": "It is now X's turn"
+    },
+    "reset_waifu_cost": {
+      "msg": "Waifu price for user",
+      "name": "waifu_price",
+      "description": "Reset's specified user's waifu cost to 0"
+    },
+    "reset_waifu_cost_2": {
+      "msg": "была сброшена до"
+    },
+    "reset_gift_count": {
+      "msg": "For user",
+      "name": "gift_count",
+      "description": "Reset's specified user's gift counter for all gifts to 0"
+    },
+    "reset_gift_count_2": {
+      "msg": "gift counter for all gifts was set to"
     }
 }
