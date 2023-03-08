@@ -775,7 +775,11 @@ class Games(commands.Cog):
         )
         await interaction.send(embed=embed, view=TicTacToe(author=interaction.user, bet=bet))
 
-    @nextcord.slash_command(name='hangman')
+    @nextcord.slash_command(name='hangman',
+                            name_localizations=get_localized_name("hangman"),
+                            description_localizations=get_localized_description("hangman"),
+                            default_member_permissions=Permissions(send_messages=True),
+                            )
     async def __hangman(self, interaction: Interaction):
         word_list = ['питон',
                      'анаконда',
@@ -1017,7 +1021,7 @@ class Games(commands.Cog):
         embed_formatter = nextcord.Embed(
             color=DEFAULT_BOT_COLOR
         )
-        embed_formatter.set_author(name='Виселица')
+        embed_formatter.set_author(name=get_msg_from_locale_by_key(interaction.guild.id, "hangman_name"))
         hangman_picture_1 = """```
               _______
              |/      |
@@ -1076,47 +1080,33 @@ class Games(commands.Cog):
              |      / \\
             _|___```"""
         image = 'шо'
+        animals = get_msg_from_locale_by_key(interaction.guild.id, "animals")
+        info_msg = get_msg_from_locale_by_key(interaction.guild.id, "information")
+        word_msg = get_msg_from_locale_by_key(interaction.guild.id, "word")
+        attempts_msg = get_msg_from_locale_by_key(interaction.guild.id, "attempts")
 
-        embed_formatter.add_field(name='Животные', value=image)
-        embed_formatter.add_field(name='Слово', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+        embed_formatter.add_field(name=animals, value=image)
+        embed_formatter.add_field(name=word_msg, value=f'\n {attempts_msg}: {guesses} \n ```{unbox_blank}```')
         embed_formatter.set_footer(text=str(guess_list_unbox))
         while guesses < 7:
             embed_formatter.clear_fields()
             if guesses == 0:
                 image = hangman_picture_1
-                embed_formatter.add_field(name='Животные', value=image)
-                embed_formatter.add_field(name='Слово', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
-                embed_formatter.set_footer(text=str(guess_list_unbox))
             if guesses == 1:
                 image = hangman_picture_2
-                embed_formatter.add_field(name='Животные', value=image)
-                embed_formatter.add_field(name='Слово', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
-                embed_formatter.set_footer(text=str(guess_list_unbox))
             if guesses == 2:
                 image = hangman_picture_3
-                embed_formatter.add_field(name='Животные', value=image)
-                embed_formatter.add_field(name='Слово', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
-                embed_formatter.set_footer(text=str(guess_list_unbox))
             if guesses == 3:
                 image = hangman_picture_4
-                embed_formatter.add_field(name='Животные', value=image)
-                embed_formatter.add_field(name='Слово', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
-                embed_formatter.set_footer(text=str(guess_list_unbox))
             if guesses == 4:
                 image = hangman_picture_5
-                embed_formatter.add_field(name='Животные', value=image)
-                embed_formatter.add_field(name='Слово', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
-                embed_formatter.set_footer(text=str(guess_list_unbox))
             if guesses == 5:
                 image = hangman_picture_6
-                embed_formatter.add_field(name='Животные', value=image)
-                embed_formatter.add_field(name='Слово', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
-                embed_formatter.set_footer(text=str(guess_list_unbox))
             if guesses == 6:
                 image = hangman_picture_7
-                embed_formatter.add_field(name='Животные', value=image)
-                embed_formatter.add_field(name='Слово', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
-                embed_formatter.set_footer(text=str(guess_list_unbox))
+            embed_formatter.add_field(name=animals, value=image)
+            embed_formatter.add_field(name=word_msg, value=f'\n {attempts_msg}: {guesses} \n ```{unbox_blank}```')
+            embed_formatter.set_footer(text=str(guess_list_unbox))
             await interaction.send(embed=embed_formatter)
 
             russian_symbols = {'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р',
@@ -1130,12 +1120,12 @@ class Games(commands.Cog):
 
             guess = await self.client.wait_for('message', check=check(interaction.user), timeout=120)
             if len(guess.content) > 1 and guess.content != word:
-                await interaction.send('Хватит жульничать')
+                await interaction.send(get_msg_from_locale_by_key(interaction.guild.id, "hangman_error_1"))
                 guesses -= 1
             if guess.content == " ":
-                await interaction.send("Эй, ты не хочешь играть чтоле? Давай пиши подходящие буквы!")
+                await interaction.send(get_msg_from_locale_by_key(interaction.guild.id, "hangman_error_2"))
             if guess.content in guess_list:
-                await interaction.send(f"Ты уже использовал данный символ!")
+                await interaction.send(get_msg_from_locale_by_key(interaction.guild.id, "hangman_error_3"))
             else:
                 if len(guess.content) == 1:
                     guess.content = guess.content.casefold()
@@ -1156,15 +1146,18 @@ class Games(commands.Cog):
 
                     if word_list == blanks_list or guess.content.casefold() == word:
                         embed_formatter.clear_fields()
-                        embed_formatter.add_field(name='Животные', value=image)
-                        embed_formatter.add_field(name='Информация',
-                                                  value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+                        embed_formatter.add_field(name=animals, value=image)
+                        embed_formatter.add_field(name=f'{info_msg}',
+                                                  value=f'\n {attempts_msg}: {guesses} \n ```{unbox_blank}```')
                         embed_formatter.set_footer(text=str(guess_list_unbox))
                         await interaction.send(embed=embed_formatter)
-                        await interaction.send(f'победа')
+                        await interaction.send(f'{interaction.user.mention} '
+                                               f'{get_msg_from_locale_by_key(interaction.guild.id, "win")}! ')
                         break
         if guesses == 7:
-            await interaction.send(f'Вы проиграли! Правильное слово: {word}')
+            await interaction.send(f'{interaction.user.mention} '
+                                   f'{get_msg_from_locale_by_key(interaction.guild.id, "lost")}! '
+                                   f'{get_msg_from_locale_by_key(interaction.guild.id, "hangman_word_was")}: {word}')
 
 
 def setup(client):
