@@ -777,8 +777,6 @@ class Games(commands.Cog):
 
     @nextcord.slash_command(name='hangman')
     async def __hangman(self, interaction: Interaction):
-        author = interaction.user
-        member_id = str(author.id)
         word_list = ['питон',
                      'анаконда',
                      'змея',
@@ -1017,7 +1015,7 @@ class Games(commands.Cog):
         guess_list = []
         guess_list_unbox = (', '.join(guess_list))
         embed_formatter = nextcord.Embed(
-            color=nextcord.Colour.dark_purple()
+            color=DEFAULT_BOT_COLOR
         )
         embed_formatter.set_author(name='Виселица')
         hangman_picture_1 = """```
@@ -1026,7 +1024,6 @@ class Games(commands.Cog):
              |      
              |      
              |       
-             |
              |
             _|___```"""
 
@@ -1037,14 +1034,12 @@ class Games(commands.Cog):
              |      \|/
              |       |
              |
-             |
             _|___```"""
         hangman_picture_4 = """```
               _______
              |/      |
              |      (_)
              |      \|/
-             |
              |
              |
             _|___```"""
@@ -1055,13 +1050,11 @@ class Games(commands.Cog):
              |      \|
              |
              |
-             |
             _|___```"""
         hangman_picture_2 = """```
               _______
              |/      |
              |      (_)
-             |
              |
              |
              |
@@ -1073,7 +1066,6 @@ class Games(commands.Cog):
              |      \|/
              |       |
              |      /
-             |
             _|___```"""
         hangman_picture_7 = """```
               _______
@@ -1082,49 +1074,48 @@ class Games(commands.Cog):
              |      \|/
              |       |
              |      / \\
-             |
             _|___```"""
         image = 'шо'
 
         embed_formatter.add_field(name='Животные', value=image)
-        embed_formatter.add_field(name='Информация', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+        embed_formatter.add_field(name='Слово', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
         embed_formatter.set_footer(text=str(guess_list_unbox))
         while guesses < 7:
             embed_formatter.clear_fields()
             if guesses == 0:
                 image = hangman_picture_1
                 embed_formatter.add_field(name='Животные', value=image)
-                embed_formatter.add_field(name='Информация', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+                embed_formatter.add_field(name='Слово', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
                 embed_formatter.set_footer(text=str(guess_list_unbox))
             if guesses == 1:
                 image = hangman_picture_2
                 embed_formatter.add_field(name='Животные', value=image)
-                embed_formatter.add_field(name='Информация', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+                embed_formatter.add_field(name='Слово', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
                 embed_formatter.set_footer(text=str(guess_list_unbox))
             if guesses == 2:
                 image = hangman_picture_3
                 embed_formatter.add_field(name='Животные', value=image)
-                embed_formatter.add_field(name='Информация', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+                embed_formatter.add_field(name='Слово', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
                 embed_formatter.set_footer(text=str(guess_list_unbox))
             if guesses == 3:
                 image = hangman_picture_4
                 embed_formatter.add_field(name='Животные', value=image)
-                embed_formatter.add_field(name='Информация', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+                embed_formatter.add_field(name='Слово', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
                 embed_formatter.set_footer(text=str(guess_list_unbox))
             if guesses == 4:
                 image = hangman_picture_5
                 embed_formatter.add_field(name='Животные', value=image)
-                embed_formatter.add_field(name='Информация', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+                embed_formatter.add_field(name='Слово', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
                 embed_formatter.set_footer(text=str(guess_list_unbox))
             if guesses == 5:
                 image = hangman_picture_6
                 embed_formatter.add_field(name='Животные', value=image)
-                embed_formatter.add_field(name='Информация', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+                embed_formatter.add_field(name='Слово', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
                 embed_formatter.set_footer(text=str(guess_list_unbox))
             if guesses == 6:
                 image = hangman_picture_7
                 embed_formatter.add_field(name='Животные', value=image)
-                embed_formatter.add_field(name='Информация', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
+                embed_formatter.add_field(name='Слово', value=f'\n Попыток: {guesses} \n ```{unbox_blank}```')
                 embed_formatter.set_footer(text=str(guess_list_unbox))
             await interaction.send(embed=embed_formatter)
 

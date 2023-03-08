@@ -19,6 +19,7 @@ from core.fun.ball.storage import get_eight_ball_answer
 from core.fun.coin import get_coin_toss
 from core.fun.random_api import build_random_image_embed
 from core.embeds import construct_basic_embed, DEFAULT_BOT_COLOR
+from core.errors import construct_error_limit_break_embed
 
 
 class Funny(commands.Cog):
@@ -57,6 +58,12 @@ class Funny(commands.Cog):
             description_localizations={"ru": "Вопрос шару"},
         ),
     ):
+        if len(question) > 1500:
+            return await interaction.response.send_message(
+                embed=construct_error_limit_break_embed(
+                    get_msg_from_locale_by_key(interaction.guild.id, "limit_break"),
+                    self.client.user.avatar.url,
+                ))
         await interaction.response.send_message(
             embed=construct_basic_embed(
                 interaction.application_command.name,
