@@ -158,9 +158,9 @@ class Funny(commands.Cog):
         description_localizations=get_localized_description("bird"),
         default_member_permissions=Permissions(send_messages=True),
     )
-    async def __birb(self, interaction: Interaction):
+    async def __bird(self, interaction: Interaction):
         async with aiohttp.ClientSession() as session:
-            request = await session.get("https://some-random-api.ml/img/birb")
+            request = await session.get("https://some-random-api.ml/img/bird")
             data = await request.json()
             await interaction.response.send_message(
                 embed=build_random_image_embed(
