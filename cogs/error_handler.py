@@ -34,7 +34,6 @@ class ErrorHandler(commands.Cog):
                     color=DEFAULT_BOT_COLOR,
                 )
             )
-
         elif isinstance(error, ApplicationMissingPermissions):
             msg = get_msg_from_locale_by_key(
                 interaction.guild.id, "ApplicationMissingPermissions"

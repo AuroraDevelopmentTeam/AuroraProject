@@ -1272,5 +1272,36 @@
     },
     "reset_gift_count_2": {
       "msg": "gift counter for all gifts was set to"
+    },
+    "hangman": {
+      "name": "hangman",
+      "description": "Allows you to play hangman game where you have to guess the word"
+    },
+    "animals": {
+      "msg": "Animals"
+    },
+    "word": {
+      "msg": "Word"
+    },
+    "attempts": {
+      "msg": "Attempts"
+    },
+    "information": {
+      "msg": "Information"
+    },
+    "hangman_error_1": {
+      "msg": "Stop cheating"
+    },
+    "hangman_error_2": {
+      "msg": "Hey, do you want to play? Write the right letters!"
+    },
+    "hangman_error_3": {
+      "msg": "You have already used this character!"
+    },
+    "hangman_word_was": {
+      "msg": "Right word"
+    },
+    "hangman_name": {
+      "msg": "Hangman"
     }
 }
