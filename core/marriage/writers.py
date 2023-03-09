@@ -56,3 +56,26 @@ def write_in_gifts_standart_values(guilds) -> None:
     cursor.close()
     db.close()
     return
+
+
+def write_new_column(guilds) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+
+    query = "ALTER TABLE marriage ADD loveroom_id VARCHAR(100)"
+
+    cursor.execute(query)
+    db.commit()
+
+    for guild in guilds:
+        for member in guild.members:
+            if not member.bot:
+                if is_user_in_table("marriage", guild.id, member.id) is True:
+                    sql = (
+                        "INSERT INTO marriage(loveroom_id) VALUES (?)"
+                    )
+                    val = ["0"]
+                    cursor.execute(sql, val)
+                    db.commit()
+    cursor.close()
+    db.close()

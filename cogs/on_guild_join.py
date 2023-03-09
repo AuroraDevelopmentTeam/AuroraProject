@@ -53,6 +53,7 @@ from core.auto.mod.writers import write_in_mod_config_standart_values
 from core.voice.writers import write_in_voice_private_config_standart_values
 from core.clan.writers import write_in_clan_members_standart_values, write_in_clan_config_standart_values
 from core.emotions.writers import write_in_emotions_cost_standart_values
+from core.marriage.writers import write_new_column
 
 
 class OnGuildListener(commands.Cog):

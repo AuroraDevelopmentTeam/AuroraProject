@@ -169,7 +169,7 @@ class Information(commands.Cog):
                 f"```{self.client.user.id}```",
                 f"```{psutil.cpu_percent()}```",
                 f"```{psutil.virtual_memory().percent}```",
-                f"```{psutil.virtual_memory().available * 100 / psutil.virtual_memory().total}```",
+                f"```{round((psutil.virtual_memory().available * 100 / psutil.virtual_memory().total), 1)}```",
                 f"```{self.client.ws.shard_id}```",
                 f"```{self.client.status}```",
                 f"{nextcord.utils.format_dt(self.client.user.created_at)}",

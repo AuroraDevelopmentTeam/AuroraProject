@@ -28,6 +28,7 @@ from core.emotions.storage import (
 )
 from core.emotions.getters import is_emotion_free, get_emotions_cost
 from core.emotions.update import update_emotions_cost, update_emotions_for_money_state
+from core.emotions.writers import write_in_emotions_cost_standart_values
 from core.errors import (
     construct_error_self_choose_embed,
     construct_error_not_enough_embed,
