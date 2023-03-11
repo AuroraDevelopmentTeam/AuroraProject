@@ -105,25 +105,9 @@ class Dropdown(nextcord.ui.Select):
                         interaction.guild, interaction.user, disabled=True
                     ),
                 )
-            try:
-                print(self.role_list[int(self.values[0]) - 1])
-                print(self.role_list)
-                await interaction.user.add_roles(
-                    self.role_list[int(self.values[0]) - 1]
-                )
-            except Exception as error:
-                print(error)
-                return await interaction.message.edit(
-                    embed=construct_error_forbidden_embed(
-                        get_msg_from_locale_by_key(
-                            interaction.guild.id, "forbidden_error"
-                        ),
-                        interaction.user.display_avatar,
-                    ),
-                    view=DropdownView(
-                        interaction.guild, interaction.user, disabled=True
-                    ),
-                )
+            await interaction.user.add_roles(
+                self.role_list[int(self.values[0]) - 1]
+            )
             msg = get_msg_from_locale_by_key(self.guild.id, "shop")
             embed.add_field(
                 name="Shop",

@@ -32,6 +32,7 @@ from core.auto.mod.updaters import (
     update_server_moderation_mode,
 )
 from core.auto.mod.writers import write_in_mod_word, delete_mod_word
+from core.auto.mod.writers import write_in_mod_config_standart_values
 from core.locales.getters import (
     get_msg_from_locale_by_key,
     get_localized_description,
@@ -74,7 +75,12 @@ class AutoModeration(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: nextcord.Member):
-        word_detect = get_server_word_detect(member.guild.id)
+        try:
+            word_detect = get_server_word_detect(member.guild.id)
+        except TypeError:
+            guilds = [member.guild]
+            write_in_mod_config_standart_values(guilds)
+            return
         if word_detect is False:
             return
         mod_words = None
@@ -149,7 +155,12 @@ class AutoModeration(commands.Cog):
             or message.author.guild_permissions.manage_guild is True
         ):
             return
-        word_detect = get_server_word_detect(message.guild.id)
+        try:
+            word_detect = get_server_word_detect(message.guild.id)
+        except TypeError:
+            guilds = [message.guild]
+            write_in_mod_config_standart_values(guilds)
+            return
         if word_detect is False:
             return
         mod_words = None
@@ -989,7 +1000,12 @@ class AutoModeration(commands.Cog):
                 interaction.guild.id,
             )
         )
-        moderation_mode = get_server_moderation_mode(interaction.guild.id)
+        try:
+            moderation_mode = get_server_moderation_mode(interaction.guild.id)
+        except TypeError:
+            guilds = [interaction.guild]
+            write_in_mod_config_standart_values(guilds)
+            return
         if moderation_mode == "community":
             try:
                 auto_mod_rules = await interaction.guild.auto_moderation_rules()
@@ -1050,7 +1066,12 @@ class AutoModeration(commands.Cog):
         interaction: Interaction,
         enable: Optional[bool] = SlashOption(required=True),
     ):
-        moderation_mode = get_server_moderation_mode(interaction.guild.id)
+        try:
+            moderation_mode = get_server_moderation_mode(interaction.guild.id)
+        except TypeError:
+            guilds = [interaction.guild]
+            write_in_mod_config_standart_values(guilds)
+            return
         if moderation_mode == "friends_group":
             update_server_link_detect(interaction.guild.id, enable)
             message = get_msg_from_locale_by_key(

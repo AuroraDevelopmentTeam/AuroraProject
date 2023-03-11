@@ -104,7 +104,6 @@ class NoStopButtonMenuPages(menus.ButtonMenuPages, inherit_buttons=False):
 async def yes_create(interaction: Interaction):
     await interaction.response.defer()
     create_cost = get_server_clan_create_cost(interaction.guild.id)
-    update_user_balance(interaction.guild.id, interaction.user.id, -create_cost)
     clan_id = get_owner_clan_id(interaction.guild.id, interaction.user.id)
     color = get_clan_color(interaction.guild.id, clan_id)
     color_to_table = color
@@ -189,6 +188,7 @@ async def yes_create(interaction: Interaction):
         description=f"Восславьте **{name}**! Поздравляем вас основатель {interaction.user.mention}, "
                     f"прославьте имя своего клана, желаем вам удачи на вашем пути!",
     )
+    update_user_balance(interaction.guild.id, interaction.user.id, -create_cost)
     return await interaction.followup.send(embed=embed, view=view)
 
 

@@ -1,7 +1,16 @@
 from typing import List
+import typing
+import random
 
 import nextcord
+from nextcord import Interaction
 from nextcord.ext import commands
+
+from core.locales.getters import get_msg_from_locale_by_key
+from core.embeds import construct_basic_embed
+from core.ui.buttons import create_button, ViewAuthorCheck, View
+from core.money.updaters import update_user_balance
+from core.money.getters import get_user_balance
 
 
 class TicTacToeButton(nextcord.ui.Button["TicTacToe"]):
@@ -12,7 +21,8 @@ class TicTacToeButton(nextcord.ui.Button["TicTacToe"]):
 
     async def callback(self, interaction: nextcord.Interaction):
         assert self.view is not None
-        view: TicTacToe = self.view
+        bet = self.view.bet
+        view: TicTacToe(author=interaction.user, bet=bet) = self.view
         state = view.board[self.x][self.y]
         if state != 0:
             return
@@ -20,39 +30,57 @@ class TicTacToeButton(nextcord.ui.Button["TicTacToe"]):
         if view.current_player == view.X:
             self.view.board[self.x][self.y] = view.X
             view.current_player = view.O
-            content = "It is now O's turn"
+            content = get_msg_from_locale_by_key(
+                interaction.guild.id, "ttt_turn_o"
+            )
         else:
             self.view.board[self.x][self.y] = view.O
             view.current_player = view.X
-            content = "It is now X's turn"
+            content = get_msg_from_locale_by_key(
+                interaction.guild.id, "ttt_turn_x"
+            )
 
         winner = view.check_board_winner()
         if winner is not None:
             if winner == view.X:
-                content = "X won!"
+                content = f"X {get_msg_from_locale_by_key(interaction.guild.id, 'win')}"
+                update_user_balance(interaction.guild.id, interaction.user.id, int(bet/2))
             elif winner == view.O:
-                content = "O won!"
+                content = f"O {get_msg_from_locale_by_key(interaction.guild.id, 'win')}"
+                update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
             else:
-                content = "It's a tie!"
+                content = get_msg_from_locale_by_key(
+                    interaction.guild.id, "draw"
+                )
+                update_user_balance(interaction.guild.id, interaction.user.id, -int(bet/10))
 
             for child in view.children:
                 child.disabled = True
 
             view.stop()
         if winner is None:
-            best_move = view.find_best_move()
+            bad_move_chance = 10
+            randomizer = random.randint(1, 100)
+            best_move = view.make_move(is_bad=(bad_move_chance > randomizer))
             self.view.board[best_move[0]][best_move[1]] = view.O
             view.current_player = view.X
-            content = "It is     now X's turn"
+            content = get_msg_from_locale_by_key(
+                interaction.guild.id, "ttt_turn_x"
+            )
 
             winner = view.check_board_winner()
             if winner is not None:
                 if winner == view.X:
-                    content = "X won!"
+                    content = f"X {get_msg_from_locale_by_key(interaction.guild.id, 'win')}"
+                    update_user_balance(interaction.guild.id, interaction.user.id, int(bet / 2))
                 elif winner == view.O:
-                    content = "O won!"
+                    content = f"O {get_msg_from_locale_by_key(interaction.guild.id, 'win')}"
+                    update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
                 else:
-                    content = "It's a tie!"
+                    content = get_msg_from_locale_by_key(
+                        interaction.guild.id, "draw"
+                    )
+                    update_user_balance(interaction.guild.id, interaction.user.id, -int(bet / 10))
 
                 for child in view.children:
                     child.disabled = True
@@ -81,7 +109,17 @@ class TicTacToeButton(nextcord.ui.Button["TicTacToe"]):
                     button.style = nextcord.ButtonStyle.danger
                     button.disabled = True
                     view.add_item(button)
-        await interaction.response.edit_message(content=content, view=view)
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        embed = construct_basic_embed(
+            "O | ☓",
+            f"{content}",
+            f"{requested} {interaction.user}\n{msg} {balance}",
+            interaction.user.display_avatar,
+            interaction.guild.id,
+        )
+        await interaction.response.edit_message(embed=embed, view=view)
 
 
 class TicTacToe(nextcord.ui.View):
@@ -90,8 +128,11 @@ class TicTacToe(nextcord.ui.View):
     O = 1
     Tie = 2
 
-    def __init__(self):
+    def __init__(self, author: typing.Union[nextcord.Member, nextcord.User], bet: typing.Optional[int]):
+        self.bet = bet
+        self.author = author
         super().__init__()
+        self.bet = bet
         self.current_player = self.X
         self.board = [
             [0, 0, 0],
@@ -119,6 +160,11 @@ class TicTacToe(nextcord.ui.View):
                     button.style = nextcord.ButtonStyle.danger
                     button.disabled = True
                     self.add_item(button)
+
+    async def interaction_check(self, interaction: Interaction) -> bool:
+        if interaction.user != self.author:
+            return False
+        return True
 
     def is_moves_left(self):
         for i in range(3):
@@ -162,47 +208,18 @@ class TicTacToe(nextcord.ui.View):
 
         return None
 
-    def evaluate(self):
-        b = self.board
-
-        # Checking for Rows for X or O victory.
-        for row in range(3):
-            if b[row][0] == b[row][1] and b[row][1] == b[row][2]:
-                if b[row][0] == self.X:
-                    return 10
-                elif b[row][0] == self.O:
-                    return -10
-
-        # Checking for Columns for X or O victory.
-        for col in range(3):
-
-            if b[0][col] == b[1][col] and b[1][col] == b[2][col]:
-
-                if b[0][col] == self.O:
-                    return 10
-                elif b[0][col] == self.X:
-                    return -10
-
-        # Checking for Diagonals for X or O victory.
-        if b[0][0] == b[1][1] and b[1][1] == b[2][2]:
-
-            if b[0][0] == self.X:
-                return 10
-            elif b[0][0] == self.O:
+    def eval(self):
+        winner = self.check_board_winner()
+        if winner is not None:
+            if winner == self.X:
                 return -10
-
-        if b[0][2] == b[1][1] and b[1][1] == b[2][0]:
-
-            if b[0][2] == self.X:
+            elif winner == self.O:
                 return 10
-            elif b[0][2] == self.O:
-                return -10
-
-        # Else if none of them have won then return 0
-        return 0
+            else:
+                return 0
 
     def minimax(self, depth, isMax):
-        score = self.evaluate()
+        score = self.eval()
         if score == 10:
             return score
 
@@ -217,8 +234,8 @@ class TicTacToe(nextcord.ui.View):
             for i in range(3):
                 for j in range(3):
                     if self.board[i][j] == 0:
-                        self.board[i][j] = self.X
-                        best = max(best, self.minimax(depth + 1, not isMax))
+                        self.board[i][j] = 1
+                        best = max(best, self.minimax(depth=depth + 1, isMax=(not isMax)))
                         self.board[i][j] = 0
             return best
         else:
@@ -226,22 +243,35 @@ class TicTacToe(nextcord.ui.View):
             for i in range(3):
                 for j in range(3):
                     if self.board[i][j] == 0:
-                        self.board[i][j] = self.O
-                        best = max(best, self.minimax(depth + 1, not isMax))
+                        self.board[i][j] = -1
+                        best = min(best, self.minimax(depth=depth + 1, isMax=(not isMax)))
                         self.board[i][j] = 0
             return best
 
-    def find_best_move(self):
-        global bestVal
-        best_val = -1000
-        best_move = (-1, -1)
+    def make_move(self, is_bad: bool) -> tuple:
+        if is_bad is True:
+            moves = []
+            for i in range(3):
+                for j in range(3):
+                    if self.board[i][j] == 0:
+                        moves.append((i, j))
+
+            move = random.choice(moves)
+        else:
+            move = self.find_best_move()
+        return move
+
+    def find_best_move(self) -> tuple:
+        bestVal = -1000
+        bestMove = (-1, -1)
         for i in range(3):
             for j in range(3):
                 if self.board[i][j] == 0:
                     self.board[i][j] = 1
-                    move_val = self.minimax(0, False)
+                    moveVal = self.minimax(0, False)
                     self.board[i][j] = 0
-                    if move_val > best_val:
-                        best_move = (i, j)
-                        best_val = move_val
-        return best_move
+                    if moveVal > bestVal:
+                        bestMove = (i, j)
+                        bestVal = moveVal
+
+        return bestMove

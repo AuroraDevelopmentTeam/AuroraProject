@@ -29,7 +29,7 @@ class TasksCog(commands.Cog):
                 try:
                     guild = self.client.get_guild(role[0])
                     rol = nextcord.utils.get(guild.roles, id=role[2])
-                    await rol.delete(reason="Role expired")
+                    await rol.delete(reason="Custom role expired")
                     delete_role_from_shop(guild, rol.id)
 
                 except Exception as e:
@@ -51,11 +51,10 @@ class TasksCog(commands.Cog):
             return
         for row in rows:
             try:
-                guild = await self.client.fetch_guild(row[2])
+                guild = self.client.get_guild(row[2])
                 role = nextcord.utils.get(guild.roles, id=row[0])
             except:
                 continue
-            print(guild, role)
             if role is not None:
                 for member in guild.members:
                     if not member.bot:

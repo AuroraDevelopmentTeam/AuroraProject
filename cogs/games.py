@@ -53,7 +53,7 @@ from core.errors import (
     construct_error_not_enough_embed,
     construct_error_command_is_active
 )
-from core.embeds import DEFAULT_BOT_COLOR
+from core.embeds import DEFAULT_BOT_COLOR, construct_basic_embed
 from core.emojify import SWORD
 
 MULTIPLIERS_FOR_TWO_ROWS = [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]
@@ -231,7 +231,7 @@ class Games(commands.Cog):
         if user is None:
             self.users.update({interaction.user.id: timestamp})
         if user is not None:
-            if timestamp-user < 120:
+            if timestamp - user < 120:
                 return await interaction.followup.send(
                     embed=construct_error_command_is_active(
                         get_msg_from_locale_by_key(
@@ -733,9 +733,431 @@ class Games(commands.Cog):
                 embed=embed, view=DuelStartEng(interaction.user, bet)
             )
 
-    @nextcord.slash_command(name="ttt_test")
-    async def _ttt_test(self, interaction: Interaction):
-        await interaction.send("Tic Tac Toe: X goes first", view=TicTacToe())
+    @nextcord.slash_command(name="ttt")
+    async def __ttt(self, interaction: Interaction,
+                    bet: Optional[int] = SlashOption(
+                        required=True,
+                        description="Number of money you bet in game",
+                        description_localizations={
+                            "ru": "Количество денег, которое вы хотите поставить в качестве ставки"
+                        },
+                    )
+                    ):
+        if bet <= 0:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "negative_value_error"
+                    ),
+                    self.client.user.avatar.url,
+                    bet,
+                )
+            )
+        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if balance < bet:
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            return await interaction.response.send_message(
+                embed=construct_error_not_enough_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_enough_money_error"
+                    ),
+                    interaction.user.display_avatar,
+                    f"{msg} {balance}",
+                )
+            )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        embed = construct_basic_embed(
+            "O | ☓",
+            f"_ _",
+            f"{requested} {interaction.user}",
+            interaction.user.display_avatar,
+            interaction.guild.id,
+        )
+        await interaction.send(embed=embed, view=TicTacToe(author=interaction.user, bet=bet))
+
+    @nextcord.slash_command(name='hangman',
+                            name_localizations=get_localized_name("hangman"),
+                            description_localizations=get_localized_description("hangman"),
+                            default_member_permissions=Permissions(send_messages=True),
+                            )
+    async def __hangman(self, interaction: Interaction):
+        word_list = ['питон',
+                     'анаконда',
+                     'змея',
+                     'сова',
+                     'мышь',
+                     'пчела',
+                     'шершень',
+                     'собака',
+                     'хорек',
+                     'кошка',
+                     'афалина',
+                     'баран',
+                     'нерпа',
+                     'бабуин',
+                     'аплодонтия',
+                     'вол',
+                     'верблюд',
+                     'ремнезуб',
+                     'бегемот',
+                     'барсук',
+                     'белка',
+                     'гиббон',
+                     'белуха',
+                     'медведь',
+                     'бизон',
+                     'бобер',
+                     'муравьед',
+                     'кенгуру',
+                     'валлаби',
+                     'бонго',
+                     'буйвол',
+                     'гиена',
+                     'бурозубка',
+                     'бурундук',
+                     'викунья',
+                     'мангуст',
+                     'волк',
+                     'вомбат',
+                     'выхухоль',
+                     'газель',
+                     'гамадрил',
+                     'гепард',
+                     'геренук',
+                     'мартышка',
+                     'песец',
+                     'кит',
+                     'горилла',
+                     'зебра',
+                     'тапир',
+                     'гринда',
+                     'гуанако',
+                     'горностай',
+                     'дельфин',
+                     'жираф',
+                     'дикдик',
+                     'кабан',
+                     'дзерен',
+                     'осел',
+                     'динго',
+                     'кенгуру',
+                     'норка',
+                     'долгопят',
+                     'еж',
+                     'зубр',
+                     'ирбис',
+                     'тигр',
+                     'какомицли',
+                     'капибара',
+                     'игрунка',
+                     'бегемот',
+                     'кашалот',
+                     'коала',
+                     'козел',
+                     'корова',
+                     'свинья',
+                     'косуля',
+                     'крыса',
+                     'лев',
+                     'леопард',
+                     'гепард',
+                     'летяга',
+                     'лось',
+                     'лошадь',
+                     'конь',
+                     'морж',
+                     'овца',
+                     'ондатра',
+                     'песчанка',
+                     'пони',
+                     'рысь',
+                     'лисица',
+                     'лиса',
+                     'антилопа',
+                     'сайгак',
+                     'соня',
+                     'ленивец',
+                     'шимпанзе',
+                     'ягуар',
+                     'як',
+                     'шиншилла',
+                     'акула',
+                     'чайка',
+                     'скумбрия',
+                     'змееящерица',
+                     'ястреб',
+                     'варан',
+                     'журавль',
+                     'лев',
+                     'тигр',
+                     'бабочка',
+                     'геккон',
+                     'барсук',
+                     'щука',
+                     'гепард',
+                     'волк',
+                     'буйвол',
+                     'бурундук',
+                     'снегирь',
+                     'крыса',
+                     'альбатрос',
+                     'черепаха',
+                     'акула',
+                     'жаба',
+                     'лягушка',
+                     'пищуха',
+                     'кряква',
+                     'утка',
+                     'утконос',
+                     'пиранья',
+                     'пиранга',
+                     'аист',
+                     'уж',
+                     'сом',
+                     'осетр',
+                     'соня',
+                     'жираф',
+                     'дрозд',
+                     'лемминг',
+                     'пенелопа',
+                     'свиристель',
+                     'свистун',
+                     'клещ',
+                     'медведь',
+                     'осел',
+                     'газель',
+                     'хамелеон',
+                     'дикобраз',
+                     'ястреб',
+                     'голубь',
+                     'воробей',
+                     'ворона',
+                     'сорока',
+                     'рысь',
+                     'пума',
+                     'бабуин',
+                     'стриж',
+                     'тюлень',
+                     'опоссум',
+                     'орлан',
+                     'попугай',
+                     'певун',
+                     'баклан',
+                     'удод',
+                     'тля',
+                     'моль',
+                     'выдра',
+                     'колибри',
+                     'гну',
+                     'бизон',
+                     'древолаз',
+                     'шелкопряд',
+                     'блоха',
+                     'вошь',
+                     'свинья',
+                     'кабан',
+                     'свин',
+                     'хомяк',
+                     'лань',
+                     'кролик',
+                     'антилопа',
+                     'леопард',
+                     'какаду',
+                     'конь',
+                     'муравьед',
+                     'вилорог',
+                     'сельдь',
+                     'ослик',
+                     'ночница',
+                     'саламандра',
+                     'филин',
+                     'сова',
+                     'гадюка',
+                     'морж',
+                     'дятел',
+                     'петух',
+                     'курица',
+                     'осьминог',
+                     'краб',
+                     'креветка',
+                     'лягушка',
+                     'бабочка',
+                     'глухарь',
+                     'гусь',
+                     'кенгуру',
+                     'аноа',
+                     'тритон',
+                     'карась',
+                     'аист',
+                     'бык',
+                     'дзерен',
+                     'синица',
+                     'удав',
+                     'бегемот',
+                     'суслик',
+                     'шпрот',
+                     'енот',
+                     'трясогузка',
+                     'медосос',
+                     'окунь',
+                     'нетопырь',
+                     'цапля',
+                     'кукушка',
+                     'рогоклюв',
+                     'фазан',
+                     'сипуха',
+                     'зубр',
+                     'кит',
+                     'игуана']
+        guesses = 0
+        word = random.choice(word_list)
+        word_list = list(word)
+        blanks = ("◆" * len(word))
+        blanks_list = list(blanks)
+        unbox_blank = (' '.join(blanks_list))
+        new_blanks_list = list(blanks)
+        guess_list = []
+        guess_list_unbox = (', '.join(guess_list))
+        embed_formatter = nextcord.Embed(
+            color=DEFAULT_BOT_COLOR
+        )
+        embed_formatter.set_author(name=get_msg_from_locale_by_key(interaction.guild.id, "hangman_name"))
+        hangman_picture_1 = """```
+              _______
+             |/      |
+             |      
+             |      
+             |       
+             |
+            _|___```"""
+
+        hangman_picture_5 = """```
+              _______
+             |/      |
+             |      (_)
+             |      \|/
+             |       |
+             |
+            _|___```"""
+        hangman_picture_4 = """```
+              _______
+             |/      |
+             |      (_)
+             |      \|/
+             |
+             |
+            _|___```"""
+        hangman_picture_3 = """```
+              _______
+             |/      |
+             |      (_)
+             |      \|
+             |
+             |
+            _|___```"""
+        hangman_picture_2 = """```
+              _______
+             |/      |
+             |      (_)
+             |
+             |
+             |
+            _|___```"""
+        hangman_picture_6 = """```
+              _______
+             |/      |
+             |      (_)
+             |      \|/
+             |       |
+             |      /
+            _|___```"""
+        hangman_picture_7 = """```
+              _______
+             |/      |
+             |      (_)
+             |      \|/
+             |       |
+             |      / \\
+            _|___```"""
+        image = 'шо'
+        animals = get_msg_from_locale_by_key(interaction.guild.id, "animals")
+        info_msg = get_msg_from_locale_by_key(interaction.guild.id, "information")
+        word_msg = get_msg_from_locale_by_key(interaction.guild.id, "word")
+        attempts_msg = get_msg_from_locale_by_key(interaction.guild.id, "attempts")
+
+        embed_formatter.add_field(name=animals, value=image)
+        embed_formatter.add_field(name=word_msg, value=f'\n {attempts_msg}: {guesses} \n ```{unbox_blank}```')
+        embed_formatter.set_footer(text=str(guess_list_unbox))
+        while guesses < 7:
+            embed_formatter.clear_fields()
+            if guesses == 0:
+                image = hangman_picture_1
+            if guesses == 1:
+                image = hangman_picture_2
+            if guesses == 2:
+                image = hangman_picture_3
+            if guesses == 3:
+                image = hangman_picture_4
+            if guesses == 4:
+                image = hangman_picture_5
+            if guesses == 5:
+                image = hangman_picture_6
+            if guesses == 6:
+                image = hangman_picture_7
+            embed_formatter.add_field(name=animals, value=image)
+            embed_formatter.add_field(name=word_msg, value=f'\n {attempts_msg}: {guesses} \n ```{unbox_blank}```')
+            embed_formatter.set_footer(text=str(guess_list_unbox))
+            await interaction.send(embed=embed_formatter)
+
+            russian_symbols = {'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р',
+                               'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ь', 'ы', 'э', 'ю', 'я'}
+
+            def check(author):
+                def inner_check(message):
+                    return message.author == author and message.content.casefold() in russian_symbols
+
+                return inner_check
+
+            guess = await self.client.wait_for('message', check=check(interaction.user), timeout=120)
+            if len(guess.content) > 1 and guess.content != word:
+                await interaction.send(get_msg_from_locale_by_key(interaction.guild.id, "hangman_error_1"))
+                guesses -= 1
+            if guess.content == " ":
+                await interaction.send(get_msg_from_locale_by_key(interaction.guild.id, "hangman_error_2"))
+            if guess.content in guess_list:
+                await interaction.send(get_msg_from_locale_by_key(interaction.guild.id, "hangman_error_3"))
+            else:
+                if len(guess.content) == 1:
+                    guess.content = guess.content.casefold()
+                    guess_list.append(guess.content)
+                    guess_list_unbox = (', '.join(guess_list))
+                i = 0
+                while i < len(word):
+                    if guess.content == word[i]:
+                        new_blanks_list[i] = word_list[i]
+                    i = i + 1
+
+                if new_blanks_list == blanks_list:
+                    guesses = guesses + 1
+
+                if word_list != blanks_list:
+                    blanks_list = new_blanks_list[:]
+                    unbox_blank = (' '.join(blanks_list))
+
+                    if word_list == blanks_list or guess.content.casefold() == word:
+                        embed_formatter.clear_fields()
+                        embed_formatter.add_field(name=animals, value=image)
+                        embed_formatter.add_field(name=f'{info_msg}',
+                                                  value=f'\n {attempts_msg}: {guesses} \n ```{unbox_blank}```')
+                        embed_formatter.set_footer(text=str(guess_list_unbox))
+                        await interaction.send(embed=embed_formatter)
+                        await interaction.send(f'{interaction.user.mention} '
+                                               f'{get_msg_from_locale_by_key(interaction.guild.id, "win")}! ')
+                        break
+        if guesses == 7:
+            await interaction.send(f'{interaction.user.mention} '
+                                   f'{get_msg_from_locale_by_key(interaction.guild.id, "lost")}! '
+                                   f'{get_msg_from_locale_by_key(interaction.guild.id, "hangman_word_was")}: {word}')
 
 
 def setup(client):

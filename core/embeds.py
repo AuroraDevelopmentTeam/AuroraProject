@@ -190,3 +190,5 @@ def construct_log(
         )
     embed.set_footer(text=f"{guild.name}\nAURORA", icon_url=guild.icon)
     return embed
+
+

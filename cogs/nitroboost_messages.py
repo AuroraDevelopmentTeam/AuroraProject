@@ -15,7 +15,7 @@ class NitroBoostAnnouncement(commands.Cog):
     async def on_member_update(self, before, after):
         if before.premium_since is None and after.premium_since is not None:
             print("boosted server")
-            if get_server_nitro_state(after.guild.id) is False:
+            if not get_server_nitro_state(after.guild.id):
                 return
             nitro_boost_channel_id = get_server_nitro_channel_id(after.guild.id)
             if nitro_boost_channel_id == 0:

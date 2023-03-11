@@ -74,13 +74,17 @@ class UserVoiceHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
+        server_voice_creation_room = None
         try:
-            server_voice_creation_room = get_voice_creation_room(after.channel.guild.id)
-        except AttributeError:
-            server_voice_creation_room = get_voice_creation_room(before.channel.guild.id)
+            try:
+                server_voice_creation_room = get_voice_creation_room(after.channel.guild.id)
+            except AttributeError:
+                server_voice_creation_room = get_voice_creation_room(before.channel.guild.id)
+        except TypeError:
+            pass
         if member.bot:
             return
-        if server_voice_creation_room == 0:
+        if server_voice_creation_room == 0 or None:
             return
         if after.channel and after.channel.id == server_voice_creation_room:
             overwrites = {

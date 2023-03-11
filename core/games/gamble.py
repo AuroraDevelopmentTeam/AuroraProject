@@ -8,7 +8,7 @@ from core.locales.getters import get_msg_from_locale_by_key
 
 
 def perform_strikes() -> tuple:
-    user_strikes = random.randint(1, 18)
+    user_strikes = random.randint(1, 15)
     bot_strikes = random.randint(3, 18)
     return user_strikes, bot_strikes
 
@@ -26,6 +26,8 @@ def approximate_bet(bet, state) -> tuple:
     if state is True:
         percentage = random.randint(50, 100) / 100
         bet *= percentage
+        if isinstance(percentage, float):
+            percentage = round(percentage, 1)
         return percentage, bet
     if state is None:
         return 0, bet

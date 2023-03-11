@@ -157,11 +157,6 @@ class Information(commands.Cog):
         names_of_embed_fields = get_keys_value_in_locale(
             interaction.guild.id, interaction.application_command.name
         )
-        users = 0
-        print(len(self.client.guilds))
-        for guild in self.client.guilds:
-            guild = await self.client.fetch_guild(guild.id)
-            users += guild.approximate_member_count
         embed = construct_long_embed(
             f"{self.client.user}:",
             self.client.user.avatar.url,
@@ -169,12 +164,12 @@ class Information(commands.Cog):
             interaction.user.display_avatar,
             names_of_embed_fields,
             [
-                f"```\n{users} 🧍```",
+                f"```\n{len(self.client.users)} 🧍```",
                 f"```{len(self.client.guilds)}```",
                 f"```{self.client.user.id}```",
                 f"```{psutil.cpu_percent()}```",
                 f"```{psutil.virtual_memory().percent}```",
-                f"```{psutil.virtual_memory().available * 100 / psutil.virtual_memory().total}```",
+                f"```{round((psutil.virtual_memory().available * 100 / psutil.virtual_memory().total), 1)}```",
                 f"```{self.client.ws.shard_id}```",
                 f"```{self.client.status}```",
                 f"{nextcord.utils.format_dt(self.client.user.created_at)}",

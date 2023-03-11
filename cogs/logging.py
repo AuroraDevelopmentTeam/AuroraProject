@@ -13,7 +13,10 @@ class EventsLogging(commands.Cog):
     async def on_message_delete(self, message):
         if message.author.bot:
             return
-        if get_logging_channel(message.guild.id) == 0:
+        try:
+            if get_logging_channel(message.guild.id) == 0:
+                return
+        except TypeError:
             return
         if get_logging_state(message.guild.id) is False:
             return
@@ -40,7 +43,10 @@ class EventsLogging(commands.Cog):
     async def on_message_edit(self, before, after):
         if after.author.bot:
             return
-        if get_logging_channel(before.guild.id) == 0:
+        try:
+            if get_logging_channel(before.guild.id) == 0:
+                return
+        except TypeError:
             return
         if get_logging_state(before.guild.id) is False:
             return
@@ -70,7 +76,10 @@ class EventsLogging(commands.Cog):
     async def on_member_join(self, member):
         if member.bot:
             return
-        if get_logging_channel(member.guild.id) == 0:
+        try:
+            if get_logging_channel(member.guild.id) == 0:
+                return
+        except TypeError:
             return
         if get_logging_state(member.guild.id) is False:
             return
@@ -90,7 +99,10 @@ class EventsLogging(commands.Cog):
     async def on_member_remove(self, member):
         if member.bot:
             return
-        if get_logging_channel(member.guild.id) == 0:
+        try:
+            if get_logging_channel(member.guild.id) == 0:
+                return
+        except TypeError:
             return
         if get_logging_state(member.guild.id) is False:
             return
@@ -110,7 +122,10 @@ class EventsLogging(commands.Cog):
     async def on_member_ban(self, guild, user):
         if user.bot:
             return
-        if get_logging_channel(guild.id) == 0:
+        try:
+            if get_logging_channel(guild.id) == 0:
+                return
+        except TypeError:
             return
         if get_logging_state(guild.id) is False:
             return
@@ -128,7 +143,10 @@ class EventsLogging(commands.Cog):
     async def on_member_unban(self, guild, user):
         if user.bot:
             return
-        if get_logging_channel(guild.id) == 0:
+        try:
+            if get_logging_channel(guild.id) == 0:
+                return
+        except TypeError:
             return
         if get_logging_state(guild.id) is False:
             return
@@ -144,7 +162,10 @@ class EventsLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_role_update(self, before, after):
-        if get_logging_channel(before.guild.id) == 0:
+        try:
+            if get_logging_channel(before.guild.id) == 0:
+                return
+        except TypeError:
             return
         if get_logging_state(before.guild.id) is False:
             return
@@ -170,7 +191,10 @@ class EventsLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_role_create(self, role):
-        if get_logging_channel(role.guild.id) == 0:
+        try:
+            if get_logging_channel(role.guild.id) == 0:
+                return
+        except TypeError:
             return
         if get_logging_state(role.guild.id) is False:
             return
@@ -188,7 +212,10 @@ class EventsLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_role_delete(self, role):
-        if get_logging_channel(role.guild.id) == 0:
+        try:
+            if get_logging_channel(role.guild.id) == 0:
+                return
+        except TypeError:
             return
         if get_logging_state(role.guild.id) is False:
             return
@@ -212,7 +239,10 @@ class EventsLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_channel_create(self, channel):
-        if get_logging_channel(channel.guild.id) == 0:
+        try:
+            if get_logging_channel(channel.guild.id) == 0:
+                return
+        except TypeError:
             return
         if get_logging_state(channel.guild.id) is False:
             return
@@ -230,7 +260,10 @@ class EventsLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel):
-        if get_logging_channel(channel.guild.id) == 0:
+        try:
+            if get_logging_channel(channel.guild.id) == 0:
+                return
+        except TypeError:
             return
         if get_logging_state(channel.guild.id) is False:
             return
@@ -248,7 +281,10 @@ class EventsLogging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_channel_update(self, before, after):
-        if get_logging_channel(before.guild.id) == 0:
+        try:
+            if get_logging_channel(before.guild.id) == 0:
+                return
+        except TypeError:
             return
         if get_logging_state(before.guild.id) is False:
             return

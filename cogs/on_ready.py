@@ -84,6 +84,7 @@ class OnReadyListener(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         guilds = self.client.guilds
+        """
         create_locales_table()
         write_in_locales_standart_values(guilds)
         create_money_config_table()
@@ -147,16 +148,11 @@ class OnReadyListener(commands.Cog):
         write_in_emotions_cost_standart_values(guilds)
         create_marriage_config_table()
         write_in_marriage_config_standart_values(guilds)
-        users = 0
-        print(len(self.client.guilds))
-        for guild in self.client.guilds:
-            guild = await self.client.fetch_guild(guild.id)
-            print(f"{guild.name} - {guild.approximate_member_count}")
-            users += guild.approximate_member_count
+        """
         await self.client.change_presence(
             activity=nextcord.Game(
-                name=f"You cute! /help\nСервера: {len(guilds)}\n"
-                f"Пользователи: {users}"
+                name=f"You cute! /help\nСервера: {len(self.client.guilds)}\n"
+                f"Пользователи: {len(self.client.users)}"
             )
         )
 

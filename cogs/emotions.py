@@ -28,6 +28,7 @@ from core.emotions.storage import (
 )
 from core.emotions.getters import is_emotion_free, get_emotions_cost
 from core.emotions.update import update_emotions_cost, update_emotions_for_money_state
+from core.emotions.writers import write_in_emotions_cost_standart_values
 from core.errors import (
     construct_error_self_choose_embed,
     construct_error_not_enough_embed,
@@ -164,8 +165,13 @@ class Emotions(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        is_free = is_emotion_free(interaction.guild.id)
-        emotions_cost = get_emotions_cost(interaction.guild.id)
+        try:
+            is_free = is_emotion_free(interaction.guild.id)
+            emotions_cost = get_emotions_cost(interaction.guild.id)
+        except TypeError:
+            guilds = [interaction.guild]
+            write_in_emotions_cost_standart_values(guilds)
+            return await interaction.response.send_message('Попробуйте ещё раз')
         if is_emotion_free(interaction.guild.id) is False:
             emotions_cost = get_emotions_cost(interaction.guild.id)
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -228,8 +234,13 @@ class Emotions(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        is_free = is_emotion_free(interaction.guild.id)
-        emotions_cost = get_emotions_cost(interaction.guild.id)
+        try:
+            is_free = is_emotion_free(interaction.guild.id)
+            emotions_cost = get_emotions_cost(interaction.guild.id)
+        except TypeError:
+            guilds = [interaction.guild]
+            write_in_emotions_cost_standart_values(guilds)
+            return await interaction.response.send_message('Попробуйте ещё раз')
         if is_emotion_free(interaction.guild.id) is False:
             emotions_cost = get_emotions_cost(interaction.guild.id)
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -276,8 +287,13 @@ class Emotions(commands.Cog):
                 },
             ),
     ):
-        is_free = is_emotion_free(interaction.guild.id)
-        emotions_cost = get_emotions_cost(interaction.guild.id)
+        try:
+            is_free = is_emotion_free(interaction.guild.id)
+            emotions_cost = get_emotions_cost(interaction.guild.id)
+        except TypeError:
+            guilds = [interaction.guild]
+            write_in_emotions_cost_standart_values(guilds)
+            return await interaction.response.send_message('Попробуйте ещё раз')
         if is_emotion_free(interaction.guild.id) is False:
             emotions_cost = get_emotions_cost(interaction.guild.id)
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -323,8 +339,13 @@ class Emotions(commands.Cog):
                 },
             ),
     ):
-        is_free = is_emotion_free(interaction.guild.id)
-        emotions_cost = get_emotions_cost(interaction.guild.id)
+        try:
+            is_free = is_emotion_free(interaction.guild.id)
+            emotions_cost = get_emotions_cost(interaction.guild.id)
+        except TypeError:
+            guilds = [interaction.guild]
+            write_in_emotions_cost_standart_values(guilds)
+            return await interaction.response.send_message('Попробуйте ещё раз')
         if is_emotion_free(interaction.guild.id) is False:
             emotions_cost = get_emotions_cost(interaction.guild.id)
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -386,8 +407,13 @@ class Emotions(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        is_free = is_emotion_free(interaction.guild.id)
-        emotions_cost = get_emotions_cost(interaction.guild.id)
+        try:
+            is_free = is_emotion_free(interaction.guild.id)
+            emotions_cost = get_emotions_cost(interaction.guild.id)
+        except TypeError:
+            guilds = [interaction.guild]
+            write_in_emotions_cost_standart_values(guilds)
+            return await interaction.response.send_message('Попробуйте ещё раз')
         if is_emotion_free(interaction.guild.id) is False:
             emotions_cost = get_emotions_cost(interaction.guild.id)
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -434,8 +460,13 @@ class Emotions(commands.Cog):
                 },
             ),
     ):
-        is_free = is_emotion_free(interaction.guild.id)
-        emotions_cost = get_emotions_cost(interaction.guild.id)
+        try:
+            is_free = is_emotion_free(interaction.guild.id)
+            emotions_cost = get_emotions_cost(interaction.guild.id)
+        except TypeError:
+            guilds = [interaction.guild]
+            write_in_emotions_cost_standart_values(guilds)
+            return await interaction.response.send_message('Попробуйте ещё раз')
         if is_emotion_free(interaction.guild.id) is False:
             emotions_cost = get_emotions_cost(interaction.guild.id)
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -497,8 +528,13 @@ class Emotions(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        is_free = is_emotion_free(interaction.guild.id)
-        emotions_cost = get_emotions_cost(interaction.guild.id)
+        try:
+            is_free = is_emotion_free(interaction.guild.id)
+            emotions_cost = get_emotions_cost(interaction.guild.id)
+        except TypeError:
+            guilds = [interaction.guild]
+            write_in_emotions_cost_standart_values(guilds)
+            return await interaction.response.send_message('Попробуйте ещё раз')
         if is_emotion_free(interaction.guild.id) is False:
             emotions_cost = get_emotions_cost(interaction.guild.id)
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -561,8 +597,13 @@ class Emotions(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        is_free = is_emotion_free(interaction.guild.id)
-        emotions_cost = get_emotions_cost(interaction.guild.id)
+        try:
+            is_free = is_emotion_free(interaction.guild.id)
+            emotions_cost = get_emotions_cost(interaction.guild.id)
+        except TypeError:
+            guilds = [interaction.guild]
+            write_in_emotions_cost_standart_values(guilds)
+            return await interaction.response.send_message('Попробуйте ещё раз')
         if is_emotion_free(interaction.guild.id) is False:
             emotions_cost = get_emotions_cost(interaction.guild.id)
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -625,8 +666,13 @@ class Emotions(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        is_free = is_emotion_free(interaction.guild.id)
-        emotions_cost = get_emotions_cost(interaction.guild.id)
+        try:
+            is_free = is_emotion_free(interaction.guild.id)
+            emotions_cost = get_emotions_cost(interaction.guild.id)
+        except TypeError:
+            guilds = [interaction.guild]
+            write_in_emotions_cost_standart_values(guilds)
+            return await interaction.response.send_message('Попробуйте ещё раз')
         if is_emotion_free(interaction.guild.id) is False:
             emotions_cost = get_emotions_cost(interaction.guild.id)
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -689,8 +735,13 @@ class Emotions(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        is_free = is_emotion_free(interaction.guild.id)
-        emotions_cost = get_emotions_cost(interaction.guild.id)
+        try:
+            is_free = is_emotion_free(interaction.guild.id)
+            emotions_cost = get_emotions_cost(interaction.guild.id)
+        except TypeError:
+            guilds = [interaction.guild]
+            write_in_emotions_cost_standart_values(guilds)
+            return await interaction.response.send_message('Попробуйте ещё раз')
         if is_emotion_free(interaction.guild.id) is False:
             emotions_cost = get_emotions_cost(interaction.guild.id)
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -753,8 +804,13 @@ class Emotions(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        is_free = is_emotion_free(interaction.guild.id)
-        emotions_cost = get_emotions_cost(interaction.guild.id)
+        try:
+            is_free = is_emotion_free(interaction.guild.id)
+            emotions_cost = get_emotions_cost(interaction.guild.id)
+        except TypeError:
+            guilds = [interaction.guild]
+            write_in_emotions_cost_standart_values(guilds)
+            return await interaction.response.send_message('Попробуйте ещё раз')
         if is_emotion_free(interaction.guild.id) is False:
             emotions_cost = get_emotions_cost(interaction.guild.id)
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -801,8 +857,13 @@ class Emotions(commands.Cog):
                 },
             ),
     ):
-        is_free = is_emotion_free(interaction.guild.id)
-        emotions_cost = get_emotions_cost(interaction.guild.id)
+        try:
+            is_free = is_emotion_free(interaction.guild.id)
+            emotions_cost = get_emotions_cost(interaction.guild.id)
+        except TypeError:
+            guilds = [interaction.guild]
+            write_in_emotions_cost_standart_values(guilds)
+            return await interaction.response.send_message('Попробуйте ещё раз')
         if is_emotion_free(interaction.guild.id) is False:
             emotions_cost = get_emotions_cost(interaction.guild.id)
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -848,8 +909,13 @@ class Emotions(commands.Cog):
                 },
             ),
     ):
-        is_free = is_emotion_free(interaction.guild.id)
-        emotions_cost = get_emotions_cost(interaction.guild.id)
+        try:
+            is_free = is_emotion_free(interaction.guild.id)
+            emotions_cost = get_emotions_cost(interaction.guild.id)
+        except TypeError:
+            guilds = [interaction.guild]
+            write_in_emotions_cost_standart_values(guilds)
+            return await interaction.response.send_message('Попробуйте ещё раз')
         if is_emotion_free(interaction.guild.id) is False:
             emotions_cost = get_emotions_cost(interaction.guild.id)
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -895,8 +961,13 @@ class Emotions(commands.Cog):
                 },
             ),
     ):
-        is_free = is_emotion_free(interaction.guild.id)
-        emotions_cost = get_emotions_cost(interaction.guild.id)
+        try:
+            is_free = is_emotion_free(interaction.guild.id)
+            emotions_cost = get_emotions_cost(interaction.guild.id)
+        except TypeError:
+            guilds = [interaction.guild]
+            write_in_emotions_cost_standart_values(guilds)
+            return await interaction.response.send_message('Попробуйте ещё раз')
         if is_emotion_free(interaction.guild.id) is False:
             emotions_cost = get_emotions_cost(interaction.guild.id)
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
