@@ -297,7 +297,10 @@ class Marriage(commands.Cog):
                 )
             )
         pair_id = get_user_pair_id(interaction.guild.id, interaction.user.id)
-        pair = await interaction.guild.fetch_member(pair_id)
+        try:
+            pair = await interaction.guild.fetch_member(pair_id)
+        except nextcord.NotFound:
+            pair = None
         divorce_users(interaction.guild.id, interaction.user.id, pair_id)
         marriage_autorole = get_server_marriage_autorole(interaction.guild.id)
         if marriage_autorole != 0:
@@ -305,7 +308,8 @@ class Marriage(commands.Cog):
             if role != 0:
                 try:
                     await interaction.user.remove_roles(role)
-                    await pair.remove_roles(role)
+                    if pair is not None:
+                        await pair.remove_roles(role)
                 except Exception as error:
                     print(error)
         message = get_msg_from_locale_by_key(
