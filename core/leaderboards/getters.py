@@ -87,20 +87,20 @@ async def custom_top_embed(
     cursor.close()
     db.close()
     roles = list(roles)
-    pagescol = len(roles) // 5
-    if len(roles) % 5 != 0:
+    pagescol = len(roles) // 10
+    if len(roles) % 10 != 0:
         pagescol += 1
-    x = pagen * 5
-    col = x - 5
+    x = pagen * 10
+    col = x - 10
     users = []
-    for each in roles[x - 5 : x]:
+    for each in roles[x - 10 : x]:
         each = list(each)
         col += 1
         if (user := inter.client.get_user(each[0])) == None: 
             user = await inter.client.fetch_user(each[0])
         if order == "voice":
             each[1] = format_seconds_to_hhmmss(each[1])
-        users.append([user, each[1]])
+        users.append([user, each[1], col])
     select = Select(
         options=[
             nextcord.SelectOption(label="Balance", default=balance),
