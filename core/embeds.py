@@ -89,14 +89,18 @@ def construct_top_embed(
             if guild is not None:
                 msg = get_msg_from_locale_by_key(guild.id, "price")
                 users.append(
-                    f"**{row[2]}** • {row[0]}\n> {msg} **{row[1]}** {currency_symbol}\n"
+                    f"**{counter}** • {row[0]}\n> {msg} **{row[1]}** {currency_symbol}\n"
                 )
             else:
                 users.append(
-                    f"**{row[2]}** • {row[0]}\n> **{row[1]}** {currency_symbol}\n"
+                    f"**{counter}** • {row[0]}\n> **{row[1]}** {currency_symbol}\n"
                 )
         else:
-            users.append(f"**{row[2]}** • {row[0]}\n> {row[1]}\n")
+            if len(top_list) > 2:
+                counter = row[2]
+            else:
+                pass
+            users.append(f"**{counter}** • {row[0]}\n> {row[1]}\n")
     if len(users) > 0:
         description = " ".join([user for user in users])
     else:
@@ -106,6 +110,7 @@ def construct_top_embed(
     )
     embed.set_footer(text=footer_text, icon_url=footer_url)
     return embed
+
 
 
 def construct_log(
