@@ -2122,7 +2122,7 @@ class ClanHandler(commands.Cog):
             self, interaction: Interaction,
             enabled: Optional[bool] = SlashOption(required=True)
     ):
-        update_server_create_clan_channels(interaction.guild.id, create_channels)
+        update_server_create_clan_channels(interaction.guild.id, enabled)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_config_{interaction.application_command.name}"
         )
@@ -2138,7 +2138,7 @@ class ClanHandler(commands.Cog):
         await interaction.response.send_message(
             embed=construct_basic_embed(
                 f"clan_config_{interaction.application_command.name}",
-                f"{message} {enabled}",
+                f"{message} **{enabled}**",
                 f"{requested} {interaction.user}",
                 interaction.user.display_avatar,
                 interaction.guild.id,
