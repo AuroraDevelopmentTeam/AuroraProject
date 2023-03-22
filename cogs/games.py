@@ -1022,63 +1022,65 @@ class Games(commands.Cog):
             color=DEFAULT_BOT_COLOR
         )
         embed_formatter.set_author(name=get_msg_from_locale_by_key(interaction.guild.id, "hangman_name"))
-        hangman_picture_1 = """```
+        hangman_pictures = {
+            "hangman_picture_1": """```
               _______
              |/      |
              |      
              |      
              |       
              |
-            _|___```"""
-
-        hangman_picture_5 = """```
+            _|___```""",
+            "hangman_picture_2": """```
               _______
              |/      |
              |      (_)
-             |      \|/
-             |       |
-             |
-            _|___```"""
-        hangman_picture_4 = """```
-              _______
-             |/      |
-             |      (_)
-             |      \|/
              |
              |
-            _|___```"""
-        hangman_picture_3 = """```
+             |
+            _|___```""",
+            "hangman_picture_3": """```
               _______
              |/      |
              |      (_)
              |      \|
              |
              |
-            _|___```"""
-        hangman_picture_2 = """```
+            _|___```""",
+            "hangman_picture_4": """```
               _______
              |/      |
              |      (_)
+             |      \|/
              |
              |
+            _|___```""",
+            "hangman_picture_5": """```
+              _______
+             |/      |
+             |      (_)
+             |      \|/
+             |       |
              |
-            _|___```"""
-        hangman_picture_6 = """```
+            _|___```""",
+            "hangman_picture_6": """```
               _______
              |/      |
              |      (_)
              |      \|/
              |       |
              |      /
-            _|___```"""
-        hangman_picture_7 = """```
+            _|___```""",
+            "hangman_picture_7": """```
               _______
              |/      |
              |      (_)
              |      \|/
              |       |
              |      / \\
-            _|___```"""
+            _|___```""" 
+            
+        }
         image = 'шо'
         animals = get_msg_from_locale_by_key(interaction.guild.id, "animals")
         info_msg = get_msg_from_locale_by_key(interaction.guild.id, "information")
@@ -1090,20 +1092,7 @@ class Games(commands.Cog):
         embed_formatter.set_footer(text=str(guess_list_unbox))
         while guesses < 7:
             embed_formatter.clear_fields()
-            if guesses == 0:
-                image = hangman_picture_1
-            if guesses == 1:
-                image = hangman_picture_2
-            if guesses == 2:
-                image = hangman_picture_3
-            if guesses == 3:
-                image = hangman_picture_4
-            if guesses == 4:
-                image = hangman_picture_5
-            if guesses == 5:
-                image = hangman_picture_6
-            if guesses == 6:
-                image = hangman_picture_7
+            image = hangman_pictures[f"hangman_picture_{guesses+1}"]
             embed_formatter.add_field(name=animals, value=image)
             embed_formatter.add_field(name=word_msg, value=f'\n {attempts_msg}: {guesses} \n ```{unbox_blank}```')
             embed_formatter.set_footer(text=str(guess_list_unbox))
