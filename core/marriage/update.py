@@ -6,6 +6,7 @@ from core.marriage.getters import (
     get_user_gifts_price,
     get_user_gift_counter,
     get_family_money,
+    get_user_loveroom_id
 )
 from core.money.updaters import update_user_balance
 
@@ -97,6 +98,11 @@ def divorce_users(guild_id: int, user_id: int, pair_id: int) -> None:
     update_user_balance(guild_id, user_id, int(family_money / 2))
     update_user_balance(guild_id, pair_id, int(family_money / 2))
     set_couple_family_money(guild_id, user_id, pair_id, 0)
+    update_user_loveroom_expire_date(guild_id, user_id, 0)
+    update_user_loveroom_expire_date(guild_id, pair_id, 0)
+    update_user_loveroom_id(guild_id, user_id, 0)
+    update_user_loveroom_id(guild_id, user_id, 0)
+
     return
 
 
