@@ -3,7 +3,15 @@ import sqlite3
 import nextcord
 
 from core.shop.updaters import delete_role_from_shop
-from core.marriage.update import update_user_loveroom_id
+from core.marriage.update import (
+    update_user_loveroom_id, 
+    update_couple_family_money, 
+    update_user_loveroom_expire_date 
+)
+from core.marriage.getters import (
+    get_family_money, 
+    get_marriage_config_month_loveroom_price 
+)
 from core.money.updaters import update_user_balance
 from nextcord.ext import tasks, commands
 
@@ -25,12 +33,18 @@ class TasksCog(commands.Cog):
                                        ).fetchall()
         if all_loverooms:
             for loveroom in all_loverooms:
+                guild_id, loveroom_id, user_id, pair_id = loveroom[0], loveroom[1], loveroom[2], loveroom[3], 
                 try:
-                    guild = await self.client.fetch_guild(loveroom[0])
-                    room = await guild.fetch_channel(loveroom[1])
-                    update_user_loveroom_id(loveroom[0], loveroom[2], 0)
-                    update_user_loveroom_id(loveroom[0], loveroom[3], 0)
-                    await room.delete(reason = "Loveroom expired")
+                    loveroom_cost = get_marriage_config_month_loveroom_price(guild_id)
+                    if get_family_money(guild_id, user_id) > loveroom_cost:
+                        update_couple_family_money(guild_id, user_id, pair_id, -loveroom_cost)
+                        update_user_loveroom_expire_date(guild_id, user_id, now+86400*30)
+                    else:
+                        guild = await self.client.fetch_guild(guild_id)
+                        room = await guild.fetch_channel(loveroom_id)
+                        update_user_loveroom_id(guild_id, user_id, 0)
+                        update_user_loveroom_id(guild_id, pair_id, 0)
+                        await room.delete(reason = "Loveroom expired")
                 except Exception as e:
                     if isinstance(e, nextcord.errors.NotFound):
                         pass

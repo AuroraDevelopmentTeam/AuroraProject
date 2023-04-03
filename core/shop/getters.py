@@ -65,7 +65,7 @@ def get_custom_shop_roles_limit(
     roles = cursor.execute(
         "SELECT * FROM custom_shop WHERE guild_id = ?", (guild_id,)
     ).fetchall()
-    if len(roles) >= 50:  # в будущем можно будет увеличить
+    if len(roles) >= 100:  # в будущем можно будет увеличить
         return True
     return False
 
