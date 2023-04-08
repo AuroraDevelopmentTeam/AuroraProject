@@ -1305,7 +1305,7 @@
       "msg": "Hangman"
     },
     "bet_config": {
-      "name": "ставки_конфиг",
-      "description:": "Префиксная команда для ставок"
+      "name": "bet_config",
+      "description:": "Bet config prefix slash command that will be the prefix of economical bet commands"
     }
 }
