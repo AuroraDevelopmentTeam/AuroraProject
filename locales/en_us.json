@@ -1303,5 +1303,9 @@
     },
     "hangman_name": {
       "msg": "Hangman"
+    },
+    "bet_config": {
+      "name": "ставки_конфиг",
+      "description:": "Префиксная команда для ставок"
     }
 }

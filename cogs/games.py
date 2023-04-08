@@ -56,6 +56,9 @@ from core.errors import (
 from core.embeds import DEFAULT_BOT_COLOR, construct_basic_embed
 from core.emojify import SWORD
 
+from core.bet.getters import get_max_bet, get_min_bet
+from core.bet.update import update_max_bet, update_min_bet
+
 MULTIPLIERS_FOR_TWO_ROWS = [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]
 
 MULTIPLIERS_FOR_THREE_ROWS = [2.0, 2.1, 2.2, 2.3, 2.4, 2.5]
@@ -1078,8 +1081,8 @@ class Games(commands.Cog):
              |      \|/
              |       |
              |      / \\
-            _|___```""" 
-            
+            _|___```"""
+
         }
         image = 'шо'
         animals = get_msg_from_locale_by_key(interaction.guild.id, "animals")
@@ -1092,7 +1095,7 @@ class Games(commands.Cog):
         embed_formatter.set_footer(text=str(guess_list_unbox))
         while guesses < 7:
             embed_formatter.clear_fields()
-            image = hangman_pictures[f"hangman_picture_{guesses+1}"]
+            image = hangman_pictures[f"hangman_picture_{guesses + 1}"]
             embed_formatter.add_field(name=animals, value=image)
             embed_formatter.add_field(name=word_msg, value=f'\n {attempts_msg}: {guesses} \n ```{unbox_blank}```')
             embed_formatter.set_footer(text=str(guess_list_unbox))
@@ -1147,6 +1150,20 @@ class Games(commands.Cog):
             await interaction.send(f'{interaction.user.mention} '
                                    f'{get_msg_from_locale_by_key(interaction.guild.id, "lost")}! '
                                    f'{get_msg_from_locale_by_key(interaction.guild.id, "hangman_word_was")}: {word}')
+
+    @nextcord.slash_command(
+        name="bet_config",
+        description="This is the bet config slash command that will be the prefix of economical bet commands",
+        name_localizations=get_localized_name("bet_config"),
+        description_localizations=get_localized_description("bet_config"),
+        default_member_permissions=Permissions(administrator=True),
+    )
+    @application_checks.has_permissions(manage_guild=True)
+    async def __bet_config(self, interaction: Interaction):
+        """
+        This is the bet config slash command that will be the prefix of bet commands
+        """
+        pass
 
 
 def setup(client):
