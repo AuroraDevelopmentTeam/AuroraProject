@@ -1304,5 +1304,15 @@
     "bet_config": {
       "name": "ставки_конфиг",
       "description:": "Префиксная команда для ставок"
+    },
+    "bet_config_set_min_bet": {
+      "name": "установить_минимальную_ставку",
+      "description:": "Set minimal bet on your server",
+      "msg": "Для вашего сервера было установлено значение минимальной ставки размером"
+    },
+    "bet_config_set_max_bet": {
+      "name": "установить_максимальную_ставку",
+      "description:": "Set maximal bet on your server",
+      "msg": "Для вашего сервера было установлено значение максимальной ставки размером"
     }
 }

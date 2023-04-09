@@ -1165,6 +1165,45 @@ class Games(commands.Cog):
         """
         pass
 
+    @__bet_config.subcommand(name="set_min_bet",
+                             description="Set minimal bet on your server")
+    async def __bet_config(self, interaction: Interaction, minimal_bet: Optional[int] = SlashOption(required=True)):
+        update_min_bet(interaction.guild.id, minimal_bet)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"bet_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} **{minimal_bet}** {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__bet_config.subcommand(name="set_max_bet",
+                             description="Set maximal bet on your server",
+                             name_localizations=get_localized_name("bet_config_set_max_bet"))
+    async def __bet_config(self, interaction: Interaction, maximal_bet: Optional[int] = SlashOption(required=True)):
+        update_max_bet(interaction.guild.id, maximal_bet)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"bet_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} **{maximal_bet}** {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
 
 def setup(client):
     client.add_cog(Games(client))
