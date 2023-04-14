@@ -116,20 +116,21 @@ async def custom_top_embed(
 
             await interaction.response.defer()
             # await interaction.delete_original_message()
+            order = select.values[0].lower()
             if select.values[0] == "Balance":
-                gay, sex = await custom_top_embed(inter=inter, order="balance")
+                gay, sex = await custom_top_embed(inter=inter, order=order)
                 await inter.edit_original_message(embed=gay, view=sex)
             if select.values[0] == "Voice":
-                gay, sex = await custom_top_embed(inter=inter, order="voice")
+                gay, sex = await custom_top_embed(inter=inter, order=order)
                 await inter.edit_original_message(embed=gay, view=sex)
             if select.values[0] == "Waifu":
-                gay, sex = await custom_top_embed(inter=inter, order="waifu")
+                gay, sex = await custom_top_embed(inter=inter, order=order)
                 await inter.edit_original_message(embed=gay, view=sex)
             if select.values[0] == "Messages":
-                gay, sex = await custom_top_embed(inter=inter, order="messages")
+                gay, sex = await custom_top_embed(inter=inter, order=order)
                 await inter.edit_original_message(embed=gay, view=sex)
             if select.values[0] == "Levels":
-                gay, sex = await custom_top_embed(inter=inter, order="levels")
+                gay, sex = await custom_top_embed(inter=inter, order=order)
                 await inter.edit_original_message(embed=gay, view=sex)
         else:
             await interaction.response.defer()
