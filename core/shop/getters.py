@@ -59,13 +59,13 @@ class ShopLeave(Button):
 
 def get_custom_shop_roles_limit(
     guild_id: int,
-) -> bool:  # TODO сделать чтобы создатель сервера мог регулировать лимит
+) -> bool:  # TODO сделать чтобы создатель сервера мог регулировать лимит и переименовать, а то не совсем соответствует
     db = sqlite3.connect("./database/main.sqlite")
     cursor = db.cursor()
     roles = cursor.execute(
         "SELECT * FROM custom_shop WHERE guild_id = ?", (guild_id,)
     ).fetchall()
-    if len(roles) >= 50:  # в будущем можно будет увеличить
+    if len(roles) >= 60:  # в будущем можно будет увеличить
         return True
     return False
 
@@ -77,10 +77,7 @@ async def custom_shop_embed(
     cursor = db.cursor()
     embed = nextcord.Embed(title="Магазин личных ролей")
     view = View()
-    notnew = False
-    new = False
-    highcost = False
-    lowcost = False
+    notnew, new, highcost, lowcost = False, False, False, False
     if order == "notnew":
         roles = cursor.execute(
             f"SELECT * FROM custom_shop WHERE guild_id = {inter.guild.id} ORDER BY created ASC"

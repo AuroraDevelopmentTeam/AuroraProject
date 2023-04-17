@@ -63,6 +63,7 @@ class TasksCog(commands.Cog):
 
     @custom_shop_roles_expiration.before_loop
     @give_roles_money.before_loop
+    @custom_shop_roles_expiration.before_loop
     async def before_printer(self):
         print("waiting...")
         await self.client.wait_until_ready()
