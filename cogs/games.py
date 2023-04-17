@@ -4,7 +4,7 @@ import datetime
 
 import cooldowns
 import nextcord
-from nextcord.ext import commands
+from nextcord.ext import commands, application_checks
 from nextcord import Interaction, ButtonStyle, File, Permissions, SlashOption
 from nextcord.ui import Button, View
 
@@ -1153,7 +1153,6 @@ class Games(commands.Cog):
 
     @nextcord.slash_command(
         name="bet_config",
-        description="This is the bet config slash command that will be the prefix of economical bet commands",
         name_localizations=get_localized_name("bet_config"),
         description_localizations=get_localized_description("bet_config"),
         default_member_permissions=Permissions(administrator=True),

@@ -77,7 +77,7 @@ class Information(commands.Cog):
             names_of_embed_fields,
             [
                 f"```\n{users} 🧍\n```",
-                f"```{guild.owner.name}```",
+                f"```{await self.client.fetch_user(guild.owner_id)}```",
                 f"```{len(guild.emojis)}```",
                 f"```{guild.created_at.strftime('%a, %d %b %Y')}```",
                 f"```{guild.id}```",
