@@ -594,7 +594,7 @@
       "msg": "All warns were purged from"
     },
     "too_long": {
-      "msg": "Description is too long, max length is 140 characters!"
+      "msg": "Description is too long, max length is 100 characters!"
     },
     "profile_description": {
       "name": "description",

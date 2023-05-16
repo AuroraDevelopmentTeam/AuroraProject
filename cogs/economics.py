@@ -560,6 +560,16 @@ class Economics(commands.Cog):
                 },
             ),
     ):
+        if len(role.name) < 100:
+            return await interaction.response.send_message(
+                embed=construct_error_negative_value_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "too_long"
+                    ),
+                    self.client.user.avatar.url,
+                    cost,
+                )
+            )
         if cost < 0:
             return await interaction.response.send_message(
                 embed=construct_error_negative_value_embed(
@@ -1137,6 +1147,7 @@ class Economics(commands.Cog):
         roles = list_income_roles(interaction.guild.id)
         source_for_pages = []
         for row in roles:
+            print(roles, interaction.guild.id)
             role = nextcord.utils.get(interaction.guild.roles, id=row[0])
             role = role.mention
             income_msg = localize_name(interaction.guild.id, "income").capitalize()
