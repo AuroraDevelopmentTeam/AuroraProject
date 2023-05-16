@@ -560,7 +560,7 @@ class Economics(commands.Cog):
                 },
             ),
     ):
-        if len(role.name) < 100:
+        if len(role.name) > 99:
             return await interaction.response.send_message(
                 embed=construct_error_negative_value_embed(
                     get_msg_from_locale_by_key(
