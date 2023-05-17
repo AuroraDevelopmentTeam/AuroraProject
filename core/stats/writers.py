@@ -23,9 +23,18 @@ def write_in_stats_standart_values(guilds) -> None:
 def write_channel_in_config(guild_id: int, channel_id: int, enabled: bool) -> None:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
-    sql = "INSERT INTO stats_channels_config(guild_id, channel_id, enabled) VALUES (?, ?, ?)"
-    val = (guild_id, channel_id, enabled)
-    cursor.execute(sql, val)
-    db.commit()
+    state = cursor.execute(
+        f"SELECT enabled FROM stats_channels_config WHERE guild_id = {guild_id} AND channel_id = {channel_id}"
+    ).fetchone()
+    if state is None:
+        sql = "INSERT INTO stats_channels_config(guild_id, channel_id, enabled) VALUES (?, ?, ?)"
+        val = (guild_id, channel_id, enabled)
+        cursor.execute(sql, val)
+        db.commit()
+    else:
+        sql = "UPDATE stats_channels_config SET enabled = ? WHERE guild_id = ? AND channel_id = ?"
+        val = (enabled, guild_id, channel_id)
+        cursor.execute(sql, val)
+        db.commit()
     cursor.close()
     db.close()

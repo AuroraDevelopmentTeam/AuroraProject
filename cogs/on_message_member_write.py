@@ -52,6 +52,7 @@ from core.utils import (
     write_member_in_money,
     write_member_in_clan,
 )
+from core.checkers import is_user_in_table
 
 
 class OnMessageListener(commands.Cog):
@@ -63,16 +64,19 @@ class OnMessageListener(commands.Cog):
         guild = message.guild
         member = message.author
         if not message.author.bot:
-            write_member_in_money(guild, member)
-            write_member_in_levels(guild, member)
-            write_member_in_profiles(guild, member)
-            write_member_in_marriage(guild, member)
-            write_member_in_gifts(guild, member)
-            write_member_in_honor(member)
-            write_member_in_profiles(guild, member)
-            write_member_in_stats(guild, member)
-            write_member_in_badges(guild, member)
-            write_member_in_clan(guild, member)
+            if is_user_in_table("money", guild.id, member.id) is False:
+                write_member_in_money(guild, member)
+                write_member_in_levels(guild, member)
+                write_member_in_profiles(guild, member)
+                write_member_in_marriage(guild, member)
+                write_member_in_gifts(guild, member)
+                write_member_in_honor(member)
+                write_member_in_profiles(guild, member)
+                write_member_in_stats(guild, member)
+                write_member_in_badges(guild, member)
+                write_member_in_clan(guild, member)
+            else:
+                return
 
 
 def setup(client):
