@@ -71,13 +71,13 @@ class Information(commands.Cog):
         users = guild.approximate_member_count
         embed = construct_long_embed(
             f"{guild.name}:",
-            embedicon,  # Тут был guild.icon
+            embedicon,  # Тут был guild.icon (помним любим скорбим)
             f"{requested} {interaction.user}",
             interaction.user.display_avatar,
             names_of_embed_fields,
             [
                 f"```\n{users} 🧍\n```",
-                f"```{guild.owner.name}```",
+                f"```{await self.client.fetch_user(guild.owner_id)}```",
                 f"```{len(guild.emojis)}```",
                 f"```{guild.created_at.strftime('%a, %d %b %Y')}```",
                 f"```{guild.id}```",

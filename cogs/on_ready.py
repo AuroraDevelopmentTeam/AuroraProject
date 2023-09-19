@@ -75,6 +75,8 @@ from core.voice.writers import write_in_voice_private_config_standart_values
 from core.emotions.create import create_emotions_cost_table
 from core.emotions.writers import write_in_emotions_cost_standart_values
 from core.marriage.create import add_column
+from core.bet.create import create_bets_table
+from core.bet.writers import write_in_bets_standart_values
 
 
 class OnReadyListener(commands.Cog):
@@ -84,7 +86,6 @@ class OnReadyListener(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         guilds = self.client.guilds
-        """
         create_locales_table()
         write_in_locales_standart_values(guilds)
         create_money_config_table()
@@ -148,7 +149,8 @@ class OnReadyListener(commands.Cog):
         write_in_emotions_cost_standart_values(guilds)
         create_marriage_config_table()
         write_in_marriage_config_standart_values(guilds)
-        """
+        create_bets_table()
+        write_in_bets_standart_values(guilds)
         await self.client.change_presence(
             activity=nextcord.Game(
                 name=f"You cute! /help\nСервера: {len(self.client.guilds)}\n"

@@ -87,20 +87,20 @@ async def custom_top_embed(
     cursor.close()
     db.close()
     roles = list(roles)
-    pagescol = len(roles) // 5
-    if len(roles) % 5 != 0:
+    pagescol = len(roles) // 10
+    if len(roles) % 10 != 0:
         pagescol += 1
-    x = pagen * 5
-    col = x - 5
+    x = pagen * 10
+    col = x - 10
     users = []
-    for each in roles[x - 5 : x]:
+    for each in roles[x - 10 : x]:
         each = list(each)
         col += 1
         if (user := inter.client.get_user(each[0])) == None: 
             user = await inter.client.fetch_user(each[0])
         if order == "voice":
             each[1] = format_seconds_to_hhmmss(each[1])
-        users.append([user, each[1]])
+        users.append([user, each[1], col])
     select = Select(
         options=[
             nextcord.SelectOption(label="Balance", default=balance),
@@ -116,20 +116,21 @@ async def custom_top_embed(
 
             await interaction.response.defer()
             # await interaction.delete_original_message()
+            order = select.values[0].lower()
             if select.values[0] == "Balance":
-                gay, sex = await custom_top_embed(inter=inter, order="balance")
+                gay, sex = await custom_top_embed(inter=inter, order=order)
                 await inter.edit_original_message(embed=gay, view=sex)
             if select.values[0] == "Voice":
-                gay, sex = await custom_top_embed(inter=inter, order="voice")
+                gay, sex = await custom_top_embed(inter=inter, order=order)
                 await inter.edit_original_message(embed=gay, view=sex)
             if select.values[0] == "Waifu":
-                gay, sex = await custom_top_embed(inter=inter, order="waifu")
+                gay, sex = await custom_top_embed(inter=inter, order=order)
                 await inter.edit_original_message(embed=gay, view=sex)
             if select.values[0] == "Messages":
-                gay, sex = await custom_top_embed(inter=inter, order="messages")
+                gay, sex = await custom_top_embed(inter=inter, order=order)
                 await inter.edit_original_message(embed=gay, view=sex)
             if select.values[0] == "Levels":
-                gay, sex = await custom_top_embed(inter=inter, order="levels")
+                gay, sex = await custom_top_embed(inter=inter, order=order)
                 await inter.edit_original_message(embed=gay, view=sex)
         else:
             await interaction.response.defer()

@@ -59,16 +59,16 @@ class StatisticsCounter(commands.Cog):
         if not message.author.bot:
             try:
                 if get_channel_stats_state(message.guild.id, message.channel.id) is True:
+                    print('hui hui')
                     update_user_messages_counter(message.guild.id, message.author.id, 1)
                 if get_channel_income_state(message.guild.id, message.channel.id) is False:
                     return
-
                 message_counter = get_user_messages_counter(
                     message.guild.id, message.author.id
                 )
                 try:
                     messages_for_money = get_msg_cooldown(message.guild.id)
-                except TypeError:
+                except TypeError as error:
                     messages_for_money = 10
                 if message_counter % messages_for_money == 0:
                     try:

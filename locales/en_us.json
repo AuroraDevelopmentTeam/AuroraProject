@@ -594,7 +594,7 @@
       "msg": "All warns were purged from"
     },
     "too_long": {
-      "msg": "Description is too long, max length is 140 characters!"
+      "msg": "Description is too long, max length is 100 characters!"
     },
     "profile_description": {
       "name": "description",
@@ -1303,5 +1303,19 @@
     },
     "hangman_name": {
       "msg": "Hangman"
+    },
+    "bet_config": {
+      "name": "bet_config",
+      "description": "Bet config prefix slash command that will be the prefix of economical bet commands"
+    },
+    "bet_config_set_min_bet": {
+      "name": "set_min_bet",
+      "description": "Set minimal bet on your server",
+      "msg": "Now on your server is the next minimal bet amount"
+    },
+    "bet_config_set_max_bet": {
+      "name": "set_max_bet",
+      "description": "Set maximal bet on your server",
+      "msg": "Now on your server is the next maximal bet amount"
     }
 }

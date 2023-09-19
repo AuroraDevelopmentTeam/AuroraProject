@@ -16,6 +16,7 @@ from core.utils import format_seconds_to_hhmmss
 
 DEFAULT_BOT_COLOR = settings["default_color"]
 
+
 class Leaderboard(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -31,8 +32,8 @@ class Leaderboard(commands.Cog):
         """
         This is the set slash command that will be the prefix of leaderboard commands.
         """
-        gay, sex = await custom_top_embed(inter=interaction)
-        await interaction.send(embed=gay, view=sex)
+        embed, view = await custom_top_embed(inter=interaction)
+        await interaction.send(embed=embed, view=view)
 
 
 def setup(client):

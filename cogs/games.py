@@ -4,7 +4,7 @@ import datetime
 
 import cooldowns
 import nextcord
-from nextcord.ext import commands
+from nextcord.ext import commands, application_checks
 from nextcord import Interaction, ButtonStyle, File, Permissions, SlashOption
 from nextcord.ui import Button, View
 
@@ -56,6 +56,9 @@ from core.errors import (
 from core.embeds import DEFAULT_BOT_COLOR, construct_basic_embed
 from core.emojify import SWORD
 
+from core.bet.getters import get_max_bet, get_min_bet
+from core.bet.update import update_max_bet, update_min_bet
+
 MULTIPLIERS_FOR_TWO_ROWS = [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]
 
 MULTIPLIERS_FOR_THREE_ROWS = [2.0, 2.1, 2.2, 2.3, 2.4, 2.5]
@@ -76,10 +79,11 @@ class DuelEndRu(nextcord.ui.View):
 
 class DuelStartRu(nextcord.ui.View):
     def __init__(
-            self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int]
+            self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int], users_dict: dict
     ):
         self.author = author
         self.bet = bet
+        self.users_dict = users_dict
         super().__init__()
 
     async def interaction_check(self, interaction: Interaction) -> bool:
@@ -113,7 +117,13 @@ class DuelStartRu(nextcord.ui.View):
         balance = get_user_balance(interaction.guild.id, who_win.id)
         msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
         embed.set_footer(text=f"{msg} {balance}", icon_url=who_win.display_avatar)
+        users_dict = self.users_dict
+        if author.id in users_dict:
+            users_dict.pop(author.id)
+        if user.id in users_dict:
+            users_dict.pop(user.id)
         await interaction.message.edit(embed=embed, view=DuelEndRu())
+        return users_dict
 
 
 class DuelEndEng(nextcord.ui.View):
@@ -131,10 +141,11 @@ class DuelEndEng(nextcord.ui.View):
 
 class DuelStartEng(nextcord.ui.View):
     def __init__(
-            self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int]
+            self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int], users_dict: dict
     ):
         self.author = author
         self.bet = bet
+        self.users_dict = users_dict
         super().__init__()
 
     async def interaction_check(self, interaction: Interaction) -> bool:
@@ -168,12 +179,17 @@ class DuelStartEng(nextcord.ui.View):
         balance = get_user_balance(interaction.guild.id, who_win.id)
         msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
         embed.set_footer(text=f"{msg} {balance}", icon_url=who_win.display_avatar)
+        if author.id in users_dict:
+            users_dict.pop(author)
+        if user.id in users_dict:
+            users_dict.pop(user)
         await interaction.message.edit(embed=embed, view=DuelEndEng())
 
 
 class Games(commands.Cog):
     def __init__(self, client):
         self.users = dict()
+        self.users_2 = dict()
         self.client = client
 
     @nextcord.slash_command(
@@ -706,6 +722,20 @@ class Games(commands.Cog):
                     bet,
                 )
             )
+        timestamp = datetime.datetime.now().timestamp()
+        user = self.users_2.get(interaction.user.id, None)
+        if user is None:
+            self.users_2.update({interaction.user.id: timestamp})
+        if user is not None:
+            if timestamp - user < 120:
+                return await interaction.send(
+                    embed=construct_error_command_is_active(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "command_is_active_error"
+                        ),
+                        interaction.user.display_avatar,
+                    )
+                )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
@@ -725,13 +755,17 @@ class Games(commands.Cog):
             color=DEFAULT_BOT_COLOR,
         )
         if get_guild_locale(interaction.guild.id) == "ru_ru":
-            await interaction.response.send_message(
-                embed=embed, view=DuelStartRu(interaction.user, bet)
+            users_2 = await interaction.response.send_message(
+                embed=embed, view=DuelStartRu(interaction.user, bet, self.users_2)
             )
+            if type(users_2) == dict:
+                self.users_2 = users_2
         else:
-            await interaction.response.send_message(
-                embed=embed, view=DuelStartEng(interaction.user, bet)
+            users_2 = await interaction.response.send_message(
+                embed=embed, view=DuelStartEng(interaction.user, bet, self.users_2)
             )
+            if type(users_2) == dict:
+                self.users_2 = users_2
 
     @nextcord.slash_command(name="ttt")
     async def __ttt(self, interaction: Interaction,
@@ -1022,56 +1056,56 @@ class Games(commands.Cog):
             color=DEFAULT_BOT_COLOR
         )
         embed_formatter.set_author(name=get_msg_from_locale_by_key(interaction.guild.id, "hangman_name"))
-        hangman_picture_1 = """```
+        hangman_pictures = {
+            "hangman_picture_1": """```
               _______
              |/      |
              |      
              |      
              |       
              |
-            _|___```"""
-
-        hangman_picture_5 = """```
+            _|___```""",
+            "hangman_picture_2": """```
               _______
              |/      |
              |      (_)
-             |      \|/
-             |       |
-             |
-            _|___```"""
-        hangman_picture_4 = """```
-              _______
-             |/      |
-             |      (_)
-             |      \|/
              |
              |
-            _|___```"""
-        hangman_picture_3 = """```
+             |
+            _|___```""",
+            "hangman_picture_3": """```
               _______
              |/      |
              |      (_)
              |      \|
              |
              |
-            _|___```"""
-        hangman_picture_2 = """```
+            _|___```""",
+            "hangman_picture_4": """```
               _______
              |/      |
              |      (_)
+             |      \|/
              |
              |
+            _|___```""",
+            "hangman_picture_5": """```
+              _______
+             |/      |
+             |      (_)
+             |      \|/
+             |       |
              |
-            _|___```"""
-        hangman_picture_6 = """```
+            _|___```""",
+            "hangman_picture_6": """```
               _______
              |/      |
              |      (_)
              |      \|/
              |       |
              |      /
-            _|___```"""
-        hangman_picture_7 = """```
+            _|___```""",
+            "hangman_picture_7": """```
               _______
              |/      |
              |      (_)
@@ -1079,6 +1113,8 @@ class Games(commands.Cog):
              |       |
              |      / \\
             _|___```"""
+
+        }
         image = 'шо'
         animals = get_msg_from_locale_by_key(interaction.guild.id, "animals")
         info_msg = get_msg_from_locale_by_key(interaction.guild.id, "information")
@@ -1090,20 +1126,7 @@ class Games(commands.Cog):
         embed_formatter.set_footer(text=str(guess_list_unbox))
         while guesses < 7:
             embed_formatter.clear_fields()
-            if guesses == 0:
-                image = hangman_picture_1
-            if guesses == 1:
-                image = hangman_picture_2
-            if guesses == 2:
-                image = hangman_picture_3
-            if guesses == 3:
-                image = hangman_picture_4
-            if guesses == 4:
-                image = hangman_picture_5
-            if guesses == 5:
-                image = hangman_picture_6
-            if guesses == 6:
-                image = hangman_picture_7
+            image = hangman_pictures[f"hangman_picture_{guesses + 1}"]
             embed_formatter.add_field(name=animals, value=image)
             embed_formatter.add_field(name=word_msg, value=f'\n {attempts_msg}: {guesses} \n ```{unbox_blank}```')
             embed_formatter.set_footer(text=str(guess_list_unbox))
@@ -1158,6 +1181,58 @@ class Games(commands.Cog):
             await interaction.send(f'{interaction.user.mention} '
                                    f'{get_msg_from_locale_by_key(interaction.guild.id, "lost")}! '
                                    f'{get_msg_from_locale_by_key(interaction.guild.id, "hangman_word_was")}: {word}')
+
+    @nextcord.slash_command(
+        name="bet_config",
+        name_localizations=get_localized_name("bet_config"),
+        description_localizations=get_localized_description("bet_config"),
+        default_member_permissions=Permissions(administrator=True),
+    )
+    @application_checks.has_permissions(manage_guild=True)
+    async def __bet_config(self, interaction: Interaction):
+        """
+        This is the bet config slash command that will be the prefix of bet commands
+        """
+        pass
+
+    @__bet_config.subcommand(name="set_min_bet",
+                             description="Set minimal bet on your server")
+    async def __bet_config(self, interaction: Interaction, minimal_bet: Optional[int] = SlashOption(required=True)):
+        update_min_bet(interaction.guild.id, minimal_bet)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"bet_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} **{minimal_bet}** {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__bet_config.subcommand(name="set_max_bet",
+                             description="Set maximal bet on your server",
+                             name_localizations=get_localized_name("bet_config_set_max_bet"))
+    async def __bet_config(self, interaction: Interaction, maximal_bet: Optional[int] = SlashOption(required=True)):
+        update_max_bet(interaction.guild.id, maximal_bet)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"bet_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} **{maximal_bet}** {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
 
 
 def setup(client):
