@@ -7,7 +7,7 @@ from PIL import Image
 import cooldowns
 from nextcord.ext import commands, menus, application_checks, tasks
 from nextcord.abc import GuildChannel
-from nextcord import Interaction, SlashOption, Permissions
+from nextcord import Interaction, SlashOption, Permissions, PartialInteractionMessage, WebhookMessage
 import nextcord
 
 import config
@@ -732,7 +732,7 @@ class Economics(commands.Cog):
 
                     async def color_callback(
                             inter: Interaction,
-                    ) -> Coroutine[Any, Any, None]:
+                    ) -> PartialInteractionMessage | WebhookMessage:
                         if inter.user == interaction.user:
                             await inter.response.defer()
                             await inter.delete_original_message()

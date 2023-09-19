@@ -177,6 +177,7 @@ class DuelStartEng(nextcord.ui.View):
 class Games(commands.Cog):
     def __init__(self, client):
         self.users = dict()
+        self.users_2 = dict()
         self.client = client
 
     @nextcord.slash_command(
@@ -709,6 +710,20 @@ class Games(commands.Cog):
                     bet,
                 )
             )
+        timestamp = datetime.datetime.now().timestamp()
+        user = self.users_2.get(interaction.user.id, None)
+        if user is None:
+            self.users_2.update({interaction.user.id: timestamp})
+        if user is not None:
+            if timestamp - user < 120:
+                return await interaction.send(
+                    embed=construct_error_command_is_active(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "command_is_active_error"
+                        ),
+                        interaction.user.display_avatar,
+                    )
+                )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")

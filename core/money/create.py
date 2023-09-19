@@ -93,7 +93,7 @@ def create_user_money_card(
     background.paste(profile, (760, 390))
     balance = get_user_balance(guild_id, user.id)
     background.text((150, 530), str(user), font=font, color="#FFFFFF")
-    background.text((400, 480), f"{balance}", font=larger_font, color="#FFFFFF")
+    background.text((400, 479.8), f"{balance}", font=larger_font, color="#FFFFFF")
     requested = get_msg_from_locale_by_key(guild_id, "requested_by")
     name = localize_name(guild_id, name).capitalize()
     embed = nextcord.Embed(
