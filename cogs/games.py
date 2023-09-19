@@ -79,10 +79,11 @@ class DuelEndRu(nextcord.ui.View):
 
 class DuelStartRu(nextcord.ui.View):
     def __init__(
-            self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int]
+            self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int], users_dict: dict
     ):
         self.author = author
         self.bet = bet
+        self.users_dict = users_dict
         super().__init__()
 
     async def interaction_check(self, interaction: Interaction) -> bool:
@@ -116,7 +117,13 @@ class DuelStartRu(nextcord.ui.View):
         balance = get_user_balance(interaction.guild.id, who_win.id)
         msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
         embed.set_footer(text=f"{msg} {balance}", icon_url=who_win.display_avatar)
+        users_dict = self.users_dict
+        if author.id in users_dict:
+            users_dict.pop(author.id)
+        if user.id in users_dict:
+            users_dict.pop(user.id)
         await interaction.message.edit(embed=embed, view=DuelEndRu())
+        return users_dict
 
 
 class DuelEndEng(nextcord.ui.View):
@@ -134,10 +141,11 @@ class DuelEndEng(nextcord.ui.View):
 
 class DuelStartEng(nextcord.ui.View):
     def __init__(
-            self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int]
+            self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int], users_dict: dict
     ):
         self.author = author
         self.bet = bet
+        self.users_dict = users_dict
         super().__init__()
 
     async def interaction_check(self, interaction: Interaction) -> bool:
@@ -171,6 +179,10 @@ class DuelStartEng(nextcord.ui.View):
         balance = get_user_balance(interaction.guild.id, who_win.id)
         msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
         embed.set_footer(text=f"{msg} {balance}", icon_url=who_win.display_avatar)
+        if author.id in users_dict:
+            users_dict.pop(author)
+        if user.id in users_dict:
+            users_dict.pop(user)
         await interaction.message.edit(embed=embed, view=DuelEndEng())
 
 
@@ -743,13 +755,17 @@ class Games(commands.Cog):
             color=DEFAULT_BOT_COLOR,
         )
         if get_guild_locale(interaction.guild.id) == "ru_ru":
-            await interaction.response.send_message(
-                embed=embed, view=DuelStartRu(interaction.user, bet)
+            users_2 = await interaction.response.send_message(
+                embed=embed, view=DuelStartRu(interaction.user, bet, self.users_2)
             )
+            if type(users_2) == dict:
+                self.users_2 = users_2
         else:
-            await interaction.response.send_message(
-                embed=embed, view=DuelStartEng(interaction.user, bet)
+            users_2 = await interaction.response.send_message(
+                embed=embed, view=DuelStartEng(interaction.user, bet, self.users_2)
             )
+            if type(users_2) == dict:
+                self.users_2 = users_2
 
     @nextcord.slash_command(name="ttt")
     async def __ttt(self, interaction: Interaction,
