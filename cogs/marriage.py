@@ -302,6 +302,10 @@ class Marriage(commands.Cog):
         except nextcord.NotFound:
             pair = None
         divorce_users(interaction.guild.id, interaction.user.id, pair_id)
+        loveroom_id = get_user_loveroom_id(interaction.guild.id, pair_id)
+
+        if loveroom_id != 0 and loveroom_id:
+            await interaction.guild.get_channel(loveroom_id).delete()
         marriage_autorole = get_server_marriage_autorole(interaction.guild.id)
         if marriage_autorole != 0:
             role = nextcord.utils.get(interaction.guild.roles, id=marriage_autorole[0])
@@ -872,7 +876,6 @@ class Marriage(commands.Cog):
                 interaction.guild.id,
             )
         )
-
     @nextcord.slash_command(name="loveroom_create")
     async def __loveroom_create(self, interaction: Interaction):
         if is_married(interaction.guild.id, interaction.user.id) is False:
@@ -887,16 +890,21 @@ class Marriage(commands.Cog):
         pair_id = get_user_pair_id(interaction.guild.id, interaction.user.id)
         pair = await interaction.guild.fetch_member(pair_id)
         loverooms_state = get_marriage_config_enable_loverooms(interaction.guild.id)
-        print(loverooms_state)
-        if loverooms_state:
+        room = get_user_loveroom_id(interaction.guild.id, interaction.user.id)
+        if room != 0 or room:
             return await interaction.response.send_message(
                 embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(interaction.guild.id, "loveroom_existing"),
                     self.client.user.avatar.url
                 )
             )
-        loveroom_category = nextcord.utils.get(interaction.guild.channels,
-                                               id=get_marriage_config_loveroom_category(interaction.guild.id))
+        if loveroom_category_id := get_marriage_config_loveroom_category(interaction.guild.id) != 0:
+            try:
+
+                loveroom_category = nextcord.utils.get(interaction.guild.channels,
+                                                    id=loveroom_category_id)
+            except:
+                await interaction.respose.send_message(embed=construct_error_bot_user_embed("No loveroom category!"))
         loveroom_price = get_marriage_config_month_loveroom_price(interaction.guild.id)
         bal = get_family_money(interaction.guild.id, interaction.user.id)
         if bal < loveroom_price:
@@ -923,8 +931,11 @@ class Marriage(commands.Cog):
                                                                 name=f"{interaction.user.name} 🤍 {pair.name}",
                                                                 user_limit=2,
                                                                 overwrites=overwrites)
+        when_expired = int(datetime.now().timestamp()+86400*30)
         update_user_loveroom_id(interaction.guild.id, interaction.user.id, loveroom.id)
         update_user_loveroom_id(interaction.guild.id, pair_id, loveroom.id)
+        update_user_loveroom_expire_date(interaction.guild.id, interaction.user.id, when_expired)
+        update_user_loveroom_expire_date(interaction.guild.id, pair_id, when_expired)
 
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"{interaction.application_command.name}"

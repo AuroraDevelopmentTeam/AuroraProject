@@ -3,6 +3,15 @@ import sqlite3
 import nextcord
 
 from core.shop.updaters import delete_role_from_shop
+from core.marriage.update import (
+    update_user_loveroom_id, 
+    update_couple_family_money, 
+    update_user_loveroom_expire_date 
+)
+from core.marriage.getters import (
+    get_family_money, 
+    get_marriage_config_month_loveroom_price 
+)
 from core.money.updaters import update_user_balance
 from nextcord.ext import tasks, commands
 
@@ -13,6 +22,37 @@ class TasksCog(commands.Cog):
         super().__init__()
         self.custom_shop_roles_expiration.start()
         self.give_roles_money.start()
+        self.loveroom_expire_delete.start()
+
+    @tasks.loop(minutes=8)
+    async def loveroom_expire_delete(self): # delete loveroom when expired
+        now = datetime.datetime.now().timestamp()
+        db = sqlite3.connect("./databases/main.sqlite")
+        cursor = db.cursor()
+        all_loverooms = cursor.execute(f"SELECT guild_id, loveroom_id, user_id, pair_id FROM marriage WHERE loveroom_expire < {int(now)}"
+                                       ).fetchall()
+        if all_loverooms:
+            for loveroom in all_loverooms:
+                guild_id, loveroom_id, user_id, pair_id = loveroom[0], loveroom[1], loveroom[2], loveroom[3], 
+                try:
+                    loveroom_cost = get_marriage_config_month_loveroom_price(guild_id)
+                    if get_family_money(guild_id, user_id) > loveroom_cost:
+                        update_couple_family_money(guild_id, user_id, pair_id, -loveroom_cost)
+                        update_user_loveroom_expire_date(guild_id, user_id, now+86400*30)
+                    else:
+                        guild = await self.client.fetch_guild(guild_id)
+                        room = await guild.fetch_channel(loveroom_id)
+                        update_user_loveroom_id(guild_id, user_id, 0)
+                        update_user_loveroom_id(guild_id, pair_id, 0)
+                        await room.delete(reason = "Loveroom expired")
+                except Exception as e:
+                    if isinstance(e, nextcord.errors.NotFound):
+                        pass
+                    else:
+                        print(e)
+                    continue
+        else:
+            return
 
     @tasks.loop(minutes=10)
     async def custom_shop_roles_expiration(self):
@@ -24,7 +64,6 @@ class TasksCog(commands.Cog):
         ).fetchall()
         if all_roles:
 
-            print(all_roles)
             for role in all_roles:
                 try:
                     guild = self.client.get_guild(role[0])
