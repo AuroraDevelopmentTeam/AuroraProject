@@ -79,11 +79,10 @@ class DuelEndRu(nextcord.ui.View):
 
 class DuelStartRu(nextcord.ui.View):
     def __init__(
-            self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int], users_dict: dict
+            self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int]
     ):
         self.author = author
         self.bet = bet
-        self.users_dict = users_dict
         super().__init__()
 
     async def interaction_check(self, interaction: Interaction) -> bool:
@@ -101,6 +100,32 @@ class DuelStartRu(nextcord.ui.View):
     async def duel_start(self, button: nextcord.ui.Button, interaction: Interaction):
         author = self.author
         user = interaction.user
+        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if balance < self.bet:
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            await interaction.message.edit(view=DuelEndRu())
+            return await interaction.response.send_message(
+                embed=construct_error_not_enough_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_enough_money_error"
+                    ),
+                    interaction.user.display_avatar,
+                    f"{msg} {balance}",
+                )
+            )
+        balance = get_user_balance(interaction.guild.id, author.id)
+        if balance < self.bet:
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            await interaction.message.edit(view=DuelEndRu())
+            return await interaction.response.send_message(
+                embed=construct_error_not_enough_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_enough_money_error"
+                    ),
+                    author.display_avatar,
+                    f"{msg} {balance}",
+                )
+            )
         who_win = random.choice([author, user])
         if who_win == author:
             losed = user
@@ -117,13 +142,7 @@ class DuelStartRu(nextcord.ui.View):
         balance = get_user_balance(interaction.guild.id, who_win.id)
         msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
         embed.set_footer(text=f"{msg} {balance}", icon_url=who_win.display_avatar)
-        users_dict = self.users_dict
-        if author.id in users_dict:
-            users_dict.pop(author.id)
-        if user.id in users_dict:
-            users_dict.pop(user.id)
         await interaction.message.edit(embed=embed, view=DuelEndRu())
-        return users_dict
 
 
 class DuelEndEng(nextcord.ui.View):
@@ -141,11 +160,10 @@ class DuelEndEng(nextcord.ui.View):
 
 class DuelStartEng(nextcord.ui.View):
     def __init__(
-            self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int], users_dict: dict
+            self, author: Union[nextcord.Member, nextcord.User], bet: Optional[int]
     ):
         self.author = author
         self.bet = bet
-        self.users_dict = users_dict
         super().__init__()
 
     async def interaction_check(self, interaction: Interaction) -> bool:
@@ -163,6 +181,32 @@ class DuelStartEng(nextcord.ui.View):
     async def duel_start(self, button: nextcord.ui.Button, interaction: Interaction):
         author = self.author
         user = interaction.user
+        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if balance < self.bet:
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            await interaction.message.edit(view=DuelEndRu())
+            return await interaction.response.send_message(
+                embed=construct_error_not_enough_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_enough_money_error"
+                    ),
+                    interaction.user.display_avatar,
+                    f"{msg} {balance}",
+                )
+            )
+        balance = get_user_balance(interaction.guild.id, author.id)
+        if balance < self.bet:
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            await interaction.message.edit(view=DuelEndRu())
+            return await interaction.response.send_message(
+                embed=construct_error_not_enough_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_enough_money_error"
+                    ),
+                    author.display_avatar,
+                    f"{msg} {balance}",
+                )
+            )
         who_win = random.choice([author, user])
         if who_win == author:
             losed = user
@@ -179,17 +223,12 @@ class DuelStartEng(nextcord.ui.View):
         balance = get_user_balance(interaction.guild.id, who_win.id)
         msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
         embed.set_footer(text=f"{msg} {balance}", icon_url=who_win.display_avatar)
-        if author.id in users_dict:
-            users_dict.pop(author)
-        if user.id in users_dict:
-            users_dict.pop(user)
         await interaction.message.edit(embed=embed, view=DuelEndEng())
 
 
 class Games(commands.Cog):
     def __init__(self, client):
         self.users = dict()
-        self.users_2 = dict()
         self.client = client
 
     @nextcord.slash_command(
@@ -722,20 +761,6 @@ class Games(commands.Cog):
                     bet,
                 )
             )
-        timestamp = datetime.datetime.now().timestamp()
-        user = self.users_2.get(interaction.user.id, None)
-        if user is None:
-            self.users_2.update({interaction.user.id: timestamp})
-        if user is not None:
-            if timestamp - user < 120:
-                return await interaction.send(
-                    embed=construct_error_command_is_active(
-                        get_msg_from_locale_by_key(
-                            interaction.guild.id, "command_is_active_error"
-                        ),
-                        interaction.user.display_avatar,
-                    )
-                )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
@@ -756,18 +781,20 @@ class Games(commands.Cog):
         )
         if get_guild_locale(interaction.guild.id) == "ru_ru":
             users_2 = await interaction.response.send_message(
-                embed=embed, view=DuelStartRu(interaction.user, bet, self.users_2)
+                embed=embed, view=DuelStartRu(interaction.user, bet)
             )
-            if type(users_2) == dict:
-                self.users_2 = users_2
         else:
             users_2 = await interaction.response.send_message(
-                embed=embed, view=DuelStartEng(interaction.user, bet, self.users_2)
+                embed=embed, view=DuelStartEng(interaction.user, bet)
             )
-            if type(users_2) == dict:
-                self.users_2 = users_2
 
-    @nextcord.slash_command(name="ttt")
+    @nextcord.slash_command(
+        name="ttt",
+        description="ttt",
+        name_localizations=get_localized_name("ttt"),
+        description_localizations=get_localized_description("ttt"),
+        default_member_permissions=Permissions(send_messages=True),
+    )
     async def __ttt(self, interaction: Interaction,
                     bet: Optional[int] = SlashOption(
                         required=True,

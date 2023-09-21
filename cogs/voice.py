@@ -180,12 +180,10 @@ class UserVoiceHandler(commands.Cog):
                                            "voice_private_config_menu_invoke"),
                                        )
     async def __voice_creation_channel_menu_invoke(self, interaction: Interaction):
-        message = await interaction.send(embed=create_button_menu_embed(), view=VoiceMenuButtonsView())
-        await message.delete()
+        processing = await interaction.send(f"{YES}")
+        await processing.delete()
         message = await interaction.channel.send(embed=create_button_menu_embed(), view=VoiceMenuButtonsView())
-        message = await message.fetch()
         update_voice_controller_msg(interaction.guild.id, message.id)
-
 
     @nextcord.slash_command("kill_process", guild_ids=[1006113954331885648])
     async def __kill(self, interaction: Interaction):

@@ -1317,5 +1317,9 @@
       "name": "set_max_bet",
       "description": "Set maximal bet on your server",
       "msg": "Now on your server is the next maximal bet amount"
+    },
+    "ttt": {
+      "name": "ttt",
+      "description": "Set bet and play tic tac toe with Aurora AI"
     }
 }
