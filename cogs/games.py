@@ -1169,21 +1169,21 @@ class Games(commands.Cog):
                 return inner_check
 
             guess = await self.client.wait_for('message', check=check(interaction.user), timeout=120)
-            if len(guess.content) > 1 and guess.content != word:
+            guess = guess.content.casefold()
+            if len(guess) > 1 and guess != word:
                 await interaction.send(get_msg_from_locale_by_key(interaction.guild.id, "hangman_error_1"))
                 guesses -= 1
-            if guess.content == " ":
+            if guess == " ":
                 await interaction.send(get_msg_from_locale_by_key(interaction.guild.id, "hangman_error_2"))
-            if guess.content in guess_list:
+            if guess in guess_list:
                 await interaction.send(get_msg_from_locale_by_key(interaction.guild.id, "hangman_error_3"))
             else:
-                if len(guess.content) == 1:
-                    guess.content = guess.content.casefold()
-                    guess_list.append(guess.content)
+                if len(guess) == 1:
+                    guess_list.append(guess)
                     guess_list_unbox = (', '.join(guess_list))
                 i = 0
                 while i < len(word):
-                    if guess.content == word[i]:
+                    if guess == word[i]:
                         new_blanks_list[i] = word_list[i]
                     i = i + 1
 
@@ -1194,7 +1194,7 @@ class Games(commands.Cog):
                     blanks_list = new_blanks_list[:]
                     unbox_blank = (' '.join(blanks_list))
 
-                    if word_list == blanks_list or guess.content.casefold() == word:
+                    if word_list == blanks_list or guess == word:
                         embed_formatter.clear_fields()
                         embed_formatter.add_field(name=animals, value=image)
                         embed_formatter.add_field(name=f'{info_msg}',
