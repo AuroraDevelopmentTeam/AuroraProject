@@ -297,6 +297,18 @@ class Games(commands.Cog):
                 )
 
         async def hit_callback(interaction: Interaction):
+            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+            if balance < bet:
+                msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+                view = create_final_view(interaction.guild.id)
+                self.users.pop(interaction.user.id)
+                return await interaction.message.edit(embed=construct_error_not_enough_embed(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "not_enough_money_error"
+                        ),
+                        interaction.user.display_avatar,
+                        f"{msg} {balance}",
+                    ), view=view)
             global turn
             turn += 1
             player_hand.add_card(deck.deal())
@@ -330,6 +342,18 @@ class Games(commands.Cog):
                 await interaction.message.edit(embed=embed)
 
         async def stand_callback(interaction: Interaction):
+            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+            if balance < bet:
+                msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+                view = create_final_view(interaction.guild.id)
+                self.users.pop(interaction.user.id)
+                return await interaction.message.edit(embed=construct_error_not_enough_embed(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "not_enough_money_error"
+                        ),
+                        interaction.user.display_avatar,
+                        f"{msg} {balance}",
+                    ), view=view)
             global turn
             turn += 1
             while dealer_hand.get_value() < 17:
@@ -408,6 +432,18 @@ class Games(commands.Cog):
                     await interaction.message.edit(embed=embed, view=view)
 
         async def dealer_blackjack_callback(interaction: Interaction):
+            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+            if balance < bet:
+                msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+                view = create_final_view(interaction.guild.id)
+                self.users.pop(interaction.user.id)
+                return await interaction.message.edit(embed=construct_error_not_enough_embed(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "not_enough_money_error"
+                        ),
+                        interaction.user.display_avatar,
+                        f"{msg} {balance}",
+                    ), view=view)
             if check_for_blackjack(dealer_hand):
                 draw = get_msg_from_locale_by_key(interaction.guild.id, "draw")
                 embed = create_blackjack_embed(
@@ -442,6 +478,18 @@ class Games(commands.Cog):
                 await interaction.message.edit(embed=embed, view=view)
 
         async def one_to_one_callback(interaction: Interaction):
+            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+            if balance < bet:
+                msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+                view = create_final_view(interaction.guild.id)
+                self.users.pop(interaction.user.id)
+                return await interaction.message.edit(embed=construct_error_not_enough_embed(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "not_enough_money_error"
+                        ),
+                        interaction.user.display_avatar,
+                        f"{msg} {balance}",
+                    ), view=view)
             update_user_balance(interaction.guild.id, interaction.user.id, bet)
             balance = get_user_balance(interaction.guild.id, interaction.user.id)
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
@@ -462,6 +510,18 @@ class Games(commands.Cog):
             await interaction.message.edit(embed=embed, view=view)
 
         if check_for_blackjack(player_hand):
+            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+            if balance < bet:
+                msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+                view = create_final_view(interaction.guild.id)
+                self.users.pop(interaction.user.id)
+                return await interaction.message.edit(embed=construct_error_not_enough_embed(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "not_enough_money_error"
+                        ),
+                        interaction.user.display_avatar,
+                        f"{msg} {balance}",
+                    ), view=view)
             if str(dealer_hand.cards[1]) in maybe_blackjack_cards:
                 dealer_blackjack = create_button(
                     "Blackjack", dealer_blackjack_callback, False
