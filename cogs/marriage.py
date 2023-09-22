@@ -877,7 +877,11 @@ class Marriage(commands.Cog):
             )
         )
 
-    @nextcord.slash_command(name="loveroom_create")
+    @nextcord.slash_command(name="loveroom_create",
+                            name_localizations=get_localized_name("loveroom_create"),
+                            description_localizations=get_localized_description(
+                                "loveroom_create"),
+                            )
     async def __loveroom_create(self, interaction: Interaction):
         if is_married(interaction.guild.id, interaction.user.id) is False:
             return await interaction.response.send_message(
@@ -891,6 +895,8 @@ class Marriage(commands.Cog):
         pair_id = get_user_pair_id(interaction.guild.id, interaction.user.id)
         pair = await interaction.guild.fetch_member(pair_id)
         loverooms_state = get_marriage_config_enable_loverooms(interaction.guild.id)
+        if loverooms_state is False:
+            return await 'loverooms on server disabled by admin'
         room = get_user_loveroom_id(interaction.guild.id, interaction.user.id)
         if room != 0 or room:
             return await interaction.response.send_message(
@@ -905,7 +911,8 @@ class Marriage(commands.Cog):
                 loveroom_category = nextcord.utils.get(interaction.guild.channels,
                                                        id=loveroom_category_id)
             except:
-                await interaction.respose.send_message(embed=construct_error_bot_user_embed("No loveroom category!"))
+                return await interaction.respose.send_message(embed=construct_error_bot_user_embed("No loveroom "
+                                                                                                   "category!"))
         loveroom_price = get_marriage_config_month_loveroom_price(interaction.guild.id)
         bal = get_family_money(interaction.guild.id, interaction.user.id)
         if bal < loveroom_price:
