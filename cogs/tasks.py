@@ -24,7 +24,7 @@ class TasksCog(commands.Cog):
         self.give_roles_money.start()
         self.loveroom_expire_delete.start()
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(minutes=8)
     async def loveroom_expire_delete(self):  # delete loveroom when expired
         now = datetime.datetime.now().timestamp()
         db = sqlite3.connect("./databases/main.sqlite")
@@ -39,7 +39,7 @@ class TasksCog(commands.Cog):
                     loveroom_cost = get_marriage_config_month_loveroom_price(guild_id)
                     if get_family_money(guild_id, user_id) >= loveroom_cost:
                         update_couple_family_money(guild_id, user_id, pair_id, -loveroom_cost)
-                        update_user_loveroom_expire_date(guild_id, user_id, now + 86400 * 30)
+                        update_user_loveroom_expire_date(guild_id, user_id, int(now + 86400 * 30))
                     else:
                         guild = await self.client.fetch_guild(guild_id)
                         room = await guild.fetch_channel(loveroom_id)

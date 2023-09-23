@@ -1321,5 +1321,9 @@
     "ttt": {
       "name": "ttt",
       "description": "Set bet and play tic tac toe with Aurora AI"
+    },
+    "bet_range_error": {
+      "msg": "Aurora denied process of command execution due to __**incorrect bet**__  \nYour command failed to successfully complete.\n Server bet range from min to max:"
     }
+
 }

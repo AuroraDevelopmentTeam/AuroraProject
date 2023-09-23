@@ -51,7 +51,8 @@ from core.money.getters import get_user_balance, get_guild_currency_symbol
 from core.errors import (
     construct_error_negative_value_embed,
     construct_error_not_enough_embed,
-    construct_error_command_is_active
+    construct_error_command_is_active,
+    construct_error_incorrect_bet,
 )
 from core.embeds import DEFAULT_BOT_COLOR, construct_basic_embed
 from core.emojify import SWORD
@@ -259,6 +260,15 @@ class Games(commands.Cog):
                     ),
                     self.client.user.avatar.url,
                     bet,
+                )
+            )
+        bet_min, bet_max = get_min_bet(interaction.guild.id), get_max_bet(interaction.guild.id)
+        if bet < bet_min or bet > bet_max:
+            return await interaction.followup.send(
+                embed=construct_error_incorrect_bet(
+                    f'{get_msg_from_locale_by_key(interaction.guild.id, "bet_range_error")} '
+                    f'**{bet_min}** - **{bet_max}** {get_guild_currency_symbol(interaction.guild.id)}',
+                    interaction.user.display_avatar,
                 )
             )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -625,6 +635,15 @@ class Games(commands.Cog):
                     bet,
                 )
             )
+        bet_min, bet_max = get_min_bet(interaction.guild.id), get_max_bet(interaction.guild.id)
+        if bet < bet_min or bet > bet_max:
+            return await interaction.response.send_message(
+                embed=construct_error_incorrect_bet(
+                    f'{get_msg_from_locale_by_key(interaction.guild.id, "bet_range_error")} '
+                    f'**{bet_min}** - **{bet_max}** {get_guild_currency_symbol(interaction.guild.id)}',
+                    interaction.user.display_avatar,
+                )
+            )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
@@ -696,6 +715,15 @@ class Games(commands.Cog):
                     bet,
                 )
             )
+        bet_min, bet_max = get_min_bet(interaction.guild.id), get_max_bet(interaction.guild.id)
+        if bet < bet_min or bet > bet_max:
+            return await interaction.response.send_message(
+                embed=construct_error_incorrect_bet(
+                    f'{get_msg_from_locale_by_key(interaction.guild.id, "bet_range_error")} '
+                    f'**{bet_min}** - **{bet_max}** {get_guild_currency_symbol(interaction.guild.id)}',
+                    interaction.user.display_avatar,
+                )
+            )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
@@ -761,6 +789,15 @@ class Games(commands.Cog):
                     bet,
                 )
             )
+        bet_min, bet_max = get_min_bet(interaction.guild.id), get_max_bet(interaction.guild.id)
+        if bet < bet_min or bet > bet_max:
+            return await interaction.response.send_message(
+                embed=construct_error_incorrect_bet(
+                    f'{get_msg_from_locale_by_key(interaction.guild.id, "bet_range_error")} '
+                    f'**{bet_min}** - **{bet_max}** {get_guild_currency_symbol(interaction.guild.id)}',
+                    interaction.user.display_avatar,
+                )
+            )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
@@ -821,6 +858,15 @@ class Games(commands.Cog):
                     bet,
                 )
             )
+        bet_min, bet_max = get_min_bet(interaction.guild.id), get_max_bet(interaction.guild.id)
+        if bet < bet_min or bet > bet_max:
+            return await interaction.response.send_message(
+                embed=construct_error_incorrect_bet(
+                    f'{get_msg_from_locale_by_key(interaction.guild.id, "bet_range_error")} '
+                    f'**{bet_min}** - **{bet_max}** {get_guild_currency_symbol(interaction.guild.id)}',
+                    interaction.user.display_avatar,
+                )
+            )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
@@ -840,11 +886,11 @@ class Games(commands.Cog):
             color=DEFAULT_BOT_COLOR,
         )
         if get_guild_locale(interaction.guild.id) == "ru_ru":
-            users_2 = await interaction.response.send_message(
+            await interaction.response.send_message(
                 embed=embed, view=DuelStartRu(interaction.user, bet)
             )
         else:
-            users_2 = await interaction.response.send_message(
+            await interaction.response.send_message(
                 embed=embed, view=DuelStartEng(interaction.user, bet)
             )
 
@@ -872,6 +918,15 @@ class Games(commands.Cog):
                     ),
                     self.client.user.avatar.url,
                     bet,
+                )
+            )
+        bet_min, bet_max = get_min_bet(interaction.guild.id), get_max_bet(interaction.guild.id)
+        if bet < bet_min or bet > bet_max:
+            return await interaction.response.send_message(
+                embed=construct_error_incorrect_bet(
+                    f'{get_msg_from_locale_by_key(interaction.guild.id, "bet_range_error")} '
+                    f'**{bet_min}** - **{bet_max}** {get_guild_currency_symbol(interaction.guild.id)}',
+                    interaction.user.display_avatar,
                 )
             )
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
@@ -1268,58 +1323,6 @@ class Games(commands.Cog):
             await interaction.send(f'{interaction.user.mention} '
                                    f'{get_msg_from_locale_by_key(interaction.guild.id, "lost")}! '
                                    f'{get_msg_from_locale_by_key(interaction.guild.id, "hangman_word_was")}: {word}')
-
-    @nextcord.slash_command(
-        name="bet_config",
-        name_localizations=get_localized_name("bet_config"),
-        description_localizations=get_localized_description("bet_config"),
-        default_member_permissions=Permissions(administrator=True),
-    )
-    @application_checks.has_permissions(manage_guild=True)
-    async def __bet_config(self, interaction: Interaction):
-        """
-        This is the bet config slash command that will be the prefix of bet commands
-        """
-        pass
-
-    @__bet_config.subcommand(name="set_min_bet",
-                             description="Set minimal bet on your server")
-    async def __bet_config(self, interaction: Interaction, minimal_bet: Optional[int] = SlashOption(required=True)):
-        update_min_bet(interaction.guild.id, minimal_bet)
-        message = get_msg_from_locale_by_key(
-            interaction.guild.id, f"bet_config_{interaction.application_command.name}"
-        )
-        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
-        await interaction.response.send_message(
-            embed=construct_basic_embed(
-                interaction.application_command.name,
-                f"{message} **{minimal_bet}** {currency_symbol}",
-                f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
-                interaction.guild.id,
-            )
-        )
-
-    @__bet_config.subcommand(name="set_max_bet",
-                             description="Set maximal bet on your server",
-                             name_localizations=get_localized_name("bet_config_set_max_bet"))
-    async def __bet_config(self, interaction: Interaction, maximal_bet: Optional[int] = SlashOption(required=True)):
-        update_max_bet(interaction.guild.id, maximal_bet)
-        message = get_msg_from_locale_by_key(
-            interaction.guild.id, f"bet_config_{interaction.application_command.name}"
-        )
-        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
-        await interaction.response.send_message(
-            embed=construct_basic_embed(
-                interaction.application_command.name,
-                f"{message} **{maximal_bet}** {currency_symbol}",
-                f"{requested} {interaction.user}",
-                interaction.user.display_avatar,
-                interaction.guild.id,
-            )
-        )
 
 
 def setup(client):

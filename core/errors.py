@@ -105,3 +105,12 @@ def construct_error_command_is_active(description: str, icon: Asset) -> nextcord
         text=f"error: command_is_active\nstatus-code: #A303 ",
     )
     return embed
+
+
+def construct_error_incorrect_bet(description: str, icon: Asset) -> nextcord.Embed:
+    embed = construct_error_embed(description)
+    embed.set_footer(
+        icon_url=icon,
+        text=f"error: incorrect user bet\nstatus-code: #103 ",
+    )
+    return embed

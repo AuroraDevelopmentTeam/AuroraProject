@@ -71,6 +71,8 @@ from core.errors import (
 )
 from core.marriage.update import set_user_gift_price
 from core.marriage.update import set_user_gift_count
+from core.bet.getters import get_min_bet, get_max_bet
+from core.bet.update import update_min_bet, update_max_bet
 
 
 class AutorolesList(menus.ListPageSource):
@@ -409,7 +411,7 @@ class Economics(commands.Cog):
         )
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         for i in range(10):
-            set_user_gift_count(interaction.guild.id, user.id, f"gift_{(i+1)}", 0)
+            set_user_gift_count(interaction.guild.id, user.id, f"gift_{(i + 1)}", 0)
         await interaction.response.send_message(
             embed=construct_basic_embed(
                 interaction.application_command.name,
@@ -1155,6 +1157,81 @@ class Economics(commands.Cog):
             source=AutorolesList(source_for_pages, interaction.guild.id),
         )
         await pages.start(interaction=interaction)
+
+    @nextcord.slash_command(
+        name="bet_config",
+        name_localizations=get_localized_name("bet_config"),
+        description_localizations=get_localized_description("bet_config"),
+        default_member_permissions=Permissions(administrator=True),
+    )
+    @application_checks.has_permissions(manage_guild=True)
+    async def __bet_config(self, interaction: Interaction):
+        """
+        This is the set slash command that will be the prefix of income commands.
+        """
+        pass
+
+    @__bet_config.subcommand(
+        name="set_min_bet",
+        description="Set minimal bet on your server",
+        name_localizations=get_localized_name("bet_config_set_min_bet"),
+        description_localizations=get_localized_description("bet_config_set_min_bet"),
+    )
+    async def __bet_config_set_min_bet(
+            self,
+            interaction: Interaction,
+            bet_amount: Optional[int] = SlashOption(
+                required=True,
+                description="Integer bet amount",
+                description_localizations={"ru": "Размер ставки, число"},
+            ),
+    ):
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        update_min_bet(interaction.guild.id, bet_amount)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"bet_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} **{bet_amount}** {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__bet_config.subcommand(
+        name="set_max_bet",
+        description="Set maximal bet on your server",
+        name_localizations=get_localized_name("bet_config_set_max_bet"),
+        description_localizations=get_localized_description("bet_config_set_max_bet"),
+    )
+    async def __bet_config_set_max_bet(
+            self,
+            interaction: Interaction,
+            bet_amount: Optional[int] = SlashOption(
+                required=True,
+                description="Bet amount integer",
+                description_localizations={"ru": "Размер ставки, число"},
+            ),
+    ):
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        update_max_bet(interaction.guild.id, bet_amount)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"bet_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} **{bet_amount}** {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
 
 
 def setup(client):
