@@ -60,7 +60,7 @@ from core.parsers import parse_server_roles
 from core.ui.paginator import (
     MyEmbedFieldPageSource,
     MyEmbedDescriptionPageSource,
-    SelectButtonMenuPages,
+    NewSelectButtonMenuPages,
 )
 from core.errors import (
     construct_error_negative_value_embed,
@@ -592,7 +592,7 @@ class Economics(commands.Cog):
             )
             return await interaction.response.send_message(embed=embed)
         guild_roles = parse_server_roles(interaction.guild)
-        if len(guild_roles) >= 25:
+        if len(guild_roles) >= 9999:
             embed = nextcord.Embed(
                 title="error",
                 description=get_msg_from_locale_by_key(
@@ -666,11 +666,9 @@ class Economics(commands.Cog):
     )
     async def __shop(self, interaction: Interaction):
         guild_roles = parse_server_roles(interaction.guild)
-        pages = SelectButtonMenuPages(
-            source=MyEmbedDescriptionPageSource(guild_roles, interaction.guild.id),
-            guild=interaction.guild,
-            disabled=False,
-        )
+        pages = NewSelectButtonMenuPages(guild_roles=guild_roles, interaction=interaction,
+                                         source=MyEmbedDescriptionPageSource(guild_roles, interaction.guild.id),
+                                         )
         await pages.start(interaction=interaction)
 
     @nextcord.slash_command(
