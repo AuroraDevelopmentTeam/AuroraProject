@@ -48,6 +48,7 @@ from core.locales.getters import (
     get_localized_name,
     localize_name,
 )
+from core.emojify import SHOP
 from core.embeds import construct_basic_embed, construct_top_embed, DEFAULT_BOT_COLOR
 from core.shop.writers import (
     write_role_in_shop,
@@ -73,6 +74,7 @@ from core.marriage.update import set_user_gift_price
 from core.marriage.update import set_user_gift_count
 from core.bet.getters import get_min_bet, get_max_bet
 from core.bet.update import update_min_bet, update_max_bet
+from core.ui.paginator import NewShopView
 
 
 class AutorolesList(menus.ListPageSource):
@@ -666,10 +668,24 @@ class Economics(commands.Cog):
     )
     async def __shop(self, interaction: Interaction):
         guild_roles = parse_server_roles(interaction.guild)
-        pages = NewSelectButtonMenuPages(guild_roles=guild_roles, interaction=interaction,
-                                         source=MyEmbedDescriptionPageSource(guild_roles, interaction.guild.id),
-                                         )
-        await pages.start(interaction=interaction)
+        if len(guild_roles) <= 6:
+            entries = []
+            for i in range(len(guild_roles)):
+                entries.append(guild_roles[i])
+            embed = nextcord.Embed(
+                title=f"{SHOP} {localize_name(interaction.guild.id, 'shop').capitalize()}",
+                description="\n".join(entries),
+                color=DEFAULT_BOT_COLOR,
+            )
+            embed.set_image(url="https://64.media.tumblr.com/e9096b8d3440af335d9996455f072ab6"
+                                "/tumblr_p5flokH8161qbw2q1o1_1280.gif")
+            embed.set_footer(text=f"1/1")
+            await interaction.response.send_message(embed=embed, view=NewShopView(guild=interaction.guild))
+        else:
+            pages = NewSelectButtonMenuPages(guild_roles=guild_roles, interaction=interaction,
+                                             source=MyEmbedDescriptionPageSource(guild_roles, interaction.guild.id),
+                                             )
+            await pages.start(interaction=interaction)
 
     @nextcord.slash_command(
         name="add-custom-shop",
@@ -700,7 +716,7 @@ class Economics(commands.Cog):
                 if nextcord.utils.get(interaction.guild.roles, name=role_name) is None:
                     colors = {
                         "Белый": 0xFFFAFA,
-                        "Чёрный": 0x000000,
+                        "Чёрный": 0x000002,
                         "Голубой": 0x00BFFF,
                         "Синий": 0x0000FF,
                         "Зеленый": 0x008000,

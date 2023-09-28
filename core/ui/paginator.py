@@ -161,7 +161,8 @@ class MyEmbedDescriptionPageSource(menus.ListPageSource):
             description="\n".join(entries),
             color=DEFAULT_BOT_COLOR,
         )
-        embed.set_image(url="https://64.media.tumblr.com/e9096b8d3440af335d9996455f072ab6/tumblr_p5flokH8161qbw2q1o1_1280.gif")
+        embed.set_image(url="https://64.media.tumblr.com/e9096b8d3440af335d9996455f072ab6"
+                            "/tumblr_p5flokH8161qbw2q1o1_1280.gif")
         embed.set_footer(text=f"{menu.current_page + 1}/{self.get_max_pages()}")
         return embed
 
@@ -273,3 +274,17 @@ class NewSelectButtonMenuPages(menus.ButtonMenuPages, inherit_buttons=False):
         self.add_item(MenuPaginationButton(emoji=self.NEXT_PAGE))
         self.add_item(MenuPaginationButton(emoji=self.LAST_PAGE))
         self._disable_unavailable_buttons()
+
+
+class NewShopView(nextcord.ui.View):
+    def __init__(
+            self,
+            guild: nextcord.Guild,
+    ):
+        super().__init__(timeout=60)
+        self.add_item(MenuPaginationButton(emoji=menus.ButtonMenuPages.FIRST_PAGE, disabled=True))
+        self.add_item(MenuPaginationButton(emoji=menus.ButtonMenuPages.PREVIOUS_PAGE, disabled=True))
+        self.add_item(create_button(label='🛒', callback=show_modal,
+                                    disabled=False))
+        self.add_item(MenuPaginationButton(emoji=menus.ButtonMenuPages.NEXT_PAGE, disabled=True))
+        self.add_item(MenuPaginationButton(emoji=menus.ButtonMenuPages.LAST_PAGE, disabled=True))
