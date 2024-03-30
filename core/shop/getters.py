@@ -60,7 +60,7 @@ class ShopLeave(Button):
 def get_custom_shop_roles_limit(
     guild_id: int,
 ) -> bool:  # TODO сделать чтобы создатель сервера мог регулировать лимит и переименовать, а то не совсем соответствует
-    db = sqlite3.connect("./database/main.sqlite")
+    db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     roles = cursor.execute(
         "SELECT * FROM custom_shop WHERE guild_id = ?", (guild_id,)

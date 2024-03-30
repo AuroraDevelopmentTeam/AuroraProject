@@ -898,7 +898,11 @@ class Marriage(commands.Cog):
         if loverooms_state is False:
             return await 'loverooms on server disabled by admin'
         room = get_user_loveroom_id(interaction.guild.id, interaction.user.id)
-        if room != 0 or room:
+        lv = interaction.guild.get_channel(room)
+        if room != 0 or room and lv:
+            update_user_loveroom_id(interaction.guild.id, interaction.user.id, 0)
+            update_user_loveroom_id(interaction.guild.id, pair_id, 0)
+        elif room != 0 or room:
             return await interaction.response.send_message(
                 embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(interaction.guild.id, "loveroom_existing"),
