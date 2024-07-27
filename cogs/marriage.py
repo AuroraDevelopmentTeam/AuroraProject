@@ -899,19 +899,18 @@ class Marriage(commands.Cog):
             return await 'loverooms on server disabled by admin'
         room = get_user_loveroom_id(interaction.guild.id, interaction.user.id)
         lv = interaction.guild.get_channel(room)
-        if room != 0 or room and lv:
-            update_user_loveroom_id(interaction.guild.id, interaction.user.id, 0)
-            update_user_loveroom_id(interaction.guild.id, pair_id, 0)
-        elif room != 0 or room:
+        # if room != 0 or room and lv:
+        #     update_user_loveroom_id(interaction.guild.id, interaction.user.id, 0)
+        #     update_user_loveroom_id(interaction.guild.id, pair_id, 0)
+        if room != 0 and lv:
             return await interaction.response.send_message(
                 embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(interaction.guild.id, "loveroom_existing"),
                     self.client.user.avatar.url
                 )
             )
-        if loveroom_category_id := get_marriage_config_loveroom_category(interaction.guild.id) != 0:
+        if loveroom_category_id := get_marriage_config_loveroom_category(interaction.guild.id):
             try:
-
                 loveroom_category = nextcord.utils.get(interaction.guild.channels,
                                                        id=loveroom_category_id)
             except:
@@ -939,6 +938,7 @@ class Marriage(commands.Cog):
                 view_channel=True, manage_channels=True, mute_members=True, move_members=True, stream=True,
             )
         }
+        print(loveroom_category)
         loveroom = await interaction.guild.create_voice_channel(category=loveroom_category,
                                                                 name=f"{interaction.user.name} 🤍 {pair.name}",
                                                                 user_limit=2,
