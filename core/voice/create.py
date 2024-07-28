@@ -183,7 +183,7 @@ async def react_on_private_room_menu_button(client, interaction: nextcord.Intera
                     await msg.add_reaction(YES)
                 except Exception as error:
                     print(error)
-                    msg.add_reaction(NO)
+                    await msg.add_reaction(NO)
         except Exception as error:
             print(error)
             await msg.add_reaction(NO)
@@ -191,6 +191,7 @@ async def react_on_private_room_menu_button(client, interaction: nextcord.Intera
     elif custom_id == 'private_room:users':
         await interaction.followup.send(embed=create_button_reaction_embed(custom_id), ephemeral=True)
         msg = await client.wait_for("message", check=lambda message: message.author == interaction.user, timeout=30)
+        
         message = msg
         try:
             msg = int(msg.content)
@@ -201,7 +202,7 @@ async def react_on_private_room_menu_button(client, interaction: nextcord.Intera
                     )
                     await message.add_reaction(YES)
                 except:
-                    message.add_reaction(NO)
+                    await message.add_reaction(NO)
         except:
             await message.add_reaction(NO)
         await message.delete(delay=5)
@@ -319,5 +320,3 @@ async def react_on_private_room_menu_button(client, interaction: nextcord.Intera
         except:
             await msg.add_reaction(NO)
         await msg.delete(delay=5)
-    else:
-        pass

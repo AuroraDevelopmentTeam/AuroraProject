@@ -6,6 +6,7 @@ from typing import Coroutine, Any
 from core.embeds import construct_top_embed
 from core.utils import format_seconds_to_hhmmss
 from core.money.getters import get_guild_currency_symbol
+from core.locales.getters import get_guild_locale
 
 gifs = {
     "messages": "https://i.pinimg.com/originals/b0/f6/64/b0f6645a029e85c67efb91c7c750ba0b.gif",
@@ -55,34 +56,34 @@ async def custom_top_embed(
     cursor = db.cursor()
     embed = nextcord.Embed(title=f"Топ по {order}")
     view = View()
-    balance, voice, waifu, messages, levels = False, False, False, False, False
+    orders = [False, False, False, False, False]
     currency = ""
     if order == "balance":
         currency = get_guild_currency_symbol(inter.guild.id)
         roles = cursor.execute(
             f"SELECT user_id, balance FROM money WHERE guild_id = {inter.guild.id} ORDER BY balance DESC"
         ).fetchall()
-        balance = True
+        orders[0] = True
     elif order == "voice":
         roles = cursor.execute(
             f"SELECT user_id, in_voice FROM stats WHERE guild_id = {inter.guild.id} ORDER BY in_voice DESC"
         ).fetchall()
-        voice = True
+        orders[1] = True
     elif order == "waifu":
         roles = cursor.execute(
             f"SELECT user_id, gift_price FROM gifts WHERE guild_id = {inter.guild.id} ORDER BY gift_price DESC"
         ).fetchall()
-        waifu = True
+        orders[2] = True
     elif order == "messages":
         roles = cursor.execute(
             f"SELECT user_id, messages FROM stats WHERE guild_id = {inter.guild.id} ORDER BY messages DESC"
         ).fetchall()
-        messages = True
+        orders[3] = True
     elif order == "levels":
         roles = cursor.execute(
             f"SELECT user_id, level FROM levels WHERE guild_id = {inter.guild.id} ORDER BY level DESC"
         ).fetchall()
-        levels = True
+        orders[4] = True
 
     cursor.close()
     db.close()
@@ -101,51 +102,44 @@ async def custom_top_embed(
         if order == "voice":
             each[1] = format_seconds_to_hhmmss(each[1])
         users.append([user, each[1], col])
+        
+    buttons_lang = ["Balance", "Voice", "Waifu", "Messages", "Levels", "Page"]
+    values = [g.lower() for g in buttons_lang]
+    
+    if get_guild_locale(inter.guild.id) == "ru_ru":
+        buttons_lang = ["Баланс", "Войс", "Вайфу", "Сообщения", "Уровни", "Страница"]
+    
+    options = []
+    
+    for i in range(len(values)-1):
+        options.append(nextcord.SelectOption(label=buttons_lang[i], default=orders[i], value=values[i]))
     select = Select(
-        options=[
-            nextcord.SelectOption(label="Balance", default=balance),
-            nextcord.SelectOption(label="Voice", default=voice),
-            nextcord.SelectOption(label="Waifu", default=waifu),
-            nextcord.SelectOption(label="Messages", default=messages),
-            nextcord.SelectOption(label="Levels", default=levels)
-        ]
+        options=options
     )
 
     async def select_callback(interaction):
         if inter.user == interaction.user:
 
             await interaction.response.defer()
-            # await interaction.delete_original_message()
-            order = select.values[0].lower()
-            if select.values[0] == "Balance":
-                gay, sex = await custom_top_embed(inter=inter, order=order)
-                await inter.edit_original_message(embed=gay, view=sex)
-            if select.values[0] == "Voice":
-                gay, sex = await custom_top_embed(inter=inter, order=order)
-                await inter.edit_original_message(embed=gay, view=sex)
-            if select.values[0] == "Waifu":
-                gay, sex = await custom_top_embed(inter=inter, order=order)
-                await inter.edit_original_message(embed=gay, view=sex)
-            if select.values[0] == "Messages":
-                gay, sex = await custom_top_embed(inter=inter, order=order)
-                await inter.edit_original_message(embed=gay, view=sex)
-            if select.values[0] == "Levels":
-                gay, sex = await custom_top_embed(inter=inter, order=order)
-                await inter.edit_original_message(embed=gay, view=sex)
+            order = select.values[0]
+
+            gay, sex = await custom_top_embed(inter=inter, order=order)
+            await inter.edit_original_message(embed=gay, view=sex)
+            
         else:
             await interaction.response.defer()
 
     select.callback = select_callback
     view.add_item(select)
     button1 = NextPageButton(
-        label=f"Страница {pagen - 1}",
+        label=f"{buttons_lang[5]} {pagen - 1}",
         interaction=inter,
         page=pagen - 1,
         emoji="⬅️",
         top_filter=order,
     )
     button3 = NextPageButton(
-        label=f"Страница {pagen + 1}",
+        label=f"{buttons_lang[5]} {pagen + 1}",
         interaction=inter,
         page=pagen + 1,
         emoji="➡️",
@@ -167,7 +161,7 @@ async def custom_top_embed(
     embed = construct_top_embed(
         inter.application_command.name,
         users,
-        f"Страница {pagen} из {str(pagescol)}",
+        f"{buttons_lang[5]} {pagen} / {str(pagescol)}",
         inter.user.display_avatar,
         currency,
     )
