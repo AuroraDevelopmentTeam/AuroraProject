@@ -903,6 +903,12 @@ class Marriage(commands.Cog):
         #     update_user_loveroom_id(interaction.guild.id, interaction.user.id, 0)
         #     update_user_loveroom_id(interaction.guild.id, pair_id, 0)
         if room != 0 and lv:
+
+            lv = interaction.guild.get_channel(int(room))
+        if room != 0 or room and lv:
+            update_user_loveroom_id(interaction.guild.id, interaction.user.id, 0)
+            update_user_loveroom_id(interaction.guild.id, pair_id, 0)
+        elif room != 0 or room:
             return await interaction.response.send_message(
                 embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(interaction.guild.id, "loveroom_existing"),
