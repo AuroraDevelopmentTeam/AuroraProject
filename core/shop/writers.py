@@ -1,6 +1,7 @@
 import sqlite3
 import nextcord
 import datetime
+from core.checkers import is_guild_id_in_table
 
 
 def write_role_in_shop(guild_id: int, role: nextcord.Role, cost: int) -> None:
@@ -37,3 +38,22 @@ def write_role_in_custom_shop(
     db.commit()
     cursor.close()
     db.close()
+
+
+def write_in_custom_shop_config_standart_values(
+    guilds: list
+) -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    for guild in guilds:
+        if is_guild_id_in_table("custom_shop_config", guild.id) is False:
+            sql = (
+                "INSERT INTO custom_shop_config (guild_id, enabled, role_create_cost) VALUES ("
+                "?, ?) "
+            )
+            val = (guild.id, True, 0)
+            cursor.execute(sql, val)
+            db.commit()
+    cursor.close()
+    db.close()
+    return
