@@ -1552,6 +1552,8 @@ class ClanHandler(commands.Cog):
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_{interaction.application_command.name}"
         )
+        if role := nextcord.utils.get(interaction.guild.roles, id=get_clan_role(interaction.guild.id, clan_id)):
+            await user.remove_roles(role)
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         await interaction.response.send_message(
             embed=construct_basic_embed(
