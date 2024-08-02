@@ -34,10 +34,11 @@ class Information(commands.Cog):
             interaction.guild.id, interaction.application_command.name
         )
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        
         await interaction.response.send_message(
             embed=construct_basic_embed(
                 interaction.application_command.name,
-                f"{message} {round(self.client.latency * 1000)} ms",
+                f"{message} {round(self.client.get_shard(interaction.guild.shard_id).latency*1000)} ms",
                 f"{requested} {interaction.user}",
                 interaction.user.display_avatar,
                 interaction.guild.id,
@@ -170,7 +171,7 @@ class Information(commands.Cog):
                 f"```{psutil.cpu_percent()}```",
                 f"```{psutil.virtual_memory().percent}```",
                 f"```{round((psutil.virtual_memory().available * 100 / psutil.virtual_memory().total), 1)}```",
-                f"```{self.client.ws.shard_id}```",
+                f"```{interaction.guild.shard_id}```",
                 f"```{self.client.status}```",
                 f"{nextcord.utils.format_dt(self.client.user.created_at)}",
                 f"```Python 3.10.4```",
