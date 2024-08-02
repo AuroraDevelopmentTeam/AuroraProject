@@ -63,6 +63,7 @@ from core.errors import (
     construct_error_negative_value_embed,
     construct_clan_error_embed,
     construct_error_self_choose_embed,
+    construct_error_command_is_active,
 )
 from core.emojify import STAR, BOSS, WRITING, CALENDAR, TEAM, UPARROW, GEM, SHOP
 
@@ -582,6 +583,7 @@ class NameModal(nextcord.ui.Modal):
 
 class ClanHandler(commands.Cog):
     def __init__(self, client):
+        self.users = dict()
         self.client = client
 
     @nextcord.slash_command(
@@ -612,6 +614,20 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
+        timestamp = datetime.datetime.now().timestamp()
+        user = self.users.get(interaction.user.id, None)
+        if user is None:
+            self.users.update({interaction.user.id: timestamp})
+        if user is not None:
+            if timestamp - user < 120:
+                return await interaction.response.send_message(
+                    embed=construct_error_command_is_active(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "command_is_active_error"
+                        ),
+                        interaction.user.display_avatar,
+                    )
+                )
         create_cost = get_server_clan_create_cost(interaction.guild.id)
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < create_cost:
