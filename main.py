@@ -13,7 +13,7 @@ token = os.getenv("token")
 
 intents = nextcord.Intents.all()
 
-client = commands.Bot(
+client = commands.AutoShardedBot(
     command_prefix=settings["PREFIX"],
     case_insensitive=True,
     intents=intents,
