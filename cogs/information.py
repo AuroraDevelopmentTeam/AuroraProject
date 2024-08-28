@@ -14,6 +14,7 @@ from core.locales.getters import (
     get_guild_locale,
 )
 from core.embeds import construct_basic_embed, construct_long_embed, DEFAULT_BOT_COLOR
+from core import EmbedCreator
 
 
 class Information(commands.Cog):
@@ -34,11 +35,11 @@ class Information(commands.Cog):
             interaction.guild.id, interaction.application_command.name
         )
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-        
+
         await interaction.response.send_message(
             embed=construct_basic_embed(
                 interaction.application_command.name,
-                f"{message} {round(self.client.get_shard(interaction.guild.shard_id).latency*1000)} ms",
+                f"{message} {round(self.client.get_shard(interaction.guild.shard_id).latency * 1000)} ms",
                 f"{requested} {interaction.user}",
                 interaction.user.display_avatar,
                 interaction.guild.id,
@@ -181,6 +182,22 @@ class Information(commands.Cog):
             True,
         )
         await interaction.response.send_message(embed=embed)
+
+    @nextcord.slash_command(name='test', guild_ids=[1006113954331885648])
+    async def embed2(self, interaction: Interaction):
+        """Embed Generator With Default Embed And Author Check So Only The Invoker Can Use The Editor"""
+        view = EmbedCreator(bot=self.client)
+        author = interaction.user
+
+        async def check(interaction: nextcord.Interaction):
+            if interaction.user.id == author.id:
+                return True
+            else:
+                await interaction.response.send_message(f"Only {author} can use this interaction!", ephemeral=True)
+                return False
+
+        view.interaction_check = check
+        await interaction.response.send_message(embed=view.get_default_embed, view=view)
 
 
 def setup(client):

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import nextcord
 from nextcord import Asset
 from config import settings
@@ -6,6 +8,11 @@ from core.locales.getters import get_msg_from_locale_by_key, localize_name
 from core.emojify import CLOCK
 from core.utils import MobilePlatform, DesktopPlatform, calculate_platform_type
 from core.locales.getters import get_guild_locale
+
+from typing import Callable, Dict
+from core.utils import ModalInput, SelectPrompt
+from nextcord import Colour, Embed, HTTPException, Interaction, SelectOption, TextInputStyle
+from nextcord.ui import TextInput
 
 DEFAULT_BOT_COLOR = settings["default_color"]
 
@@ -16,7 +23,7 @@ def construct_error_embed(description: str) -> nextcord.Embed:
 
 
 def construct_basic_embed(
-    name: str, value: str, footer_text: str, footer_url: Asset, guild_id: int
+        name: str, value: str, footer_text: str, footer_url: Asset, guild_id: int
 ) -> nextcord.Embed:
     try:
         if name == "timely":
@@ -36,13 +43,13 @@ def construct_basic_embed(
 
 
 def construct_long_embed(
-    title: str,
-    thumbnail_url: Asset,
-    footer_text: str,
-    footer_url: Asset,
-    name_list: list,
-    value_list: list,
-    inline: bool,
+        title: str,
+        thumbnail_url: Asset,
+        footer_text: str,
+        footer_url: Asset,
+        name_list: list,
+        value_list: list,
+        inline: bool,
 ) -> nextcord.Embed:
     title = title.capitalize()
     embed = nextcord.Embed(color=DEFAULT_BOT_COLOR, title=title)
@@ -71,12 +78,12 @@ def construct_leaderboard_embed(guild_id: int, leaderboard_name: str, value: str
 
 
 def construct_top_embed(
-    title: str,
-    top_list: list,
-    footer_text: str,
-    footer_url: Asset,
-    currency_symbol=None,
-    guild=None,
+        title: str,
+        top_list: list,
+        footer_text: str,
+        footer_url: Asset,
+        currency_symbol=None,
+        guild=None,
 ) -> nextcord.Embed:
     if guild is not None:
         msg = get_msg_from_locale_by_key(guild.id, "price")
@@ -112,23 +119,22 @@ def construct_top_embed(
     return embed
 
 
-
 def construct_log(
-    event_type: str,
-    guild: nextcord.Guild,
-    message: nextcord.Message = None,
-    jump_url: bool = False,
-    display_message: bool = True,
-    message_channel: nextcord.TextChannel = None,
-    user: nextcord.Member = None,
-    before: nextcord.Message = None,
-    after: nextcord.Message = None,
-    role: nextcord.Role = None,
-    role_before: nextcord.Role = None,
-    role_after: nextcord.Role = None,
-    channel=None,
-    channel_before=None,
-    channel_after=None,
+        event_type: str,
+        guild: nextcord.Guild,
+        message: nextcord.Message = None,
+        jump_url: bool = False,
+        display_message: bool = True,
+        message_channel: nextcord.TextChannel = None,
+        user: nextcord.Member = None,
+        before: nextcord.Message = None,
+        after: nextcord.Message = None,
+        role: nextcord.Role = None,
+        role_before: nextcord.Role = None,
+        role_after: nextcord.Role = None,
+        channel=None,
+        channel_before=None,
+        channel_after=None,
 ) -> nextcord.Embed:
     embed = nextcord.Embed(color=DEFAULT_BOT_COLOR, title=event_type)
     if message_channel is not None:
@@ -158,27 +164,27 @@ def construct_log(
         embed.add_field(
             name="Role",
             value=f"{role.mention}\n"
-            f"ID: **{role.id}**, name: ``{role.name}``\n"
-            f"Position: **{role.position}**, mentionable: **{role.mentionable}**\n"
-            f"Permissions: **{role.permissions.value}**",
+                  f"ID: **{role.id}**, name: ``{role.name}``\n"
+                  f"Position: **{role.position}**, mentionable: **{role.mentionable}**\n"
+                  f"Permissions: **{role.permissions.value}**",
             inline=False,
         )
     if role_before is not None:
         embed.add_field(
             name="Before",
             value=f"``@{role_before.name}``, ``{role_before.color}``\n"
-            f"Position: **{role_before.position}**, mentionable: "
-            f"**{role_before.mentionable}**\n"
-            f"Permissions: **{role_before.permissions.value}**",
+                  f"Position: **{role_before.position}**, mentionable: "
+                  f"**{role_before.mentionable}**\n"
+                  f"Permissions: **{role_before.permissions.value}**",
             inline=True,
         )
     if role_after is not None:
         embed.add_field(
             name="After",
             value=f"{role_after.mention}\n``@{role_after.name}``, ``{role_after.color}``\n"
-            f"Position: **{role_after.position}**, mentionable: "
-            f"**{role_after.mentionable}**\n"
-            f"Permissions: **{role_after.permissions.value}**",
+                  f"Position: **{role_after.position}**, mentionable: "
+                  f"**{role_after.mentionable}**\n"
+                  f"Permissions: **{role_after.permissions.value}**",
             inline=True,
         )
     if channel is not None:
@@ -197,3 +203,267 @@ def construct_log(
     return embed
 
 
+class CreatorMethods:
+    """
+    Класс содержит методы для редактирования Embed.
+    """
+
+    def __init__(self, embed: Embed) -> None:
+        self.embed = embed
+        self.callbacks: Dict[str, Callable] = {
+            "author": self.edit_author,
+            "message": self.edit_message,
+            "thumbnail": self.edit_thumbnail,
+            "image": self.edit_image,
+            "footer": self.edit_footer,
+            "color": self.edit_colour,
+            "addfield": self.add_field,
+            "removefield": self.remove_field,
+        }
+
+    async def edit_author(self, interaction: Interaction) -> None:
+        """This method edits the embed's author"""
+        print("edit_author called")  # отладка
+        try:
+            modal = ModalInput(title="Edit Embed Author")
+            modal.add_item(
+                TextInput(
+                    label="Author Name",
+                    max_length=100,
+                    default_value=self.embed.author.name,
+                    placeholder="Author name to display in the embed",
+                    required=False,
+                )
+            )
+            modal.add_item(
+                TextInput(
+                    label="Author Icon Url",
+                    default_value=self.embed.author.icon_url,
+                    placeholder="Author icon to display in the embed",
+                    required=False,
+                )
+            )
+            modal.add_item(
+                TextInput(
+                    label="Author Url",
+                    default_value=self.embed.author.url,
+                    placeholder="URL to set as the embed's author link",
+                    required=False,
+                )
+            )
+            await interaction.response.send_modal(modal)
+            print("Modal sent")  # отладка
+            await modal.wait()
+            print("Modal response received")  # отладка
+            try:
+                self.embed.set_author(
+                    name=str(modal.children[0]),
+                    icon_url=str(modal.children[1]),
+                    url=str(modal.children[2]),
+                )
+            except HTTPException as e:
+                print(f"HTTPException: {e}")
+                self.embed.set_author(name=str(modal.children[0]))
+        except Exception as e:
+            print(f"Error in edit_author: {e}")
+            await interaction.response.send_message("There was an error processing your request.", ephemeral=True)
+
+    async def edit_message(self, interaction: Interaction) -> None:
+        """Редактирование заголовка и описания эмбеда"""
+        try:
+            modal = ModalInput(title="Edit Embed Message")
+            modal.add_item(
+                TextInput(
+                    label="Embed Title",
+                    style=TextInputStyle.short,
+                    default_value=self.embed.title or "",
+                    placeholder="Title to display in the embed",
+                    max_length=255,
+                    required=False,
+                )
+            )
+            modal.add_item(
+                TextInput(
+                    label="Embed Description",
+                    style=TextInputStyle.paragraph,
+                    default_value=self.embed.description or "",
+                    placeholder="Description to display in the embed",
+                    max_length=2000,
+                    required=False,
+                )
+            )
+
+            await interaction.response.send_modal(modal)
+            await modal.wait()
+
+            # Проверка значений, которые были введены
+            new_title = modal.children[0].value
+            new_description = modal.children[1].value
+
+            print(f"New Title: {new_title}, New Description: {new_description}")
+
+            # Обновление значений эмбеда
+            self.embed.title = new_title
+            self.embed.description = new_description
+
+            # Отправка обновленного эмбеда
+            try:
+                await interaction.message.edit(embed=self.embed)
+                print("Embed updated successfully.")
+            except Exception as e:
+                print(f"Failed to update embed: {e}")
+
+        except Exception as e:
+            print(f"Error in edit_message: {e}")
+
+    async def edit_thumbnail(self, interaction: Interaction) -> None:
+        modal = ModalInput(title="Edit Embed Thumbnail")
+        modal.add_item(
+            TextInput(
+                label="Thumbnail Url",
+                default_value=self.embed.thumbnail.url,
+                placeholder="Thumbnail you want to display in the embed",
+                required=False,
+            )
+        )
+        await interaction.response.send_modal(modal)
+        await modal.wait()
+
+        self.embed.set_thumbnail(url=modal.children[0].value)
+
+    async def edit_image(self, interaction: Interaction) -> None:
+        modal = ModalInput(title="Edit Embed Image")
+        modal.add_item(
+            TextInput(
+                label="Image Url",
+                default_value=self.embed.image.url,
+                placeholder="Image you want to display in the embed",
+                required=False,
+            )
+        )
+        await interaction.response.send_modal(modal)
+        await modal.wait()
+
+        self.embed.set_image(url=modal.children[0].value)
+
+    async def edit_footer(self, interaction: Interaction) -> None:
+        modal = ModalInput(title="Edit Embed Footer")
+        modal.add_item(
+            TextInput(
+                label="Footer Text",
+                max_length=255,
+                required=False,
+                default_value=self.embed.footer.text,
+                placeholder="Text you want to display on embed footer",
+            )
+        )
+        modal.add_item(
+            TextInput(
+                label="Footer Icon",
+                required=False,
+                default_value=self.embed.footer.icon_url,
+                placeholder="Icon you want to display on embed footer",
+            )
+        )
+        await interaction.response.send_modal(modal)
+        await modal.wait()
+
+        self.embed.set_footer(
+            text=modal.children[0].value, icon_url=modal.children[1].value
+        )
+
+    async def edit_colour(self, interaction: Interaction) -> None:
+        modal = ModalInput(title="Edit Embed Colour")
+        modal.add_item(
+            TextInput(
+                label="Embed Colour",
+                placeholder="The colour you want to display on embed (e.g: #303236)",
+                max_length=20,
+            )
+        )
+        await interaction.response.send_modal(modal)
+        await modal.wait()
+
+        try:
+            colour = Colour.from_str(modal.children[0].value)
+            self.embed.color = colour
+        except ValueError:
+            await interaction.followup.send(
+                "Please provide a valid hex code.", ephemeral=True
+            )
+
+    async def add_field(self, interaction: Interaction) -> None:
+        if len(self.embed.fields) >= 25:
+            return await interaction.response.send_message(
+                "You cannot add more than 25 fields.", ephemeral=True
+            )
+
+        modal = ModalInput(title="Add a new field")
+        modal.add_item(
+            TextInput(
+                label="Field Name",
+                style=TextInputStyle.short,  # Здесь правильное использование стиля
+                placeholder="The name you want to display on the field",
+                max_length=255,
+            )
+        )
+        modal.add_item(
+            TextInput(
+                label="Field Value",
+                style=TextInputStyle.paragraph,  # Указание стиля для текста
+                placeholder="The value you want to display on the field",
+                max_length=2000,
+            )
+        )
+        modal.add_item(
+            TextInput(
+                label="Field Inline (True/False)",
+                style=TextInputStyle.short,  # Указание стиля для короткого текста
+                default_value="True",
+                placeholder="Should the field be inline? True or False",
+                max_length=5,
+            )
+        )
+
+        await interaction.response.send_modal(modal)
+        await modal.wait()
+
+        # Обработка введенных данных и обновление эмбеда
+        try:
+            inline = str(modal.children[2]).strip().lower() == "true"
+        except ValueError:
+            return await interaction.followup.send(
+                "Please provide a valid input for 'inline' (True or False).", ephemeral=True
+            )
+
+        self.embed.add_field(
+            name=str(modal.children[0]),
+            value=str(modal.children[1]),
+            inline=inline
+        )
+
+    async def remove_field(self, interaction: Interaction) -> None:
+        if not self.embed.fields:
+            return await interaction.response.send_message("There are no fields to remove.", ephemeral=True)
+
+        field_options = [
+            SelectOption(
+                label=str(field.name)[:30],
+                value=str(index),
+                emoji="\U0001f5d1"
+            )
+            for index, field in enumerate(self.embed.fields)
+        ]
+
+        select = SelectPrompt(
+            placeholder="Select a field to remove...",
+            options=field_options,
+            max_values=len(field_options),
+            ephemeral=True
+        )
+        await interaction.response.send_message(view=select, ephemeral=True)
+        await select.wait()
+
+        if vals := select.values:
+            for value in vals:
+                self.embed.remove_field(int(value))
