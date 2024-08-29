@@ -12,7 +12,7 @@ from core.locales.getters import get_guild_locale
 from typing import Callable, Dict
 from core.utils import ModalInput, SelectPrompt
 from nextcord import Colour, Embed, HTTPException, Interaction, SelectOption, TextInputStyle
-from nextcord.ui import TextInput
+from nextcord.ui import TextInput, Modal
 
 DEFAULT_BOT_COLOR = settings["default_color"]
 
@@ -271,7 +271,7 @@ class CreatorMethods:
     async def edit_message(self, interaction: Interaction) -> None:
         """Редактирование заголовка и описания эмбеда"""
         try:
-            modal = ModalInput(title="Edit Embed Message")
+            modal = Modal(title="Edit Embed Message")
             modal.add_item(
                 TextInput(
                     label="Embed Title",
@@ -294,24 +294,28 @@ class CreatorMethods:
             )
 
             await interaction.response.send_modal(modal)
-            await modal.wait()
+            print("PIZDUN")
+            # await modal.wait()
+            print("PSDD")
+            async def callback(interaction):
 
             # Проверка значений, которые были введены
-            new_title = modal.children[0].value
-            new_description = modal.children[1].value
+                new_title = modal.children[0].value
+                new_description = modal.children[1].value
 
-            print(f"New Title: {new_title}, New Description: {new_description}")
+                print(f"New Title: {new_title}, New Description: {new_description}")
 
-            # Обновление значений эмбеда
-            self.embed.title = new_title
-            self.embed.description = new_description
+                # Обновление значений эмбеда
+                self.embed.title = new_title
+                self.embed.description = new_description
 
-            # Отправка обновленного эмбеда
-            try:
-                await interaction.message.edit(embed=self.embed)
-                print("Embed updated successfully.")
-            except Exception as e:
-                print(f"Failed to update embed: {e}")
+                # Отправка обновленного эмбеда
+                try:
+                    await interaction.message.edit(embed=self.embed)
+                    print("Embed updated successfully.")
+                except Exception as e:
+                    print(f"Failed to update embed: {e}")
+            modal.callback = callback
 
         except Exception as e:
             print(f"Error in edit_message: {e}")

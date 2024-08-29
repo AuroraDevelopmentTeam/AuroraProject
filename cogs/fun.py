@@ -20,7 +20,7 @@ from core.fun.coin import get_coin_toss
 from core.fun.random_api import build_random_image_embed
 from core.embeds import construct_basic_embed, DEFAULT_BOT_COLOR
 from core.errors import construct_error_limit_break_embed
-
+from core import EmbedCreator
 
 class Funny(commands.Cog):
     def __init__(self, client):
@@ -93,7 +93,21 @@ class Funny(commands.Cog):
         )
         embed.set_image(url="attachment://coin.png")
         await interaction.response.send_message(embed=embed, file=image)
+    @nextcord.slash_command(name='test', guild_ids=[1005945475792375898])
+    async def embed2(self, interaction: Interaction):
+        """Embed Generator With Default Embed And Author Check So Only The Invoker Can Use The Editor"""
+        view = EmbedCreator(bot=self.client)
+        author = interaction.user
 
+        async def check(interaction: nextcord.Interaction):
+            if interaction.user.id == author.id:
+                return True
+            else:
+                await interaction.response.send_message(f"Only {author} can use this interaction!", ephemeral=True)
+                return False
+
+        view.interaction_check = check
+        await interaction.response.send_message(embed=view.get_default_embed, view=view)
     @nextcord.slash_command(
         name="cat",
         description="Send's random picture of cat",
