@@ -253,17 +253,30 @@ class CreatorMethods:
             )
             await interaction.response.send_modal(modal)
             print("Modal sent")  # отладка
-            await modal.wait()
-            print("Modal response received")  # отладка
-            try:
-                self.embed.set_author(
-                    name=str(modal.children[0]),
-                    icon_url=str(modal.children[1]),
-                    url=str(modal.children[2]),
-                )
-            except HTTPException as e:
-                print(f"HTTPException: {e}")
-                self.embed.set_author(name=str(modal.children[0]))
+
+            # await modal.wait()
+            async def callback(interaction):
+                print("Modal response received")  # отладка
+                name = modal.children[0].value
+                icon_url = modal.children[1].value
+                url = modal.children[2].value
+                print(name, icon_url, url)
+                try:
+                    self.embed.set_author(
+                        name=name,
+                        icon_url=icon_url,
+                        url=url,
+                    )
+                except HTTPException as e:
+                    print(f"HTTPException: {e}")
+                    self.embed.set_author(name=str(modal.children[0]))
+                try:
+                    await interaction.message.edit(embed=self.embed)
+                    print("Embed updated successfully.")
+                except Exception as e:
+                    print(f"Failed to update embed: {e}")
+
+            modal.callback = callback
         except Exception as e:
             print(f"Error in edit_author: {e}")
             await interaction.response.send_message("There was an error processing your request.", ephemeral=True)
@@ -297,9 +310,10 @@ class CreatorMethods:
             print("PIZDUN")
             # await modal.wait()
             print("PSDD")
+
             async def callback(interaction):
 
-            # Проверка значений, которые были введены
+                # Проверка значений, которые были введены
                 new_title = modal.children[0].value
                 new_description = modal.children[1].value
 
@@ -315,13 +329,14 @@ class CreatorMethods:
                     print("Embed updated successfully.")
                 except Exception as e:
                     print(f"Failed to update embed: {e}")
+
             modal.callback = callback
 
         except Exception as e:
             print(f"Error in edit_message: {e}")
 
     async def edit_thumbnail(self, interaction: Interaction) -> None:
-        modal = ModalInput(title="Edit Embed Thumbnail")
+        modal = Modal(title="Edit Embed Thumbnail")
         modal.add_item(
             TextInput(
                 label="Thumbnail Url",
@@ -331,12 +346,21 @@ class CreatorMethods:
             )
         )
         await interaction.response.send_modal(modal)
-        await modal.wait()
 
-        self.embed.set_thumbnail(url=modal.children[0].value)
+        # await modal.wait()
+
+        async def callback(interaction):
+            self.embed.set_thumbnail(url=modal.children[0].value)
+            try:
+                await interaction.message.edit(embed=self.embed)
+                print("Embed updated successfully.")
+            except Exception as e:
+                print(f"Failed to update embed: {e}")
+
+        modal.callback = callback
 
     async def edit_image(self, interaction: Interaction) -> None:
-        modal = ModalInput(title="Edit Embed Image")
+        modal = Modal(title="Edit Embed Image")
         modal.add_item(
             TextInput(
                 label="Image Url",
@@ -346,12 +370,21 @@ class CreatorMethods:
             )
         )
         await interaction.response.send_modal(modal)
-        await modal.wait()
 
-        self.embed.set_image(url=modal.children[0].value)
+        # await modal.wait()
+
+        async def callback(interaction):
+            self.embed.set_image(url=modal.children[0].value)
+            try:
+                await interaction.message.edit(embed=self.embed)
+                print("Embed updated successfully.")
+            except Exception as e:
+                print(f"Failed to update embed: {e}")
+
+        modal.callback = callback
 
     async def edit_footer(self, interaction: Interaction) -> None:
-        modal = ModalInput(title="Edit Embed Footer")
+        modal = Modal(title="Edit Embed Footer")
         modal.add_item(
             TextInput(
                 label="Footer Text",
@@ -370,14 +403,22 @@ class CreatorMethods:
             )
         )
         await interaction.response.send_modal(modal)
-        await modal.wait()
 
-        self.embed.set_footer(
-            text=modal.children[0].value, icon_url=modal.children[1].value
-        )
+        # await modal.wait()
+        async def callback(interaction):
+            self.embed.set_footer(
+                text=modal.children[0].value, icon_url=modal.children[1].value
+            )
+            try:
+                await interaction.message.edit(embed=self.embed)
+                print("Embed updated successfully.")
+            except Exception as e:
+                print(f"Failed to update embed: {e}")
+
+        modal.callback = callback
 
     async def edit_colour(self, interaction: Interaction) -> None:
-        modal = ModalInput(title="Edit Embed Colour")
+        modal = Modal(title="Edit Embed Colour")
         modal.add_item(
             TextInput(
                 label="Embed Colour",
@@ -386,15 +427,26 @@ class CreatorMethods:
             )
         )
         await interaction.response.send_modal(modal)
-        await modal.wait()
 
-        try:
-            colour = Colour.from_str(modal.children[0].value)
-            self.embed.color = colour
-        except ValueError:
-            await interaction.followup.send(
-                "Please provide a valid hex code.", ephemeral=True
-            )
+        # await modal.wait()
+        async def callback(interaction):
+            try:
+                colour = modal.children[0].value
+                color = colour.replace("#", "")
+                col = nextcord.Color(value=int(color, 16))
+                col = col.to_rgb()
+                self.embed.color = nextcord.Color.from_rgb(*col)
+            except ValueError:
+                await interaction.followup.send(
+                    "Please provide a valid hex code.", ephemeral=True
+                )
+            try:
+                await interaction.message.edit(embed=self.embed)
+                print("Embed updated successfully.")
+            except Exception as e:
+                print(f"Failed to update embed: {e}")
+
+        modal.callback = callback
 
     async def add_field(self, interaction: Interaction) -> None:
         if len(self.embed.fields) >= 25:
@@ -402,7 +454,7 @@ class CreatorMethods:
                 "You cannot add more than 25 fields.", ephemeral=True
             )
 
-        modal = ModalInput(title="Add a new field")
+        modal = Modal(title="Add a new field")
         modal.add_item(
             TextInput(
                 label="Field Name",
@@ -430,21 +482,30 @@ class CreatorMethods:
         )
 
         await interaction.response.send_modal(modal)
-        await modal.wait()
 
-        # Обработка введенных данных и обновление эмбеда
-        try:
-            inline = str(modal.children[2]).strip().lower() == "true"
-        except ValueError:
-            return await interaction.followup.send(
-                "Please provide a valid input for 'inline' (True or False).", ephemeral=True
+        # await modal.wait()
+
+        async def callback(interaction):
+            # Обработка введенных данных и обновление эмбеда
+            try:
+                inline = str(modal.children[2]).strip().lower() == "true"
+            except ValueError:
+                return await interaction.followup.send(
+                    "Please provide a valid input for 'inline' (True or False).", ephemeral=True
+                )
+
+            self.embed.add_field(
+                name=str(modal.children[0].value),
+                value=str(modal.children[1].value),
+                inline=inline
             )
+            try:
+                await interaction.message.edit(embed=self.embed)
+                print("Embed updated successfully.")
+            except Exception as e:
+                print(f"Failed to update embed: {e}")
 
-        self.embed.add_field(
-            name=str(modal.children[0]),
-            value=str(modal.children[1]),
-            inline=inline
-        )
+        modal.callback = callback
 
     async def remove_field(self, interaction: Interaction) -> None:
         if not self.embed.fields:
@@ -466,8 +527,9 @@ class CreatorMethods:
             ephemeral=True
         )
         await interaction.response.send_message(view=select, ephemeral=True)
-        await select.wait()
 
-        if vals := select.values:
-            for value in vals:
-                self.embed.remove_field(int(value))
+        async def callback(interaction):
+            if vals := select.values:
+                for value in vals:
+                    self.embed.remove_field(int(value))
+        select.select_callback = callback
