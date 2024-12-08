@@ -7,6 +7,7 @@ import nextcord
 from nextcord.ext import commands, application_checks
 from nextcord import Interaction, ButtonStyle, File, Permissions, SlashOption
 from nextcord.ui import Button, View
+import cooldowns
 
 from core.locales.getters import (
     get_localized_name,
@@ -956,6 +957,7 @@ class Games(commands.Cog):
                             description_localizations=get_localized_description("hangman"),
                             default_member_permissions=Permissions(send_messages=True),
                             )
+    @cooldowns.cooldown(1, 60, cooldowns.SlashBucket.author)
     async def __hangman(self, interaction: Interaction):
         word_list = ['питон',
                      'анаконда',

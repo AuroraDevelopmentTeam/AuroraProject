@@ -307,9 +307,7 @@ class CreatorMethods:
             )
 
             await interaction.response.send_modal(modal)
-            print("PIZDUN")
             # await modal.wait()
-            print("PSDD")
 
             async def callback(interaction):
 

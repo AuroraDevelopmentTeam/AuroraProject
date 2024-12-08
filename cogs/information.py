@@ -183,7 +183,7 @@ class Information(commands.Cog):
         )
         await interaction.response.send_message(embed=embed)
 
-    @nextcord.slash_command(name='test', guild_ids=[1006113954331885648])
+    @nextcord.slash_command(name='test', guild_ids=[795308018593562624])
     async def embed2(self, interaction: Interaction):
         """Embed Generator With Default Embed And Author Check So Only The Invoker Can Use The Editor"""
         view = EmbedCreator(bot=self.client)
@@ -192,9 +192,8 @@ class Information(commands.Cog):
         async def check(interaction: nextcord.Interaction):
             if interaction.user.id == author.id:
                 return True
-            else:
-                await interaction.response.send_message(f"Only {author} can use this interaction!", ephemeral=True)
-                return False
+            await interaction.response.send_message(f"Only {author} can use this interaction!", ephemeral=True)
+            return False
 
         view.interaction_check = check
         await interaction.response.send_message(embed=view.get_default_embed, view=view)
