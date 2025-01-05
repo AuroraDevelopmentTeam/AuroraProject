@@ -49,7 +49,7 @@ async def write_new_column(guilds) -> None:
     for guild in guilds:
         for member in guild.members:
             if not member.bot:
-                if is_user_in_table("marriage", guild.id, member.id) is True:
+                if await is_user_in_table("marriage", guild.id, member.id) is True:
                     sql = (
                         "INSERT INTO marriage(loveroom_id) VALUES (%s)"
                     )

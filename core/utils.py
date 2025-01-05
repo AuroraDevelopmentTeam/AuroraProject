@@ -103,7 +103,7 @@ async def write_member_in_profiles(guild: nextcord.Guild, member: nextcord.Membe
 
 async def write_member_in_stats(guild: nextcord.Guild, member: nextcord.Member) -> None:
     if not member.bot:
-        if is_user_in_table("stats", guild.id, member.id) is False:
+        if await is_user_in_table("stats", guild.id, member.id) is False:
             sql = "INSERT INTO stats(guild_id, user_id, messages, in_voice, join_time) VALUES (%s, %s, %s, %s, %s)"
             val = (guild.id, member.id, 0, 0, "0")
             await execute_update(sql, val)
