@@ -63,6 +63,7 @@ from core.errors import (
     construct_error_negative_value_embed,
     construct_clan_error_embed,
     construct_error_self_choose_embed,
+    construct_error_command_is_active,
 )
 from core.emojify import STAR, BOSS, WRITING, CALENDAR, TEAM, UPARROW, GEM, SHOP
 
@@ -189,7 +190,7 @@ async def yes_create(interaction: Interaction):
                     f"прославьте имя своего клана, желаем вам удачи на вашем пути!",
     )
     update_user_balance(interaction.guild.id, interaction.user.id, -create_cost)
-    return await interaction.followup.send(embed=embed, view=view)
+    return await interaction.message.edit(embed=embed, view=view)
 
 
 async def no_create_guild(interaction: Interaction):
@@ -582,6 +583,7 @@ class NameModal(nextcord.ui.Modal):
 
 class ClanHandler(commands.Cog):
     def __init__(self, client):
+        self.users = dict()
         self.client = client
 
     @nextcord.slash_command(
@@ -612,6 +614,20 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
+        timestamp = datetime.datetime.now().timestamp()
+        user = self.users.get(interaction.user.id, None)
+        if user is None:
+            self.users.update({interaction.user.id: timestamp})
+        if user is not None:
+            if timestamp - user < 120:
+                return await interaction.response.send_message(
+                    embed=construct_error_command_is_active(
+                        get_msg_from_locale_by_key(
+                            interaction.guild.id, "command_is_active_error"
+                        ),
+                        interaction.user.display_avatar,
+                    )
+                )
         create_cost = get_server_clan_create_cost(interaction.guild.id)
         balance = get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < create_cost:
@@ -929,7 +945,7 @@ class ClanHandler(commands.Cog):
         async def upgrade_clan_attack(interaction: Interaction):
             clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
             min_attack = get_clan_min_attack(interaction.guild.id, clan_id)
-            price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100)
+            price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100)
             """
             add_price = 2/min_attack
             some_price = 100/add_price
@@ -952,7 +968,8 @@ class ClanHandler(commands.Cog):
             async def upgrade_attack_1(interaction: Interaction):
                 clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
                 min = get_clan_min_attack(interaction.guild.id, clan_id)
-                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100)
+                price = round(
+                    get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100)
                 clan_storage = get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
@@ -990,7 +1007,8 @@ class ClanHandler(commands.Cog):
 
             async def upgrade_attack_10(interaction: Interaction):
                 clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 10
+                price = round(
+                    get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100) * 10
                 clan_storage = get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
@@ -1028,7 +1046,8 @@ class ClanHandler(commands.Cog):
 
             async def upgrade_attack_100(interaction: Interaction):
                 clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 100
+                price = round(
+                    get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100) * 100
                 clan_storage = get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
@@ -1066,7 +1085,8 @@ class ClanHandler(commands.Cog):
 
             async def upgrade_attack_1000(interaction: Interaction):
                 clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 1000
+                price = round(
+                    get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100) * 1000
                 clan_storage = get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
@@ -1104,7 +1124,8 @@ class ClanHandler(commands.Cog):
 
             async def upgrade_attack_10000(interaction: Interaction):
                 clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 10000
+                price = round(
+                    get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100) * 10000
                 clan_storage = get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
@@ -1142,7 +1163,8 @@ class ClanHandler(commands.Cog):
 
             async def upgrade_attack_100000(interaction: Interaction):
                 clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 100000
+                price = round(
+                    get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100) * 100000
                 clan_storage = get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
@@ -1180,7 +1202,8 @@ class ClanHandler(commands.Cog):
 
             async def upgrade_attack_1000000(interaction: Interaction):
                 clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 1000000
+                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (
+                            100 / (2 / min_attack)) / 100) * 1000000
                 clan_storage = get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
@@ -1218,7 +1241,8 @@ class ClanHandler(commands.Cog):
 
             async def upgrade_attack_10000000(interaction: Interaction):
                 clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 10000000
+                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (
+                            100 / (2 / min_attack)) / 100) * 10000000
                 clan_storage = get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
@@ -1256,7 +1280,8 @@ class ClanHandler(commands.Cog):
 
             async def upgrade_attack_100000000(interaction: Interaction):
                 clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 100000000
+                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (
+                            100 / (2 / min_attack)) / 100) * 100000000
                 clan_storage = get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
@@ -1294,7 +1319,8 @@ class ClanHandler(commands.Cog):
 
             async def upgrade_attack_1000000000(interaction: Interaction):
                 clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100/(2/min_attack))/100) * 1000000000
+                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (
+                            100 / (2 / min_attack)) / 100) * 1000000000
                 clan_storage = get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
@@ -1542,6 +1568,8 @@ class ClanHandler(commands.Cog):
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_{interaction.application_command.name}"
         )
+        if role := nextcord.utils.get(interaction.guild.roles, id=get_clan_role(interaction.guild.id, clan_id)):
+            await user.remove_roles(role)
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         await interaction.response.send_message(
             embed=construct_basic_embed(

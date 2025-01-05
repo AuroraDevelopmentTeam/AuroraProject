@@ -54,6 +54,7 @@ from core.voice.writers import write_in_voice_private_config_standart_values
 from core.clan.writers import write_in_clan_members_standart_values, write_in_clan_config_standart_values
 from core.emotions.writers import write_in_emotions_cost_standart_values
 from core.marriage.writers import write_new_column
+from core.bet.writers import write_in_bets_standart_values
 
 
 class OnGuildListener(commands.Cog):
@@ -89,6 +90,7 @@ class OnGuildListener(commands.Cog):
         write_in_autoroles_marriage_standart_values(guilds)
         write_in_emotions_cost_standart_values(guilds)
         write_in_marriage_config_standart_values(guilds)
+        write_in_bets_standart_values(guilds)
 
         await self.client.change_presence(
             activity=nextcord.Game(

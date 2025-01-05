@@ -59,7 +59,6 @@ class StatisticsCounter(commands.Cog):
         if not message.author.bot:
             try:
                 if get_channel_stats_state(message.guild.id, message.channel.id) is True:
-                    print('hui hui')
                     update_user_messages_counter(message.guild.id, message.author.id, 1)
                 if get_channel_income_state(message.guild.id, message.channel.id) is False:
                     return

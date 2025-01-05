@@ -876,7 +876,12 @@ class Marriage(commands.Cog):
                 interaction.guild.id,
             )
         )
-    @nextcord.slash_command(name="loveroom_create")
+
+    @nextcord.slash_command(name="loveroom_create",
+                            name_localizations=get_localized_name("loveroom_create"),
+                            description_localizations=get_localized_description(
+                                "loveroom_create"),
+                            )
     async def __loveroom_create(self, interaction: Interaction):
         if is_married(interaction.guild.id, interaction.user.id) is False:
             return await interaction.response.send_message(
@@ -890,21 +895,33 @@ class Marriage(commands.Cog):
         pair_id = get_user_pair_id(interaction.guild.id, interaction.user.id)
         pair = await interaction.guild.fetch_member(pair_id)
         loverooms_state = get_marriage_config_enable_loverooms(interaction.guild.id)
+        if loverooms_state is False:
+            return await 'loverooms on server disabled by admin'
         room = get_user_loveroom_id(interaction.guild.id, interaction.user.id)
-        if room != 0 or room:
+        lv = interaction.guild.get_channel(room)
+        # if room != 0 or room and lv:
+        #     update_user_loveroom_id(interaction.guild.id, interaction.user.id, 0)
+        #     update_user_loveroom_id(interaction.guild.id, pair_id, 0)
+        if room != 0 and lv:
+
+            lv = interaction.guild.get_channel(int(room))
+        if room != 0 or room and lv:
+            update_user_loveroom_id(interaction.guild.id, interaction.user.id, 0)
+            update_user_loveroom_id(interaction.guild.id, pair_id, 0)
+        elif room != 0 or room:
             return await interaction.response.send_message(
                 embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(interaction.guild.id, "loveroom_existing"),
                     self.client.user.avatar.url
                 )
             )
-        if loveroom_category_id := get_marriage_config_loveroom_category(interaction.guild.id) != 0:
+        if loveroom_category_id := get_marriage_config_loveroom_category(interaction.guild.id):
             try:
-
                 loveroom_category = nextcord.utils.get(interaction.guild.channels,
-                                                    id=loveroom_category_id)
+                                                       id=loveroom_category_id)
             except:
-                await interaction.respose.send_message(embed=construct_error_bot_user_embed("No loveroom category!"))
+                return await interaction.respose.send_message(embed=construct_error_bot_user_embed("No loveroom "
+                                                                                                   "category!"))
         loveroom_price = get_marriage_config_month_loveroom_price(interaction.guild.id)
         bal = get_family_money(interaction.guild.id, interaction.user.id)
         if bal < loveroom_price:
@@ -912,7 +929,7 @@ class Marriage(commands.Cog):
                 embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(interaction.guild.id, "on_loveroom_money_error"),
                     self.client.user.avatar.url,
-            ))
+                ))
         update_couple_family_money(interaction.guild.id, interaction.user.id, pair_id, -loveroom_price)
         overwrites = {
             interaction.guild.default_role: nextcord.PermissionOverwrite(
@@ -927,11 +944,12 @@ class Marriage(commands.Cog):
                 view_channel=True, manage_channels=True, mute_members=True, move_members=True, stream=True,
             )
         }
+        print(loveroom_category)
         loveroom = await interaction.guild.create_voice_channel(category=loveroom_category,
                                                                 name=f"{interaction.user.name} 🤍 {pair.name}",
                                                                 user_limit=2,
                                                                 overwrites=overwrites)
-        when_expired = int(datetime.now().timestamp()+86400*30)
+        when_expired = int(datetime.now().timestamp() + 86400 * 30)
         update_user_loveroom_id(interaction.guild.id, interaction.user.id, loveroom.id)
         update_user_loveroom_id(interaction.guild.id, pair_id, loveroom.id)
         update_user_loveroom_expire_date(interaction.guild.id, interaction.user.id, when_expired)

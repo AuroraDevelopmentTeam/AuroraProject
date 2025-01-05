@@ -8,3 +8,4 @@ lib/Lavalink/logs
 vk_config.v2.json
 databases/.DS_Store
 .DS_Store
+.vscode/launch.json

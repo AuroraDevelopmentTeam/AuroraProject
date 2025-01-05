@@ -109,7 +109,7 @@ def get_user_loveroom_expire_date(guild_id: int, user_id: int) -> str:
     return loveroom_expire_date
 
 
-def get_user_loveroom_id(guild_id: int, user_id: int) -> str:
+def get_user_loveroom_id(guild_id: int, user_id: int) -> int:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     loveroom_id = cursor.execute(

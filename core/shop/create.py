@@ -26,3 +26,15 @@ def create_custom_shop_table() -> None:
     cursor.close()
     db.close()
     return
+
+
+def create_custom_shop_config_table() -> None:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    cursor.execute(
+        """CREATE TABLE IF NOT EXISTS custom_shop_config (guild_id INTEGER, enabled BOOL, role_create_cost INTEGER ) """
+    )
+    db.commit()
+    cursor.close()
+    db.close()
+    return

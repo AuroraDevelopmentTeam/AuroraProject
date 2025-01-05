@@ -5,11 +5,12 @@ from core.shop.updaters import buy_role, delete_role_from_shop
 import sqlite3
 from typing import Coroutine, Any
 from core.dataclassesList import CustomRole
+from core.money.getters import get_guild_currency_symbol
 
 
 class BuyButton(Button):
     def __init__(
-        self, label, interaction, role, emoji=None
+            self, label, interaction, role, emoji=None
     ):  # TODO make custom shop emojis for guilds
         super().__init__(label=label, style=nextcord.ButtonStyle.primary, emoji="🛒")
         self.interaction = interaction
@@ -27,7 +28,7 @@ class BuyButton(Button):
 
 class NextPageButton(Button):
     def __init__(
-        self, label, interaction, page, emoji=None, shop_filter="notnew"
+            self, label, interaction, page, emoji=None, shop_filter="notnew"
     ):  # filt = filter
         super().__init__(style=nextcord.ButtonStyle.secondary, emoji=emoji, row=3)
         self.interaction = interaction
@@ -58,9 +59,9 @@ class ShopLeave(Button):
 
 
 def get_custom_shop_roles_limit(
-    guild_id: int,
+        guild_id: int,
 ) -> bool:  # TODO сделать чтобы создатель сервера мог регулировать лимит и переименовать, а то не совсем соответствует
-    db = sqlite3.connect("./database/main.sqlite")
+    db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
     roles = cursor.execute(
         "SELECT * FROM custom_shop WHERE guild_id = ?", (guild_id,)
@@ -71,7 +72,7 @@ def get_custom_shop_roles_limit(
 
 
 async def custom_shop_embed(
-    inter: Interaction, pagen: int = 1, order: str = "notnew"
+        inter: Interaction, pagen: int = 1, order: str = "notnew"
 ) -> Coroutine[Any, Any, tuple[nextcord.Embed, View]]:
     db = sqlite3.connect("./databases/main.sqlite")
     cursor = db.cursor()
@@ -106,7 +107,8 @@ async def custom_shop_embed(
         pagescol += 1
     x = pagen * 5
     col = x - 5
-    for each in roles[x - 5 : x]:
+    currency_symbol = get_guild_currency_symbol(inter.guild.id)
+    for each in roles[x - 5: x]:
         each = CustomRole(*list(each))
         col += 1
         objecta = nextcord.utils.get(inter.guild.roles, id=each.role_id)
@@ -118,7 +120,7 @@ async def custom_shop_embed(
         embed.add_field(
             name=f" ⁣ ",
             value=f"**{col}) {objecta.mention} \n Продавец: {inter.client.get_user(each.owner_id).mention} \n \
-            Цена: {each.cost} :dollar: \n Куплена раз: {each.bought}**",
+            Цена: {each.cost} {currency_symbol} \n Куплена раз: {each.bought}**",
             inline=False,
         )
     embed.set_footer(text=f"Страница {pagen} из {str(pagescol)}")
@@ -182,3 +184,25 @@ async def custom_shop_embed(
     view.add_item(button2)
     view.add_item(button3)
     return embed, view
+
+
+def get_custom_shop_enabled(guild_id: int) -> bool:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    enabled = cursor.execute(
+        f"SELECT enabled FROM custom_shop_config WHERE guild_id = {guild_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return bool(int(enabled))
+
+
+def get_custom_shop_role_create_cost(guild_id: int) -> int:
+    db = sqlite3.connect("./databases/main.sqlite")
+    cursor = db.cursor()
+    role_create_cost = cursor.execute(
+        f"role_create_cost FROM custom_shop_config WHERE guild_id = {guild_id}"
+    ).fetchone()[0]
+    cursor.close()
+    db.close()
+    return role_create_cost

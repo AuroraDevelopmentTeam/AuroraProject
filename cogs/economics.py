@@ -48,6 +48,7 @@ from core.locales.getters import (
     get_localized_name,
     localize_name,
 )
+from core.emojify import SHOP
 from core.embeds import construct_basic_embed, construct_top_embed, DEFAULT_BOT_COLOR
 from core.shop.writers import (
     write_role_in_shop,
@@ -60,7 +61,7 @@ from core.parsers import parse_server_roles
 from core.ui.paginator import (
     MyEmbedFieldPageSource,
     MyEmbedDescriptionPageSource,
-    SelectButtonMenuPages,
+    NewSelectButtonMenuPages,
 )
 from core.errors import (
     construct_error_negative_value_embed,
@@ -71,6 +72,9 @@ from core.errors import (
 )
 from core.marriage.update import set_user_gift_price
 from core.marriage.update import set_user_gift_count
+from core.bet.getters import get_min_bet, get_max_bet
+from core.bet.update import update_min_bet, update_max_bet
+from core.ui.paginator import NewShopView
 
 
 class AutorolesList(menus.ListPageSource):
@@ -409,7 +413,7 @@ class Economics(commands.Cog):
         )
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         for i in range(10):
-            set_user_gift_count(interaction.guild.id, user.id, f"gift_{(i+1)}", 0)
+            set_user_gift_count(interaction.guild.id, user.id, f"gift_{(i + 1)}", 0)
         await interaction.response.send_message(
             embed=construct_basic_embed(
                 interaction.application_command.name,
@@ -590,7 +594,7 @@ class Economics(commands.Cog):
             )
             return await interaction.response.send_message(embed=embed)
         guild_roles = parse_server_roles(interaction.guild)
-        if len(guild_roles) >= 25:
+        if len(guild_roles) >= 9999:
             embed = nextcord.Embed(
                 title="error",
                 description=get_msg_from_locale_by_key(
@@ -664,12 +668,24 @@ class Economics(commands.Cog):
     )
     async def __shop(self, interaction: Interaction):
         guild_roles = parse_server_roles(interaction.guild)
-        pages = SelectButtonMenuPages(
-            source=MyEmbedDescriptionPageSource(guild_roles, interaction.guild.id),
-            guild=interaction.guild,
-            disabled=False,
-        )
-        await pages.start(interaction=interaction)
+        if len(guild_roles) <= 6:
+            entries = []
+            for i in range(len(guild_roles)):
+                entries.append(guild_roles[i])
+            embed = nextcord.Embed(
+                title=f"{SHOP} {localize_name(interaction.guild.id, 'shop').capitalize()}",
+                description="\n".join(entries),
+                color=DEFAULT_BOT_COLOR,
+            )
+            embed.set_image(url="https://64.media.tumblr.com/e9096b8d3440af335d9996455f072ab6"
+                                "/tumblr_p5flokH8161qbw2q1o1_1280.gif")
+            embed.set_footer(text=f"1/1")
+            await interaction.response.send_message(embed=embed, view=NewShopView(guild=interaction.guild))
+        else:
+            pages = NewSelectButtonMenuPages(guild_roles=guild_roles, interaction=interaction,
+                                             source=MyEmbedDescriptionPageSource(guild_roles, interaction.guild.id),
+                                             )
+            await pages.start(interaction=interaction)
 
     @nextcord.slash_command(
         name="add-custom-shop",
@@ -677,7 +693,6 @@ class Economics(commands.Cog):
         name_localizations=get_localized_name("add-custom-shop"),
         description_localizations=get_localized_description("add-custom-shop"),
         default_member_permissions=Permissions(send_messages=True),
-        guild_ids=[1006113954331885648],
     )
     async def __add_custom_shop(
             self,
@@ -701,7 +716,7 @@ class Economics(commands.Cog):
                 if nextcord.utils.get(interaction.guild.roles, name=role_name) is None:
                     colors = {
                         "Белый": 0xFFFAFA,
-                        "Чёрный": 0x000000,
+                        "Чёрный": 0x000002,
                         "Голубой": 0x00BFFF,
                         "Синий": 0x0000FF,
                         "Зеленый": 0x008000,
@@ -780,7 +795,6 @@ class Economics(commands.Cog):
         name_localizations=get_localized_name("custom-shop"),
         description_localizations=get_localized_description("custom-shop"),
         default_member_permissions=Permissions(send_messages=True),
-        guild_ids=[1006113954331885648],
     )
     async def __custom_shop(self, interaction: Interaction):
         # await interaction.send("Загружаем магазин...")
@@ -1157,6 +1171,81 @@ class Economics(commands.Cog):
             source=AutorolesList(source_for_pages, interaction.guild.id),
         )
         await pages.start(interaction=interaction)
+
+    @nextcord.slash_command(
+        name="bet_config",
+        name_localizations=get_localized_name("bet_config"),
+        description_localizations=get_localized_description("bet_config"),
+        default_member_permissions=Permissions(administrator=True),
+    )
+    @application_checks.has_permissions(manage_guild=True)
+    async def __bet_config(self, interaction: Interaction):
+        """
+        This is the set slash command that will be the prefix of income commands.
+        """
+        pass
+
+    @__bet_config.subcommand(
+        name="set_min_bet",
+        description="Set minimal bet on your server",
+        name_localizations=get_localized_name("bet_config_set_min_bet"),
+        description_localizations=get_localized_description("bet_config_set_min_bet"),
+    )
+    async def __bet_config_set_min_bet(
+            self,
+            interaction: Interaction,
+            bet_amount: Optional[int] = SlashOption(
+                required=True,
+                description="Integer bet amount",
+                description_localizations={"ru": "Размер ставки, число"},
+            ),
+    ):
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        update_min_bet(interaction.guild.id, bet_amount)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"bet_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} **{bet_amount}** {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
+
+    @__bet_config.subcommand(
+        name="set_max_bet",
+        description="Set maximal bet on your server",
+        name_localizations=get_localized_name("bet_config_set_max_bet"),
+        description_localizations=get_localized_description("bet_config_set_max_bet"),
+    )
+    async def __bet_config_set_max_bet(
+            self,
+            interaction: Interaction,
+            bet_amount: Optional[int] = SlashOption(
+                required=True,
+                description="Bet amount integer",
+                description_localizations={"ru": "Размер ставки, число"},
+            ),
+    ):
+        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        update_max_bet(interaction.guild.id, bet_amount)
+        message = get_msg_from_locale_by_key(
+            interaction.guild.id, f"bet_config_{interaction.application_command.name}"
+        )
+        requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
+        await interaction.response.send_message(
+            embed=construct_basic_embed(
+                interaction.application_command.name,
+                f"{message} **{bet_amount}** {currency_symbol}",
+                f"{requested} {interaction.user}",
+                interaction.user.display_avatar,
+                interaction.guild.id,
+            )
+        )
 
 
 def setup(client):

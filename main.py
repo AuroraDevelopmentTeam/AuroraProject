@@ -17,7 +17,8 @@ client = commands.Bot(
     command_prefix=settings["PREFIX"],
     case_insensitive=True,
     intents=intents,
-    activity=nextcord.Game(name=f"You cute! /help")
+    activity=nextcord.Game(name=f"You cute! /help"),
+    # shard_count=2,
 )
 
 # test

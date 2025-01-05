@@ -195,7 +195,9 @@ class HelpSelectMenuENG(nextcord.ui.Select):
                 "`/income messages_per_income` — Set messages amount for income\n"
                 "`/income voice_minutes` — Set voice minutes amount for income\n"
                 "`/income role_add` — Add income to role per 12 hours\n"
-                "`/income role_remove` — Remove role from income system",
+                "`/income role_remove` — Remove role from income system"
+                "`/hangman` — Play Hangman guessing word game"
+                "`/ttt` — Сыграть в игру 'Крестики Нолики'",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006552600377839696/2623939ce6b6b5d3.gif"
@@ -612,7 +614,9 @@ class HelpSelectMenuRU(nextcord.ui.Select):
                 "`/income messages_per_income` — Настроить кол-во сообщений для выдачи дохода\n"
                 "`/income voice_minutes` — Настроить кол-во минут в голосовом чате для выдачи дохода\n"
                 "`/income role_add` — Добавить выдачу раз в 12 часов валюты роли\n"
-                "`/income role_remove` — Убрать выдачу раз в 12 часов валюты роли",
+                "`/income role_remove` — Убрать выдачу раз в 12 часов валюты роли"
+                "`/hangman` — Сыграть в игру 'Виселица'"
+                "`/ttt` — Сыграть в игру 'Крестики Нолики'",
             )
             embed.set_image(
                 url="https://cdn.discordapp.com/attachments/772385814483173398/1006552600377839696/2623939ce6b6b5d3.gif"
