@@ -1,16 +1,6 @@
-import random
+from ..db_utils import execute_update
 
-import sqlite3
-import nextcord
-
-
-def create_bets_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
-        """CREATE TABLE IF NOT EXISTS bets (guild_id INTEGER, min_bet INTEGER, max_bet INTEGER) """
+async def create_bets_table() -> None:
+    await execute_update(
+        """CREATE TABLE IF NOT EXISTS bets (guild_id BIGINT, min_bet INTEGER, max_bet INTEGER) """
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return

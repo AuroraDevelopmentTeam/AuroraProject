@@ -1,8 +1,6 @@
-import random
-import sqlite3
-import types
 import datetime
-from typing import Union, Optional
+import random
+from typing import Optional
 
 import cooldowns
 import nextcord
@@ -13,8 +11,6 @@ from nextcord.utils import get
 from core.clan.checks import boss_alive, is_clan_owner, is_user_in_clan
 from core.clan.getters import *
 from core.clan.update import (
-    update_clan_level,
-    update_clan_exp,
     update_clan_storage,
     update_clan_boss_hp,
     update_user_clan_id,
@@ -28,13 +24,11 @@ from core.clan.update import (
     update_server_clan_upgrade_attack_cost,
     update_server_clan_upgrade_limit_cost,
     update_clan_desc_on_creation,
-    update_clan_description,
     update_clan_max_attack,
     update_clan_image,
     update_clan_boss_level,
     update_clan_min_attack,
     update_server_clan_change_icon_cost,
-    update_clan_owner_id,
     update_server_clan_create_cost,
     update_server_clan_change_image_cost,
     resurrect_boss,
@@ -47,17 +41,8 @@ from core.clan.update import (
     update_server_change_color_cost
 )
 from core.clan.writers import write_clan, write_clan_on_start
-from core.money.getters import get_guild_currency_symbol, get_user_balance
-from core.money.updaters import update_user_balance
-from core.ui.buttons import create_button, ViewAuthorCheck, View
-from core.locales.getters import (
-    get_localized_name,
-    get_localized_description,
-    get_msg_from_locale_by_key,
-    localize_name,
-    get_guild_locale,
-)
 from core.embeds import construct_basic_embed, DEFAULT_BOT_COLOR
+from core.emojify import STAR, BOSS, WRITING, CALENDAR, TEAM, UPARROW, GEM
 from core.errors import (
     construct_error_not_enough_embed,
     construct_error_negative_value_embed,
@@ -65,7 +50,15 @@ from core.errors import (
     construct_error_self_choose_embed,
     construct_error_command_is_active,
 )
-from core.emojify import STAR, BOSS, WRITING, CALENDAR, TEAM, UPARROW, GEM, SHOP
+from core.locales.getters import (
+    get_localized_name,
+    get_localized_description,
+    get_msg_from_locale_by_key,
+    localize_name,
+)
+from core.money.getters import get_guild_currency_symbol, get_user_balance
+from core.money.updaters import update_user_balance
+from core.ui.buttons import create_button, ViewAuthorCheck
 
 
 class ClanMembersList(menus.ListPageSource):
@@ -104,19 +97,19 @@ class NoStopButtonMenuPages(menus.ButtonMenuPages, inherit_buttons=False):
 
 async def yes_create(interaction: Interaction):
     await interaction.response.defer()
-    create_cost = get_server_clan_create_cost(interaction.guild.id)
-    clan_id = get_owner_clan_id(interaction.guild.id, interaction.user.id)
-    color = get_clan_color(interaction.guild.id, clan_id)
+    create_cost = await get_server_clan_create_cost(interaction.guild.id)
+    clan_id = await get_owner_clan_id(interaction.guild.id, interaction.user.id)
+    color = await get_clan_color(interaction.guild.id, clan_id)
     color_to_table = color
     color = color.replace("#", "")
     if color == "000000":
         color = "010101"
     col = nextcord.Color(value=int(color, 16))
     col = col.to_rgb()
-    name = get_clan_name(interaction.guild.id, clan_id)
-    desc = get_clan_description(interaction.guild.id, clan_id)
-    icon = get_clan_icon(interaction.guild.id, clan_id)
-    create_channels = get_server_create_clan_channels(interaction.guild.id)
+    name = await get_clan_name(interaction.guild.id, clan_id)
+    desc = await get_clan_description(interaction.guild.id, clan_id)
+    icon = await get_clan_icon(interaction.guild.id, clan_id)
+    create_channels = await get_server_create_clan_channels(interaction.guild.id)
     role = await interaction.guild.create_role(
         name=name, color=nextcord.Color.from_rgb(*col)
     )
@@ -131,7 +124,7 @@ async def yes_create(interaction: Interaction):
         )
     }
     if create_channels is not False:
-        clan_category = get_server_clan_voice_category(interaction.guild.id)
+        clan_category = await get_server_clan_voice_category(interaction.guild.id)
         if clan_category == 0:
             voice_channel = await interaction.guild.create_voice_channel(
                 category=None, name=name, overwrites=overwrites
@@ -155,9 +148,9 @@ async def yes_create(interaction: Interaction):
     else:
         voice_channel_id = 0
     await interaction.user.add_roles(role)
-    delete_clan(interaction.guild.id, interaction.user.id)
+    await delete_clan(interaction.guild.id, interaction.user.id)
     timestamp = nextcord.utils.format_dt(datetime.datetime.now())
-    write_clan(
+    await write_clan(
         interaction.guild.id,
         interaction.user.id,
         timestamp,
@@ -168,9 +161,9 @@ async def yes_create(interaction: Interaction):
         voice_channel_id,
         color_to_table,
     )
-    clan_id = get_owner_clan_id(interaction.guild.id, interaction.user.id)
-    update_user_clan_id(interaction.guild.id, interaction.user.id, clan_id)
-    update_user_join_date(interaction.guild.id, interaction.user.id, timestamp)
+    clan_id = await get_owner_clan_id(interaction.guild.id, interaction.user.id)
+    await update_user_clan_id(interaction.guild.id, interaction.user.id, clan_id)
+    await update_user_join_date(interaction.guild.id, interaction.user.id, timestamp)
     yes_button = create_button(
         get_msg_from_locale_by_key(interaction.guild.id, "yes"), False, True
     )
@@ -189,7 +182,7 @@ async def yes_create(interaction: Interaction):
         description=f"Восславьте **{name}**! Поздравляем вас основатель {interaction.user.mention}, "
                     f"прославьте имя своего клана, желаем вам удачи на вашем пути!",
     )
-    update_user_balance(interaction.guild.id, interaction.user.id, -create_cost)
+    await update_user_balance(interaction.guild.id, interaction.user.id, -create_cost)
     return await interaction.message.edit(embed=embed, view=view)
 
 
@@ -198,7 +191,7 @@ async def no_create_guild(interaction: Interaction):
         title=f"{localize_name(interaction.guild.id, 'clan_create')}",
         description="Отказ от создания",
     )
-    delete_clan(interaction.guild.id, interaction.user.id)
+    await delete_clan(interaction.guild.id, interaction.user.id)
     yes_button = create_button(
         get_msg_from_locale_by_key(interaction.guild.id, "yes"), False, True
     )
@@ -255,14 +248,14 @@ async def yes_show_me_colors_modal(interaction: Interaction):
 
 
 async def yes_show_me_full(interaction: Interaction):
-    clan_id = get_owner_clan_id(interaction.guild.id, interaction.user.id)
-    name = get_clan_name(interaction.guild.id, clan_id)
-    desc = get_clan_description(interaction.guild.id, clan_id)
-    color = get_clan_color(interaction.guild.id, clan_id)
+    clan_id = await get_owner_clan_id(interaction.guild.id, interaction.user.id)
+    name = await get_clan_name(interaction.guild.id, clan_id)
+    desc = await get_clan_description(interaction.guild.id, clan_id)
+    color = await get_clan_color(interaction.guild.id, clan_id)
     color = color.replace("#", "")
     col = nextcord.Color(value=int(color, 16))
     col = col.to_rgb()
-    icon = get_clan_icon(interaction.guild.id, clan_id)
+    icon = await get_clan_icon(interaction.guild.id, clan_id)
     embed = nextcord.Embed(
         title=name,
         description=f"{desc}\n\n\nЕсли вас всё устраивает, то нажмите да, с вас будут списаны деньги, а клан будет "
@@ -304,7 +297,7 @@ class ClanShopImageEntryField(nextcord.ui.Modal):
     async def callback(self, interaction: Interaction):
         try:
             image = self.url.value
-            update_clan_image(interaction.guild.id, self.clan_id, image)
+            await update_clan_image(interaction.guild.id, self.clan_id, image)
             await interaction.response.send_message(f"{self.url.value}")
         except Exception as error:
             print(error)
@@ -328,7 +321,7 @@ class ClanShopColorEntryField(nextcord.ui.Modal):
     async def callback(self, interaction: Interaction):
         try:
             color = self.color.value
-            update_clan_color(interaction.guild.id, interaction.user.id, color)
+            await update_clan_color(interaction.guild.id, interaction.user.id, color)
             clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
             role = get_clan_role(interaction.guild.id, clan_id)
             role = nextcord.utils.get(interaction.guild.roles, id=role)
@@ -361,7 +354,7 @@ class ClanShopIconEntryField(nextcord.ui.Modal):
     async def callback(self, interaction: Interaction):
         try:
             icon = self.url.value
-            update_clan_icon(interaction.guild.id, self.clan_id, icon)
+            await update_clan_icon(interaction.guild.id, self.clan_id, icon)
             await interaction.response.send_message(f"{self.url.value}")
         except Exception as error:
             print(error)
@@ -385,7 +378,7 @@ class ClanColorModal(nextcord.ui.Modal):
     async def callback(self, interaction: Interaction):
         try:
             name = self.embedTitle.value
-            update_clan_color(interaction.guild.id, interaction.user.id, name)
+            await update_clan_color(interaction.guild.id, interaction.user.id, name)
             color = name
             color = color.replace("#", "")
             col = nextcord.Color(value=int(color, 16))
@@ -415,7 +408,7 @@ class ClanColorModal(nextcord.ui.Modal):
             await interaction.message.edit(embed=embed, view=view)
         except Exception as error:
             print(error)
-            delete_clan(interaction.guild.id, interaction.user.id)
+            await delete_clan(interaction.guild.id, interaction.user.id)
 
 
 class ClanIconModal(nextcord.ui.Modal):
@@ -436,7 +429,7 @@ class ClanIconModal(nextcord.ui.Modal):
     async def callback(self, interaction: Interaction):
         try:
             name = self.embedTitle.value
-            update_clan_icon_on_creation(
+            await update_clan_icon_on_creation(
                 interaction.guild.id, interaction.user.id, name
             )
             embed = nextcord.Embed(
@@ -474,7 +467,7 @@ class ClanIconModal(nextcord.ui.Modal):
             await interaction.message.edit(embed=embed, view=view)
         except Exception as error:
             print(error)
-            delete_clan(interaction.guild.id, interaction.user.id)
+            await delete_clan(interaction.guild.id, interaction.user.id)
 
 
 class ClanDescriptionModal(nextcord.ui.Modal):
@@ -496,7 +489,7 @@ class ClanDescriptionModal(nextcord.ui.Modal):
     async def callback(self, interaction: Interaction):
         try:
             name = self.embedTitle.value
-            update_clan_desc_on_creation(
+            await update_clan_desc_on_creation(
                 interaction.guild.id, interaction.user.id, name
             )
             embed = nextcord.Embed(
@@ -530,7 +523,7 @@ class ClanDescriptionModal(nextcord.ui.Modal):
             await interaction.message.edit(embed=embed, view=view)
         except Exception as error:
             print(error)
-            delete_clan(interaction.guild.id, interaction.user.id)
+            await delete_clan(interaction.guild.id, interaction.user.id)
 
 
 class NameModal(nextcord.ui.Modal):
@@ -552,7 +545,7 @@ class NameModal(nextcord.ui.Modal):
     async def callback(self, interaction: Interaction) -> None:
         try:
             name = self.embedTitle.value
-            update_clan_name(interaction.guild.id, interaction.user.id, name)
+            await update_clan_name(interaction.guild.id, interaction.user.id, name)
             embed = nextcord.Embed(
                 description=f"Было введено следующее имя клана: **{name}**. Теперь введите описание для вашего клана, "
                             f"кликните на да, как будете готовы или прекратите процесс создания если передумали, "
@@ -578,7 +571,7 @@ class NameModal(nextcord.ui.Modal):
             await interaction.message.edit(embed=embed, view=view)
         except Exception as error:
             print(error)
-            delete_clan(interaction.guild.id, interaction.user.id)
+            await delete_clan(interaction.guild.id, interaction.user.id)
 
 
 class ClanHandler(commands.Cog):
@@ -605,7 +598,7 @@ class ClanHandler(commands.Cog):
     @application_checks.bot_has_guild_permissions(manage_channels=True)
     @application_checks.bot_has_guild_permissions(manage_roles=True)
     async def __clan_create(self, interaction: Interaction):
-        if is_user_in_clan(interaction.guild.id, interaction.user.id) is True:
+        if await is_user_in_clan(interaction.guild.id, interaction.user.id) is True:
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(
@@ -628,8 +621,8 @@ class ClanHandler(commands.Cog):
                         interaction.user.display_avatar,
                     )
                 )
-        create_cost = get_server_clan_create_cost(interaction.guild.id)
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        create_cost = await get_server_clan_create_cost(interaction.guild.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < create_cost:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             return await interaction.response.send_message(
@@ -642,7 +635,7 @@ class ClanHandler(commands.Cog):
                 )
             )
         await interaction.response.defer()
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_{interaction.application_command.name}"
         )
@@ -655,7 +648,7 @@ class ClanHandler(commands.Cog):
             return name
 
         async def yes_create_guild_(interaction: Interaction):
-            write_clan_on_start(interaction.guild.id, interaction.user.id)
+            await write_clan_on_start(interaction.guild.id, interaction.user.id)
             embed = nextcord.Embed(
                 title=f"{localize_name(interaction.guild.id, 'clan_create')}",
                 description="Отлично, теперь настало время ввести имя Клана",
@@ -730,7 +723,7 @@ class ClanHandler(commands.Cog):
         description_localizations=get_localized_description("clan_show"),
     )
     async def __clan_display(self, interaction: Interaction):
-        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+        if not await is_user_in_clan(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(
@@ -739,29 +732,30 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
-        clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-        clan_description = get_clan_description(interaction.guild.id, clan_id)
-        clan_name = get_clan_name(interaction.guild.id, clan_id)
-        clan_level = get_clan_level(interaction.guild.id, clan_id)
-        clan_exp = get_clan_exp(interaction.guild.id, clan_id)
-        role = get_clan_role(interaction.guild.id, clan_id)
-        storage = get_clan_storage(interaction.guild.id, clan_id)
-        members = fetchall_clan_members(interaction.guild.id, clan_id)
-        limit = get_clan_member_limit(interaction.guild.id, clan_id)
+        currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
+        clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+        clan_description = await get_clan_description(interaction.guild.id, clan_id)
+        clan_name = await get_clan_name(interaction.guild.id, clan_id)
+        clan_level = await get_clan_level(interaction.guild.id, clan_id)
+        clan_exp = await get_clan_exp(interaction.guild.id, clan_id)
+        role = await get_clan_role(interaction.guild.id, clan_id)
+        print(role)
+        storage = await get_clan_storage(interaction.guild.id, clan_id)
+        members = await fetchall_clan_members(interaction.guild.id, clan_id)
+        limit = await get_clan_member_limit(interaction.guild.id, clan_id)
         role = nextcord.utils.get(interaction.guild.roles, id=role)
-        created = get_clan_create_date(interaction.guild.id, clan_id)
-        join_date = get_user_join_date(
+        created = await get_clan_create_date(interaction.guild.id, clan_id)
+        join_date = await get_user_join_date(
             interaction.guild.id, interaction.user.id, clan_id
         )
-        guild_boss = get_clan_guild_boss_level(interaction.guild.id, clan_id)
-        full_hp = get_clan_boss_hp_limit(interaction.guild.id, clan_id)
-        guild_boss_hp = get_clan_guild_boss_hp(interaction.guild.id, clan_id)
-        color = get_clan_color(interaction.guild.id, clan_id)
-        clan_icon = get_clan_icon(interaction.guild.id, clan_id)
-        clan_owner = get_clan_owner_id(interaction.guild.id, clan_id)
+        guild_boss = await get_clan_guild_boss_level(interaction.guild.id, clan_id)
+        full_hp = await get_clan_boss_hp_limit(interaction.guild.id, clan_id)
+        guild_boss_hp = await get_clan_guild_boss_hp(interaction.guild.id, clan_id)
+        color = await get_clan_color(interaction.guild.id, clan_id)
+        clan_icon = await get_clan_icon(interaction.guild.id, clan_id)
+        clan_owner = await get_clan_owner_id(interaction.guild.id, clan_id)
         clan_owner = await interaction.guild.fetch_member(clan_owner)
-        clan_image = get_clan_image(interaction.guild.id, clan_id)
+        clan_image = await get_clan_image(interaction.guild.id, clan_id)
         color = color.replace("#", "")
         col = nextcord.Color(value=int(color, 16))
         col = col.to_rgb()
@@ -812,7 +806,7 @@ class ClanHandler(commands.Cog):
     )
     async def __clan_shop(self, interaction: Interaction):
         # повысить лимит участников/сменить, поставить картинку/сменить иконку/повысить урон/повысить уровень босса
-        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+        if not await is_user_in_clan(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(
@@ -828,15 +822,15 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        embed = redraw_shop_embed(interaction)
+        embed = await redraw_shop_embed(interaction)
 
         async def upgrade_clan_limit(interaction: Interaction):
-            clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-            clan_limit = get_clan_member_limit(interaction.guild.id, clan_id)
-            price = get_server_clan_upgrade_limit_cost(
+            clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+            clan_limit = await get_clan_member_limit(interaction.guild.id, clan_id)
+            price = await get_server_clan_upgrade_limit_cost(
                 interaction.guild.id
             ) * get_upgrade_limit_multiplier(clan_limit)
-            clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+            clan_storage = await get_clan_storage(interaction.guild.id, clan_id)
             if clan_storage < price:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
                 return await interaction.response.send_message(
@@ -848,14 +842,14 @@ class ClanHandler(commands.Cog):
                         f"{msg} {clan_storage}/{price}",
                     )
                 )
-            update_clan_storage(interaction.guild.id, clan_id, -price)
-            update_clan_member_limit(interaction.guild.id, clan_id, clan_limit + 5)
+            await update_clan_storage(interaction.guild.id, clan_id, -price)
+            await update_clan_member_limit(interaction.guild.id, clan_id, clan_limit + 5)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"clan_shop_limit_buy"
             )
             requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
             limit = get_clan_member_limit(interaction.guild.id, clan_id)
-            await interaction.message.edit(embed=redraw_shop_embed(interaction))
+            await interaction.message.edit(embed=await redraw_shop_embed(interaction))
             await interaction.response.send_message(
                 embed=construct_basic_embed(
                     f"clan_shop_limit_buy",
@@ -867,12 +861,12 @@ class ClanHandler(commands.Cog):
             )
 
         async def upgrade_clan_boss(interaction: Interaction):
-            clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-            boss_level = get_clan_guild_boss_level(interaction.guild.id, clan_id)
-            price = get_server_clan_upgrade_boss_cost(
+            clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+            boss_level = await get_clan_guild_boss_level(interaction.guild.id, clan_id)
+            price = await get_server_clan_upgrade_boss_cost(
                 interaction.guild.id
             ) * get_boss_upgrade_multiplier(boss_level)
-            clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+            clan_storage = await get_clan_storage(interaction.guild.id, clan_id)
             if clan_storage < price:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
                 return await interaction.response.send_message(
@@ -887,13 +881,13 @@ class ClanHandler(commands.Cog):
             boss_level = get_clan_guild_boss_level(interaction.guild.id, clan_id)
             if boss_level == 10:
                 return await interaction.response.send_message("max level")
-            update_clan_storage(interaction.guild.id, clan_id, -price)
-            update_clan_boss_level(interaction.guild.id, clan_id, 1)
+            await update_clan_storage(interaction.guild.id, clan_id, -price)
+            await update_clan_boss_level(interaction.guild.id, clan_id, 1)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"clan_shop_boss_buy"
             )
             requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-            await interaction.message.edit(embed=redraw_shop_embed(interaction))
+            await interaction.message.edit(embed=await redraw_shop_embed(interaction))
             await interaction.response.send_message(
                 embed=construct_basic_embed(
                     f"clan_shop_boss_buy",
@@ -905,9 +899,9 @@ class ClanHandler(commands.Cog):
             )
 
         async def change_image(interaction: Interaction):
-            clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-            price = get_server_clan_change_image_cost(interaction.guild.id)
-            clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+            clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+            price = await get_server_clan_change_image_cost(interaction.guild.id)
+            clan_storage = await get_clan_storage(interaction.guild.id, clan_id)
             if clan_storage < price:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
                 return await interaction.response.send_message(
@@ -919,14 +913,14 @@ class ClanHandler(commands.Cog):
                         f"{msg} {clan_storage}/{price}",
                     )
                 )
-            update_clan_storage(interaction.guild.id, clan_id, -price)
+            await update_clan_storage(interaction.guild.id, clan_id, -price)
             modal = ClanShopImageEntryField(clan_id)
             await interaction.response.send_modal(modal)
 
         async def change_icon(interaction: Interaction):
-            clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-            price = get_server_clan_change_icon_cost(interaction.guild.id)
-            clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+            clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+            price = await get_server_clan_change_icon_cost(interaction.guild.id)
+            clan_storage = await get_clan_storage(interaction.guild.id, clan_id)
             if clan_storage < price:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
                 return await interaction.response.send_message(
@@ -938,21 +932,21 @@ class ClanHandler(commands.Cog):
                         f"{msg} {clan_storage}/{price}",
                     )
                 )
-            update_clan_storage(interaction.guild.id, clan_id, -price)
+            await update_clan_storage(interaction.guild.id, clan_id, -price)
             modal = ClanShopIconEntryField(clan_id)
             await interaction.response.send_modal(modal)
 
         async def upgrade_clan_attack(interaction: Interaction):
-            clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-            min_attack = get_clan_min_attack(interaction.guild.id, clan_id)
-            price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100)
+            clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+            min_attack = await get_clan_min_attack(interaction.guild.id, clan_id)
+            price = round(await get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100)
             """
             add_price = 2/min_attack
             some_price = 100/add_price
             some_some_price = some_price/100
             price += some_some_price
             """
-            clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+            clan_storage = await get_clan_storage(interaction.guild.id, clan_id)
             if clan_storage < price:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
                 return await interaction.response.send_message(
@@ -966,11 +960,11 @@ class ClanHandler(commands.Cog):
                 )
 
             async def upgrade_attack_1(interaction: Interaction):
-                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-                min = get_clan_min_attack(interaction.guild.id, clan_id)
+                clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+                min = await get_clan_min_attack(interaction.guild.id, clan_id)
                 price = round(
-                    get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100)
-                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                    await get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100)
+                clan_storage = await get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
                     return await interaction.response.send_message(
@@ -983,17 +977,17 @@ class ClanHandler(commands.Cog):
                         )
                     )
                 attack_to_add = random.randint(1, 5)
-                update_clan_storage(interaction.guild.id, clan_id, -price)
-                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
-                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_storage(interaction.guild.id, clan_id, -price)
+                await update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
                 message = get_msg_from_locale_by_key(
                     interaction.guild.id, f"clan_shop_attack_buy"
                 )
-                min = get_clan_min_attack(interaction.guild.id, clan_id)
-                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                min = await get_clan_min_attack(interaction.guild.id, clan_id)
+                max = await get_clan_max_attack(interaction.guild.id, clan_id)
                 requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
                 in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
-                storage = get_clan_storage(interaction.guild.id, clan_id)
+                storage = await get_clan_storage(interaction.guild.id, clan_id)
                 await interaction.response.send_message(
                     embed=construct_basic_embed(
                         f"clan_shop_attack_buy",
@@ -1006,10 +1000,10 @@ class ClanHandler(commands.Cog):
                 )
 
             async def upgrade_attack_10(interaction: Interaction):
-                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+                clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
                 price = round(
-                    get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100) * 10
-                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                    await get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100) * 10
+                clan_storage = await get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
                     return await interaction.response.send_message(
@@ -1022,17 +1016,17 @@ class ClanHandler(commands.Cog):
                         )
                     )
                 attack_to_add = random.randint(1, 5) * 10
-                update_clan_storage(interaction.guild.id, clan_id, -price)
-                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
-                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_storage(interaction.guild.id, clan_id, -price)
+                await update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
                 message = get_msg_from_locale_by_key(
                     interaction.guild.id, f"clan_shop_attack_buy"
                 )
-                min = get_clan_min_attack(interaction.guild.id, clan_id)
-                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                min = await get_clan_min_attack(interaction.guild.id, clan_id)
+                max = await get_clan_max_attack(interaction.guild.id, clan_id)
                 requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
                 in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
-                storage = get_clan_storage(interaction.guild.id, clan_id)
+                storage = await get_clan_storage(interaction.guild.id, clan_id)
                 await interaction.response.send_message(
                     embed=construct_basic_embed(
                         f"clan_shop_attack_buy",
@@ -1045,10 +1039,10 @@ class ClanHandler(commands.Cog):
                 )
 
             async def upgrade_attack_100(interaction: Interaction):
-                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+                clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
                 price = round(
-                    get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100) * 100
-                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                    await get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100) * 100
+                clan_storage = await get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
                     return await interaction.response.send_message(
@@ -1061,17 +1055,17 @@ class ClanHandler(commands.Cog):
                         )
                     )
                 attack_to_add = random.randint(1, 5) * 100
-                update_clan_storage(interaction.guild.id, clan_id, -price)
-                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
-                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_storage(interaction.guild.id, clan_id, -price)
+                await update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
                 message = get_msg_from_locale_by_key(
                     interaction.guild.id, f"clan_shop_attack_buy"
                 )
-                min = get_clan_min_attack(interaction.guild.id, clan_id)
-                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                min = await get_clan_min_attack(interaction.guild.id, clan_id)
+                max = await get_clan_max_attack(interaction.guild.id, clan_id)
                 requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
                 in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
-                storage = get_clan_storage(interaction.guild.id, clan_id)
+                storage = await get_clan_storage(interaction.guild.id, clan_id)
                 await interaction.response.send_message(
                     embed=construct_basic_embed(
                         f"clan_shop_attack_buy",
@@ -1084,9 +1078,9 @@ class ClanHandler(commands.Cog):
                 )
 
             async def upgrade_attack_1000(interaction: Interaction):
-                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+                clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
                 price = round(
-                    get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100) * 1000
+                    await get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100) * 1000
                 clan_storage = get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
@@ -1100,17 +1094,17 @@ class ClanHandler(commands.Cog):
                         )
                     )
                 attack_to_add = random.randint(1, 5) * 1000
-                update_clan_storage(interaction.guild.id, clan_id, -price)
-                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
-                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_storage(interaction.guild.id, clan_id, -price)
+                await update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
                 message = get_msg_from_locale_by_key(
                     interaction.guild.id, f"clan_shop_attack_buy"
                 )
-                min = get_clan_min_attack(interaction.guild.id, clan_id)
-                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                min = await get_clan_min_attack(interaction.guild.id, clan_id)
+                max = await get_clan_max_attack(interaction.guild.id, clan_id)
                 requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
                 in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
-                storage = get_clan_storage(interaction.guild.id, clan_id)
+                storage = await get_clan_storage(interaction.guild.id, clan_id)
                 await interaction.response.send_message(
                     embed=construct_basic_embed(
                         f"clan_shop_attack_buy",
@@ -1123,10 +1117,10 @@ class ClanHandler(commands.Cog):
                 )
 
             async def upgrade_attack_10000(interaction: Interaction):
-                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
+                clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
                 price = round(
-                    get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100) * 10000
-                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                    await get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100) * 10000
+                clan_storage = await get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
                     return await interaction.response.send_message(
@@ -1139,17 +1133,17 @@ class ClanHandler(commands.Cog):
                         )
                     )
                 attack_to_add = random.randint(1, 5) * 10000
-                update_clan_storage(interaction.guild.id, clan_id, -price)
-                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
-                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_storage(interaction.guild.id, clan_id, -price)
+                await update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
                 message = get_msg_from_locale_by_key(
                     interaction.guild.id, f"clan_shop_attack_buy"
                 )
-                min = get_clan_min_attack(interaction.guild.id, clan_id)
-                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                min = await get_clan_min_attack(interaction.guild.id, clan_id)
+                max = await get_clan_max_attack(interaction.guild.id, clan_id)
                 requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
                 in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
-                storage = get_clan_storage(interaction.guild.id, clan_id)
+                storage = await get_clan_storage(interaction.guild.id, clan_id)
                 await interaction.response.send_message(
                     embed=construct_basic_embed(
                         f"clan_shop_attack_buy",
@@ -1164,8 +1158,8 @@ class ClanHandler(commands.Cog):
             async def upgrade_attack_100000(interaction: Interaction):
                 clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
                 price = round(
-                    get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100) * 100000
-                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                    await get_server_clan_upgrade_attack_cost(interaction.guild.id) + (100 / (2 / min_attack)) / 100) * 100000
+                clan_storage = await get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
                     return await interaction.response.send_message(
@@ -1178,17 +1172,17 @@ class ClanHandler(commands.Cog):
                         )
                     )
                 attack_to_add = random.randint(1, 5) * 100000
-                update_clan_storage(interaction.guild.id, clan_id, -price)
-                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
-                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_storage(interaction.guild.id, clan_id, -price)
+                await update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
                 message = get_msg_from_locale_by_key(
                     interaction.guild.id, f"clan_shop_attack_buy"
                 )
-                min = get_clan_min_attack(interaction.guild.id, clan_id)
-                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                min = await get_clan_min_attack(interaction.guild.id, clan_id)
+                max = await get_clan_max_attack(interaction.guild.id, clan_id)
                 requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
                 in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
-                storage = get_clan_storage(interaction.guild.id, clan_id)
+                storage = await get_clan_storage(interaction.guild.id, clan_id)
                 await interaction.response.send_message(
                     embed=construct_basic_embed(
                         f"clan_shop_attack_buy",
@@ -1202,9 +1196,9 @@ class ClanHandler(commands.Cog):
 
             async def upgrade_attack_1000000(interaction: Interaction):
                 clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (
+                price = round(await get_server_clan_upgrade_attack_cost(interaction.guild.id) + (
                             100 / (2 / min_attack)) / 100) * 1000000
-                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                clan_storage = await get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
                     return await interaction.response.send_message(
@@ -1217,17 +1211,17 @@ class ClanHandler(commands.Cog):
                         )
                     )
                 attack_to_add = random.randint(1, 5) * 1000000
-                update_clan_storage(interaction.guild.id, clan_id, -price)
-                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
-                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_storage(interaction.guild.id, clan_id, -price)
+                await update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
                 message = get_msg_from_locale_by_key(
                     interaction.guild.id, f"clan_shop_attack_buy"
                 )
-                min = get_clan_min_attack(interaction.guild.id, clan_id)
-                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                min = await get_clan_min_attack(interaction.guild.id, clan_id)
+                max = await get_clan_max_attack(interaction.guild.id, clan_id)
                 requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
                 in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
-                storage = get_clan_storage(interaction.guild.id, clan_id)
+                storage = await get_clan_storage(interaction.guild.id, clan_id)
                 await interaction.response.send_message(
                     embed=construct_basic_embed(
                         f"clan_shop_attack_buy",
@@ -1240,10 +1234,10 @@ class ClanHandler(commands.Cog):
                 )
 
             async def upgrade_attack_10000000(interaction: Interaction):
-                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (
+                clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+                price = round(await get_server_clan_upgrade_attack_cost(interaction.guild.id) + (
                             100 / (2 / min_attack)) / 100) * 10000000
-                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                clan_storage = await get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
                     return await interaction.response.send_message(
@@ -1256,17 +1250,17 @@ class ClanHandler(commands.Cog):
                         )
                     )
                 attack_to_add = random.randint(1, 5) * 10000000
-                update_clan_storage(interaction.guild.id, clan_id, -price)
-                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
-                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_storage(interaction.guild.id, clan_id, -price)
+                await update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
                 message = get_msg_from_locale_by_key(
                     interaction.guild.id, f"clan_shop_attack_buy"
                 )
-                min = get_clan_min_attack(interaction.guild.id, clan_id)
-                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                min = await get_clan_min_attack(interaction.guild.id, clan_id)
+                max = await get_clan_max_attack(interaction.guild.id, clan_id)
                 requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
                 in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
-                storage = get_clan_storage(interaction.guild.id, clan_id)
+                storage = await get_clan_storage(interaction.guild.id, clan_id)
                 await interaction.response.send_message(
                     embed=construct_basic_embed(
                         f"clan_shop_attack_buy",
@@ -1279,10 +1273,10 @@ class ClanHandler(commands.Cog):
                 )
 
             async def upgrade_attack_100000000(interaction: Interaction):
-                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (
+                clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+                price = round(await get_server_clan_upgrade_attack_cost(interaction.guild.id) + (
                             100 / (2 / min_attack)) / 100) * 100000000
-                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                clan_storage = await get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
                     return await interaction.response.send_message(
@@ -1295,17 +1289,17 @@ class ClanHandler(commands.Cog):
                         )
                     )
                 attack_to_add = random.randint(1, 5) * 100000000
-                update_clan_storage(interaction.guild.id, clan_id, -price)
-                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
-                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_storage(interaction.guild.id, clan_id, -price)
+                await update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
                 message = get_msg_from_locale_by_key(
                     interaction.guild.id, f"clan_shop_attack_buy"
                 )
-                min = get_clan_min_attack(interaction.guild.id, clan_id)
-                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                min = await get_clan_min_attack(interaction.guild.id, clan_id)
+                max = await get_clan_max_attack(interaction.guild.id, clan_id)
                 requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
                 in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
-                storage = get_clan_storage(interaction.guild.id, clan_id)
+                storage = await get_clan_storage(interaction.guild.id, clan_id)
                 await interaction.response.send_message(
                     embed=construct_basic_embed(
                         f"clan_shop_attack_buy",
@@ -1318,10 +1312,10 @@ class ClanHandler(commands.Cog):
                 )
 
             async def upgrade_attack_1000000000(interaction: Interaction):
-                clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-                price = round(get_server_clan_upgrade_attack_cost(interaction.guild.id) + (
+                clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+                price = round(await get_server_clan_upgrade_attack_cost(interaction.guild.id) + (
                             100 / (2 / min_attack)) / 100) * 1000000000
-                clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+                clan_storage = await get_clan_storage(interaction.guild.id, clan_id)
                 if clan_storage < price:
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
                     return await interaction.response.send_message(
@@ -1334,17 +1328,17 @@ class ClanHandler(commands.Cog):
                         )
                     )
                 attack_to_add = random.randint(1, 5) * 1000000000
-                update_clan_storage(interaction.guild.id, clan_id, -price)
-                update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
-                update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_storage(interaction.guild.id, clan_id, -price)
+                await update_clan_min_attack(interaction.guild.id, clan_id, attack_to_add)
+                await update_clan_max_attack(interaction.guild.id, clan_id, attack_to_add)
                 message = get_msg_from_locale_by_key(
                     interaction.guild.id, f"clan_shop_attack_buy"
                 )
-                min = get_clan_min_attack(interaction.guild.id, clan_id)
-                max = get_clan_max_attack(interaction.guild.id, clan_id)
+                min = await get_clan_min_attack(interaction.guild.id, clan_id)
+                max = await get_clan_max_attack(interaction.guild.id, clan_id)
                 requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
                 in_storage = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
-                storage = get_clan_storage(interaction.guild.id, clan_id)
+                storage = await get_clan_storage(interaction.guild.id, clan_id)
                 await interaction.response.send_message(
                     embed=construct_basic_embed(
                         f"clan_shop_attack_buy",
@@ -1371,9 +1365,9 @@ class ClanHandler(commands.Cog):
             await interaction.response.send_message(embed=embed, view=view)
 
         async def change_clan_color(interaction: Interaction):
-            clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-            price = get_server_clan_change_color_cost(interaction.guild.id)
-            clan_storage = get_clan_storage(interaction.guild.id, clan_id)
+            clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+            price = await get_server_clan_change_color_cost(interaction.guild.id)
+            clan_storage = await get_clan_storage(interaction.guild.id, clan_id)
             if clan_storage < price:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "in_storage")
                 return await interaction.response.send_message(
@@ -1385,7 +1379,7 @@ class ClanHandler(commands.Cog):
                         f"{msg} {clan_storage}/{price}",
                     )
                 )
-            update_clan_storage(interaction.guild.id, clan_id, -price)
+            await update_clan_storage(interaction.guild.id, clan_id, -price)
             modal = ClanShopColorEntryField(clan_id)
             await interaction.response.send_modal(modal)
 
@@ -1410,7 +1404,7 @@ class ClanHandler(commands.Cog):
             interaction: Interaction,
             money: Optional[int] = SlashOption(required=True),
     ):
-        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+        if not await is_user_in_clan(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(
@@ -1429,7 +1423,7 @@ class ClanHandler(commands.Cog):
                     money,
                 )
             )
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < money:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             return await interaction.response.send_message(
@@ -1441,9 +1435,9 @@ class ClanHandler(commands.Cog):
                     f"{msg} {balance}/{money}",
                 )
             )
-        clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-        update_clan_storage(interaction.guild.id, clan_id, money)
-        update_user_balance(interaction.guild.id, interaction.user.id, -money)
+        clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+        await update_clan_storage(interaction.guild.id, clan_id, money)
+        await update_user_balance(interaction.guild.id, interaction.user.id, -money)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_{interaction.application_command.name}"
         )
@@ -1465,7 +1459,7 @@ class ClanHandler(commands.Cog):
         description_localizations=get_localized_description("clan_leave"),
     )
     async def __clan_leave(self, interaction: Interaction):
-        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+        if not await is_user_in_clan(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(
@@ -1474,7 +1468,7 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        if is_clan_owner(interaction.guild.id, interaction.user.id) is True:
+        if await is_clan_owner(interaction.guild.id, interaction.user.id) is True:
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(
@@ -1483,10 +1477,10 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-        clan_name = get_clan_name(interaction.guild.id, clan_id)
-        update_user_clan_id(interaction.guild.id, interaction.user.id, 0)
-        update_user_join_date(interaction.guild.id, interaction.user.id, "0")
+        clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+        clan_name = await get_clan_name(interaction.guild.id, clan_id)
+        await update_user_clan_id(interaction.guild.id, interaction.user.id, 0)
+        await update_user_join_date(interaction.guild.id, interaction.user.id, "0")
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_{interaction.application_command.name}"
         )
@@ -1518,7 +1512,7 @@ class ClanHandler(commands.Cog):
                 },
             ),
     ):
-        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+        if not await is_user_in_clan(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(
@@ -1527,7 +1521,7 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        if not is_user_in_clan(interaction.guild.id, user.id):
+        if not await is_user_in_clan(interaction.guild.id, user.id):
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(
@@ -1536,14 +1530,14 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        if not is_clan_owner(interaction.guild.id, interaction.user.id):
+        if not await is_clan_owner(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(interaction.guild.id, "not_clan_owner"),
                     self.client.user.avatar.url,
                 )
             )
-        if is_clan_owner(interaction.guild.id, user.id) is True:
+        if await is_clan_owner(interaction.guild.id, user.id) is True:
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(
@@ -1561,14 +1555,14 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-        clan_name = get_clan_name(interaction.guild.id, clan_id)
-        update_user_clan_id(interaction.guild.id, user.id, 0)
-        update_user_join_date(interaction.guild.id, user.id, "0")
+        clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+        clan_name = await get_clan_name(interaction.guild.id, clan_id)
+        await update_user_clan_id(interaction.guild.id, user.id, 0)
+        await update_user_join_date(interaction.guild.id, user.id, "0")
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_{interaction.application_command.name}"
         )
-        if role := nextcord.utils.get(interaction.guild.roles, id=get_clan_role(interaction.guild.id, clan_id)):
+        if role := nextcord.utils.get(interaction.guild.roles, id=await get_clan_role(interaction.guild.id, clan_id)):
             await user.remove_roles(role)
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         await interaction.response.send_message(
@@ -1588,7 +1582,7 @@ class ClanHandler(commands.Cog):
         description_localizations=get_localized_description("clan_members"),
     )
     async def __clan_list_members(self, interaction: Interaction):
-        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+        if not await is_user_in_clan(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(
@@ -1597,10 +1591,12 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-        clan_members = fetchall_clan_members(interaction.guild.id, clan_id)
+        clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+        clan_members = await fetchall_clan_members(interaction.guild.id, clan_id)
         members = []
+        print(clan_members)
         for row in clan_members:
+            print(row)
             try:
                 member = await self.client.fetch_user(row[0])
                 member = member.name
@@ -1619,7 +1615,7 @@ class ClanHandler(commands.Cog):
         description_localizations=get_localized_description("clan_disband"),
     )
     async def __clan_disband(self, interaction: Interaction):
-        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+        if not await is_user_in_clan(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(
@@ -1628,16 +1624,16 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        if not is_clan_owner(interaction.guild.id, interaction.user.id):
+        if not await is_clan_owner(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(interaction.guild.id, "not_clan_owner"),
                     self.client.user.avatar.url,
                 )
             )
-        clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-        clan_name = get_clan_name(interaction.guild.id, clan_id)
-        clan_channel = get_clan_channel(interaction.guild.id, clan_id)
+        clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+        clan_name = await get_clan_name(interaction.guild.id, clan_id)
+        clan_channel = await get_clan_channel(interaction.guild.id, clan_id)
         try:
             clan_channel = nextcord.utils.get(
                 interaction.guild.channels, id=clan_channel
@@ -1645,17 +1641,17 @@ class ClanHandler(commands.Cog):
             await clan_channel.delete()
         except:
             pass
-        clan_role = get_clan_role(interaction.guild.id, clan_id)
+        clan_role = await get_clan_role(interaction.guild.id, clan_id)
         try:
             clan_role = nextcord.utils.get(interaction.guild.roles, id=clan_role)
             await clan_role.delete()
         except:
             pass
-        clan_members = fetchall_clan_members(interaction.guild.id, clan_id)
+        clan_members = await fetchall_clan_members(interaction.guild.id, clan_id)
         for row in clan_members:
             member_id = row[0]
-            update_user_clan_id(interaction.guild.id, member_id, 0)
-            update_user_join_date(interaction.guild.id, member_id, "0")
+            await update_user_clan_id(interaction.guild.id, member_id, 0)
+            await update_user_join_date(interaction.guild.id, member_id, "0")
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_{interaction.application_command.name}"
         )
@@ -1687,7 +1683,7 @@ class ClanHandler(commands.Cog):
                 },
             ),
     ):
-        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+        if not await is_user_in_clan(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(
@@ -1696,7 +1692,7 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        if is_user_in_clan(interaction.guild.id, user.id) is True:
+        if await is_user_in_clan(interaction.guild.id, user.id) is True:
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(
@@ -1705,7 +1701,7 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        if not is_clan_owner(interaction.guild.id, interaction.user.id):
+        if not await is_clan_owner(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(interaction.guild.id, "not_clan_owner"),
@@ -1721,9 +1717,9 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-        clan_members = fetchall_clan_members(interaction.guild.id, clan_id)
-        if len(clan_members) >= get_clan_member_limit(interaction.guild.id, clan_id):
+        clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+        clan_members = await fetchall_clan_members(interaction.guild.id, clan_id)
+        if len(clan_members) >= await get_clan_member_limit(interaction.guild.id, clan_id):
             embed = nextcord.Embed(
                 title="error",
                 description=get_msg_from_locale_by_key(
@@ -1732,19 +1728,20 @@ class ClanHandler(commands.Cog):
                 color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
-        clan_name = get_clan_name(interaction.guild.id, clan_id)
+        clan_name = await get_clan_name(interaction.guild.id, clan_id)
         author = interaction.user
 
         async def invite_yes(interaction: Interaction):
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"clan_invite_yes"
             )
-            update_user_clan_id(interaction.guild.id, user.id, clan_id)
+            await update_user_clan_id(interaction.guild.id, user.id, clan_id)
             timestamp = nextcord.utils.format_dt(datetime.datetime.now())
-            clan_role = get_clan_role(interaction.guild.id, clan_id)
+            clan_role = await get_clan_role(interaction.guild.id, clan_id)
             clan_role = nextcord.utils.get(interaction.guild.roles, id=clan_role)
+            print(clan_role)
             await user.add_roles(clan_role)
-            update_user_join_date(interaction.guild.id, interaction.user.id, timestamp)
+            await update_user_join_date(interaction.guild.id, interaction.user.id, timestamp)
             yes_button = create_button(
                 get_msg_from_locale_by_key(interaction.guild.id, "yes"), False, True
             )
@@ -1833,7 +1830,7 @@ class ClanHandler(commands.Cog):
     )
     @cooldowns.cooldown(1, 21600, bucket=cooldowns.SlashBucket.author)
     async def __clan_attack_clan_boss(self, interaction: Interaction):
-        if not is_user_in_clan(interaction.guild.id, interaction.user.id):
+        if not await is_user_in_clan(interaction.guild.id, interaction.user.id):
             return await interaction.response.send_message(
                 embed=construct_clan_error_embed(
                     get_msg_from_locale_by_key(
@@ -1842,13 +1839,13 @@ class ClanHandler(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        clan_id = get_user_clan_id(interaction.guild.id, interaction.user.id)
-        min_attack, max_attack = get_clan_min_attack(
+        clan_id = await get_user_clan_id(interaction.guild.id, interaction.user.id)
+        min_attack, max_attack = await get_clan_min_attack(
             interaction.guild.id, clan_id
-        ), get_clan_max_attack(interaction.guild.id, clan_id)
+        ), await get_clan_max_attack(interaction.guild.id, clan_id)
         attack_amount = random.randint(min_attack, max_attack)
-        update_clan_boss_hp(interaction.guild.id, clan_id, -attack_amount)
-        boss_hp_after_attack = get_clan_guild_boss_hp(interaction.guild.id, clan_id)
+        await update_clan_boss_hp(interaction.guild.id, clan_id, -attack_amount)
+        boss_hp_after_attack = await get_clan_guild_boss_hp(interaction.guild.id, clan_id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_{interaction.application_command.name}"
         )
@@ -1859,8 +1856,8 @@ class ClanHandler(commands.Cog):
         description = (
             f"{message} **{attack_amount}**\n{message_2} **{boss_hp_after_attack}**"
         )
-        if not boss_alive(interaction.guild.id, clan_id):
-            money_added, exp_added = accomplish_boss_rewards(
+        if not await boss_alive(interaction.guild.id, clan_id):
+            money_added, exp_added = await accomplish_boss_rewards(
                 interaction.guild.id, clan_id
             )
             dead_boss_message = get_msg_from_locale_by_key(
@@ -1868,8 +1865,8 @@ class ClanHandler(commands.Cog):
             )
             currency_symbool = get_guild_currency_symbol(interaction.guild.id)
             description += f"\n{dead_boss_message}\n **{money_added}** {currency_symbool} , **{exp_added}** EXP"
-            resurrect_boss(interaction.guild.id, clan_id)
-            calculate_level(interaction.guild.id, clan_id)
+            await resurrect_boss(interaction.guild.id, clan_id)
+            await calculate_level(interaction.guild.id, clan_id)
         embed = construct_basic_embed(
             interaction.application_command.name,
             description,
@@ -1908,8 +1905,8 @@ class ClanHandler(commands.Cog):
                     money,
                 )
             )
-        update_server_clan_create_cost(interaction.guild.id, money)
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        await update_server_clan_create_cost(interaction.guild.id, money)
+        currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_config_{interaction.application_command.name}"
         )
@@ -1944,8 +1941,8 @@ class ClanHandler(commands.Cog):
                     money,
                 )
             )
-        update_server_clan_upgrade_attack_cost(interaction.guild.id, money)
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        await update_server_clan_upgrade_attack_cost(interaction.guild.id, money)
+        currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_config_{interaction.application_command.name}"
         )
@@ -1980,8 +1977,8 @@ class ClanHandler(commands.Cog):
                     money,
                 )
             )
-        update_server_clan_upgrade_limit_cost(interaction.guild.id, money)
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        await update_server_clan_upgrade_limit_cost(interaction.guild.id, money)
+        currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_config_{interaction.application_command.name}"
         )
@@ -2016,8 +2013,8 @@ class ClanHandler(commands.Cog):
                     money,
                 )
             )
-        update_server_clan_change_icon_cost(interaction.guild.id, money)
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        await update_server_clan_change_icon_cost(interaction.guild.id, money)
+        currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_config_{interaction.application_command.name}"
         )
@@ -2052,8 +2049,8 @@ class ClanHandler(commands.Cog):
                     money,
                 )
             )
-        update_server_clan_change_image_cost(interaction.guild.id, money)
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        await update_server_clan_change_image_cost(interaction.guild.id, money)
+        currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_config_{interaction.application_command.name}"
         )
@@ -2088,8 +2085,8 @@ class ClanHandler(commands.Cog):
                     money,
                 )
             )
-        update_server_clan_upgrade_boss_cost(interaction.guild.id, money)
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        await update_server_clan_upgrade_boss_cost(interaction.guild.id, money)
+        currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_config_{interaction.application_command.name}"
         )
@@ -2124,8 +2121,8 @@ class ClanHandler(commands.Cog):
                     money,
                 )
             )
-        update_server_change_color_cost(interaction.guild.id, money)
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        await update_server_change_color_cost(interaction.guild.id, money)
+        currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_config_{interaction.application_command.name}"
         )
@@ -2150,7 +2147,7 @@ class ClanHandler(commands.Cog):
             self, interaction: Interaction,
             enabled: Optional[bool] = SlashOption(required=True)
     ):
-        update_server_create_clan_channels(interaction.guild.id, enabled)
+        await update_server_create_clan_channels(interaction.guild.id, enabled)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"clan_config_{interaction.application_command.name}"
         )
@@ -2184,7 +2181,7 @@ class ClanHandler(commands.Cog):
             clan_voice_category: Optional[nextcord.abc.GuildChannel] = SlashOption(required=True)
     ):
         if isinstance(clan_voice_category, nextcord.CategoryChannel):
-            update_server_clan_voice_category(interaction.guild.id, clan_voice_category.id)
+            await update_server_clan_voice_category(interaction.guild.id, clan_voice_category.id)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"clan_config_{interaction.application_command.name}"
             )

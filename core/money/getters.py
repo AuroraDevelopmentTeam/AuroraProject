@@ -1,110 +1,77 @@
 import sqlite3
+from typing import Any
+
+from ..db_utils import fetch_all, fetch_one
 
 
-def get_user_balance(guild_id: int, user_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    balance = cursor.execute(
+async def get_user_balance(guild_id: int, user_id: int) -> int:
+    balance = await fetch_one(
         f"SELECT balance FROM money WHERE guild_id = {guild_id} AND user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return balance
+    )
+    return balance[0]
 
 
-def get_guild_currency_symbol(guild_id: int) -> str:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    currency_symbol = cursor.execute(
+async def get_guild_currency_symbol(guild_id: int) -> str:
+    currency_symbol = await fetch_one(
         f"SELECT guild_currency FROM money_config" f" WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return currency_symbol
+    )
+    return currency_symbol[0]
 
 
-def get_guild_starting_balance(guild_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    starting_balance = cursor.execute(
+async def get_guild_starting_balance(guild_id: int) -> int:
+    starting_balance = await fetch_one(
         f"SELECT guild_starting_balance FROM money_config"
         f" WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return starting_balance
+    )
+    return starting_balance[0]
 
 
-def get_guild_payday_amount(guild_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    payday_amount = cursor.execute(
+async def get_guild_payday_amount(guild_id: int) -> int:
+    payday_amount = await fetch_one(
         f"SELECT guild_payday_amount FROM money_config" f" WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return payday_amount
+    )
+    return payday_amount[0]
 
 
-def get_guild_min_max_msg_income(guild_id: int) -> list[int, int]:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    income = cursor.execute(
+async def get_guild_min_max_msg_income(guild_id: int) -> list[tuple | Any]:
+    income = await fetch_one(
         f"SELECT min_msg_income, max_msg_income FROM chat_money_config"
         f" WHERE guild_id = {guild_id}"
-    ).fetchone()
+    )
     min_income = income[0]
     max_income = income[1]
-    cursor.close()
-    db.close()
     return [min_income, max_income]
 
 
-def get_msg_cooldown(guild_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    msg_cooldown = cursor.execute(
+async def get_msg_cooldown(guild_id: int) -> int:
+    msg_cooldown = await fetch_one(
         f"SELECT msg_cooldown FROM chat_money_config" f" WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return msg_cooldown
+    )
+    return msg_cooldown[0]
 
 
-def get_guild_min_max_voice_income(guild_id: int) -> list[int, int]:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    income = cursor.execute(
+async def get_guild_min_max_voice_income(guild_id: int) -> list[tuple | Any]:
+    income = await fetch_one(
         f"SELECT min_voice_income, max_voice_income FROM chat_money_config"
         f" WHERE guild_id = {guild_id}"
-    ).fetchone()
+    )
     min_income = income[0]
     max_income = income[1]
-    cursor.close()
-    db.close()
     return [min_income, max_income]
 
 
-def get_voice_minutes_for_income(guild_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    voice_minutes = cursor.execute(
+async def get_voice_minutes_for_income(guild_id: int) -> int:
+    voice_minutes = await fetch_one(
         f"SELECT voice_minutes_for_money FROM chat_money_config"
         f" WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return voice_minutes
+    )
+    return voice_minutes[0]
 
 
-def get_channel_income_state(guild_id: int, channel_id: int) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    messages_state = cursor.execute(
+async def get_channel_income_state(guild_id: int, channel_id: int) -> bool:
+    messages_state = await fetch_one(
         f"SELECT enabled FROM money_channels_config WHERE guild_id = {guild_id} AND channel_id = {channel_id}"
-    ).fetchone()
-    cursor.close()
-    db.close()
+    )
     if messages_state is None:
         return True
     else:
@@ -112,26 +79,18 @@ def get_channel_income_state(guild_id: int, channel_id: int) -> bool:
         return bool(state)
 
 
-def list_income_roles(guild_id: int):
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    rows = cursor.execute(
+async def list_income_roles(guild_id: int):
+    rows = await fetch_all(
         f"SELECT role_id, income FROM roles_money WHERE guild_id = {guild_id}"
-    ).fetchall()
-    cursor.close()
-    db.close()
+    )
     return rows
 
 
-def get_all_users(guild_id: int) -> list[tuple[int]]:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    rows = cursor.execute(
+async def get_all_users(guild_id: int) -> list[tuple[int]]:
+    rows = await fetch_all(
         f"SELECT user_id FROM money WHERE guild_id = {guild_id}"
-    ).fetchall()
+    )
     rows_list = []
     for row in rows:
         rows_list.append(row[0])
-    cursor.close()
-    db.close()
     return rows_list

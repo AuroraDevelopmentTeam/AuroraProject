@@ -1,13 +1,9 @@
-import sqlite3
+from ..db_utils import execute_update
+from .getters import LOCALE_CACHE
 
 
-def update_guild_locale(locale: str, guild_id: int) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    sql = "UPDATE locales SET locale = ? WHERE guild_id = ?"
+async def update_guild_locale(locale: str, guild_id: int) -> None:
+    sql = "UPDATE locales SET locale = %s WHERE guild_id = %s"
     values = (locale, guild_id)
-    cursor.execute(sql, values)
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    await execute_update(sql, values)
+    LOCALE_CACHE[guild_id] = locale

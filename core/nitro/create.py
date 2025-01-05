@@ -1,5 +1,5 @@
 import typing
-import sqlite3
+from ..db_utils import execute_update, fetch_one
 import nextcord
 
 from easy_pil import *
@@ -7,34 +7,29 @@ from core.embeds import DEFAULT_BOT_COLOR
 import re
 
 
-def create_on_nitro_config() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
-        f"""CREATE TABLE IF NOT EXISTS on_nitro_config (guild_id INTERGER, nitro_message_enabled BOOLEAN, 
-    nitro_message_channel INTERGER, 
+async def create_on_nitro_config() -> None:
+    await execute_update(
+        f"""CREATE TABLE IF NOT EXISTS on_nitro_config (guild_id BIGINT, nitro_message_enabled BOOLEAN, 
+    nitro_message_channel BIGINT, 
     nitro_message_title TEXT, nitro_message_description TEXT, nitro_message_url TEXT )"""
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return
 
 
-def create_server_nitro_embed(
+async def create_server_nitro_embed(
     member: typing.Union[nextcord.Member, nextcord.User], guild: nextcord.Guild
 ) -> nextcord.Embed:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    welcome_message_title = cursor.execute(
+    welcome_message_title = await fetch_one(
         f"SELECT nitro_message_title FROM on_nitro_config WHERE guild_id = {guild.id}"
-    ).fetchone()[0]
-    welcome_message_description = cursor.execute(
+    )
+    welcome_message_title = welcome_message_title[0]
+    welcome_message_description = await fetch_one(
         f"SELECT nitro_message_description FROM on_nitro_config WHERE guild_id = {guild.id}"
-    ).fetchone()[0]
-    welcome_message_url = cursor.execute(
+    )
+    welcome_message_description = welcome_message_description[0]
+    welcome_message_url = await fetch_one(
         f"SELECT nitro_message_url FROM on_nitro_config WHERE guild_id = {guild.id}"
-    ).fetchone()[0]
+    )
+    welcome_message_url = welcome_message_url[0]
     if "{member.mention}" in welcome_message_title:
         welcome_message_title = welcome_message_title.replace(
             "{member.mention}", f"{member.mention}"
@@ -121,9 +116,6 @@ def create_server_nitro_embed(
             welcome_message_description = welcome_message_description.replace(
                 channel, really_channel.mention
             )
-    db.commit()
-    cursor.close()
-    db.close()
     embed = nextcord.Embed(
         color=DEFAULT_BOT_COLOR,
         title=f"{welcome_message_title}",

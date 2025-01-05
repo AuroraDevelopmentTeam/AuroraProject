@@ -3,132 +3,92 @@ from typing import List, Any
 
 import nextcord
 
+from ...db_utils import fetch_one, fetch_all
 
-def get_server_autorole_state(guild_id: int) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    autoroles_state = cursor.execute(
+
+async def get_server_autorole_state(guild_id: int) -> bool:
+    autoroles_state = await fetch_one(
         f"SELECT autoroles_enabled FROM autoroles WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
+    )[0]
     return bool(autoroles_state)
 
 
-def get_server_autorole_id(guild_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    autorole_id = cursor.execute(
+async def get_server_autorole_id(guild_id: int) -> int:
+    autorole_id = await fetch_one(
         f"SELECT autorole_id FROM autoroles WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
+    )[0]
     return autorole_id
 
 
-def get_server_reaction_autorole(
+async def get_server_reaction_autorole(
         guild_id: int, channel_id: int, message_id: int, reaction: str
 ) -> list[int]:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
     list_of_autoroles = []
-    for row in cursor.execute(
+    async for row in await fetch_all(
             f"SELECT autorole_id FROM reaction_autorole WHERE guild_id = {guild_id} AND channel_id = {channel_id} AND "
             f"message_id = {message_id} AND reaction = '{reaction}'"
     ):
         list_of_autoroles.append(row[0])
-    cursor.close()
-    db.close()
     return list_of_autoroles
 
 
-def check_reaction_autorole(guild_id: int, role: nextcord.Role) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    autorole_id = cursor.execute(
+async def check_reaction_autorole(guild_id: int, role: nextcord.Role) -> bool:
+    autorole_id = fetch_one(
         f"SELECT autorole_id FROM reaction_autorole WHERE guild_id = {guild_id} AND autorole_id = {role.id}"
-    ).fetchone()
-    cursor.close()
-    db.close()
+    )
     if autorole_id is not None:
         return True
     else:
         return False
 
 
-def check_level_autorole(guild_id: int, level: int) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    autorole_id = cursor.execute(
+async def check_level_autorole(guild_id: int, level: int) -> bool:
+    autorole_id = await fetch_one(
         f"SELECT autorole_id FROM autoroles_level WHERE guild_id = {guild_id} AND level = {level}"
-    ).fetchone()
-    cursor.close()
-    db.close()
+    )
     if autorole_id is not None:
         return True
     else:
         return False
 
 
-def get_server_level_autorole(guild_id: int, level: int):
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    autorole_id = cursor.execute(
+async def get_server_level_autorole(guild_id: int, level: int):
+    autorole_id = await fetch_one(
         f"SELECT autorole_id FROM autoroles_level WHERE guild_id = {guild_id} AND level = {level}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
+    )[0]
     return autorole_id
 
 
-def list_level_autoroles(guild_id: int):
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    rows = cursor.execute(
+async def list_level_autoroles(guild_id: int):
+    rows = await fetch_all(
         f"SELECT autorole_id, level FROM autoroles_level WHERE guild_id = {guild_id}"
-    ).fetchall()
-    cursor.close()
-    db.close()
+    )
     return rows
 
 
-def list_reaction_autoroles(guild_id: int):
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    rows = cursor.execute(
+async def list_reaction_autoroles(guild_id: int):
+    rows = await fetch_all(
         f"SELECT autorole_id, reaction FROM reaction_autorole WHERE guild_id = {guild_id}"
-    ).fetchall()
-    cursor.close()
-    db.close()
+    )
     return rows
 
 
-def get_autorole_lvl_deletion_state(guild_id: int) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    remove_lvl_roles = cursor.execute(
+async def get_autorole_lvl_deletion_state(guild_id: int) -> bool:
+    remove_lvl_roles = await fetch_one(
         f"SELECT remove_lvl_roles FROM autorole_bool WHERE guild_id = {guild_id}"
-    ).fetchone()
-    cursor.close()
-    db.close()
+    )
     return bool(remove_lvl_roles)
 
 
-def get_lesser_lvl_roles_list(guild_id: int, level: int) -> list:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    all_roles = cursor.execute(
+async def get_lesser_lvl_roles_list(guild_id: int, level: int) -> list:
+    all_roles = await fetch_all(
         f"SELECT autorole_id FROM autoroles_level WHERE level < {level} AND guild_id = {guild_id}"
-    ).fetchall()
+    )
     return all_roles
 
 
-def get_server_marriage_autorole(guild_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    marriage_autorole = cursor.execute(
+async def get_server_marriage_autorole(guild_id: int) -> int:
+    marriage_autorole = await fetch_one(
         f"SELECT autorole_id FROM autoroles_marriage WHERE guild_id = {guild_id}"
-    ).fetchone()
-    cursor.close()
-    db.close()
+    )
     return marriage_autorole

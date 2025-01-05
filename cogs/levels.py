@@ -42,9 +42,9 @@ class Levels(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    def level_up(self, guild_id, user_id):
-        user_exp = get_user_exp(guild_id, user_id)
-        user_level = get_user_level(guild_id, user_id)
+    async def level_up(self, guild_id, user_id):
+        user_exp = await get_user_exp(guild_id, user_id)
+        user_level = await get_user_level(guild_id, user_id)
         leveling_formula = round((7 * (user_level ** 2)) + 58)
         if user_exp >= leveling_formula:
             return True
@@ -55,26 +55,26 @@ class Levels(commands.Cog):
     async def on_message(self, message):
         if message.author.bot:
             return
-        if get_channel_level_state(message.guild.id, message.channel.id) is False:
+        if await get_channel_level_state(message.guild.id, message.channel.id) is False:
             return
-        elif self.level_up(message.guild.id, message.author.id):
-            update_user_level(message.guild.id, message.author.id, 1)
-            set_user_exp_to_zero(message.guild.id, message.author.id)
-            user_level = get_user_level(message.guild.id, message.author.id)
-            if check_level_autorole(message.guild.id, user_level) is True:
-                role = get_server_level_autorole(message.guild.id, user_level)
+        elif await self.level_up(message.guild.id, message.author.id):
+            await update_user_level(message.guild.id, message.author.id, 1)
+            await set_user_exp_to_zero(message.guild.id, message.author.id)
+            user_level = await get_user_level(message.guild.id, message.author.id)
+            if await check_level_autorole(message.guild.id, user_level) is True:
+                role = await get_server_level_autorole(message.guild.id, user_level)
                 role = nextcord.utils.get(message.guild.roles, id=role)
                 await message.author.add_roles(role)
-                if get_autorole_lvl_deletion_state(message.guild.id) is True:
-                    roles_list = get_lesser_lvl_roles_list(message.guild.id, user_level)
+                if await get_autorole_lvl_deletion_state(message.guild.id) is True:
+                    roles_list = await get_lesser_lvl_roles_list(message.guild.id, user_level)
                     for rolee in roles_list:
                         try:
                             role = nextcord.utils.get(message.author.guild.roles, id=rolee[0])
                             await message.author.remove_roles(role)
                         except Exception as error:
                             print(error)
-            if get_guild_messages_state(message.guild.id) is True:
-                user_level = get_user_level(message.guild.id, message.author.id)
+            if await get_guild_messages_state(message.guild.id) is True:
+                user_level = await get_user_level(message.guild.id, message.author.id)
                 msg = get_msg_from_locale_by_key(message.guild.id, "level_up")
                 embed = construct_basic_embed(
                     f"{message.author}",
@@ -87,8 +87,8 @@ class Levels(commands.Cog):
             else:
                 pass
         else:
-            min_exp, max_exp = get_min_max_exp(message.guild.id)
-            update_user_exp(message.guild.id, message.author.id, min_exp, max_exp)
+            min_exp, max_exp = await get_min_max_exp(message.guild.id)
+            await update_user_exp(message.guild.id, message.author.id, min_exp, max_exp)
 
     @nextcord.slash_command(
         name="level",
@@ -113,8 +113,8 @@ class Levels(commands.Cog):
                 )
             )
         await interaction.response.defer()
-        user_exp = get_user_exp(interaction.guild.id, user.id)
-        user_level = get_user_level(interaction.guild.id, user.id)
+        user_exp = await get_user_exp(interaction.guild.id, user.id)
+        user_level = await get_user_level(interaction.guild.id, user.id)
         exp_to_next_level = round((7 * (user_level ** 2)) + 58)
         percentage = int(((user_exp * 100) / exp_to_next_level))
         background = Editor(Canvas((900, 300), color="#141414"))
@@ -204,26 +204,26 @@ class Levels(commands.Cog):
                 )
             )
         min_exp, max_exp = exp_points, exp_points
-        update_user_exp(interaction.guild.id, user.id, min_exp, max_exp)
-        user_level = get_user_level(interaction.guild.id, user.id)
-        user_exp = get_user_exp(interaction.guild.id, user.id)
+        await update_user_exp(interaction.guild.id, user.id, min_exp, max_exp)
+        user_level = await get_user_level(interaction.guild.id, user.id)
+        user_exp = await get_user_exp(interaction.guild.id, user.id)
         if user_exp > 0:
             leveling_formula = round((7 * (user_level ** 2)) + 58)
-            while self.level_up(interaction.guild.id, interaction.user.id):
-                update_user_exp(
+            while await self.level_up(interaction.guild.id, interaction.user.id):
+                await update_user_exp(
                     interaction.guild.id,
                     interaction.user.id,
                     -leveling_formula,
                     -leveling_formula,
                 )
-                update_user_level(interaction.guild.id, interaction.user.id, 1)
-                user_level = get_user_level(interaction.guild.id, user.id)
-                if check_level_autorole(interaction.guild.id, user_level) is True:
-                    role = get_server_level_autorole(interaction.guild.id, user_level)
+                await update_user_level(interaction.guild.id, interaction.user.id, 1)
+                user_level = await get_user_level(interaction.guild.id, user.id)
+                if await check_level_autorole(interaction.guild.id, user_level) is True:
+                    role = await get_server_level_autorole(interaction.guild.id, user_level)
                     role = nextcord.utils.get(interaction.guild.roles, id=role)
                     await user.add_roles(role)
-                    if get_autorole_lvl_deletion_state(interaction.guild.id) is True:
-                        roles_list = get_lesser_lvl_roles_list(interaction.guild.id, user_level)
+                    if await get_autorole_lvl_deletion_state(interaction.guild.id) is True:
+                        roles_list = await get_lesser_lvl_roles_list(interaction.guild.id, user_level)
                         for rolee in roles_list:
                             try:
                                 role = nextcord.utils.get(interaction.guild.roles, id=rolee[0])
@@ -292,7 +292,7 @@ class Levels(commands.Cog):
                 )
             )
         min_exp, max_exp = exp_points, exp_points
-        update_user_exp(interaction.guild.id, user.id, -min_exp, -max_exp)
+        await update_user_exp(interaction.guild.id, user.id, -min_exp, -max_exp)
         msg = get_msg_from_locale_by_key(
             interaction.guild.id, interaction.application_command.name
         )

@@ -64,17 +64,17 @@ class OnMessageListener(commands.Cog):
         guild = message.guild
         member = message.author
         if not message.author.bot:
-            if is_user_in_table("money", guild.id, member.id) is False:
-                write_member_in_money(guild, member)
-                write_member_in_levels(guild, member)
-                write_member_in_profiles(guild, member)
-                write_member_in_marriage(guild, member)
-                write_member_in_gifts(guild, member)
-                write_member_in_honor(member)
-                write_member_in_profiles(guild, member)
-                write_member_in_stats(guild, member)
-                write_member_in_badges(guild, member)
-                write_member_in_clan(guild, member)
+            if await is_user_in_table("money", guild.id, member.id) is False:
+                await write_member_in_money(guild, member)
+                await write_member_in_levels(guild, member)
+                await write_member_in_profiles(guild, member)
+                await write_member_in_marriage(guild, member)
+                await write_member_in_gifts(guild, member)
+                await write_member_in_honor(member)
+                await write_member_in_profiles(guild, member)
+                await write_member_in_stats(guild, member)
+                await write_member_in_badges(guild, member)
+                await write_member_in_clan(guild, member)
             else:
                 return
 

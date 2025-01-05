@@ -58,21 +58,22 @@ class StatisticsCounter(commands.Cog):
     async def on_message(self, message: nextcord.Message):
         if not message.author.bot:
             try:
-                if get_channel_stats_state(message.guild.id, message.channel.id) is True:
-                    update_user_messages_counter(message.guild.id, message.author.id, 1)
-                if get_channel_income_state(message.guild.id, message.channel.id) is False:
+                if await get_channel_stats_state(message.guild.id, message.channel.id) is True:
+                    await update_user_messages_counter(message.guild.id, message.author.id, 1)
+                if await get_channel_income_state(message.guild.id, message.channel.id) is False:
                     return
-                message_counter = get_user_messages_counter(
+                message_counter = await get_user_messages_counter(
                     message.guild.id, message.author.id
                 )
                 try:
-                    messages_for_money = get_msg_cooldown(message.guild.id)
+                    messages_for_money = await get_msg_cooldown(message.guild.id)
                 except TypeError as error:
                     messages_for_money = 10
+                    print(error)
                 if message_counter % messages_for_money == 0:
                     try:
-                        min, max = get_guild_min_max_msg_income(message.guild.id)
-                        update_user_balance(
+                        min, max = await get_guild_min_max_msg_income(message.guild.id)
+                        await update_user_balance(
                             message.guild.id, message.author.id, random.randint(min, max)
                         )
                     except TypeError:
@@ -86,48 +87,48 @@ class StatisticsCounter(commands.Cog):
             return
 
         if before.channel is not None and after.channel is None:
-            join_time = get_user_join_time(member.guild.id, member.id)
+            join_time = await get_user_join_time(member.guild.id, member.id)
             join_time = int(join_time)
             if join_time != 0:
                 voice_leave_time = int(datetime.datetime.now().timestamp())
                 calculate_time = voice_leave_time-join_time
                 second_in_voice = calculate_time
-                update_user_join_time(member.guild.id, member.id, "0")
-                update_user_time_in_voice(member.guild.id, member.id, second_in_voice)
+                await update_user_join_time(member.guild.id, member.id, "0")
+                await update_user_time_in_voice(member.guild.id, member.id, second_in_voice)
 
                 minutes_in_voice = int(second_in_voice / 60)
                 try:
-                    voice_minutes_for_income = get_voice_minutes_for_income(member.guild.id)
-                    min, max = get_guild_min_max_voice_income(member.guild.id)
+                    voice_minutes_for_income = await get_voice_minutes_for_income(member.guild.id)
+                    min, max = await get_guild_min_max_voice_income(member.guild.id)
                     money_to_update = (
                         int(minutes_in_voice // voice_minutes_for_income)
                     ) * random.randint(min, max)
-                    update_user_balance(member.guild.id, member.id, money_to_update)
+                    await update_user_balance(member.guild.id, member.id, money_to_update)
 
-                    min_exp, max_exp = get_min_max_exp(member.guild.id)
+                    min_exp, max_exp = await get_min_max_exp(member.guild.id)
                     exp = random.randint(min_exp, max_exp) * (int(minutes_in_voice // 5))
-                    update_user_exp(member.guild.id, member.id, exp, exp)
+                    await update_user_exp(member.guild.id, member.id, exp, exp)
                     user_level = get_user_level(member.guild.id, member.id)
                     user_exp = get_user_exp(member.guild.id, member.id)
                     if user_exp > 0:
                         leveling_formula = round((7 * (user_level**2)) + 58)
                         while self.level_up(member.guild.id, member.id):
-                            update_user_exp(
+                            await update_user_exp(
                                 member.guild.id,
                                 member.id,
                                 -leveling_formula,
                                 -leveling_formula,
                             )
-                            update_user_level(member.guild.id, member.id, 1)
-                            user_level = get_user_level(member.guild.id, member.id)
-                            if check_level_autorole(member.guild.id, user_level) is True:
-                                role = get_server_level_autorole(
+                            await update_user_level(member.guild.id, member.id, 1)
+                            user_level = await get_user_level(member.guild.id, member.id)
+                            if await check_level_autorole(member.guild.id, user_level) is True:
+                                role = await get_server_level_autorole(
                                     member.guild.id, user_level
                                 )
                                 role = nextcord.utils.get(member.guild.roles, id=role)
                                 await member.add_roles(role)
-                                if get_autorole_lvl_deletion_state(member.guild.id) is True:
-                                    roles_list = get_lesser_lvl_roles_list(member.guild.id, user_level)
+                                if await get_autorole_lvl_deletion_state(member.guild.id) is True:
+                                    roles_list = await get_lesser_lvl_roles_list(member.guild.id, user_level)
                                     for rolee in roles_list:
                                         try:
                                             role = nextcord.utils.get(member.guild.roles, id=rolee[0])
@@ -140,7 +141,7 @@ class StatisticsCounter(commands.Cog):
 
         elif before.channel is None and after.channel is not None:
             join_time = str(int(datetime.datetime.now().timestamp()))
-            update_user_join_time(member.guild.id, member.id, join_time)
+            await update_user_join_time(member.guild.id, member.id, join_time)
         else:
             pass
 
@@ -166,7 +167,7 @@ class StatisticsCounter(commands.Cog):
             user = interaction.user
         if user.bot:
             return await interaction.response.send_message("bot_user_error")
-        voice_time = get_user_time_in_voice(interaction.guild.id, user.id)
+        voice_time = await get_user_time_in_voice(interaction.guild.id, user.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"{interaction.application_command.name}"
         )
@@ -199,7 +200,7 @@ class StatisticsCounter(commands.Cog):
     async def __messages_counter_channel(self, interaction: Interaction,
                                          channel: Optional[GuildChannel] = SlashOption(required=True),
                                          enabled: Optional[bool] = SlashOption(required=True)):
-        write_channel_in_config(interaction.guild.id, channel.id, enabled)
+        await write_channel_in_config(interaction.guild.id, channel.id, enabled)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"{interaction.application_command.name}"
         )
@@ -243,7 +244,7 @@ class StatisticsCounter(commands.Cog):
             user = interaction.user
         if user.bot:
             return await interaction.response.send_message("bot_user_error")
-        msg_count = get_user_messages_counter(interaction.guild.id, user.id)
+        msg_count = await get_user_messages_counter(interaction.guild.id, user.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"{interaction.application_command.name}"
         )

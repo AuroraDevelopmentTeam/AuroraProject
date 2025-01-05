@@ -1,4 +1,4 @@
-import sqlite3
+from ..db_utils import execute_update
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 import random
@@ -19,83 +19,54 @@ from core.money.getters import get_guild_currency_symbol
 from core.emojify import *
 
 
-def create_marriage_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
+async def create_marriage_table() -> None:
+    await execute_update(
         f"""CREATE TABLE IF NOT EXISTS marriage (
-        guild_id INTEGER, user_id INTEGER, pair_id INTEGER, like_id INTEGER, 
+        guild_id BIGINT, user_id BIGINT, pair_id INTEGER, like_id INTEGER, 
         divorces INTEGER, love_description TEXT, date TEXT, family_money INTEGER, loveroom_expire INTEGER, 
         loveroom_id INTEGER)"""
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return
 
 
-def create_marriage_config_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
-        f"""CREATE TABLE IF NOT EXISTS marriage_config ( guild_id INTEGER, enable_loverooms BOOL, marriage_price 
+async def create_marriage_config_table() -> None:
+    await execute_update(
+        f"""CREATE TABLE IF NOT EXISTS marriage_config ( guild_id BIGINT, enable_loverooms BOOL, marriage_price 
         INTEGER, month_loveroom_price INTEGER, loveroom_category INTEGER) """
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return
 
 
-def create_gifts_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
+async def create_gifts_table() -> None:
+    await execute_update(
         f"""CREATE TABLE IF NOT EXISTS gifts (
-        guild_id INTEGER, user_id INTEGER, gift_1 INTEGER, gift_2 INTEGER, gift_3 INTEGER, 
+        guild_id BIGINT, user_id BIGINT, gift_1 INTEGER, gift_2 INTEGER, gift_3 INTEGER, 
         gift_4 INTEGER, gift_5 INTEGER, gift_6 INTEGER, gift_7 INTEGER, gift_8 INTEGER, gift_9 INTEGER, 
         gift_10 INTEGER, gift_price INTEGER)"""
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return
 
 
-def add_column(guilds) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
+async def add_column(guilds) -> None:
+    await execute_update(
         """ALTER TABLE marriage 
         ADD COLUMN 'loveroom_expire' 'integer'"""
     )
-    db.commit()
     for guild in guilds:
         for member in guild.members:
             if not member.bot:
-                if is_user_in_table("marriage", guild.id, member.id) is True:
+                if await is_user_in_table("marriage", guild.id, member.id) is True:
                     sql = (
                         "INSERT INTO marriage(loveroom_expire, loveroom_id) VALUES (?, ?)"
                             )
                     val = (0, 0)
-                    cursor.execute(sql, val)
-                    db.commit()
-        cursor.close()
-        db.close()
-        return
-    cursor.close()
-    db.close()
-    return
+                    await execute_update(sql, val)
 
-
-def create_marry_embed(
+async def create_marry_embed(
         name: str, guild_id: int, author: nextcord.Member, pair: nextcord.Member
 ) -> nextcord.Embed:
     embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
     marry = get_msg_from_locale_by_key(guild_id, name)
     marry_answer = get_msg_from_locale_by_key(guild_id, f"{name}_answer")
-    currency_symbol = get_guild_currency_symbol(guild_id)
-    marriage_price = get_marriage_config_marriage_price(guild_id)
+    currency_symbol = await get_guild_currency_symbol(guild_id)
+    marriage_price = await get_marriage_config_marriage_price(guild_id)
     embed.add_field(
         name=f"{MARRY} {name.capitalize()}",
         value=f"{author.mention} {marry} {pair.mention} {marry_answer} **{marriage_price}** {currency_symbol}",
@@ -146,13 +117,13 @@ def create_love_card(avatar_1, avatar_2) -> nextcord.File:
     return file
 
 
-def create_love_profile_embed(
+async def create_love_profile_embed(
         name: str, guild_id: int, user: nextcord.Member, pair: nextcord.Member
 ) -> nextcord.Embed:
     embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
-    love_description = get_user_love_description(guild_id, user.id)
-    love_date = get_user_marry_date(guild_id, user.id)
-    family_money = get_family_money(guild_id, user.id)
+    love_description = await get_user_love_description(guild_id, user.id)
+    love_date = await get_user_marry_date(guild_id, user.id)
+    family_money = await get_family_money(guild_id, user.id)
     name = localize_name(guild_id, name).capitalize()
     name = name.replace("_", " ")
     embed.add_field(
@@ -166,7 +137,7 @@ def create_love_profile_embed(
         value=f"```{love_description}```",
         inline=False,
     )
-    currency_symbol = get_guild_currency_symbol(guild_id)
+    currency_symbol = await get_guild_currency_symbol(guild_id)
     field_name = get_msg_from_locale_by_key(guild_id, "love_money")
     embed.add_field(
         name=f"{PIGBANK} {field_name}",

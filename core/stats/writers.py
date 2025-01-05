@@ -1,40 +1,27 @@
-import sqlite3
-
 from core.checkers import is_guild_id_in_table, is_user_in_table
+from core.db_utils import execute_update, fetch_one
 from config import settings
 
 
-def write_in_stats_standart_values(guilds) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
+async def write_in_stats_standart_values(guilds) -> None:
     for guild in guilds:
         for member in guild.members:
             if not member.bot:
-                if is_user_in_table("stats", guild.id, member.id) is False:
-                    sql = "INSERT INTO stats(guild_id, user_id, messages, in_voice, join_time) VALUES (?, ?, ?, ?, ?)"
+                if await is_user_in_table("stats", guild.id, member.id) is False:
+                    sql = "INSERT INTO stats(guild_id, user_id, messages, in_voice, join_time) VALUES (%s, %s, %s, %s, %s)"
                     val = (guild.id, member.id, 0, 0, "0")
-                    cursor.execute(sql, val)
-                    db.commit()
-    cursor.close()
-    db.close()
-    return
+                    await execute_update(sql, val)
 
 
-def write_channel_in_config(guild_id: int, channel_id: int, enabled: bool) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    state = cursor.execute(
+async def write_channel_in_config(guild_id: int, channel_id: int, enabled: bool) -> None:
+    state = await fetch_one(
         f"SELECT enabled FROM stats_channels_config WHERE guild_id = {guild_id} AND channel_id = {channel_id}"
-    ).fetchone()
+    )
     if state is None:
-        sql = "INSERT INTO stats_channels_config(guild_id, channel_id, enabled) VALUES (?, ?, ?)"
+        sql = "INSERT INTO stats_channels_config(guild_id, channel_id, enabled) VALUES (%s, %s, %s)"
         val = (guild_id, channel_id, enabled)
-        cursor.execute(sql, val)
-        db.commit()
+        await execute_update(sql, val)
     else:
-        sql = "UPDATE stats_channels_config SET enabled = ? WHERE guild_id = ? AND channel_id = ?"
+        sql = "UPDATE stats_channels_config SET enabled = %s WHERE guild_id = %s AND channel_id = %s"
         val = (enabled, guild_id, channel_id)
-        cursor.execute(sql, val)
-        db.commit()
-    cursor.close()
-    db.close()
+        await execute_update(sql, val)

@@ -1,15 +1,9 @@
-import sqlite3
+from core.db_utils import execute_update
 
 
-def create_tickets_config_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
+async def create_tickets_config_table() -> None:
+    await execute_update(
         f"""CREATE TABLE IF NOT EXISTS tickets_config (
-        guild_id INTEGER, ticket_category INTEGER, ticket_archive INTEGER, ticket_support INTEGER
+        guild_id BIGINT, ticket_category INTEGER, ticket_archive INTEGER, ticket_support INTEGER
     )"""
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return

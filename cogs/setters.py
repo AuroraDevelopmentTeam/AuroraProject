@@ -155,7 +155,7 @@ class Setters(commands.Cog):
             Locale is the bot respond language. Available locales: ru_ru/en_us
         """
         if is_locale_valid(locale) is True:
-            update_guild_locale(locale, interaction.guild.id)
+            await update_guild_locale(locale, interaction.guild.id)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"set_{interaction.application_command.name}"
             )
@@ -192,7 +192,7 @@ class Setters(commands.Cog):
             New symbol for currency
         """
         if is_str_or_emoji(currency_symbol):
-            update_guild_currency_symbol(interaction.guild.id, currency_symbol)
+            await update_guild_currency_symbol(interaction.guild.id, currency_symbol)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"set_{interaction.application_command.name}"
             )
@@ -229,7 +229,7 @@ class Setters(commands.Cog):
             New guests of server will start with this number of money on their balance
         """
         if balance >= 0 and isinstance(balance, int):
-            update_guild_starting_balance(interaction.guild.id, balance)
+            await update_guild_starting_balance(interaction.guild.id, balance)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"set_{interaction.application_command.name}"
             )
@@ -266,7 +266,7 @@ class Setters(commands.Cog):
             Members of server will get this number of money on their balance with /timely command
         """
         if payday_amount >= 0 and isinstance(payday_amount, int):
-            update_guild_payday_amount(interaction.guild.id, payday_amount)
+            await update_guild_payday_amount(interaction.guild.id, payday_amount)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"set_{interaction.application_command.name}"
             )
@@ -404,7 +404,7 @@ class Setters(commands.Cog):
                     f"{min} - {max}",
                 )
             )
-        update_min_max_exp(interaction.guild.id, min, max)
+        await update_min_max_exp(interaction.guild.id, min, max)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"set_{interaction.application_command.name}"
         )
@@ -440,7 +440,7 @@ class Setters(commands.Cog):
         """
         try:
             if isinstance(channel, nextcord.TextChannel):
-                set_welcome_channel(interaction.guild.id, channel.id)
+                await set_welcome_channel(interaction.guild.id, channel.id)
                 message = get_msg_from_locale_by_key(
                     interaction.guild.id, f"set_{interaction.application_command.name}"
                 )
@@ -513,7 +513,7 @@ class Setters(commands.Cog):
         welcome_message_type: Optional[str]
             Avialable types of welcome message are card and embed
         """
-        update_welcome_message_type(interaction.guild.id, welcome_message_type)
+        await update_welcome_message_type(interaction.guild.id, welcome_message_type)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"set_{interaction.application_command.name}"
         )
@@ -544,7 +544,7 @@ class Setters(commands.Cog):
         ),
     ):
         welcome_message_state = bool(welcome_message_state)
-        set_welcome_message_state(interaction.guild.id, welcome_message_state)
+        await set_welcome_message_state(interaction.guild.id, welcome_message_state)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"set_{interaction.application_command.name}"
         )
@@ -587,7 +587,7 @@ class Setters(commands.Cog):
             Channel to
         """
         if isinstance(channel, nextcord.TextChannel):
-            set_goodbye_channel(interaction.guild.id, channel.id)
+            await set_goodbye_channel(interaction.guild.id, channel.id)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"set_{interaction.application_command.name}"
             )
@@ -648,7 +648,7 @@ class Setters(commands.Cog):
         goodbye_message_type: Optional[str]
             Avialable types of goodbye message are card and embed
         """
-        update_goodbye_message_type(interaction.guild.id, goodbye_message_type)
+        await update_goodbye_message_type(interaction.guild.id, goodbye_message_type)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"set_{interaction.application_command.name}"
         )
@@ -679,7 +679,7 @@ class Setters(commands.Cog):
         ),
     ):
         goodbye_message_state = bool(goodbye_message_state)
-        set_goodbye_message_state(interaction.guild.id, goodbye_message_state)
+        await set_goodbye_message_state(interaction.guild.id, goodbye_message_state)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"set_{interaction.application_command.name}"
         )
@@ -722,7 +722,7 @@ class Setters(commands.Cog):
             Channel to
         """
         if isinstance(channel, nextcord.TextChannel):
-            set_nitro_channel(interaction.guild.id, channel.id)
+            await set_nitro_channel(interaction.guild.id, channel.id)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"set_{interaction.application_command.name}"
             )
@@ -771,7 +771,7 @@ class Setters(commands.Cog):
         ),
     ):
         nitro_message_state = bool(nitro_message_state)
-        set_nitro_message_state(interaction.guild.id, nitro_message_state)
+        await set_nitro_message_state(interaction.guild.id, nitro_message_state)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"set_{interaction.application_command.name}"
         )
@@ -815,7 +815,7 @@ class Setters(commands.Cog):
                     channel,
                 )
             )
-        update_logging_channel_id(interaction.guild.id, channel.id)
+        await update_logging_channel_id(interaction.guild.id, channel.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"set_{interaction.application_command.name}"
         )
@@ -844,7 +844,7 @@ class Setters(commands.Cog):
         ),
     ):
         logging_state = bool(logging_state)
-        update_logging_guild_state(interaction.guild.id, logging_state)
+        await update_logging_guild_state(interaction.guild.id, logging_state)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"set_{interaction.application_command.name}"
         )
@@ -882,8 +882,7 @@ class Setters(commands.Cog):
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "negative_value_error"
                     ),
-                    self.client.user.avatar.url,
-                    money,
+                    self.client.user.avatar.url
                 )
             )
         if not isinstance(ticket_category_id, int):
@@ -892,15 +891,14 @@ class Setters(commands.Cog):
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "negative_value_error"
                     ),
-                    self.client.user.avatar.url,
-                    money,
+                    self.client.user.avatar.url
                 )
             )
         try:
             category = nextcord.utils.get(
                 interaction.guild.categories, id=ticket_category_id
             )
-            update_ticket_category(interaction.guild.id, category.id)
+            await update_ticket_category(interaction.guild.id, category.id)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"set_{interaction.application_command.name}"
             )
@@ -936,8 +934,7 @@ class Setters(commands.Cog):
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "negative_value_error"
                     ),
-                    self.client.user.avatar.url,
-                    money,
+                    self.client.user.avatar.url
                 )
             )
         if not isinstance(ticket_category_id, int):
@@ -946,15 +943,14 @@ class Setters(commands.Cog):
                     get_msg_from_locale_by_key(
                         interaction.guild.id, "negative_value_error"
                     ),
-                    self.client.user.avatar.url,
-                    money,
+                    self.client.user.avatar.url
                 )
             )
         try:
             category = nextcord.utils.get(
                 interaction.guild.categories, id=ticket_category_id
             )
-            update_ticket_archive(interaction.guild.id, category.id)
+            await update_ticket_archive(interaction.guild.id, category.id)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"set_{interaction.application_command.name}"
             )
@@ -982,7 +978,7 @@ class Setters(commands.Cog):
         interaction: Interaction,
         ticket_support: Optional[nextcord.Role] = SlashOption(required=True),
     ):
-        update_ticket_support(interaction.guild.id, ticket_support.id)
+        await update_ticket_support(interaction.guild.id, ticket_support.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"set_{interaction.application_command.name}"
         )

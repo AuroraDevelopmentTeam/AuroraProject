@@ -1,27 +1,37 @@
-import datetime
-from typing import Optional, Union, Coroutine, Any, List
+from typing import Optional
 from io import BytesIO
-import sqlite3
+from typing import Optional
 
-from PIL import Image
 import cooldowns
-from nextcord.ext import commands, menus, application_checks, tasks
-from nextcord.abc import GuildChannel
-from nextcord import Interaction, SlashOption, Permissions, PartialInteractionMessage, WebhookMessage
 import nextcord
+from PIL import Image
+from nextcord import Interaction, SlashOption, Permissions, PartialInteractionMessage, WebhookMessage
+from nextcord.abc import GuildChannel
+from nextcord.ext import commands, menus, application_checks
 
 import config
-from core.money.updaters import (
-    update_guild_currency_symbol,
-    update_guild_starting_balance,
-    update_guild_payday_amount,
-    update_user_balance,
-    set_user_balance,
-    update_guild_msg_cooldown,
-    update_guild_min_max_msg_income,
-    update_guild_min_max_voice_income,
-    update_guild_voice_minutes_for_money,
+from core.bet.update import update_min_bet, update_max_bet
+from core.checkers import (
+    is_role_in_shop,
+    is_role_in_income,
 )
+from core.embeds import construct_basic_embed, DEFAULT_BOT_COLOR
+from core.emojify import SHOP
+from core.errors import (
+    construct_error_negative_value_embed,
+    construct_error_bot_user_embed,
+    construct_error_self_choose_embed,
+    construct_error_not_enough_embed,
+)
+from core.locales.getters import (
+    get_msg_from_locale_by_key,
+    get_localized_description,
+    get_localized_name,
+    localize_name,
+)
+from core.marriage.update import set_user_gift_count
+from core.marriage.update import set_user_gift_price
+from core.money.create import create_user_money_card
 from core.money.getters import (
     get_user_balance,
     get_guild_currency_symbol,
@@ -30,50 +40,30 @@ from core.money.getters import (
     list_income_roles,
     get_all_users,
 )
+from core.money.updaters import (
+    update_user_balance,
+    set_user_balance,
+    update_guild_msg_cooldown,
+    update_guild_min_max_msg_income,
+    update_guild_min_max_voice_income,
+    update_guild_voice_minutes_for_money,
+)
 from core.money.writers import (
     write_role_in_income,
     delete_role_from_income,
     write_channel_in_config,
 )
-from core.money.create import create_user_money_card
-from core.checkers import (
-    is_str_or_emoji,
-    is_role_in_shop,
-    is_role_in_income,
-    is_channel_in_config,
-)
-from core.locales.getters import (
-    get_msg_from_locale_by_key,
-    get_localized_description,
-    get_localized_name,
-    localize_name,
-)
-from core.emojify import SHOP
-from core.embeds import construct_basic_embed, construct_top_embed, DEFAULT_BOT_COLOR
+from core.parsers import parse_server_roles
+from core.shop.getters import custom_shop_embed, get_custom_shop_roles_limit
 from core.shop.writers import (
     write_role_in_shop,
     write_role_in_custom_shop,
     delete_role_from_shop,
 )
-from core.shop.getters import custom_shop_embed, get_custom_shop_roles_limit
-
-from core.parsers import parse_server_roles
 from core.ui.paginator import (
-    MyEmbedFieldPageSource,
     MyEmbedDescriptionPageSource,
     NewSelectButtonMenuPages,
 )
-from core.errors import (
-    construct_error_negative_value_embed,
-    construct_error_bot_user_embed,
-    construct_error_self_choose_embed,
-    construct_error_not_enough_embed,
-    construct_error_forbidden_embed,
-)
-from core.marriage.update import set_user_gift_price
-from core.marriage.update import set_user_gift_count
-from core.bet.getters import get_min_bet, get_max_bet
-from core.bet.update import update_min_bet, update_max_bet
 from core.ui.paginator import NewShopView
 
 
@@ -145,8 +135,8 @@ class Economics(commands.Cog):
                 )
             )
         elif money > 0 and isinstance(money, int):
-            currency_symbol = get_guild_currency_symbol(interaction.guild.id)
-            update_user_balance(interaction.guild.id, user.id, money)
+            currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
+            await update_user_balance(interaction.guild.id, user.id, money)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"{interaction.application_command.name}"
             )
@@ -206,7 +196,7 @@ class Economics(commands.Cog):
             )
         elif money > 0 and isinstance(money, int):
             currency_symbol = get_guild_currency_symbol(interaction.guild.id)
-            update_user_balance(interaction.guild.id, user.id, -money)
+            await update_user_balance(interaction.guild.id, user.id, -money)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"{interaction.application_command.name}"
             )
@@ -263,7 +253,7 @@ class Economics(commands.Cog):
         avatar = BytesIO()
         await user.display_avatar.with_format("png").save(avatar)
         profile_picture = Image.open(avatar)
-        file, embed = create_user_money_card(
+        file, embed = await create_user_money_card(
             interaction.application_command.name,
             interaction.user,
             user,
@@ -313,7 +303,7 @@ class Economics(commands.Cog):
             )
         else:
             starting_balance = get_guild_starting_balance(interaction.guild.id)
-            set_user_balance(interaction.guild.id, user.id, starting_balance)
+            await set_user_balance(interaction.guild.id, user.id, starting_balance)
             currency_symbol = get_guild_currency_symbol(interaction.guild.id)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"reset_{interaction.application_command.name}"
@@ -344,7 +334,7 @@ class Economics(commands.Cog):
         starting_balance = get_guild_starting_balance(interaction.guild.id)
         all_users = get_all_users(interaction.guild.id)
         for user_id in all_users:
-            set_user_balance(interaction.guild.id, user_id, starting_balance)
+            await set_user_balance(interaction.guild.id, user_id, starting_balance)
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"reset_{interaction.application_command.name}"
@@ -433,9 +423,9 @@ class Economics(commands.Cog):
     )
     @cooldowns.cooldown(1, 10800, bucket=cooldowns.SlashBucket.author)
     async def __timely(self, interaction: Interaction):
-        payday_amount = get_guild_payday_amount(interaction.guild.id)
-        update_user_balance(interaction.guild.id, interaction.user.id, payday_amount)
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        payday_amount = await get_guild_payday_amount(interaction.guild.id)
+        await update_user_balance(interaction.guild.id, interaction.user.id, payday_amount)
+        currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"{interaction.application_command.name}"
         )
@@ -511,8 +501,8 @@ class Economics(commands.Cog):
                     )
                 )
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, -money)
-                update_user_balance(interaction.guild.id, user.id, money)
+                await update_user_balance(interaction.guild.id, interaction.user.id, -money)
+                await update_user_balance(interaction.guild.id, user.id, money)
                 currency_symbol = get_guild_currency_symbol(interaction.guild.id)
                 message = get_msg_from_locale_by_key(
                     interaction.guild.id, f"{interaction.application_command.name}"
@@ -584,7 +574,7 @@ class Economics(commands.Cog):
                     cost,
                 )
             )
-        if is_role_in_shop(interaction.guild.id, role.id) is True:
+        if await is_role_in_shop(interaction.guild.id, role.id) is True:
             embed = nextcord.Embed(
                 title="error",
                 description=get_msg_from_locale_by_key(
@@ -593,7 +583,7 @@ class Economics(commands.Cog):
                 color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
-        guild_roles = parse_server_roles(interaction.guild)
+        guild_roles = await parse_server_roles(interaction.guild)
         if len(guild_roles) >= 9999:
             embed = nextcord.Embed(
                 title="error",
@@ -603,7 +593,7 @@ class Economics(commands.Cog):
                 color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
-        write_role_in_shop(interaction.guild.id, role, cost)
+        await write_role_in_shop(interaction.guild.id, role, cost)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"{interaction.application_command.name}"
         )
@@ -667,7 +657,7 @@ class Economics(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __shop(self, interaction: Interaction):
-        guild_roles = parse_server_roles(interaction.guild)
+        guild_roles = await parse_server_roles(interaction.guild)
         if len(guild_roles) <= 6:
             entries = []
             for i in range(len(guild_roles)):
@@ -710,7 +700,7 @@ class Economics(commands.Cog):
                 },
             ),
     ):
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
         if balance >= config.settings["default_custom_shop_create_role"]:
             if 100000 > cost > 100:
                 if nextcord.utils.get(interaction.guild.roles, name=role_name) is None:
@@ -751,7 +741,7 @@ class Economics(commands.Cog):
                         if inter.user == interaction.user:
                             await inter.response.defer()
                             await inter.delete_original_message()
-                            if get_custom_shop_roles_limit(inter.guild.id):
+                            if await get_custom_shop_roles_limit(inter.guild.id):
                                 return await inter.send(
                                     "В магазине достигнут лимит ролей - 50!",
                                     delete_after=5,
@@ -763,7 +753,7 @@ class Economics(commands.Cog):
                             )
 
                             role = nextcord.utils.get(inter.guild.roles, name=role_name)
-                            write_role_in_custom_shop(
+                            await write_role_in_custom_shop(
                                 inter.guild.id, role, cost, inter.user.id
                             )
                             await inter.user.add_roles(role)
@@ -845,10 +835,10 @@ class Economics(commands.Cog):
                         interaction.guild.id, "negative_value_error"
                     ),
                     self.client.user.avatar.url,
-                    cost,
+                    income,
                 )
             )
-        if is_role_in_income(interaction.guild.id, role.id) is True:
+        if await is_role_in_income(interaction.guild.id, role.id) is True:
             embed = nextcord.Embed(
                 title="error",
                 description=get_msg_from_locale_by_key(
@@ -857,12 +847,12 @@ class Economics(commands.Cog):
                 color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
-        write_role_in_income(interaction.guild.id, role, income)
+        await write_role_in_income(interaction.guild.id, role, income)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"income_{interaction.application_command.name}"
         )
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
         await interaction.response.send_message(
             embed=construct_basic_embed(
                 interaction.application_command.name,
@@ -897,7 +887,7 @@ class Economics(commands.Cog):
                 color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
-        delete_role_from_income(interaction.guild.id, role)
+        await delete_role_from_income(interaction.guild.id, role)
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"income_{interaction.application_command.name}"
@@ -933,7 +923,7 @@ class Economics(commands.Cog):
                 description_localizations={"ru": "True - включить, False - выключить"},
             ),
     ):
-        write_channel_in_config(interaction.guild.id, channel.id, enabled)
+        await write_channel_in_config(interaction.guild.id, channel.id, enabled)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"income_{interaction.application_command.name}"
         )
@@ -991,7 +981,7 @@ class Economics(commands.Cog):
             )
         if max_msg_income < min_msg_income:
             return
-        update_guild_min_max_msg_income(
+        await update_guild_min_max_msg_income(
             interaction.guild.id, min_msg_income, max_msg_income
         )
         message = get_msg_from_locale_by_key(
@@ -1052,7 +1042,7 @@ class Economics(commands.Cog):
                     f"{min_voice_income} - {max_voice_income}",
                 )
             )
-        update_guild_min_max_voice_income(
+        await update_guild_min_max_voice_income(
             interaction.guild.id, min_voice_income, max_voice_income
         )
         message = get_msg_from_locale_by_key(
@@ -1096,7 +1086,7 @@ class Economics(commands.Cog):
                     f"{min_msg_income} - {max_msg_income}",
                 )
             )
-        update_guild_msg_cooldown(interaction.guild.id, msg_per_income)
+        await update_guild_msg_cooldown(interaction.guild.id, msg_per_income)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"income_{interaction.application_command.name}"
         )
@@ -1136,7 +1126,7 @@ class Economics(commands.Cog):
                     f"{min_msg_income} - {max_msg_income}",
                 )
             )
-        update_guild_voice_minutes_for_money(interaction.guild.id, voice_minutes)
+        await update_guild_voice_minutes_for_money(interaction.guild.id, voice_minutes)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"income_{interaction.application_command.name}"
         )
@@ -1201,7 +1191,7 @@ class Economics(commands.Cog):
             ),
     ):
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
-        update_min_bet(interaction.guild.id, bet_amount)
+        await update_min_bet(interaction.guild.id, bet_amount)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"bet_config_{interaction.application_command.name}"
         )
@@ -1232,7 +1222,7 @@ class Economics(commands.Cog):
             ),
     ):
         currency_symbol = get_guild_currency_symbol(interaction.guild.id)
-        update_max_bet(interaction.guild.id, bet_amount)
+        await update_max_bet(interaction.guild.id, bet_amount)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"bet_config_{interaction.application_command.name}"
         )

@@ -1,26 +1,18 @@
-import sqlite3
+from ..db_utils import fetch_one
 
 
-def get_user_honor_points(user_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    honor_points = cursor.execute(
+async def get_user_honor_points(user_id: int) -> int:
+    honor_points = await fetch_one(
         f"SELECT honor_points FROM honor WHERE user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return honor_points
+    )
+    return honor_points[0]
 
 
-def get_user_honor_level(user_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    honor_level = cursor.execute(
+async def get_user_honor_level(user_id: int) -> int:
+    honor_level = await fetch_one(
         f"SELECT honor_level FROM honor WHERE user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return honor_level
+    )
+    return honor_level[0]
 
 
 def get_rome_symbol(number: int) -> str:

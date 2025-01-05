@@ -1,28 +1,25 @@
-from typing import Optional, Union
-import random
 import datetime
+import random
+from typing import Optional, Union
 
 import cooldowns
 import nextcord
-from nextcord.ext import commands, application_checks
-from nextcord import Interaction, ButtonStyle, File, Permissions, SlashOption
-from nextcord.ui import Button, View
-import cooldowns
+from nextcord import Interaction, Permissions, SlashOption
+from nextcord.ext import commands
 
-from core.locales.getters import (
-    get_localized_name,
-    get_localized_description,
-    get_msg_from_locale_by_key,
-    get_guild_locale,
+from core.bet.getters import get_max_bet, get_min_bet
+from core.embeds import DEFAULT_BOT_COLOR, construct_basic_embed
+from core.emojify import SWORD
+from core.errors import (
+    construct_error_negative_value_embed,
+    construct_error_not_enough_embed,
+    construct_error_command_is_active,
+    construct_error_incorrect_bet,
 )
-from core.games.ttt import TicTacToe
 from core.games.blackjack import (
     Hand,
-    Deck,
     check_for_blackjack,
-    show_blackjack_results,
     player_is_over,
-    cards_emoji_representation,
     create_deck,
     deal_starting_cards,
     create_blackjack_embed,
@@ -30,7 +27,6 @@ from core.games.blackjack import (
     maybe_blackjack_cards,
     create_game_start_blackjack_embed,
 )
-from core.games.slots import check_win_get_multiplier, spin_slots, create_slots_embed
 from core.games.gamble import (
     perform_strikes,
     compare_strikes,
@@ -38,6 +34,8 @@ from core.games.gamble import (
     approximate_bet,
     get_game_state,
 )
+from core.games.slots import check_win_get_multiplier, spin_slots, create_slots_embed
+from core.games.ttt import TicTacToe
 from core.games.wheel import (
     get_multiplier,
     construct_wheel_embed,
@@ -45,21 +43,15 @@ from core.games.wheel import (
     initialize_multipliers,
     get_direction,
 )
-from core.ui.buttons import create_button, ViewAuthorCheck
-from core.locales.getters import get_msg_from_locale_by_key, localize_name
-from core.money.updaters import update_user_balance
-from core.money.getters import get_user_balance, get_guild_currency_symbol
-from core.errors import (
-    construct_error_negative_value_embed,
-    construct_error_not_enough_embed,
-    construct_error_command_is_active,
-    construct_error_incorrect_bet,
+from core.locales.getters import (
+    get_localized_name,
+    get_localized_description,
+    get_guild_locale,
 )
-from core.embeds import DEFAULT_BOT_COLOR, construct_basic_embed
-from core.emojify import SWORD
-
-from core.bet.getters import get_max_bet, get_min_bet
-from core.bet.update import update_max_bet, update_min_bet
+from core.locales.getters import get_msg_from_locale_by_key, localize_name
+from core.money.getters import get_user_balance, get_guild_currency_symbol
+from core.money.updaters import update_user_balance
+from core.ui.buttons import create_button, ViewAuthorCheck
 
 MULTIPLIERS_FOR_TWO_ROWS = [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]
 
@@ -90,7 +82,7 @@ class DuelStartRu(nextcord.ui.View):
     async def interaction_check(self, interaction: Interaction) -> bool:
         if interaction.user == self.author:
             return False
-        if get_user_balance(interaction.guild.id, interaction.user.id) < self.bet:
+        if await get_user_balance(interaction.guild.id, interaction.user.id) < self.bet:
             return False
         return True
 
@@ -102,7 +94,7 @@ class DuelStartRu(nextcord.ui.View):
     async def duel_start(self, button: nextcord.ui.Button, interaction: Interaction):
         author = self.author
         user = interaction.user
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < self.bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             await interaction.message.edit(view=DuelEndRu())
@@ -115,7 +107,7 @@ class DuelStartRu(nextcord.ui.View):
                     f"{msg} {balance}",
                 )
             )
-        balance = get_user_balance(interaction.guild.id, author.id)
+        balance = await get_user_balance(interaction.guild.id, author.id)
         if balance < self.bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             await interaction.message.edit(view=DuelEndRu())
@@ -133,15 +125,15 @@ class DuelStartRu(nextcord.ui.View):
             losed = user
         else:
             losed = author
-        currency = get_guild_currency_symbol(interaction.guild.id)
+        currency = await get_guild_currency_symbol(interaction.guild.id)
         embed = nextcord.Embed(
             title=f"{SWORD} Дуэль",
             description=f"В дуэле побеждает {who_win.mention} и зарабатывает {self.bet} {currency}",
             color=DEFAULT_BOT_COLOR,
         )
-        update_user_balance(interaction.guild.id, who_win.id, self.bet)
-        update_user_balance(interaction.guild.id, losed.id, -self.bet)
-        balance = get_user_balance(interaction.guild.id, who_win.id)
+        await update_user_balance(interaction.guild.id, who_win.id, self.bet)
+        await update_user_balance(interaction.guild.id, losed.id, -self.bet)
+        balance = await get_user_balance(interaction.guild.id, who_win.id)
         msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
         embed.set_footer(text=f"{msg} {balance}", icon_url=who_win.display_avatar)
         await interaction.message.edit(embed=embed, view=DuelEndRu())
@@ -171,7 +163,7 @@ class DuelStartEng(nextcord.ui.View):
     async def interaction_check(self, interaction: Interaction) -> bool:
         if interaction.user == self.author:
             return False
-        if get_user_balance(interaction.guild.id, interaction.user.id) < self.bet:
+        if await get_user_balance(interaction.guild.id, interaction.user.id) < self.bet:
             return False
         return True
 
@@ -183,7 +175,7 @@ class DuelStartEng(nextcord.ui.View):
     async def duel_start(self, button: nextcord.ui.Button, interaction: Interaction):
         author = self.author
         user = interaction.user
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < self.bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             await interaction.message.edit(view=DuelEndRu())
@@ -196,7 +188,7 @@ class DuelStartEng(nextcord.ui.View):
                     f"{msg} {balance}",
                 )
             )
-        balance = get_user_balance(interaction.guild.id, author.id)
+        balance = await get_user_balance(interaction.guild.id, author.id)
         if balance < self.bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             await interaction.message.edit(view=DuelEndRu())
@@ -220,9 +212,9 @@ class DuelStartEng(nextcord.ui.View):
             description=f"In duel **won** {who_win.mention} and this user get **{self.bet}** {currency}",
             color=DEFAULT_BOT_COLOR,
         )
-        update_user_balance(interaction.guild.id, who_win.id, self.bet)
-        update_user_balance(interaction.guild.id, losed.id, -self.bet)
-        balance = get_user_balance(interaction.guild.id, who_win.id)
+        await update_user_balance(interaction.guild.id, who_win.id, self.bet)
+        await update_user_balance(interaction.guild.id, losed.id, -self.bet)
+        balance = await get_user_balance(interaction.guild.id, who_win.id)
         msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
         embed.set_footer(text=f"{msg} {balance}", icon_url=who_win.display_avatar)
         await interaction.message.edit(embed=embed, view=DuelEndEng())
@@ -263,7 +255,7 @@ class Games(commands.Cog):
                     bet,
                 )
             )
-        bet_min, bet_max = get_min_bet(interaction.guild.id), get_max_bet(interaction.guild.id)
+        bet_min, bet_max = await get_min_bet(interaction.guild.id), await get_max_bet(interaction.guild.id)
         if bet < bet_min or bet > bet_max:
             return await interaction.followup.send(
                 embed=construct_error_incorrect_bet(
@@ -272,7 +264,7 @@ class Games(commands.Cog):
                     interaction.user.display_avatar,
                 )
             )
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             return await interaction.followup.send(
@@ -308,7 +300,7 @@ class Games(commands.Cog):
                 )
 
         async def hit_callback(interaction: Interaction):
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < bet:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 view = create_final_view(interaction.guild.id)
@@ -324,12 +316,12 @@ class Games(commands.Cog):
             turn += 1
             player_hand.add_card(deck.deal())
             if player_is_over(player_hand):
-                update_user_balance(interaction.guild.id, interaction.user.id, -bet)
-                balance = get_user_balance(interaction.guild.id, interaction.user.id)
+                await update_user_balance(interaction.guild.id, interaction.user.id, -bet)
+                balance = await get_user_balance(interaction.guild.id, interaction.user.id)
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 win = get_msg_from_locale_by_key(interaction.guild.id, "win")
                 lost = get_msg_from_locale_by_key(interaction.guild.id, "lost")
-                embed = create_blackjack_embed(
+                embed = await create_blackjack_embed(
                     self.client,
                     f"{self.client.user.mention} {win}",
                     player_hand,
@@ -338,12 +330,12 @@ class Games(commands.Cog):
                     interaction.user.display_avatar,
                     guild_id=interaction.guild.id,
                 )
-                view = create_final_view(interaction.guild.id)
+                view = await create_final_view(interaction.guild.id)
                 self.users.pop(interaction.user.id)
                 await interaction.message.edit(embed=embed, view=view)
             else:
                 turn_msg = get_msg_from_locale_by_key(interaction.guild.id, "turn")
-                embed = create_game_start_blackjack_embed(
+                embed = await create_game_start_blackjack_embed(
                     self.client,
                     f"{turn_msg} {turn}",
                     player_hand,
@@ -353,10 +345,10 @@ class Games(commands.Cog):
                 await interaction.message.edit(embed=embed)
 
         async def stand_callback(interaction: Interaction):
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < bet:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
-                view = create_final_view(interaction.guild.id)
+                view = await create_final_view(interaction.guild.id)
                 self.users.pop(interaction.user.id)
                 return await interaction.message.edit(embed=construct_error_not_enough_embed(
                         get_msg_from_locale_by_key(
@@ -370,13 +362,13 @@ class Games(commands.Cog):
             while dealer_hand.get_value() < 17:
                 dealer_hand.add_card(deck.deal())
                 if player_is_over(dealer_hand):
-                    update_user_balance(interaction.guild.id, interaction.user.id, bet)
-                    balance = get_user_balance(
+                    await update_user_balance(interaction.guild.id, interaction.user.id, bet)
+                    balance = await get_user_balance(
                         interaction.guild.id, interaction.user.id
                     )
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                     win = get_msg_from_locale_by_key(interaction.guild.id, "win")
-                    embed = create_blackjack_embed(
+                    embed = await create_blackjack_embed(
                         self.client,
                         f"**{interaction.user.mention}** {win}",
                         player_hand,
@@ -385,19 +377,19 @@ class Games(commands.Cog):
                         interaction.user.display_avatar,
                         guild_id=interaction.guild.id,
                     )
-                    view = create_final_view(interaction.guild.id)
+                    view = await create_final_view(interaction.guild.id)
                     self.users.pop(interaction.user.id)
                     await interaction.message.edit(embed=embed, view=view)
             if 17 <= dealer_hand.get_value() <= 21:
                 if dealer_hand.get_value() > player_hand.get_value():
-                    update_user_balance(interaction.guild.id, interaction.user.id, -bet)
-                    balance = get_user_balance(
+                    await update_user_balance(interaction.guild.id, interaction.user.id, -bet)
+                    balance = await get_user_balance(
                         interaction.guild.id, interaction.user.id
                     )
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                     win = get_msg_from_locale_by_key(interaction.guild.id, "win")
                     lost = get_msg_from_locale_by_key(interaction.guild.id, "lost")
-                    embed = create_blackjack_embed(
+                    embed = await create_blackjack_embed(
                         self.client,
                         f"{self.client.user.mention} {win}",
                         player_hand,
@@ -406,30 +398,30 @@ class Games(commands.Cog):
                         interaction.user.display_avatar,
                         guild_id=interaction.guild.id,
                     )
-                    view = create_final_view(interaction.guild.id)
+                    view = await create_final_view(interaction.guild.id)
                     self.users.pop(interaction.user.id)
                     await interaction.message.edit(embed=embed, view=view)
                 elif dealer_hand.get_value() == player_hand.get_value():
                     draw = get_msg_from_locale_by_key(interaction.guild.id, "draw")
-                    embed = create_blackjack_embed(
+                    embed = await create_blackjack_embed(
                         self.client,
                         f"**{draw}**",
                         player_hand,
                         dealer_hand,
                         guild_id=interaction.guild.id,
                     )
-                    view = create_final_view(interaction.guild.id)
+                    view = await create_final_view(interaction.guild.id)
                     self.users.pop(interaction.user.id)
                     await interaction.message.edit(embed=embed, view=view)
                 else:
-                    update_user_balance(interaction.guild.id, interaction.user.id, bet)
-                    balance = get_user_balance(
+                    await update_user_balance(interaction.guild.id, interaction.user.id, bet)
+                    balance = await get_user_balance(
                         interaction.guild.id, interaction.user.id
                     )
                     msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                     win = get_msg_from_locale_by_key(interaction.guild.id, "win")
                     lost = get_msg_from_locale_by_key(interaction.guild.id, "lost")
-                    embed = create_blackjack_embed(
+                    embed = await create_blackjack_embed(
                         self.client,
                         f"**{interaction.user.mention}** {win}",
                         player_hand,
@@ -438,15 +430,15 @@ class Games(commands.Cog):
                         interaction.user.display_avatar,
                         guild_id=interaction.guild.id,
                     )
-                    view = create_final_view(interaction.guild.id)
+                    view = await create_final_view(interaction.guild.id)
                     self.users.pop(interaction.user.id)
                     await interaction.message.edit(embed=embed, view=view)
 
         async def dealer_blackjack_callback(interaction: Interaction):
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < bet:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
-                view = create_final_view(interaction.guild.id)
+                view = await create_final_view(interaction.guild.id)
                 self.users.pop(interaction.user.id)
                 return await interaction.message.edit(embed=construct_error_not_enough_embed(
                         get_msg_from_locale_by_key(
@@ -457,25 +449,25 @@ class Games(commands.Cog):
                     ), view=view)
             if check_for_blackjack(dealer_hand):
                 draw = get_msg_from_locale_by_key(interaction.guild.id, "draw")
-                embed = create_blackjack_embed(
+                embed = await create_blackjack_embed(
                     self.client,
                     f"**{draw}**",
                     player_hand,
                     dealer_hand,
                     guild_id=interaction.guild.id,
                 )
-                view = create_final_view(interaction.guild.id)
+                view = await create_final_view(interaction.guild.id)
                 self.users.pop(interaction.user.id)
                 await interaction.message.edit(embed=embed, view=view)
             else:
-                update_user_balance(
+                await update_user_balance(
                     interaction.guild.id, interaction.user.id, int(bet * 1.5)
                 )
-                balance = get_user_balance(interaction.guild.id, interaction.user.id)
+                balance = await get_user_balance(interaction.guild.id, interaction.user.id)
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 win = get_msg_from_locale_by_key(interaction.guild.id, "win")
                 lost = get_msg_from_locale_by_key(interaction.guild.id, "lost")
-                embed = create_blackjack_embed(
+                embed = await create_blackjack_embed(
                     self.client,
                     f"**{interaction.user.mention}** {win}",
                     player_hand,
@@ -484,15 +476,15 @@ class Games(commands.Cog):
                     interaction.user.display_avatar,
                     guild_id=interaction.guild.id,
                 )
-                view = create_final_view(interaction.guild.id)
+                view = await create_final_view(interaction.guild.id)
                 self.users.pop(interaction.user.id)
                 await interaction.message.edit(embed=embed, view=view)
 
         async def one_to_one_callback(interaction: Interaction):
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < bet:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
-                view = create_final_view(interaction.guild.id)
+                view = await create_final_view(interaction.guild.id)
                 self.users.pop(interaction.user.id)
                 return await interaction.message.edit(embed=construct_error_not_enough_embed(
                         get_msg_from_locale_by_key(
@@ -501,8 +493,8 @@ class Games(commands.Cog):
                         interaction.user.display_avatar,
                         f"{msg} {balance}",
                     ), view=view)
-            update_user_balance(interaction.guild.id, interaction.user.id, bet)
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+            await update_user_balance(interaction.guild.id, interaction.user.id, bet)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             one_to_one_msg = get_msg_from_locale_by_key(
                 interaction.guild.id, "one_to_one"
@@ -521,10 +513,10 @@ class Games(commands.Cog):
             await interaction.message.edit(embed=embed, view=view)
 
         if check_for_blackjack(player_hand):
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < bet:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
-                view = create_final_view(interaction.guild.id)
+                view = await create_final_view(interaction.guild.id)
                 self.users.pop(interaction.user.id)
                 return await interaction.message.edit(embed=construct_error_not_enough_embed(
                         get_msg_from_locale_by_key(
@@ -542,7 +534,7 @@ class Games(commands.Cog):
                 view.add_item(dealer_blackjack)
                 view.add_item(one_to_one)
                 turn_msg = get_msg_from_locale_by_key(interaction.guild.id, "turn")
-                embed = create_game_start_blackjack_embed(
+                embed = await create_game_start_blackjack_embed(
                     self.client,
                     f"{turn_msg} {turn}",
                     player_hand,
@@ -551,10 +543,10 @@ class Games(commands.Cog):
                 )
                 await interaction.followup.send(embed=embed, view=view)
             else:
-                update_user_balance(
+                await update_user_balance(
                     interaction.guild.id, interaction.user.id, int(bet * 1.5)
                 )
-                balance = get_user_balance(interaction.guild.id, interaction.user.id)
+                balance = await get_user_balance(interaction.guild.id, interaction.user.id)
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 win = get_msg_from_locale_by_key(interaction.guild.id, "win")
                 lost = get_msg_from_locale_by_key(interaction.guild.id, "lost")
@@ -567,17 +559,17 @@ class Games(commands.Cog):
                     interaction.user.display_avatar,
                     guild_id=interaction.guild.id,
                 )
-                view = create_final_view(interaction.guild.id)
+                view = await create_final_view(interaction.guild.id)
                 self.users.pop(interaction.user.id)
                 await interaction.followup.send(embed=embed, view=view)
         else:
             if check_for_blackjack(dealer_hand):
-                update_user_balance(interaction.guild.id, interaction.user.id, -bet)
-                balance = get_user_balance(interaction.guild.id, interaction.user.id)
+                await update_user_balance(interaction.guild.id, interaction.user.id, -bet)
+                balance = await get_user_balance(interaction.guild.id, interaction.user.id)
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 win = get_msg_from_locale_by_key(interaction.guild.id, "win")
                 lost = get_msg_from_locale_by_key(interaction.guild.id, "lost")
-                embed = create_blackjack_embed(
+                embed = await create_blackjack_embed(
                     self.client,
                     f"{self.client.user.mention} {win}",
                     player_hand,
@@ -586,7 +578,7 @@ class Games(commands.Cog):
                     interaction.user.display_avatar,
                     guild_id=interaction.guild.id,
                 )
-                view = create_final_view(interaction.guild.id)
+                view = await create_final_view(interaction.guild.id)
                 self.users.pop(interaction.user.id)
                 await interaction.followup.send(embed=embed, view=view)
             else:
@@ -598,7 +590,7 @@ class Games(commands.Cog):
                 view.add_item(hit)
                 view.add_item(stand)
                 turn_msg = get_msg_from_locale_by_key(interaction.guild.id, "turn")
-                embed = create_game_start_blackjack_embed(
+                embed = await create_game_start_blackjack_embed(
                     self.client,
                     f"{turn_msg} {turn}",
                     player_hand,
@@ -636,16 +628,16 @@ class Games(commands.Cog):
                     bet,
                 )
             )
-        bet_min, bet_max = get_min_bet(interaction.guild.id), get_max_bet(interaction.guild.id)
+        bet_min, bet_max = await get_min_bet(interaction.guild.id), await get_max_bet(interaction.guild.id)
         if bet < bet_min or bet > bet_max:
             return await interaction.response.send_message(
                 embed=construct_error_incorrect_bet(
                     f'{get_msg_from_locale_by_key(interaction.guild.id, "bet_range_error")} '
-                    f'**{bet_min}** - **{bet_max}** {get_guild_currency_symbol(interaction.guild.id)}',
+                    f'**{bet_min}** - **{bet_max}** {await get_guild_currency_symbol(interaction.guild.id)}',
                     interaction.user.display_avatar,
                 )
             )
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             return await interaction.response.send_message(
@@ -663,8 +655,8 @@ class Games(commands.Cog):
             win = get_msg_from_locale_by_key(interaction.guild.id, "win")
             game_state = f"{interaction.user.mention} **{win}**"
             bet *= multiplier
-            update_user_balance(interaction.guild.id, interaction.user.id, int(bet))
-            embed = create_slots_embed(
+            await update_user_balance(interaction.guild.id, interaction.user.id, int(bet))
+            embed = await create_slots_embed(
                 interaction.guild.id,
                 interaction.user.id,
                 interaction.user.display_avatar,
@@ -676,8 +668,8 @@ class Games(commands.Cog):
         else:
             lost = get_msg_from_locale_by_key(interaction.guild.id, "lost")
             game_state = f"{interaction.user.mention} **{lost}**"
-            update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
-            embed = create_slots_embed(
+            await update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
+            embed = await create_slots_embed(
                 interaction.guild.id,
                 interaction.user.id,
                 interaction.user.display_avatar,
@@ -716,7 +708,7 @@ class Games(commands.Cog):
                     bet,
                 )
             )
-        bet_min, bet_max = get_min_bet(interaction.guild.id), get_max_bet(interaction.guild.id)
+        bet_min, bet_max = await get_min_bet(interaction.guild.id), await get_max_bet(interaction.guild.id)
         if bet < bet_min or bet > bet_max:
             return await interaction.response.send_message(
                 embed=construct_error_incorrect_bet(
@@ -725,7 +717,7 @@ class Games(commands.Cog):
                     interaction.user.display_avatar,
                 )
             )
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             return await interaction.response.send_message(
@@ -741,15 +733,15 @@ class Games(commands.Cog):
         is_win = compare_strikes(user_strikes, bot_strikes)
         percentage, bet = approximate_bet(bet, is_win)
         if is_win is True:
-            update_user_balance(interaction.guild.id, interaction.user.id, int(bet))
+            await update_user_balance(interaction.guild.id, interaction.user.id, int(bet))
         if is_win is False:
-            update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
+            await update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
         msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
-        game_state = get_game_state(
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
+        game_state = await get_game_state(
             is_win, interaction.user, self.client, interaction.guild.id
         )
-        embed = create_gamble_embed(
+        embed = await create_gamble_embed(
             is_win,
             game_state,
             percentage,
@@ -790,16 +782,16 @@ class Games(commands.Cog):
                     bet,
                 )
             )
-        bet_min, bet_max = get_min_bet(interaction.guild.id), get_max_bet(interaction.guild.id)
+        bet_min, bet_max = await get_min_bet(interaction.guild.id), await get_max_bet(interaction.guild.id)
         if bet < bet_min or bet > bet_max:
             return await interaction.response.send_message(
                 embed=construct_error_incorrect_bet(
                     f'{get_msg_from_locale_by_key(interaction.guild.id, "bet_range_error")} '
-                    f'**{bet_min}** - **{bet_max}** {get_guild_currency_symbol(interaction.guild.id)}',
+                    f'**{bet_min}** - **{bet_max}** {await get_guild_currency_symbol(interaction.guild.id)}',
                     interaction.user.display_avatar,
                 )
             )
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             return await interaction.response.send_message(
@@ -811,15 +803,15 @@ class Games(commands.Cog):
                     f"{msg} {balance}",
                 )
             )
-        update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
+        await update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
         multipliers = initialize_multipliers()
         wheel_number = spin_wheel()
         bet_multiplier = get_multiplier(multipliers, wheel_number)
-        update_user_balance(
+        await update_user_balance(
             interaction.guild.id, interaction.user.id, (int(bet * bet_multiplier))
         )
         msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
         await interaction.response.send_message(
             embed=construct_wheel_embed(
                 interaction.application_command.name.capitalize(),
@@ -859,16 +851,16 @@ class Games(commands.Cog):
                     bet,
                 )
             )
-        bet_min, bet_max = get_min_bet(interaction.guild.id), get_max_bet(interaction.guild.id)
+        bet_min, bet_max = await get_min_bet(interaction.guild.id), await get_max_bet(interaction.guild.id)
         if bet < bet_min or bet > bet_max:
             return await interaction.response.send_message(
                 embed=construct_error_incorrect_bet(
                     f'{get_msg_from_locale_by_key(interaction.guild.id, "bet_range_error")} '
-                    f'**{bet_min}** - **{bet_max}** {get_guild_currency_symbol(interaction.guild.id)}',
+                    f'**{bet_min}** - **{bet_max}** {await get_guild_currency_symbol(interaction.guild.id)}',
                     interaction.user.display_avatar,
                 )
             )
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             return await interaction.response.send_message(
@@ -883,7 +875,7 @@ class Games(commands.Cog):
         embed = nextcord.Embed(
             title=f"{SWORD} {localize_name(interaction.guild.id, 'duel').capitalize()}",
             description=f"{interaction.user.mention} {get_msg_from_locale_by_key(interaction.guild.id, 'duel')} **{bet}** "
-                        f"{get_guild_currency_symbol(interaction.guild.id)}",
+                        f"{await get_guild_currency_symbol(interaction.guild.id)}",
             color=DEFAULT_BOT_COLOR,
         )
         if get_guild_locale(interaction.guild.id) == "ru_ru":
@@ -921,16 +913,16 @@ class Games(commands.Cog):
                     bet,
                 )
             )
-        bet_min, bet_max = get_min_bet(interaction.guild.id), get_max_bet(interaction.guild.id)
+        bet_min, bet_max = await get_min_bet(interaction.guild.id), await get_max_bet(interaction.guild.id)
         if bet < bet_min or bet > bet_max:
             return await interaction.response.send_message(
                 embed=construct_error_incorrect_bet(
                     f'{get_msg_from_locale_by_key(interaction.guild.id, "bet_range_error")} '
-                    f'**{bet_min}** - **{bet_max}** {get_guild_currency_symbol(interaction.guild.id)}',
+                    f'**{bet_min}** - **{bet_max}** {await get_guild_currency_symbol(interaction.guild.id)}',
                     interaction.user.display_avatar,
                 )
             )
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
         if balance < bet:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             return await interaction.response.send_message(
@@ -1259,7 +1251,7 @@ class Games(commands.Cog):
             _|___```"""
 
         }
-        image = 'шо'
+        image = 'шо' # ничо
         animals = get_msg_from_locale_by_key(interaction.guild.id, "animals")
         info_msg = get_msg_from_locale_by_key(interaction.guild.id, "information")
         word_msg = get_msg_from_locale_by_key(interaction.guild.id, "word")

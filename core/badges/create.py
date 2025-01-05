@@ -1,16 +1,11 @@
 import sqlite3
+from ..db_utils import execute_update
 
 
-def create_badges_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
+async def create_badges_table() -> None:
+    await execute_update(
         f"""CREATE TABLE IF NOT EXISTS badges (
-        guild_id INTEGER, user_id INTEGER, badge_1 BOOL, badge_2 BOOL, badge_3 BOOL, badge_4 BOOL, 
+        guild_id BIGINT, user_id BIGINT, badge_1 BOOL, badge_2 BOOL, badge_3 BOOL, badge_4 BOOL, 
         badge_5 BOOL, badge_6 BOOL, badge_7 BOOL, badge_8 BOOL, badge_9 BOOL
     )"""
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return

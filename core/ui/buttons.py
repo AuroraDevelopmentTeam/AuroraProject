@@ -3,7 +3,6 @@ import typing
 import nextcord
 from nextcord import ButtonStyle, Interaction
 from nextcord.ui import Button, View
-from nextcord.ext import commands
 
 
 def create_button(label: str, callback=False, disabled: bool = False):

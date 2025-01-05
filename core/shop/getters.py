@@ -1,6 +1,8 @@
 import nextcord
 from nextcord import Interaction
 from nextcord.ui import Button, Select, View
+
+from core.db_utils import fetch_one, fetch_all
 from core.shop.updaters import buy_role, delete_role_from_shop
 import sqlite3
 from typing import Coroutine, Any
@@ -58,14 +60,12 @@ class ShopLeave(Button):
         await interaction.delete_original_message()
 
 
-def get_custom_shop_roles_limit(
+async def get_custom_shop_roles_limit(
         guild_id: int,
 ) -> bool:  # TODO сделать чтобы создатель сервера мог регулировать лимит и переименовать, а то не совсем соответствует
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    roles = cursor.execute(
-        "SELECT * FROM custom_shop WHERE guild_id = ?", (guild_id,)
-    ).fetchall()
+    roles = await fetch_all(
+        "SELECT * FROM custom_shop WHERE guild_id = %s", (guild_id,)
+    )
     if len(roles) >= 60:  # в будущем можно будет увеличить
         return True
     return False
@@ -74,46 +74,42 @@ def get_custom_shop_roles_limit(
 async def custom_shop_embed(
         inter: Interaction, pagen: int = 1, order: str = "notnew"
 ) -> Coroutine[Any, Any, tuple[nextcord.Embed, View]]:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
     embed = nextcord.Embed(title="Магазин личных ролей")
     view = View()
     notnew, new, highcost, lowcost = False, False, False, False
     if order == "notnew":
-        roles = cursor.execute(
+        roles = await fetch_all(
             f"SELECT * FROM custom_shop WHERE guild_id = {inter.guild.id} ORDER BY created ASC"
-        ).fetchall()
+        )
         notnew = True
     elif order == "new":
-        roles = cursor.execute(
+        roles = await fetch_all(
             f"SELECT * FROM custom_shop WHERE guild_id = {inter.guild.id} ORDER BY created DESC"
-        ).fetchall()
+        )
         new = True
     elif order == "highcost":
-        roles = cursor.execute(
+        roles = await fetch_all(
             f"SELECT * FROM custom_shop WHERE guild_id = {inter.guild.id} ORDER BY cost DESC"
-        ).fetchall()
+        )
         highcost = True
     elif order == "lowcost":
-        roles = cursor.execute(
+        roles = await fetch_all(
             f"SELECT * FROM custom_shop WHERE guild_id = {inter.guild.id} ORDER BY cost ASC"
-        ).fetchall()
+        )
         lowcost = True
-    cursor.close()
-    db.close()
     roles = list(roles)
     pagescol = len(roles) // 5
     if len(roles) % 5 != 0:
         pagescol += 1
     x = pagen * 5
     col = x - 5
-    currency_symbol = get_guild_currency_symbol(inter.guild.id)
+    currency_symbol = await get_guild_currency_symbol(inter.guild.id)
     for each in roles[x - 5: x]:
         each = CustomRole(*list(each))
         col += 1
         objecta = nextcord.utils.get(inter.guild.roles, id=each.role_id)
         if objecta is None:
-            delete_role_from_shop(inter.guild, each.role_id)
+            await delete_role_from_shop(inter.guild, each.role_id)
             return await custom_shop_embed(inter, pagen, order)
         button = BuyButton(label=col, interaction=inter, role=objecta.name)
         view.add_item(button)
@@ -186,23 +182,15 @@ async def custom_shop_embed(
     return embed, view
 
 
-def get_custom_shop_enabled(guild_id: int) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    enabled = cursor.execute(
+async def get_custom_shop_enabled(guild_id: int) -> bool:
+    enabled = await fetch_one(
         f"SELECT enabled FROM custom_shop_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return bool(int(enabled))
+    )
+    return bool(int(enabled[0]))
 
 
-def get_custom_shop_role_create_cost(guild_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
+async def get_custom_shop_role_create_cost(guild_id: int) -> int:
     role_create_cost = cursor.execute(
         f"role_create_cost FROM custom_shop_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return role_create_cost
+    )
+    return role_create_cost[0]

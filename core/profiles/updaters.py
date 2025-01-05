@@ -1,25 +1,13 @@
-import sqlite3
+from core.db_utils import execute_update
 
 
-def update_profile_description(user_id: int, description: str) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    sql = "UPDATE profiles SET description = ? WHERE user_id = ?"
+async def update_profile_description(user_id: int, description: str) -> None:
+    sql = "UPDATE profiles SET description = %s WHERE user_id = %s"
     values = (description, user_id)
-    cursor.execute(sql, values)
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    await execute_update(sql, values)
 
 
-def update_avatar_form(user_id: int, avatar_form: str) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    sql = "UPDATE profiles SET avatar_form = ? WHERE user_id = ?"
+async def update_avatar_form(user_id: int, avatar_form: str) -> None:
+    sql = "UPDATE profiles SET avatar_form = %s WHERE user_id = %s"
     values = (avatar_form, user_id)
-    cursor.execute(sql, values)
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    await execute_update(sql, values)
