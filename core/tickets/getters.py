@@ -1,34 +1,22 @@
-import sqlite3
+from core.db_utils import fetch_one
 
 
-def get_ticket_category(guild_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    ticket_category = cursor.execute(
+async def get_ticket_category(guild_id: int) -> int:
+    ticket_category = await fetch_one(
         f"SELECT ticket_category FROM tickets_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return ticket_category
+    )
+    return ticket_category[0]
 
 
-def get_ticket_archive(guild_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    ticket_archive = cursor.execute(
+async def get_ticket_archive(guild_id: int) -> int:
+    ticket_archive = await fetch_one(
         f"SELECT ticket_archive FROM tickets_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return ticket_archive
+    )
+    return ticket_archive[0]
 
 
-def get_ticket_support(guild_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    ticket_support = cursor.execute(
+async def get_ticket_support(guild_id: int) -> int:
+    ticket_support = await fetch_one(
         f"SELECT ticket_support FROM tickets_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return ticket_support
+    )
+    return ticket_support[0]

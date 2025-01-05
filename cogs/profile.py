@@ -1,52 +1,40 @@
-from typing import Optional
-from easy_pil import *
-from PIL import Image
-from io import BytesIO
-import textwrap
 import locale
+import textwrap
+from io import BytesIO
+from typing import Optional
 
 import nextcord
-from nextcord.ext import commands, application_checks
+from PIL import Image
+from easy_pil import *
 from nextcord import Permissions, Interaction, SlashOption
+from nextcord.ext import commands
 
-from core.profiles.updaters import update_profile_description, update_avatar_form
-from core.money.getters import get_user_balance
+from core.badges.check import check_badges
+from core.badges.converters import ACHIEVMENTS_DESCRIPTION, ACHIEVMENTS_LIST
+from core.badges.getters import get_user_badge_state
+from core.embeds import DEFAULT_BOT_COLOR
+from core.embeds import construct_basic_embed
+from core.emojify import (
+    STAR,
+    SETTINGS,
+    MASK,
+    MESSAGE,
+    VOICE,
+)
+from core.errors import construct_error_bot_user_embed
 from core.honor.getters import get_user_honor_level, get_rome_symbol
 from core.levels.getters import get_user_level
-from core.profiles.getters import get_profile_description
-from core.badges.getters import get_user_badge_state
-from core.badges.converters import ACHIEVMENTS_DESCRIPTION, ACHIEVMENTS_LIST
-from core.embeds import DEFAULT_BOT_COLOR
-from core.badges.check import check_badges
-from core.errors import construct_error_bot_user_embed
 from core.locales.getters import (
     get_msg_from_locale_by_key,
     get_localized_description,
     get_localized_name,
     localize_name,
 )
-from core.emojify import (
-    SHOP,
-    STAR,
-    SWORD,
-    SETTINGS,
-    HANDWRITTEN_HEARTS,
-    HEARTS_SCROLL,
-    HEARTS_MANY,
-    HEARTS_THREE,
-    USERS,
-    GIFT,
-    MASK,
-    RINGS,
-    BROKEN_HEART,
-    MESSAGE,
-    PIGBANK,
-    PRICE_TAG,
-    VOICE,
-)
+from core.money.getters import get_user_balance
+from core.profiles.getters import get_profile_description
+from core.profiles.updaters import update_profile_description
 from core.stats.getters import get_user_messages_counter, get_user_time_in_voice
 from core.utils import format_seconds_to_hhmmss
-from core.embeds import construct_basic_embed
 
 
 def get_description_rows(description: str):
@@ -97,7 +85,7 @@ class UserProfiles(commands.Cog):
                 color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
-        update_profile_description(interaction.user.id, description)
+        await update_profile_description(interaction.user.id, description)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"profile_{interaction.application_command.name}"
         )
@@ -157,7 +145,7 @@ class UserProfiles(commands.Cog):
                 )
             )
         await interaction.response.defer()
-        check_badges(interaction.guild.id, user)
+        await check_badges(interaction.guild.id, user)
         background = Editor(f"./assets/without_badges.png")
         avatar = BytesIO()
         await user.display_avatar.with_format("png").save(avatar)
@@ -167,32 +155,32 @@ class UserProfiles(commands.Cog):
         level_font = Font.montserrat(size=40)
         larger_font = Font.montserrat(size=40)
         font = Font.montserrat(size=21)
-        level = get_user_level(interaction.guild.id, user.id)
-        if get_user_badge_state(interaction.guild.id, user.id, "badge_1") is True:
+        level = await get_user_level(interaction.guild.id, user.id)
+        if await get_user_badge_state(interaction.guild.id, user.id, "badge_1") is True:
             developer = Editor("./assets/developer_badge.png").resize((35, 35))
             background.paste(developer, (105, 455))
-        if get_user_badge_state(interaction.guild.id, user.id, "badge_2") is True:
+        if await get_user_badge_state(interaction.guild.id, user.id, "badge_2") is True:
             developer = Editor("./assets/staff_badge.png").resize((35, 35))
             background.paste(developer, (175, 455))
-        if get_user_badge_state(interaction.guild.id, user.id, "badge_3") is True:
+        if await get_user_badge_state(interaction.guild.id, user.id, "badge_3") is True:
             developer = Editor("./assets/golden_wings.png").resize((50, 35))
             background.paste(developer, (245, 455))
-        if get_user_badge_state(interaction.guild.id, user.id, "badge_4") is True:
+        if await get_user_badge_state(interaction.guild.id, user.id, "badge_4") is True:
             developer = Editor("./assets/diamond.png").resize((45, 45))
             background.paste(developer, (100, 495))
-        if get_user_badge_state(interaction.guild.id, user.id, "badge_5") is True:
+        if await get_user_badge_state(interaction.guild.id, user.id, "badge_5") is True:
             developer = Editor("./assets/honor.png").resize((55, 45))
             background.paste(developer, (165, 495))
-        if get_user_badge_state(interaction.guild.id, user.id, "badge_6") is True:
+        if await get_user_badge_state(interaction.guild.id, user.id, "badge_6") is True:
             developer = Editor("./assets/lab.png").resize((35, 35))
             background.paste(developer, (250, 495))
-        if get_user_badge_state(interaction.guild.id, user.id, "badge_7") is True:
+        if await get_user_badge_state(interaction.guild.id, user.id, "badge_7") is True:
             developer = Editor("./assets/bug_hunter.png").resize((35, 35))
             background.paste(developer, (105, 545))
-        if get_user_badge_state(interaction.guild.id, user.id, "badge_8") is True:
+        if await get_user_badge_state(interaction.guild.id, user.id, "badge_8") is True:
             developer = Editor("./assets/immortal.jpg").resize((45, 45))
             background.paste(developer, (170, 535))
-        if get_user_badge_state(interaction.guild.id, user.id, "badge_9") is True:
+        if await get_user_badge_state(interaction.guild.id, user.id, "badge_9") is True:
             developer = Editor("./assets/badge_heart.png").resize((50, 45))
             background.paste(developer, (245, 535))
 
@@ -207,7 +195,7 @@ class UserProfiles(commands.Cog):
         background.text((705, 30), f"LVL", font=larger_font, color="#000000")
         background.text(coordinates, f"{level}", font=level_font, color="#000000")
         background.text((460, 520), str(user.name), font=larger_font, color="#000000")
-        honor_level = get_rome_symbol(get_user_honor_level(user.id))
+        honor_level = get_rome_symbol(await get_user_honor_level(user.id))
         if len(honor_level) >= 3:
             coordinates = (18, 80)
         elif len(honor_level) == 2:
@@ -221,7 +209,7 @@ class UserProfiles(commands.Cog):
             elif honor_level == "I":
                 coordinates = (30, 80)
         background.text(coordinates, honor_level, font=larger_font, color="#FFFFFF")
-        balance = get_user_balance(interaction.guild.id, user.id)
+        balance = await get_user_balance(interaction.guild.id, user.id)
         if balance > 1000000:
             balance = f"{(balance / 1000000):10.2f}KK"
             coordinates = (90, 20)
@@ -231,7 +219,7 @@ class UserProfiles(commands.Cog):
         else:
             coordinates = (130, 20)
         background.text(coordinates, f"{balance}", font=larger_font, color="#FFFFFF")
-        description = get_profile_description(user.id)
+        description = await get_profile_description(user.id)
         lines = textwrap.wrap(description, width=35)
         y_text = 380
         for line in lines:
@@ -246,12 +234,12 @@ class UserProfiles(commands.Cog):
         )
         embed.add_field(
             name=f"{MESSAGE}",
-            value=f"**{get_user_messages_counter(interaction.guild.id, user.id)}**",
+            value=f"**{await get_user_messages_counter(interaction.guild.id, user.id)}**",
             inline=True,
         )
         embed.add_field(
             name=f"{VOICE}",
-            value=f"**{format_seconds_to_hhmmss(get_user_time_in_voice(interaction.guild.id, user.id))}**",
+            value=f"**{format_seconds_to_hhmmss(await get_user_time_in_voice(interaction.guild.id, user.id))}**",
             inline=True,
         )
         embed.add_field(name=f"{STAR}", value=f"**{honor_level}**", inline=True)
@@ -280,9 +268,9 @@ class UserProfiles(commands.Cog):
     )
     async def __badges_profile(self, interaction: Interaction):
         embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
-        check_badges(interaction.guild.id, interaction.user)
+        await check_badges(interaction.guild.id, interaction.user)
         for i in range(9):
-            state = get_user_badge_state(
+            state = await get_user_badge_state(
                 interaction.guild.id, interaction.user.id, f"badge_{i + 1}"
             )
             if state is False:

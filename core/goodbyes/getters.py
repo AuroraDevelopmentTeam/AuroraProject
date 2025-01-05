@@ -1,34 +1,22 @@
-import sqlite3
+from ..db_utils import fetch_one
 
 
-def get_server_goodbye_channel_id(guild_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    goodbye_channel_id = cursor.execute(
+async def get_server_goodbye_channel_id(guild_id: int) -> int:
+    goodbye_channel_id = await fetch_one(
         f"SELECT goodbye_message_channel FROM goodbye_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return goodbye_channel_id
+    )
+    return goodbye_channel_id[0]
 
 
-def get_server_goodbye_state(guild_id: int) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    messages_state = cursor.execute(
+async def get_server_goodbye_state(guild_id: int) -> bool:
+    messages_state = await fetch_one(
         f"SELECT goodbye_message_enabled FROM goodbye_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return bool(messages_state)
+    )
+    return bool(messages_state[0])
 
 
-def get_server_goodbye_message_type(guild_id: int) -> str:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    messages_type = cursor.execute(
+async def get_server_goodbye_message_type(guild_id: int) -> str:
+    messages_type = await fetch_one(
         f"SELECT goodbye_message_type FROM goodbye_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return messages_type
+    )
+    return messages_type[0]

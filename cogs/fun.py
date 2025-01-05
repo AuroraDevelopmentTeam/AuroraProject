@@ -117,12 +117,12 @@ class Funny(commands.Cog):
     )
     async def __cat(self, interaction: Interaction):
         async with aiohttp.ClientSession() as session:
-            request = await session.get("https://some-random-api.ml/img/cat")
+            request = await session.get("https://some-random-api.com/animal/cat")
             data = await request.json()
             await interaction.response.send_message(
-                embed=build_random_image_embed(
+                embed=await build_random_image_embed(
                     interaction.application_command.name,
-                    data["link"],
+                    data["image"],
                     interaction.guild.id,
                 )
             )
@@ -136,12 +136,12 @@ class Funny(commands.Cog):
     )
     async def __dog(self, interaction: Interaction):
         async with aiohttp.ClientSession() as session:
-            request = await session.get("https://some-random-api.ml/img/dog")
+            request = await session.get("https://some-random-api.com/animal/dog")
             data = await request.json()
             await interaction.response.send_message(
-                embed=build_random_image_embed(
+                embed=await build_random_image_embed(
                     interaction.application_command.name,
-                    data["link"],
+                    data["image"],
                     interaction.guild.id,
                 )
             )
@@ -155,12 +155,12 @@ class Funny(commands.Cog):
     )
     async def __fox(self, interaction: Interaction):
         async with aiohttp.ClientSession() as session:
-            request = await session.get("https://some-random-api.ml/img/fox")
+            request = await session.get("https://some-random-api.com/animal/fox")
             data = await request.json()
             await interaction.response.send_message(
-                embed=build_random_image_embed(
+                embed=await build_random_image_embed(
                     interaction.application_command.name,
-                    data["link"],
+                    data["image"],
                     interaction.guild.id,
                 )
             )
@@ -174,12 +174,12 @@ class Funny(commands.Cog):
     )
     async def __bird(self, interaction: Interaction):
         async with aiohttp.ClientSession() as session:
-            request = await session.get("https://some-random-api.ml/img/bird")
+            request = await session.get("https://some-random-api.com/animal/bird")
             data = await request.json()
             await interaction.response.send_message(
-                embed=build_random_image_embed(
+                embed=await build_random_image_embed(
                     interaction.application_command.name,
-                    data["link"],
+                    data["image"],
                     interaction.guild.id,
                 )
             )
@@ -193,34 +193,34 @@ class Funny(commands.Cog):
     )
     async def __panda(self, interaction: Interaction):
         async with aiohttp.ClientSession() as session:
-            request = await session.get("https://some-random-api.ml/img/panda")
+            request = await session.get("https://some-random-api.com/animal/panda")
             data = await request.json()
             await interaction.response.send_message(
-                embed=build_random_image_embed(
+                embed=await build_random_image_embed(
                     interaction.application_command.name,
-                    data["link"],
+                    data["image"],
                     interaction.guild.id,
                 )
             )
 
-    @nextcord.slash_command(
-        name="red_panda",
-        description="Send's random picture of red panda",
-        name_localizations=get_localized_name("red_panda"),
-        description_localizations=get_localized_description("red_panda"),
-        default_member_permissions=Permissions(send_messages=True),
-    )
-    async def __red_panda(self, interaction: Interaction):
-        async with aiohttp.ClientSession() as session:
-            request = await session.get("https://some-random-api.ml/img/red_panda")
-            data = await request.json()
-            await interaction.response.send_message(
-                embed=build_random_image_embed(
-                    interaction.application_command.name,
-                    data["link"],
-                    interaction.guild.id,
-                )
-            )
+    # @nextcord.slash_command(
+    #     name="red_panda",
+    #     description="Send's random picture of red panda",
+    #     name_localizations=get_localized_name("red_panda"),
+    #     description_localizations=get_localized_description("red_panda"),
+    #     default_member_permissions=Permissions(send_messages=True),
+    # )
+    # async def __red_panda(self, interaction: Interaction):
+    #     async with aiohttp.ClientSession() as session:
+    #         request = await session.get("https://some-random-api.com/animal/panda")
+    #         data = await request.json()
+    #         await interaction.response.send_message(
+    #             embed=await build_random_image_embed(
+    #                 interaction.application_command.name,
+    #                 data["image"],
+    #                 interaction.guild.id,
+    #             )
+    #         )
 
 
 def setup(client):

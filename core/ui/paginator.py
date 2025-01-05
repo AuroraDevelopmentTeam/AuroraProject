@@ -80,7 +80,7 @@ class Dropdown(nextcord.ui.Select):
         embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
         msg = get_msg_from_locale_by_key(self.guild.id, "shop")
         if self.values[0] != "...":
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             msg = get_msg_from_locale_by_key(self.guild.id, "on_balance")
             if balance < (self.price[int(self.values[0]) - 1]):
                 embed = construct_error_not_enough_embed(
@@ -113,12 +113,12 @@ class Dropdown(nextcord.ui.Select):
             msg = get_msg_from_locale_by_key(self.guild.id, "shop")
             embed.description(f"{msg} {self.role_list[int(self.values[0]) - 1].mention}")
             embed.title(f"{SHOP} {localize_name(self.guild_id, 'shop').capitalize()}")
-            update_user_balance(
+            await update_user_balance(
                 interaction.guild.id,
                 interaction.user.id,
                 -(self.price[int(self.values[0]) - 1]),
             )
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             embed.set_footer(
                 text=f"{msg} {balance}", icon_url=interaction.user.display_avatar
@@ -193,12 +193,10 @@ class SelectButtonMenuPages(menus.ButtonMenuPages, inherit_buttons=False):
 class ShopModal(nextcord.ui.Modal):
     def __init__(self, guild: nextcord.Guild):
         self.guild = guild
-        self.guild_roles = parse_server_roles(guild, False)
+        self.guild_roles = []
         self.price = []
         self.role_list = []
-        super().__init__(
-            "Shop",
-        )
+        super().__init__("Shop")
         self.number = nextcord.ui.TextInput(
             label="Shop",
             min_length=1,
@@ -207,59 +205,60 @@ class ShopModal(nextcord.ui.Modal):
             placeholder="1",
         )
         self.add_item(self.number)
+
+    async def setup_roles(self):
+        self.guild_roles = await parse_server_roles(self.guild, False)
         if len(self.guild_roles) > 0:
-            for i in range(len(self.guild_roles)):
-                self.price.append(self.guild_roles[i][1])
-                self.role_list.append(self.guild_roles[i][0])
+            for role_info in self.guild_roles:
+                self.price.append(role_info[1])
+                self.role_list.append(role_info[0])
 
     async def callback(self, interaction: Interaction):
-        try:
-            if len(self.guild_roles) > 0:
-                embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
-                balance = get_user_balance(interaction.guild.id, interaction.user.id)
-                msg = get_msg_from_locale_by_key(self.guild.id, "on_balance")
-                if balance < (self.price[int(self.number.value) - 1]):
-                    embed = construct_error_not_enough_embed(
-                        get_msg_from_locale_by_key(
-                            interaction.guild.id, "not_enough_money_error"
-                        ),
-                        interaction.user.display_avatar,
-                        f"{msg} {balance}",
-                    )
-                    return await interaction.response.send_message(
-                        embed=embed)
-                if self.role_list[int(self.number.value) - 1] in interaction.user.roles:
-                    message = get_msg_from_locale_by_key(
-                        interaction.guild.id, "already_have"
-                    )
-                    embed.add_field(name="error", value=f"{message}")
-                    return await interaction.response.send_message(
-                        embed=embed)
-                await interaction.user.add_roles(
-                    self.role_list[int(self.number.value) - 1]
+        if len(self.guild_roles) > 0:
+            embed = nextcord.Embed(color=DEFAULT_BOT_COLOR)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
+            msg = get_msg_from_locale_by_key(self.guild.id, "on_balance")
+            if balance < (self.price[int(self.number.value) - 1]):
+                embed = construct_error_not_enough_embed(
+                    get_msg_from_locale_by_key(
+                        interaction.guild.id, "not_enough_money_error"
+                    ),
+                    interaction.user.display_avatar,
+                    f"{msg} {balance}",
                 )
-                msg = get_msg_from_locale_by_key(self.guild.id, "shop")
-                embed = nextcord.Embed(color=DEFAULT_BOT_COLOR,
-                                       description=f"{msg} {self.role_list[int(self.number.value) - 1].mention}",
-                                       title=f"{SHOP} {localize_name(self.guild.id, 'shop').capitalize()}")
-                update_user_balance(
-                    interaction.guild.id,
-                    interaction.user.id,
-                    -(self.price[int(self.number.value) - 1]),
+                return await interaction.response.send_message(
+                    embed=embed)
+            if self.role_list[int(self.number.value) - 1] in interaction.user.roles:
+                message = get_msg_from_locale_by_key(
+                    interaction.guild.id, "already_have"
                 )
-                balance = get_user_balance(interaction.guild.id, interaction.user.id)
-                msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
-                embed.set_footer(
-                    text=f"{msg} {balance}", icon_url=interaction.user.display_avatar
-                )
-                return await interaction.response.send_message(embed=embed)
-        except Exception as err:
-            print(err)
-            await interaction.response.send_message(err)
+                embed.add_field(name="error", value=f"{message}")
+                return await interaction.response.send_message(
+                    embed=embed)
+            await interaction.user.add_roles(
+                self.role_list[int(self.number.value) - 1]
+            )
+            msg = get_msg_from_locale_by_key(self.guild.id, "shop")
+            embed = nextcord.Embed(color=DEFAULT_BOT_COLOR,
+                                   description=f"{msg} {self.role_list[int(self.number.value) - 1].mention}",
+                                   title=f"{SHOP} {localize_name(self.guild.id, 'shop').capitalize()}")
+            await update_user_balance(
+                interaction.guild.id,
+                interaction.user.id,
+                -(self.price[int(self.number.value) - 1]),
+            )
+            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+            msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
+            embed.set_footer(
+                text=f"{msg} {balance}", icon_url=interaction.user.display_avatar
+            )
+            return await interaction.response.send_message(embed=embed)
+
 
 
 async def show_modal(interaction: Interaction):
     modal = ShopModal(guild=interaction.guild)
+    await modal.setup_roles()
     return await interaction.response.send_modal(modal)
 
 

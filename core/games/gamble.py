@@ -37,7 +37,7 @@ def approximate_bet(bet, state) -> tuple:
         return percentage, bet
 
 
-def get_game_state(state, user: nextcord.Member, client, guild_id: int) -> str:
+async def get_game_state(state, user: nextcord.Member, client, guild_id: int) -> str:
     if state is True:
         return f'{user.mention} **{get_msg_from_locale_by_key(guild_id, "win")}**'
     if state is None:
@@ -48,7 +48,7 @@ def get_game_state(state, user: nextcord.Member, client, guild_id: int) -> str:
         )
 
 
-def create_gamble_embed(
+async def create_gamble_embed(
     state,
     game_state: str,
     percentage: int,

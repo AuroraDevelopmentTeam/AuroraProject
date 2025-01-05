@@ -1,15 +1,9 @@
-import sqlite3
+from core.db_utils import execute_update
 
 
-def create_profiles_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
+async def create_profiles_table() -> None:
+    await execute_update(
         f"""CREATE TABLE IF NOT EXISTS profiles (
-        user_id INTEGER, description TEXT, avatar_form TEXT
+        user_id BIGINT, description TEXT, avatar_form TEXT
     )"""
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return

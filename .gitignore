@@ -9,3 +9,11 @@ vk_config.v2.json
 databases/.DS_Store
 .DS_Store
 .vscode/launch.json
+*.log
+*.log
+*.sql
+*.yaml
+*.sql
+output.sql
+test.py
+*.1

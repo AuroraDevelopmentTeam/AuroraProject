@@ -1,14 +1,12 @@
-import sqlite3
+from core.db_utils import execute_update
 from core.checkers import is_guild_id_in_table, is_user_in_table
 from config import settings
 from core.locales.getters import get_msg_from_locale_by_key
 
 
-def write_in_welcomers_config_standart_values(guilds) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
+async def write_in_welcomers_config_standart_values(guilds) -> None:
     for guild in guilds:
-        if is_guild_id_in_table("welcomers_config", guild.id) is False:
+        if await is_guild_id_in_table("welcomers_config", guild.id) is False:
             default_welcome_message_title = get_msg_from_locale_by_key(
                 guild.id, "default_welcome_message_title"
             )
@@ -19,7 +17,7 @@ def write_in_welcomers_config_standart_values(guilds) -> None:
             sql = (
                 "INSERT INTO welcomers_config(guild_id, welcome_message_enabled, "
                 "welcome_message_channel, welcome_message_type, welcome_message_title, "
-                "welcome_message_description, welcome_message_url) VALUES (?, ?, ?, ?, ?, ?, ?)"
+                "welcome_message_description, welcome_message_url) VALUES (%s, %s, %s, %s, %s, %s, %s)"
             )
             val = (
                 guild.id,
@@ -30,8 +28,4 @@ def write_in_welcomers_config_standart_values(guilds) -> None:
                 default_welcome_message_description,
                 default_welcome_message_url,
             )
-            cursor.execute(sql, val)
-            db.commit()
-    cursor.close()
-    db.close()
-    return
+            await execute_update(sql, val)

@@ -1,47 +1,42 @@
-import sqlite3
-from easy_pil import *
-import nextcord
-
-from core.embeds import construct_basic_embed
-from core.checkers import is_guild_id_in_table, is_user_in_table
+from core.db_utils import execute_update
 
 
-def create_level_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
-        f"""CREATE TABLE IF NOT EXISTS levels (
-        guild_id INTEGER, user_id INTEGER, level INTEGER, exp INTEGER
-    )"""
+async def create_level_table() -> None:
+    query = """
+    CREATE TABLE IF NOT EXISTS levels (
+        guild_id BIGINT, 
+        user_id BIGINT, 
+        level INTEGER, 
+        exp INTEGER
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    """
+    await execute_update(query)
 
-
-def create_level_config_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
-        f"""CREATE TABLE IF NOT EXISTS levels_config (
-        guild_id INTEGER, min_exp_per_message INTEGER, max_exp_per_message INTEGER, level_up_messages_state BOOLEAN
-    )"""
+async def create_level_config_table() -> None:
+    query = """
+    CREATE TABLE IF NOT EXISTS levels_config (
+        guild_id BIGINT, 
+        min_exp_per_message INTEGER, 
+        max_exp_per_message INTEGER, 
+        level_up_messages_state BOOLEAN
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    """
+    await execute_update(query)
 
-
-def create_level_channels_config_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
-        f"""CREATE TABLE IF NOT EXISTS level_channels_config (
-        guild_id INTEGER, channel_id INTEGER, enabled BOOL)"""
+async def create_level_channels_config_table() -> None:
+    query = """
+    CREATE TABLE IF NOT EXISTS level_channels_config (
+        guild_id BIGINT, 
+        channel_id BIGINT, 
+        enabled BOOL
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    """
+    await execute_update(query)
+
+
+
+
+
+
+
+

@@ -1,61 +1,41 @@
-import sqlite3
+from ..db_utils import fetch_one
 
 
-def get_user_level(guild_id: int, user_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    level = cursor.execute(
+async def get_user_level(guild_id: int, user_id: int) -> int:
+    level = await fetch_one(
         f"SELECT level FROM levels WHERE guild_id = {guild_id} AND user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return level
+    )
+    return level[0]
 
 
-def get_user_exp(guild_id: int, user_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    exp = cursor.execute(
+async def get_user_exp(guild_id: int, user_id: int) -> int:
+    exp = await fetch_one(
         f"SELECT exp FROM levels WHERE guild_id = {guild_id} AND user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return exp
+    )
+    return exp[0]
 
 
-def get_min_max_exp(guild_id: int) -> tuple[int, int]:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    min_exp = cursor.execute(
+async def get_min_max_exp(guild_id: int) -> tuple[int, int]:
+    min_exp = await fetch_one(
         f"SELECT min_exp_per_message FROM levels_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    max_exp = cursor.execute(
+    )
+    max_exp = await fetch_one(
         f"SELECT max_exp_per_message FROM levels_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return min_exp, max_exp
+    )
+    return min_exp[0], max_exp[0]
 
 
-def get_guild_messages_state(guild_id: int) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    messages_state = cursor.execute(
+async def get_guild_messages_state(guild_id: int) -> bool:
+    messages_state = await fetch_one(
         f"SELECT level_up_messages_state FROM levels_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return bool(messages_state)
+    )
+    return bool(messages_state[0])
 
 
-def get_channel_level_state(guild_id: int, channel_id: int) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    state = cursor.execute(
+async def get_channel_level_state(guild_id: int, channel_id: int) -> bool:
+    state = await fetch_one(
         f"SELECT enabled FROM level_channels_config WHERE guild_id = {guild_id} AND channel_id = {channel_id}"
-    ).fetchone()
-    cursor.close()
-    db.close()
+    )
     if state is None:
         return True
     else:

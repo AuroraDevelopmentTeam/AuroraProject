@@ -1,11 +1,11 @@
 import asyncio
 from typing import Optional
-import emoji
 
+import emoji
 import nextcord
-from nextcord import Interaction, Message, Permissions, SlashOption
-from nextcord.ext import commands, menus, application_checks
+from nextcord import Interaction, Permissions, SlashOption
 from nextcord.abc import GuildChannel
+from nextcord.ext import commands, menus, application_checks
 
 from core.auto.roles.getters import (
     get_server_autorole_state,
@@ -15,9 +15,6 @@ from core.auto.roles.getters import (
     list_level_autoroles,
     list_reaction_autoroles,
     check_reaction_autorole,
-    get_autorole_lvl_deletion_state,
-    get_lesser_lvl_roles_list,
-    get_server_marriage_autorole,
 )
 from core.auto.roles.updaters import (
     delete_autorole_for_reaction,
@@ -31,17 +28,17 @@ from core.auto.roles.updaters import (
     update_autorole_on_marriage,
 )
 from core.embeds import DEFAULT_BOT_COLOR, construct_basic_embed
-from core.locales.getters import (
-    get_msg_from_locale_by_key,
-    get_localized_description,
-    get_localized_name,
-    localize_name,
-)
 from core.errors import (
     construct_error_forbidden_embed,
     construct_error_negative_value_embed,
     construct_error_http_exception_embed,
     construct_error_not_found_embed,
+)
+from core.locales.getters import (
+    get_msg_from_locale_by_key,
+    get_localized_description,
+    get_localized_name,
+    localize_name,
 )
 
 
@@ -81,9 +78,9 @@ class Autorole(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        if get_server_autorole_state(member.guild.id) is False:
+        if await get_server_autorole_state(member.guild.id) is False:
             return
-        autorole_id = get_server_autorole_id(member.guild.id)
+        autorole_id = await get_server_autorole_id(member.guild.id)
         if autorole_id == 0:
             return
         role = nextcord.utils.get(member.guild.roles, id=autorole_id)
@@ -189,9 +186,9 @@ class Autorole(commands.Cog):
     ):
         try:
             if check_level_autorole(interaction.guild.id, level):
-                update_autorole_for_level(interaction.guild.id, role, level)
+                await update_autorole_for_level(interaction.guild.id, role, level)
             else:
-                write_autorole_for_level(interaction.guild.id, role, level)
+                await write_autorole_for_level(interaction.guild.id, role, level)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"autorole_{interaction.application_command.name}"
             )
@@ -249,7 +246,7 @@ class Autorole(commands.Cog):
                 color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
-        delete_autorole_for_level(interaction.guild.id, level)
+        await delete_autorole_for_level(interaction.guild.id, level)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"autorole_{interaction.application_command.name}"
         )
@@ -334,7 +331,7 @@ class Autorole(commands.Cog):
             else:
                 is_custom = True
             if is_custom is True:
-                write_autorole_for_reaction(
+                await write_autorole_for_reaction(
                     interaction.guild.id,
                     channel.id,
                     message.id,
@@ -344,7 +341,7 @@ class Autorole(commands.Cog):
                 )
             else:
                 emote = emoji.demojize(str(reaction.emoji), delimiters=("", ""))
-                write_autorole_for_reaction(
+                await write_autorole_for_reaction(
                     interaction.guild.id,
                     channel.id,
                     message.id,
@@ -433,7 +430,7 @@ class Autorole(commands.Cog):
                 color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
-        delete_autorole_for_reaction(interaction.guild.id, role)
+        await delete_autorole_for_reaction(interaction.guild.id, role)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"autorole_{interaction.application_command.name}"
         )
@@ -483,7 +480,7 @@ class Autorole(commands.Cog):
         ),
     ):
         autoroles_state = bool(autoroles_state)
-        set_autoroles_state(interaction.guild.id, autoroles_state)
+        await set_autoroles_state(interaction.guild.id, autoroles_state)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"autorole_{interaction.application_command.name}"
         )
@@ -519,7 +516,7 @@ class Autorole(commands.Cog):
         role: Optional[nextcord.Role] = SlashOption(required=True),
     ):
         try:
-            update_autorole(interaction.guild.id, role.id)
+            await update_autorole(interaction.guild.id, role.id)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"autorole_{interaction.application_command.name}"
             )
@@ -549,7 +546,7 @@ class Autorole(commands.Cog):
     @application_checks.bot_has_guild_permissions(manage_roles=True)
     async def __autoroles_remove_lvl_roles(self, interaction: Interaction,
                                            remove: Optional[bool] = SlashOption(required=True)):
-        update_autorole_lvl_deletion_state(interaction.guild.id, remove)
+        await update_autorole_lvl_deletion_state(interaction.guild.id, remove)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"autorole_{interaction.application_command.name}"
         )
@@ -573,7 +570,7 @@ class Autorole(commands.Cog):
     async def __autorole_on_marriage(self, interaction: Interaction,
                                      role: Optional[nextcord.Role] = SlashOption(required=True)):
         try:
-            update_autorole_on_marriage(interaction.guild.id, role)
+            await update_autorole_on_marriage(interaction.guild.id, role)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"autorole_{interaction.application_command.name}"
             )

@@ -1,15 +1,9 @@
-import sqlite3
+from ..db_utils import execute_update
 
 
-def create_loggers_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
+async def create_loggers_table() -> None:
+    await execute_update(
         f"""CREATE TABLE IF NOT EXISTS loggers (
-        guild_id INTEGER, log_channel_id INTEGER, logs_enabled BOOL
+        guild_id BIGINT, log_channel_id BIGINT, logs_enabled BOOL
     )"""
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return

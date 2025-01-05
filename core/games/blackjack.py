@@ -261,7 +261,7 @@ def get_hand_hidden_cards(client, hand: Hand) -> str:
     return field_value
 
 
-def create_blackjack_embed(
+async def create_blackjack_embed(
     client,
     state_of_game: str,
     player_hand: Hand,
@@ -296,7 +296,7 @@ def create_blackjack_embed(
     return embed
 
 
-def create_game_start_blackjack_embed(
+async def create_game_start_blackjack_embed(
     client,
     state_of_game: str,
     player_hand: Hand,
@@ -337,7 +337,7 @@ def create_game_start_blackjack_embed(
     return embed
 
 
-def create_final_view(guild_id: int) -> View:
+async def create_final_view(guild_id: int) -> View:
     hit_msg = get_msg_from_locale_by_key(guild_id, "hit")
     stand_msg = get_msg_from_locale_by_key(guild_id, "stand")
     hit = create_button(hit_msg, False, True)

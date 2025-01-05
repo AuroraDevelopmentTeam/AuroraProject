@@ -1,18 +1,12 @@
-import sqlite3
+from ..db_utils import execute_update
 from core.checkers import is_guild_id_in_table
 import json
 from config import settings
 
 
-def create_locales_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
+async def create_locales_table() -> None:
+    await execute_update(
         f"""CREATE TABLE IF NOT EXISTS locales (
-        guild_id INTEGER, locale TEXT
+        guild_id BIGINT, locale TEXT
     )"""
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return

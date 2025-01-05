@@ -1,21 +1,42 @@
-from typing import Optional
 import locale
 from datetime import datetime
 from io import BytesIO
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from typing import Optional
 
-from easy_pil import *
 import nextcord
+from PIL import Image
 from nextcord import Interaction, SlashOption, Permissions
+from nextcord.abc import GuildChannel
 from nextcord.ext import commands
 from nextcord.utils import get
-from nextcord.abc import GuildChannel
 
-from core.locales.getters import get_localized_name, get_localized_description
+from core.auto.roles.getters import get_server_marriage_autorole
 from core.checkers import is_married
-from core.money.updaters import update_user_balance
-from core.money.getters import get_user_balance, get_guild_currency_symbol
-from core.marriage.update import marry_users, divorce_users
+from core.embeds import DEFAULT_BOT_COLOR
+from core.embeds import construct_basic_embed
+from core.emojify import (
+    HANDWRITTEN_HEARTS,
+    HEARTS_SCROLL,
+    HEARTS_MANY,
+    GIFT,
+    RINGS,
+    BROKEN_HEART,
+    PRICE_TAG,
+)
+from core.errors import (
+    construct_error_negative_value_embed,
+    construct_error_bot_user_embed,
+    construct_error_self_choose_embed,
+    construct_error_not_enough_embed,
+    construct_error_already_married_embed,
+    construct_error_not_married_embed,
+)
+from core.locales.getters import get_localized_name, get_localized_description
+from core.locales.getters import (
+    get_msg_from_locale_by_key,
+    get_guild_locale,
+    localize_name,
+)
 from core.marriage.create import (
     create_marry_embed,
     create_marry_yes_embed,
@@ -24,8 +45,6 @@ from core.marriage.create import (
     create_love_profile_embed,
 )
 from core.marriage.getters import (
-    get_user_love_description,
-    get_user_marry_date,
     get_user_pair_id,
     get_user_like_id,
     get_user_gifts_price,
@@ -37,10 +56,10 @@ from core.marriage.getters import (
     get_marriage_config_marriage_price,
     get_marriage_config_loveroom_category,
     get_marriage_config_month_loveroom_price,
-    get_user_loveroom_expire_date,
     get_user_loveroom_id,
     get_family_money,
 )
+from core.marriage.update import marry_users, divorce_users
 from core.marriage.update import (
     update_user_like,
     update_user_gift_count,
@@ -54,44 +73,10 @@ from core.marriage.update import (
     update_user_loveroom_expire_date,
     update_user_loveroom_id,
 )
-from core.embeds import construct_basic_embed
-from core.ui.buttons import create_button, ViewAuthorCheck, View
-from core.locales.getters import (
-    get_msg_from_locale_by_key,
-    get_guild_locale,
-    localize_name,
-)
-from core.auto.roles.getters import get_server_marriage_autorole
+from core.money.getters import get_user_balance, get_guild_currency_symbol
+from core.money.updaters import update_user_balance
 from core.parsers import parse_likes, parse_user_gifts
-from core.embeds import DEFAULT_BOT_COLOR
-from core.errors import (
-    construct_error_negative_value_embed,
-    construct_error_bot_user_embed,
-    construct_error_self_choose_embed,
-    construct_error_not_enough_embed,
-    construct_error_already_married_embed,
-    construct_error_not_married_embed,
-)
-from core.emojify import (
-    SHOP,
-    STAR,
-    SWORD,
-    SETTINGS,
-    HANDWRITTEN_HEARTS,
-    HEARTS_SCROLL,
-    HEARTS_MANY,
-    HEARTS_THREE,
-    USERS,
-    GIFT,
-    MASK,
-    RINGS,
-    BROKEN_HEART,
-    MESSAGE,
-    PIGBANK,
-    PRICE_TAG,
-    VOICE,
-    MARRY,
-)
+from core.ui.buttons import create_button, ViewAuthorCheck, View
 
 
 class Marriage(commands.Cog):
@@ -142,7 +127,7 @@ class Marriage(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        if is_married(interaction.guild.id, user.id) is True:
+        if await is_married(interaction.guild.id, user.id) is True:
             return await interaction.response.send_message(
                 embed=construct_error_already_married_embed(
                     get_msg_from_locale_by_key(
@@ -151,8 +136,8 @@ class Marriage(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
-        marriage_price = get_marriage_config_marriage_price(interaction.guild.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
+        marriage_price = await get_marriage_config_marriage_price(interaction.guild.id)
         if balance < marriage_price:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
             return await interaction.response.send_message(
@@ -196,9 +181,9 @@ class Marriage(commands.Cog):
             date_format = "%a, %d %b %Y %H:%M:%S"
             timestamp = datetime.now()
             date = timestamp.strftime(date_format)
-            marry_users(interaction.guild.id, author.id, pair.id, date)
-            update_user_balance(interaction.guild.id, author.id, -marriage_price)
-            marriage_autorole = get_server_marriage_autorole(interaction.guild.id)
+            await marry_users(interaction.guild.id, author.id, pair.id, date)
+            await update_user_balance(interaction.guild.id, author.id, -marriage_price)
+            marriage_autorole = await get_server_marriage_autorole(interaction.guild.id)
             if marriage_autorole != 0:
                 role = nextcord.utils.get(interaction.guild.roles, id=marriage_autorole[0])
                 if role != 0:
@@ -220,7 +205,7 @@ class Marriage(commands.Cog):
             view.add_item(no_button)
             await interaction.message.edit(embed=embed, view=view)
 
-        embed = create_marry_embed(
+        embed = await create_marry_embed(
             interaction.application_command.name, interaction.guild.id, author, pair
         )
         emoji_no = get(self.client.emojis, name="emoji_no")
@@ -252,7 +237,7 @@ class Marriage(commands.Cog):
     )
     async def __loveprofile(self, interaction: Interaction):
         await interaction.response.defer()
-        if is_married(interaction.guild.id, interaction.user.id) is False:
+        if await is_married(interaction.guild.id, interaction.user.id) is False:
             return await interaction.followup.send(
                 embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(
@@ -262,7 +247,7 @@ class Marriage(commands.Cog):
                 )
             )
         pair = await self.client.fetch_user(
-            get_user_pair_id(interaction.guild.id, interaction.user.id)
+            await get_user_pair_id(interaction.guild.id, interaction.user.id)
         )
         avatar = BytesIO()
         await interaction.user.display_avatar.with_format("png").save(avatar)
@@ -271,7 +256,7 @@ class Marriage(commands.Cog):
         await pair.display_avatar.with_format("png").save(avatar)
         pair_profile_picture = Image.open(avatar)
         file = create_love_card(user_profile_picture, pair_profile_picture)
-        embed = create_love_profile_embed(
+        embed = await create_love_profile_embed(
             interaction.application_command.name,
             interaction.guild.id,
             interaction.user,
@@ -287,7 +272,7 @@ class Marriage(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __divorce(self, interaction: Interaction):
-        if is_married(interaction.guild.id, interaction.user.id) is False:
+        if await is_married(interaction.guild.id, interaction.user.id) is False:
             return await interaction.response.send_message(
                 embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(
@@ -296,17 +281,17 @@ class Marriage(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        pair_id = get_user_pair_id(interaction.guild.id, interaction.user.id)
+        pair_id = await get_user_pair_id(interaction.guild.id, interaction.user.id)
         try:
             pair = await interaction.guild.fetch_member(pair_id)
         except nextcord.NotFound:
             pair = None
-        divorce_users(interaction.guild.id, interaction.user.id, pair_id)
-        loveroom_id = get_user_loveroom_id(interaction.guild.id, pair_id)
+        await divorce_users(interaction.guild.id, interaction.user.id, pair_id)
+        loveroom_id = await get_user_loveroom_id(interaction.guild.id, pair_id)
 
         if loveroom_id != 0 and loveroom_id:
             await interaction.guild.get_channel(loveroom_id).delete()
-        marriage_autorole = get_server_marriage_autorole(interaction.guild.id)
+        marriage_autorole = await get_server_marriage_autorole(interaction.guild.id)
         if marriage_autorole != 0:
             role = nextcord.utils.get(interaction.guild.roles, id=marriage_autorole[0])
             if role != 0:
@@ -361,13 +346,13 @@ class Marriage(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        pair_id = get_user_pair_id(interaction.guild.id, user.id)
-        like_id = get_user_like_id(interaction.guild.id, user.id)
-        gift_price = get_user_gifts_price(interaction.guild.id, user.id)
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
-        divorces = get_divorce_counter(interaction.guild.id, user.id)
-        likes_counter = parse_likes(interaction.guild.id, user.id)
-        gifts = parse_user_gifts(interaction.guild.id, user.id)
+        pair_id = await get_user_pair_id(interaction.guild.id, user.id)
+        like_id = await get_user_like_id(interaction.guild.id, user.id)
+        gift_price = await get_user_gifts_price(interaction.guild.id, user.id)
+        currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
+        divorces = await get_divorce_counter(interaction.guild.id, user.id)
+        likes_counter = await parse_likes(interaction.guild.id, user.id)
+        gifts = await parse_user_gifts(interaction.guild.id, user.id)
         embed = nextcord.Embed(
             color=DEFAULT_BOT_COLOR,
             title=f"{HEARTS_SCROLL} {localize_name(interaction.guild.id, interaction.application_command.name).capitalize()} - {user}",
@@ -450,7 +435,7 @@ class Marriage(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        update_user_like(interaction.guild.id, interaction.user.id, user.id)
+        await update_user_like(interaction.guild.id, interaction.user.id, user.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, interaction.application_command.name
         )
@@ -473,7 +458,7 @@ class Marriage(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __unlike(self, interaction: Interaction):
-        like_id = get_user_like_id(interaction.guild.id, interaction.user.id)
+        like_id = await get_user_like_id(interaction.guild.id, interaction.user.id)
         if like_id == 0:
             embed = nextcord.Embed(
                 title="error",
@@ -483,7 +468,7 @@ class Marriage(commands.Cog):
                 color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
-        update_user_like(interaction.guild.id, interaction.user.id, 0)
+        await update_user_like(interaction.guild.id, interaction.user.id, 0)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, interaction.application_command.name
         )
@@ -506,8 +491,8 @@ class Marriage(commands.Cog):
         default_member_permissions=Permissions(send_messages=True),
     )
     async def __gifts(self, interaction: Interaction):
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
-        guild_locale = get_guild_locale(interaction.guild.id)
+        currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
+        guild_locale = await get_guild_locale(interaction.guild.id)
         counter = 1
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         embed = nextcord.Embed(
@@ -587,7 +572,7 @@ class Marriage(commands.Cog):
                         interaction.guild.id, "negative_value_error"
                     ),
                     self.client.user.avatar.url,
-                    money,
+                    amount,
                 )
             )
         if user.bot:
@@ -606,7 +591,7 @@ class Marriage(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
         price = GIFT_PRICES[gift] * amount
         if balance < price:
             msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
@@ -619,9 +604,9 @@ class Marriage(commands.Cog):
                     f"{msg} {balance}",
                 )
             )
-        update_user_balance(interaction.guild.id, interaction.user.id, -price)
-        update_user_gift_count(interaction.guild.id, user.id, gift, amount)
-        update_user_gift_price(interaction.guild.id, user.id, price)
+        await update_user_balance(interaction.guild.id, interaction.user.id, -price)
+        await update_user_gift_count(interaction.guild.id, user.id, gift, amount)
+        await update_user_gift_price(interaction.guild.id, user.id, price)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, interaction.application_command.name
         )
@@ -650,7 +635,7 @@ class Marriage(commands.Cog):
             interaction: Interaction,
             description: Optional[str] = SlashOption(required=True),
     ):
-        if is_married(interaction.guild.id, interaction.user.id) is False:
+        if await is_married(interaction.guild.id, interaction.user.id) is False:
             return await interaction.response.send_message(
                 embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(
@@ -659,7 +644,7 @@ class Marriage(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        update_user_love_description(
+        await update_user_love_description(
             interaction.guild.id, interaction.user.id, description
         )
         message = get_msg_from_locale_by_key(
@@ -688,7 +673,7 @@ class Marriage(commands.Cog):
             interaction: Interaction,
             amount: Optional[int] = SlashOption(required=True),
     ):
-        if is_married(interaction.guild.id, interaction.user.id) is False:
+        if await is_married(interaction.guild.id, interaction.user.id) is False:
             return await interaction.response.send_message(
                 embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(
@@ -697,7 +682,7 @@ class Marriage(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
         if amount <= 0:
             return await interaction.response.send_message(
                 embed=construct_error_negative_value_embed(
@@ -705,7 +690,7 @@ class Marriage(commands.Cog):
                         interaction.guild.id, "negative_value_error"
                     ),
                     self.client.user.avatar.url,
-                    money,
+                    amount,
                 )
             )
         if balance < amount:
@@ -719,18 +704,18 @@ class Marriage(commands.Cog):
                     f"{msg} {balance}",
                 )
             )
-        pair = get_user_pair_id(interaction.guild.id, interaction.user.id)
-        update_user_balance(interaction.guild.id, interaction.user.id, -amount)
-        update_couple_family_money(
+        pair = await get_user_pair_id(interaction.guild.id, interaction.user.id)
+        await update_user_balance(interaction.guild.id, interaction.user.id, -amount)
+        await update_couple_family_money(
             interaction.guild.id, interaction.user.id, pair, amount
         )
         message = get_msg_from_locale_by_key(
             interaction.guild.id, interaction.application_command.name
         )
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
         msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
         await interaction.response.send_message(
             embed=construct_basic_embed(
                 interaction.application_command.name,
@@ -756,7 +741,7 @@ class Marriage(commands.Cog):
                                   )
     async def __marriage_config_enable_loverooms(self, interaction: Interaction,
                                                  enable_loverooms: Optional[bool] = SlashOption(required=True)):
-        update_marriage_config_enable_loverooms(interaction.guild.id, enable_loverooms)
+        await update_marriage_config_enable_loverooms(interaction.guild.id, enable_loverooms)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"marriage_config_{interaction.application_command.name}"
         )
@@ -795,12 +780,12 @@ class Marriage(commands.Cog):
                     marriage_price,
                 )
             )
-        update_marriage_config_marriage_price(interaction.guild.id, marriage_price)
+        await update_marriage_config_marriage_price(interaction.guild.id, marriage_price)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"marriage_config_{interaction.application_command.name}"
         )
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
         await interaction.response.send_message(
             embed=construct_basic_embed(
                 f"marriage_config_{interaction.application_command.name}",
@@ -828,7 +813,7 @@ class Marriage(commands.Cog):
                     month_loveroom_price,
                 )
             )
-        update_marriage_config_month_loveroom_price(interaction.guild.id, month_loveroom_price)
+        await update_marriage_config_month_loveroom_price(interaction.guild.id, month_loveroom_price)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"marriage_config_{interaction.application_command.name}"
         )
@@ -862,7 +847,7 @@ class Marriage(commands.Cog):
                     loveroom_category,
                 )
             )
-        update_marriage_config_loveroom_category(interaction.guild.id, loveroom_category.id)
+        await update_marriage_config_loveroom_category(interaction.guild.id, loveroom_category.id)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"marriage_config_{interaction.application_command.name}"
         )
@@ -883,7 +868,7 @@ class Marriage(commands.Cog):
                                 "loveroom_create"),
                             )
     async def __loveroom_create(self, interaction: Interaction):
-        if is_married(interaction.guild.id, interaction.user.id) is False:
+        if await is_married(interaction.guild.id, interaction.user.id) is False:
             return await interaction.response.send_message(
                 embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(
@@ -892,12 +877,12 @@ class Marriage(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        pair_id = get_user_pair_id(interaction.guild.id, interaction.user.id)
+        pair_id = await get_user_pair_id(interaction.guild.id, interaction.user.id)
         pair = await interaction.guild.fetch_member(pair_id)
-        loverooms_state = get_marriage_config_enable_loverooms(interaction.guild.id)
+        loverooms_state = await get_marriage_config_enable_loverooms(interaction.guild.id)
         if loverooms_state is False:
-            return await 'loverooms on server disabled by admin'
-        room = get_user_loveroom_id(interaction.guild.id, interaction.user.id)
+            return 'loverooms on server disabled by admin'
+        room = await get_user_loveroom_id(interaction.guild.id, interaction.user.id)
         lv = interaction.guild.get_channel(room)
         # if room != 0 or room and lv:
         #     update_user_loveroom_id(interaction.guild.id, interaction.user.id, 0)
@@ -906,8 +891,8 @@ class Marriage(commands.Cog):
 
             lv = interaction.guild.get_channel(int(room))
         if room != 0 or room and lv:
-            update_user_loveroom_id(interaction.guild.id, interaction.user.id, 0)
-            update_user_loveroom_id(interaction.guild.id, pair_id, 0)
+            await update_user_loveroom_id(interaction.guild.id, interaction.user.id, 0)
+            await update_user_loveroom_id(interaction.guild.id, pair_id, 0)
         elif room != 0 or room:
             return await interaction.response.send_message(
                 embed=construct_error_not_married_embed(
@@ -915,22 +900,22 @@ class Marriage(commands.Cog):
                     self.client.user.avatar.url
                 )
             )
-        if loveroom_category_id := get_marriage_config_loveroom_category(interaction.guild.id):
+        if loveroom_category_id := await get_marriage_config_loveroom_category(interaction.guild.id):
             try:
                 loveroom_category = nextcord.utils.get(interaction.guild.channels,
                                                        id=loveroom_category_id)
             except:
                 return await interaction.respose.send_message(embed=construct_error_bot_user_embed("No loveroom "
                                                                                                    "category!"))
-        loveroom_price = get_marriage_config_month_loveroom_price(interaction.guild.id)
-        bal = get_family_money(interaction.guild.id, interaction.user.id)
+        loveroom_price = await get_marriage_config_month_loveroom_price(interaction.guild.id)
+        bal = await get_family_money(interaction.guild.id, interaction.user.id)
         if bal < loveroom_price:
             return await interaction.response.send_message(
                 embed=construct_error_not_married_embed(
                     get_msg_from_locale_by_key(interaction.guild.id, "on_loveroom_money_error"),
                     self.client.user.avatar.url,
                 ))
-        update_couple_family_money(interaction.guild.id, interaction.user.id, pair_id, -loveroom_price)
+        await update_couple_family_money(interaction.guild.id, interaction.user.id, pair_id, -loveroom_price)
         overwrites = {
             interaction.guild.default_role: nextcord.PermissionOverwrite(
                 connect=False,
@@ -944,16 +929,15 @@ class Marriage(commands.Cog):
                 view_channel=True, manage_channels=True, mute_members=True, move_members=True, stream=True,
             )
         }
-        print(loveroom_category)
         loveroom = await interaction.guild.create_voice_channel(category=loveroom_category,
                                                                 name=f"{interaction.user.name} 🤍 {pair.name}",
                                                                 user_limit=2,
                                                                 overwrites=overwrites)
         when_expired = int(datetime.now().timestamp() + 86400 * 30)
-        update_user_loveroom_id(interaction.guild.id, interaction.user.id, loveroom.id)
-        update_user_loveroom_id(interaction.guild.id, pair_id, loveroom.id)
-        update_user_loveroom_expire_date(interaction.guild.id, interaction.user.id, when_expired)
-        update_user_loveroom_expire_date(interaction.guild.id, pair_id, when_expired)
+        await update_user_loveroom_id(interaction.guild.id, interaction.user.id, loveroom.id)
+        await update_user_loveroom_id(interaction.guild.id, pair_id, loveroom.id)
+        await update_user_loveroom_expire_date(interaction.guild.id, interaction.user.id, when_expired)
+        await update_user_loveroom_expire_date(interaction.guild.id, pair_id, when_expired)
 
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"{interaction.application_command.name}"
@@ -962,7 +946,7 @@ class Marriage(commands.Cog):
         on_family_balance = get_msg_from_locale_by_key(
             interaction.guild.id, f"on_family_balance"
         )
-        family_balance = get_family_money(interaction.guild.id, interaction.user.id)
+        family_balance = await get_family_money(interaction.guild.id, interaction.user.id)
         await interaction.response.send_message(
             embed=construct_basic_embed(
                 f"{interaction.application_command.name}",
