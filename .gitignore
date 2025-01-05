@@ -16,3 +16,4 @@ databases/.DS_Store
 *.sql
 output.sql
 test.py
+*.1
