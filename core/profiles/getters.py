@@ -1,23 +1,15 @@
-import sqlite3
+from core.db_utils import fetch_one
 
 
-def get_profile_description(user_id: int) -> str:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    description = cursor.execute(
+async def get_profile_description(user_id: int) -> str:
+    description = await fetch_one(
         f"SELECT description FROM profiles WHERE user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return description
+    )
+    return description[0]
 
 
-def get_avatar_form(user_id: int) -> str:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    avatar_form = cursor.execute(
+async def get_avatar_form(user_id: int) -> str:
+    avatar_form = await fetch_one(
         f"SELECT avatar_form FROM profiles WHERE user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return avatar_form
+    )
+    return avatar_form[0]

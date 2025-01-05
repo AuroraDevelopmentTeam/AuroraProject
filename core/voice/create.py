@@ -3,6 +3,7 @@ import asyncio
 
 import nextcord
 
+from core.db_utils import execute_update
 from core.embeds import DEFAULT_BOT_COLOR
 from core.emojify import TEAM, LOCK, UNLOCK, PEN, KICK, YES, NO, CROWN, MUTE, MICROPHONE
 
@@ -65,18 +66,12 @@ class VoiceRoomLimit(nextcord.ui.Modal):
             pass
 
 
-def create_voice_private_config_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
+async def create_voice_private_config_table() -> None:
+    await execute_update(
         f"""CREATE TABLE IF NOT EXISTS voice_private_config (
-        guild_id INTEGER, voice_creation_room_id INTEGER, voice_controller_msg_id INTEGER
+        guild_id BIGINT, voice_creation_room_id INTEGER, voice_controller_msg_id INTEGER
     )"""
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return
 
 
 def create_button_menu_embed() -> nextcord.Embed:

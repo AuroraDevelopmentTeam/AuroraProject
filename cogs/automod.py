@@ -1,8 +1,6 @@
 from typing import Optional
 
 import nextcord
-from nextcord.ext import commands, application_checks
-from nextcord.abc import GuildChannel
 from nextcord import (
     Interaction,
     Permissions,
@@ -14,8 +12,9 @@ from nextcord import (
     AutoModerationActionMetadata,
     AutoModerationTriggerMetadata,
 )
+from nextcord.abc import GuildChannel
+from nextcord.ext import commands, application_checks
 
-from core.embeds import DEFAULT_BOT_COLOR, construct_basic_embed
 from core.auto.mod.getters import (
     get_server_moderation_mode,
     get_server_link_detect,
@@ -31,15 +30,15 @@ from core.auto.mod.updaters import (
     update_server_word_detect,
     update_server_moderation_mode,
 )
-from core.auto.mod.writers import write_in_mod_word, delete_mod_word
 from core.auto.mod.writers import write_in_mod_config_standart_values
+from core.auto.mod.writers import write_in_mod_word, delete_mod_word
+from core.embeds import DEFAULT_BOT_COLOR, construct_basic_embed
+from core.errors import construct_error_not_found_embed
 from core.locales.getters import (
     get_msg_from_locale_by_key,
     get_localized_description,
     get_localized_name,
-    get_guild_locale,
 )
-from core.errors import construct_error_not_found_embed
 
 block_links = [
     "discord.gg*",
@@ -76,17 +75,17 @@ class AutoModeration(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member: nextcord.Member):
         try:
-            word_detect = get_server_word_detect(member.guild.id)
+            word_detect = await get_server_word_detect(member.guild.id)
         except TypeError:
             guilds = [member.guild]
-            write_in_mod_config_standart_values(guilds)
+            await write_in_mod_config_standart_values(guilds)
             return
         if word_detect is False:
             return
         mod_words = None
-        moderation_mode = get_server_moderation_mode(member.guild.id)
+        moderation_mode = await get_server_moderation_mode(member.guild.id)
         if moderation_mode == "friends_group":
-            mod_words = fetchall_mod_words(member.guild.id)
+            mod_words = await fetchall_mod_words(member.guild.id)
         elif moderation_mode == "community":
             try:
                 auto_mod_rules = await member.guild.auto_moderation_rules()
@@ -104,7 +103,7 @@ class AutoModeration(commands.Cog):
             except nextcord.NotFound:
                 pass
 
-        nickname_detect = get_server_nickname_detect(member.guild.id)
+        nickname_detect = await get_server_nickname_detect(member.guild.id)
         if mod_words is None:
             return
         if nickname_detect is True:
@@ -121,7 +120,7 @@ class AutoModeration(commands.Cog):
                         return
                     except nextcord.Forbidden:
                         pass
-        status_detect = get_server_status_detect(member.guild.id)
+        status_detect = await get_server_status_detect(member.guild.id)
         if status_detect is True:
             try:
                 activity = member.activity.name
@@ -156,17 +155,17 @@ class AutoModeration(commands.Cog):
         ):
             return
         try:
-            word_detect = get_server_word_detect(message.guild.id)
+            word_detect = await get_server_word_detect(message.guild.id)
         except TypeError:
             guilds = [message.guild]
-            write_in_mod_config_standart_values(guilds)
+            await write_in_mod_config_standart_values(guilds)
             return
         if word_detect is False:
             return
         mod_words = None
-        moderation_mode = get_server_moderation_mode(message.guild.id)
+        moderation_mode = await get_server_moderation_mode(message.guild.id)
         if moderation_mode == "friends_group":
-            mod_words = fetchall_mod_words(message.guild.id)
+            mod_words = await fetchall_mod_words(message.guild.id)
         elif moderation_mode == "community":
             try:
                 auto_mod_rules = await message.guild.auto_moderation_rules()
@@ -185,7 +184,7 @@ class AutoModeration(commands.Cog):
                 pass
         if mod_words is None or len(mod_words) == 0:
             return
-        nickname_detect = get_server_nickname_detect(message.guild.id)
+        nickname_detect = await get_server_nickname_detect(message.guild.id)
         if nickname_detect is True:
             member_nickname = message.author.name
             for word in mod_words:
@@ -200,7 +199,7 @@ class AutoModeration(commands.Cog):
                         return
                     except nextcord.Forbidden:
                         pass
-        status_detect = get_server_status_detect(message.guild.id)
+        status_detect = await get_server_status_detect(message.guild.id)
         if status_detect is True:
             try:
                 activity = message.author.activity.name
@@ -214,7 +213,7 @@ class AutoModeration(commands.Cog):
                     try:
                         await message.author.send(
                             get_msg_from_locale_by_key(
-                                member.guild.id, "forbidden_description"
+                                message.guild.id, "forbidden_description"
                             )
                         )
                         await message.guild.kick(message.author)
@@ -222,19 +221,19 @@ class AutoModeration(commands.Cog):
                     except nextcord.Forbidden:
                         pass
 
-        moderation_mode = get_server_moderation_mode(message.guild.id)
+        moderation_mode = await get_server_moderation_mode(message.guild.id)
         if moderation_mode == "friends_group":
-            word_detect = get_server_word_detect(message.guild.id)
+            word_detect = await get_server_word_detect(message.guild.id)
             if word_detect is False:
                 return
             else:
-                mod_words = fetchall_mod_words(message.guild.id)
+                mod_words = await fetchall_mod_words(message.guild.id)
                 message_content = message.content
                 for word in mod_words:
                     if word in message_content:
                         await message.delete()
                         break
-            if get_server_link_detect(message.guild.id) is True:
+            if await get_server_link_detect(message.guild.id) is True:
                 for link in block_links:
                     if link in message_content:
                         await message.delete()
@@ -264,7 +263,7 @@ class AutoModeration(commands.Cog):
         description_localizations=get_localized_description("automod_setup"),
     )
     async def __test_automod(self, interaction: Interaction):
-        moderation_mode = get_server_moderation_mode(interaction.guild.id)
+        moderation_mode = await get_server_moderation_mode(interaction.guild.id)
         if moderation_mode == "friends_group":
             embed = nextcord.Embed(
                 color=DEFAULT_BOT_COLOR,
@@ -419,11 +418,11 @@ class AutoModeration(commands.Cog):
     async def __test_automod_wordadd(
         self, interaction: Interaction, word: Optional[str] = SlashOption(required=True)
     ):
-        moderation_mode = get_server_moderation_mode(interaction.guild.id)
+        moderation_mode = await get_server_moderation_mode(interaction.guild.id)
         if moderation_mode == "friends_group":
-            mod_words = fetchall_mod_words(interaction.guild.id)
+            mod_words = await fetchall_mod_words(interaction.guild.id)
             if word not in mod_words:
-                write_in_mod_word(interaction.guild.id, word)
+                await write_in_mod_word(interaction.guild.id, word)
                 message = get_msg_from_locale_by_key(
                     interaction.guild.id,
                     f"automod_{interaction.application_command.name}",
@@ -535,11 +534,11 @@ class AutoModeration(commands.Cog):
     async def __test_automod_wordremove(
         self, interaction: Interaction, word: Optional[str] = SlashOption(required=True)
     ):
-        moderation_mode = get_server_moderation_mode(interaction.guild.id)
+        moderation_mode = await get_server_moderation_mode(interaction.guild.id)
         if moderation_mode == "friends_group":
-            mod_words = fetchall_mod_words(interaction.guild.id)
+            mod_words = await fetchall_mod_words(interaction.guild.id)
             if word in mod_words:
-                delete_mod_word(interaction.guild.id, word)
+                await delete_mod_word(interaction.guild.id, word)
                 message = get_msg_from_locale_by_key(
                     interaction.guild.id,
                     f"automod_{interaction.application_command.name}",
@@ -949,7 +948,7 @@ class AutoModeration(commands.Cog):
         interaction: Interaction,
         enable: Optional[bool] = SlashOption(required=True),
     ):
-        update_server_nickname_detect(interaction.guild.id, enable)
+        await update_server_nickname_detect(interaction.guild.id, enable)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"automod_{interaction.application_command.name}"
         )
@@ -981,7 +980,7 @@ class AutoModeration(commands.Cog):
         interaction: Interaction,
         enable: Optional[bool] = SlashOption(required=True),
     ):
-        update_server_word_detect(interaction.guild.id, enable)
+        await update_server_word_detect(interaction.guild.id, enable)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"automod_{interaction.application_command.name}"
         )
@@ -1001,23 +1000,18 @@ class AutoModeration(commands.Cog):
             )
         )
         try:
-            moderation_mode = get_server_moderation_mode(interaction.guild.id)
+            moderation_mode = await get_server_moderation_mode(interaction.guild.id)
         except TypeError:
             guilds = [interaction.guild]
-            write_in_mod_config_standart_values(guilds)
+            await write_in_mod_config_standart_values(guilds)
             return
         if moderation_mode == "community":
-            try:
-                auto_mod_rules = await interaction.guild.auto_moderation_rules()
-                try:
-                    aurora_automoderation_rule = nextcord.utils.get(
-                        auto_mod_rules, name="Aurora-Automoderation"
-                    )
-                    await aurora_automoderation_rule.edit(enabled=enabled)
-                except:
-                    pass
-            except:
-                pass
+            auto_mod_rules = await interaction.guild.auto_moderation_rules()
+            aurora_automoderation_rule = nextcord.utils.get(
+                auto_mod_rules, name="Aurora-Automoderation"
+            )
+            await aurora_automoderation_rule.edit(enabled=enabled)
+
 
     @application_checks.bot_has_guild_permissions(kick_members=True)
     @application_checks.has_permissions(manage_guild=True)
@@ -1034,7 +1028,7 @@ class AutoModeration(commands.Cog):
         interaction: Interaction,
         enable: Optional[bool] = SlashOption(required=True),
     ):
-        update_server_status_detect(interaction.guild.id, enable)
+        await update_server_status_detect(interaction.guild.id, enable)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"automod_{interaction.application_command.name}"
         )
@@ -1067,13 +1061,13 @@ class AutoModeration(commands.Cog):
         enable: Optional[bool] = SlashOption(required=True),
     ):
         try:
-            moderation_mode = get_server_moderation_mode(interaction.guild.id)
+            moderation_mode = await get_server_moderation_mode(interaction.guild.id)
         except TypeError:
             guilds = [interaction.guild]
-            write_in_mod_config_standart_values(guilds)
+            await write_in_mod_config_standart_values(guilds)
             return
         if moderation_mode == "friends_group":
-            update_server_link_detect(interaction.guild.id, enable)
+            await update_server_link_detect(interaction.guild.id, enable)
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, f"automod_{interaction.application_command.name}"
             )
@@ -1175,7 +1169,7 @@ class AutoModeration(commands.Cog):
             required=True,
         ),
     ):
-        update_server_moderation_mode(interaction.guild.id, moderation_mode)
+        await update_server_moderation_mode(interaction.guild.id, moderation_mode)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"automod_{interaction.application_command.name}"
         )

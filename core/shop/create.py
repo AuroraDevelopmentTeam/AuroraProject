@@ -1,40 +1,22 @@
-import sqlite3
+from core.db_utils import execute_update
 
 
-def create_shop_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
+async def create_shop_table() -> None:
+    await execute_update(
         """CREATE TABLE IF NOT EXISTS shop (
-        guild_id INTEGER, role_id INTEGER, cost INTEGER
+        guild_id BIGINT, role_id BIGINT, cost INTEGER
     )"""
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return
 
 
-def create_custom_shop_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
-        """CREATE TABLE IF NOT EXISTS custom_shop ( guild_id INTEGER, role_id INTEGER, cost INTEGER, 
-        owner_id INTEGER, created INTEGER, expiration_date INTEGER, bought INTEGER ) """
+async def create_custom_shop_table() -> None:
+    await execute_update(
+        """CREATE TABLE IF NOT EXISTS custom_shop ( guild_id BIGINT, role_id BIGINT, cost INTEGER, 
+        owner_id BIGINT, created INTEGER, expiration_date INTEGER, bought INTEGER ) """
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return
 
 
-def create_custom_shop_config_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
-        """CREATE TABLE IF NOT EXISTS custom_shop_config (guild_id INTEGER, enabled BOOL, role_create_cost INTEGER ) """
+async def create_custom_shop_config_table() -> None:
+    await execute_update(
+        """CREATE TABLE IF NOT EXISTS custom_shop_config (guild_id BIGINT, enabled BOOL, role_create_cost INTEGER ) """
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return

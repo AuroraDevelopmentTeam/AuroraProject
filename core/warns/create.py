@@ -1,19 +1,9 @@
-import sqlite3
-import nextcord
-
-from core.embeds import construct_basic_embed
-from core.checkers import is_guild_id_in_table, is_user_in_table
+from core.db_utils import execute_update
 
 
-def create_warns_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
+async def create_warns_table() -> None:
+    await execute_update(
         f"""CREATE TABLE IF NOT EXISTS warns (
-        warn_id INTEGER, guild_id INTEGER, user_id INTEGER, warn_reason TEXT
+        warn_id INTEGER, guild_id BIGINT, user_id BIGINT, warn_reason TEXT
     )"""
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return

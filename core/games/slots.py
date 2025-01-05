@@ -41,7 +41,7 @@ def unpack_slots_row(row: list) -> str:
     return f"**<** {row[0]} {row[1]} {row[2]} **>**"
 
 
-def create_slots_embed(
+async def create_slots_embed(
     guild_id,
     user_id,
     footer_url: nextcord.Asset,
@@ -50,7 +50,7 @@ def create_slots_embed(
     game_state: str,
 ) -> nextcord.Embed:
     name = name.capitalize()
-    users_balance = get_user_balance(guild_id, user_id)
+    users_balance = await get_user_balance(guild_id, user_id)
     additional_row = spin_slots()
     additional_row_2 = spin_slots()
     embed = nextcord.Embed(

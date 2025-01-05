@@ -1,4 +1,5 @@
-import sqlite3
+from ..db_utils import fetch_one
+
 
 GIFT_EMOJIS = {
     "gift_1": "🥕",
@@ -54,156 +55,100 @@ GIFT_PRICES = {
 }
 
 
-def get_divorce_counter(guild_id: int, user_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    divorce_counter = cursor.execute(
+async def get_divorce_counter(guild_id: int, user_id: int) -> int:
+    divorce_counter = await fetch_one(
         f"SELECT divorces FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return divorce_counter
+    )
+    return divorce_counter[0]
 
-
-def get_user_pair_id(guild_id: int, user_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    pair_id = cursor.execute(
+# TODO ничего не происходит если развод когда не женаты
+async def get_user_pair_id(guild_id: int, user_id: int) -> int:
+    pair_id = await fetch_one(
         f"SELECT pair_id FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return pair_id
+    )
+    return pair_id[0]
 
 
-def get_user_love_description(guild_id: int, user_id: int) -> str:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    love_description = cursor.execute(
+async def get_user_love_description(guild_id: int, user_id: int) -> str:
+    love_description = await fetch_one(
         f"SELECT love_description FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return love_description
+    )
+    return love_description[0]
 
 
-def get_user_marry_date(guild_id: int, user_id: int) -> str:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    date = cursor.execute(
+async def get_user_marry_date(guild_id: int, user_id: int) -> str:
+    date = await fetch_one(
         f"SELECT date FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return date
+    )
+    return date[0]
 
 
-def get_user_loveroom_expire_date(guild_id: int, user_id: int) -> str:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    loveroom_expire_date = cursor.execute(
+async def get_user_loveroom_expire_date(guild_id: int, user_id: int) -> str:
+    loveroom_expire_date = await fetch_one(
         f"SELECT loveroom_expire FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return loveroom_expire_date
+    )
+    return loveroom_expire_date[0]
 
 
-def get_user_loveroom_id(guild_id: int, user_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    loveroom_id = cursor.execute(
+async def get_user_loveroom_id(guild_id: int, user_id: int) -> int:
+    loveroom_id = await fetch_one(
         f"SELECT loveroom_id FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return loveroom_id
+    )
+    return loveroom_id[0]
 
 
-def get_family_money(guild_id: int, user_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    family_money = cursor.execute(
+async def get_family_money(guild_id: int, user_id: int) -> int:
+    family_money = await fetch_one(
         f"SELECT family_money FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return family_money
+    )
+    return family_money[0]
 
 
-def get_user_like_id(guild_id: int, user_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    like_id = cursor.execute(
+async def get_user_like_id(guild_id: int, user_id: int) -> int:
+    like_id = await fetch_one(
         f"SELECT like_id FROM marriage WHERE guild_id = {guild_id} AND user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return like_id
+    )
+    return like_id[0]
 
 
-def get_user_gifts_price(guild_id: int, user_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    gift_price = cursor.execute(
+async def get_user_gifts_price(guild_id: int, user_id: int) -> int:
+    gift_price = await fetch_one(
         f"SELECT gift_price FROM gifts WHERE guild_id = {guild_id} AND user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return gift_price
+    )
+    return gift_price[0]
 
 
-def get_user_gift_counter(guild_id: int, user_id: int, gift: str) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    gift_count = cursor.execute(
+async def get_user_gift_counter(guild_id: int, user_id: int, gift: str) -> int:
+    gift_count = await fetch_one(
         f"SELECT {gift} FROM gifts WHERE guild_id = {guild_id} AND user_id = {user_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return gift_count
+    )
+    return gift_count[0]
 
 
-def get_marriage_config_enable_loverooms(guild_id) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    enable_loverooms = cursor.execute(
+async def get_marriage_config_enable_loverooms(guild_id) -> bool:
+    enable_loverooms = await fetch_one(
         f"SELECT enable_loverooms FROM marriage_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return bool(enable_loverooms)
+    )
+    return bool(enable_loverooms[0])
 
 
-def get_marriage_config_marriage_price(guild_id) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    marriage_price = cursor.execute(
+async def get_marriage_config_marriage_price(guild_id) -> int:
+    marriage_price = await fetch_one(
         f"SELECT marriage_price FROM marriage_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return marriage_price
+    )
+    return marriage_price[0]
 
 
-def get_marriage_config_month_loveroom_price(guild_id) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    month_loveroom_price = cursor.execute(
+async def get_marriage_config_month_loveroom_price(guild_id) -> int:
+    month_loveroom_price = await fetch_one(
         f"SELECT month_loveroom_price FROM marriage_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return month_loveroom_price
+    )
+    return month_loveroom_price[0]
 
 
-def get_marriage_config_loveroom_category(guild_id) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    loveroom_category = cursor.execute(
+async def get_marriage_config_loveroom_category(guild_id) -> int:
+    loveroom_category = await fetch_one(
         f"SELECT loveroom_category FROM marriage_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return loveroom_category
+    )
+    return loveroom_category[0]
 

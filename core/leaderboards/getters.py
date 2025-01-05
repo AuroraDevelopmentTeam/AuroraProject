@@ -59,7 +59,7 @@ async def custom_top_embed(
     orders = [False, False, False, False, False]
     currency = ""
     if order == "balance":
-        currency = get_guild_currency_symbol(inter.guild.id)
+        currency = await get_guild_currency_symbol(inter.guild.id)
         roles = cursor.execute(
             f"SELECT user_id, balance FROM money WHERE guild_id = {inter.guild.id} ORDER BY balance DESC"
         ).fetchall()

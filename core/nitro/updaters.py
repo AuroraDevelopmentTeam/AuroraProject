@@ -1,63 +1,33 @@
-import sqlite3
+from core.db_utils import execute_update
 
 
-def set_nitro_channel(guild_id: int, nitro_channel_id: int) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    sql = "UPDATE on_nitro_config SET nitro_message_channel = ? WHERE guild_id = ?"
+async def set_nitro_channel(guild_id: int, nitro_channel_id: int) -> None:
+    sql = "UPDATE on_nitro_config SET nitro_message_channel = %s WHERE guild_id = %s"
     values = (nitro_channel_id, guild_id)
-    cursor.execute(sql, values)
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    await execute_update(sql, values)
 
 
-def set_nitro_message_state(guild_id: int, nitro_message_enabled: bool) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    sql = "UPDATE on_nitro_config SET nitro_message_enabled = ? WHERE guild_id = ?"
+async def set_nitro_message_state(guild_id: int, nitro_message_enabled: bool) -> None:
+    sql = "UPDATE on_nitro_config SET nitro_message_enabled = %s WHERE guild_id = %s"
     values = (nitro_message_enabled, guild_id)
-    cursor.execute(sql, values)
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    await execute_update(sql, values)
 
 
-def update_nitro_message_title(guild_id: int, nitro_message_title: str) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    sql = "UPDATE on_nitro_config SET nitro_message_title = ? WHERE guild_id = ?"
+async def update_nitro_message_title(guild_id: int, nitro_message_title: str) -> None:
+    sql = "UPDATE on_nitro_config SET nitro_message_title = %s WHERE guild_id = %s"
     values = (nitro_message_title, guild_id)
-    cursor.execute(sql, values)
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    await execute_update(sql, values)
 
 
-def update_nitro_message_description(
+async def update_nitro_message_description(
     guild_id: int, nitro_message_description: str
 ) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    sql = "UPDATE on_nitro_config SET nitro_message_description = ? WHERE guild_id = ?"
+    sql = "UPDATE on_nitro_config SET nitro_message_description = %s WHERE guild_id = %s"
     values = (nitro_message_description, guild_id)
-    cursor.execute(sql, values)
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    await execute_update(sql, values)
 
 
-def update_nitro_message_url(guild_id: int, nitro_message_url: str) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    sql = "UPDATE on_nitro_config SET nitro_message_url = ? WHERE guild_id = ?"
+async def update_nitro_message_url(guild_id: int, nitro_message_url: str) -> None:
+    sql = "UPDATE on_nitro_config SET nitro_message_url = %s WHERE guild_id = %s"
     values = (nitro_message_url, guild_id)
-    cursor.execute(sql, values)
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    await execute_update(sql, values)

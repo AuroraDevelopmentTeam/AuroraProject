@@ -1,40 +1,36 @@
-import sqlite3
+from sys import get_coroutine_origin_tracking_depth
+
+from ..db_utils import execute_update, fetch_one
 import typing
-import sqlite3
 import nextcord
 from easy_pil import *
 from core.embeds import DEFAULT_BOT_COLOR
 import re
 
 
-def create_goodbye_config() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
-        f"""CREATE TABLE IF NOT EXISTS goodbye_config (guild_id INTEGER, goodbye_message_enabled BOOLEAN, 
-    goodbye_message_channel INTEGER, goodbye_message_type TEXT, 
+async def create_goodbye_config() -> None:
+    await execute_update(
+        f"""CREATE TABLE IF NOT EXISTS goodbye_config (guild_id BIGINT, goodbye_message_enabled BOOLEAN, 
+    goodbye_message_channel BIGINT, goodbye_message_type TEXT, 
     goodbye_message_title TEXT, goodbye_message_description TEXT, goodbye_message_url TEXT )"""
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return
 
 
-def create_server_goodbye_embed(
+async def create_server_goodbye_embed(
     member: typing.Union[nextcord.Member, nextcord.User], guild: nextcord.Guild
 ) -> nextcord.Embed:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    goodbye_message_title = cursor.execute(
+    goodbye_message_title = await fetch_one(
         f"SELECT goodbye_message_title FROM goodbye_config WHERE guild_id = {guild.id}"
-    ).fetchone()[0]
-    goodbye_message_description = cursor.execute(
+    )
+    goodbye_message_title = goodbye_message_title[0]
+    goodbye_message_description = await fetch_one(
         f"SELECT goodbye_message_description FROM goodbye_config WHERE guild_id = {guild.id}"
-    ).fetchone()[0]
-    goodbye_message_url = cursor.execute(
+    )
+    goodbye_message_description = goodbye_message_description[0]
+    goodbye_message_url = await fetch_one(
         f"SELECT goodbye_message_url FROM goodbye_config WHERE guild_id = {guild.id}"
-    ).fetchone()[0]
+    )
+    goodbye_message_url = goodbye_message_url[0]
     if "{member.mention}" in goodbye_message_title:
         goodbye_message_title = goodbye_message_title.replace(
             "{member.mention}", f"{member.mention}"
@@ -121,9 +117,6 @@ def create_server_goodbye_embed(
             goodbye_message_description = goodbye_message_description.replace(
                 channel, really_channel.mention
             )
-    db.commit()
-    cursor.close()
-    db.close()
     embed = nextcord.Embed(
         color=DEFAULT_BOT_COLOR,
         title=f"{goodbye_message_title}",
@@ -135,7 +128,7 @@ def create_server_goodbye_embed(
     return embed
 
 
-def create_goodbye_card(member) -> nextcord.File:
+async def create_goodbye_card(member) -> nextcord.File:
     background = Editor(Canvas((900, 300), color="#141414"))
     profile_picture = load_image(str(member.display_avatar))
     profile = Editor(profile_picture).resize((150, 150)).circle_image()

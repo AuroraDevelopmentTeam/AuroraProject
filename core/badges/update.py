@@ -1,15 +1,9 @@
 import sqlite3
+from ..db_utils import execute_update
 
-
-def update_user_badge_state(
+async def update_user_badge_state(
     guild_id: int, user_id: int, badge: str, state: bool
 ) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    sql = f"UPDATE badges SET {badge} = ? WHERE guild_id = ? AND user_id = ?"
+    sql = f"UPDATE badges SET {badge} = %s WHERE guild_id = %s AND user_id = %s"
     values = (state, guild_id, user_id)
-    cursor.execute(sql, values)
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    await execute_update(sql, values)

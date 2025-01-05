@@ -2,70 +2,47 @@ import sqlite3
 
 import nextcord
 
+from ...db_utils import fetch_one, fetch_all
 
-def get_server_word_detect(guild_id: int) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    word_detect = cursor.execute(
+async def get_server_word_detect(guild_id: int) -> bool:
+    word_detect = await fetch_one(
         f"SELECT word_detect FROM mod_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return bool(word_detect)
+    )
+    return bool(word_detect[0])
 
 
-def get_server_link_detect(guild_id: int) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    link_detect = cursor.execute(
+async def get_server_link_detect(guild_id: int) -> bool:
+    link_detect = await fetch_one(
         f"SELECT link_detect FROM mod_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return bool(link_detect)
+    )
+    return bool(link_detect[0])
 
 
-def get_server_nickname_detect(guild_id: int) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    nickname_detect = cursor.execute(
+async def get_server_nickname_detect(guild_id: int) -> bool:
+    nickname_detect = await fetch_one(
         f"SELECT nickname_detect FROM mod_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return bool(nickname_detect)
+    )
+    return bool(nickname_detect[0])
 
 
-def get_server_status_detect(guild_id: int) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    status_detect = cursor.execute(
+async def get_server_status_detect(guild_id: int) -> bool:
+    status_detect = fetch_one(
         f"SELECT status_detect FROM mod_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return bool(status_detect)
+    )
+    return bool(status_detect[0])
 
 
-def get_server_moderation_mode(guild_id: int) -> str:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    guild_moderation_mode = cursor.execute(
+async def get_server_moderation_mode(guild_id: int) -> str:
+    guild_moderation_mode = await fetch_one(
         f"SELECT guild_moderation_mode FROM mod_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return guild_moderation_mode
+    )
+    return guild_moderation_mode[0]
 
 
-def fetchall_mod_words(guild_id: int) -> list[str]:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    mod_words = cursor.execute(
+async def fetchall_mod_words(guild_id: int) -> list[str]:
+    mod_words = await fetch_all(
         f"SELECT word FROM mod_word WHERE guild_id = {guild_id}"
-    ).fetchall()
-    cursor.close()
-    db.close()
+    )
     words = []
     for row in mod_words:
         words.append(row[0])

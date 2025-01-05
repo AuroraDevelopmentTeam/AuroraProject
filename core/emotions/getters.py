@@ -1,36 +1,27 @@
 import sqlite3
 
+from ..db_utils import fetch_one
 
-def get_emotions_for_money_state(guild_id: int) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    emotions_for_money_state = cursor.execute(
+async def get_emotions_for_money_state(guild_id: int) -> bool:
+    emotions_for_money_state = await fetch_one(
         f"SELECT emotions_for_money_state FROM emotions_cost WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    db.commit()
-    cursor.close()
-    db.close()
+    )[0]
     return bool(emotions_for_money_state)
 
 
-def get_emotions_cost(guild_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    emotions_cost = cursor.execute(
+async def get_emotions_cost(guild_id: int) -> int:
+    emotions_cost = await fetch_one(
         f"SELECT cost FROM emotions_cost WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    db.commit()
-    cursor.close()
-    db.close()
+    )[0]
     return emotions_cost
 
 
-def is_emotion_free(guild_id: int) -> bool:
-    emotions_for_money_state = get_emotions_for_money_state(guild_id)
+async def is_emotion_free(guild_id: int) -> bool:
+    emotions_for_money_state = await get_emotions_for_money_state(guild_id)
     if emotions_for_money_state is False:
         return True
     else:
-        emotions_cost = get_emotions_cost(guild_id)
+        emotions_cost = await get_emotions_cost(guild_id)
         if emotions_cost == 0:
             return True
         else:

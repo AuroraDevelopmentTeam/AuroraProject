@@ -1,15 +1,9 @@
-import sqlite3
+from ..db_utils import execute_update
 
 
-def create_honor_table() -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
+async def create_honor_table() -> None:
+    await execute_update(
         f"""CREATE TABLE IF NOT EXISTS honor (
-        user_id INTEGER, honor_level INTEGER, honor_points INTEGER
+        user_id BIGINT, honor_level INTEGER, honor_points INTEGER
     )"""
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return

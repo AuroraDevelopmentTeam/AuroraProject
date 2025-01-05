@@ -1,25 +1,14 @@
 import sqlite3
 
+from ..db_utils import execute_update
 
-def update_min_bet(guild_id: int, min_bet: int) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    sql = "UPDATE bets SET min_bet = ? WHERE guild_id = ?"
+async def update_min_bet(guild_id: int, min_bet: int) -> None:
+    sql = "UPDATE bets SET min_bet = %s WHERE guild_id = %s"
     values = (min_bet, guild_id)
-    cursor.execute(sql, values)
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    await execute_update(sql, values)
 
 
-def update_max_bet(guild_id: int, max_bet: int) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    sql = "UPDATE bets SET max_bet = ? WHERE guild_id = ?"
+async def update_max_bet(guild_id: int, max_bet: int) -> None:
+    sql = "UPDATE bets SET max_bet = %s WHERE guild_id = %s"
     values = (max_bet, guild_id)
-    cursor.execute(sql, values)
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    await execute_update(sql, values)

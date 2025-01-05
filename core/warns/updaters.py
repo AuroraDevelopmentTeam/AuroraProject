@@ -1,25 +1,13 @@
-import sqlite3
+from core.db_utils import execute_update
 
 
-def remove_warn_from_table(warn_id: int, guild_id: int, user_id: int) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    cursor.execute(
+async def remove_warn_from_table(warn_id: int, guild_id: int, user_id: int) -> None:
+    await execute_update(
         f"DELETE FROM warns WHERE warn_id = {warn_id} AND guild_id = {guild_id} AND user_id = {user_id}"
     )
-    db.commit()
-    cursor.close()
-    db.close()
-    return
 
 
-def update_warn_reason(guild_id: int, warn_id: int, warn_reason: str):
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    sql = "UPDATE warns SET warn_reason = ? WHERE guild_id = ? AND warn_id = ?"
+async def update_warn_reason(guild_id: int, warn_id: int, warn_reason: str):
+    sql = "UPDATE warns SET warn_reason = %s WHERE guild_id = %s AND warn_id = %s"
     values = (warn_reason, guild_id, warn_id)
-    cursor.execute(sql, values)
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    await execute_update(sql, values)

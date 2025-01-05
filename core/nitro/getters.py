@@ -1,23 +1,15 @@
-import sqlite3
+from ..db_utils import fetch_one
 
 
-def get_server_nitro_channel_id(guild_id: int) -> int:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    nitro_channel_id = cursor.execute(
+async def get_server_nitro_channel_id(guild_id: int) -> int:
+    nitro_channel_id = await fetch_one(
         f"SELECT nitro_message_channel FROM on_nitro_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return nitro_channel_id
+    )
+    return nitro_channel_id[0]
 
 
-def get_server_nitro_state(guild_id: int) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    messages_state = cursor.execute(
+async def get_server_nitro_state(guild_id: int) -> bool:
+    messages_state = await fetch_one(
         f"SELECT nitro_message_enabled FROM on_nitro_config WHERE guild_id = {guild_id}"
-    ).fetchone()[0]
-    cursor.close()
-    db.close()
-    return bool(messages_state)
+    )
+    return bool(messages_state[0])

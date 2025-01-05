@@ -22,7 +22,7 @@ class TicTacToeButton(nextcord.ui.Button["TicTacToe"]):
     async def callback(self, interaction: nextcord.Interaction):
         assert self.view is not None
         bet = self.view.bet
-        view: TicTacToe(author=interaction.user, bet=bet) = self.view
+        view: TicTacToe = self.view
         state = view.board[self.x][self.y]
         if state != 0:
             return
@@ -44,15 +44,15 @@ class TicTacToeButton(nextcord.ui.Button["TicTacToe"]):
         if winner is not None:
             if winner == view.X:
                 content = f"X {get_msg_from_locale_by_key(interaction.guild.id, 'win')}"
-                update_user_balance(interaction.guild.id, interaction.user.id, int(bet/2))
+                await update_user_balance(interaction.guild.id, interaction.user.id, int(bet/2))
             elif winner == view.O:
                 content = f"O {get_msg_from_locale_by_key(interaction.guild.id, 'win')}"
-                update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
+                await update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
             else:
                 content = get_msg_from_locale_by_key(
                     interaction.guild.id, "draw"
                 )
-                update_user_balance(interaction.guild.id, interaction.user.id, -int(bet/10))
+                await update_user_balance(interaction.guild.id, interaction.user.id, -int(bet/10))
 
             for child in view.children:
                 child.disabled = True
@@ -72,15 +72,15 @@ class TicTacToeButton(nextcord.ui.Button["TicTacToe"]):
             if winner is not None:
                 if winner == view.X:
                     content = f"X {get_msg_from_locale_by_key(interaction.guild.id, 'win')}"
-                    update_user_balance(interaction.guild.id, interaction.user.id, int(bet / 2))
+                    await update_user_balance(interaction.guild.id, interaction.user.id, int(bet / 2))
                 elif winner == view.O:
                     content = f"O {get_msg_from_locale_by_key(interaction.guild.id, 'win')}"
-                    update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
+                    await update_user_balance(interaction.guild.id, interaction.user.id, -int(bet))
                 else:
                     content = get_msg_from_locale_by_key(
                         interaction.guild.id, "draw"
                     )
-                    update_user_balance(interaction.guild.id, interaction.user.id, -int(bet / 10))
+                    await update_user_balance(interaction.guild.id, interaction.user.id, -int(bet / 10))
 
                 for child in view.children:
                     child.disabled = True
@@ -111,7 +111,7 @@ class TicTacToeButton(nextcord.ui.Button["TicTacToe"]):
                     view.add_item(button)
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
-        balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        balance = await get_user_balance(interaction.guild.id, interaction.user.id)
         embed = construct_basic_embed(
             "O | ☓",
             f"{content}",

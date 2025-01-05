@@ -61,16 +61,16 @@ class OnMemberListener(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         guild = member.guild
-        write_member_in_money(guild, member)
-        write_member_in_levels(guild, member)
-        write_member_in_profiles(guild, member)
-        write_member_in_marriage(guild, member)
-        write_member_in_gifts(guild, member)
-        write_member_in_honor(member)
-        write_member_in_profiles(guild, member)
-        write_member_in_stats(guild, member)
-        write_member_in_badges(guild, member)
-        write_member_in_clan(guild, member)
+        await write_member_in_money(guild, member)
+        await write_member_in_levels(guild, member)
+        await write_member_in_profiles(guild, member)
+        await write_member_in_marriage(guild, member)
+        await write_member_in_gifts(guild, member)
+        await write_member_in_honor(member)
+        await write_member_in_profiles(guild, member)
+        await write_member_in_stats(guild, member)
+        await write_member_in_badges(guild, member)
+        await write_member_in_clan(guild, member)
 
 
 def setup(client):

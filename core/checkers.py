@@ -1,46 +1,32 @@
-import sqlite3
+from core.db_utils import fetch_one
 import nextcord
 
 from core.marriage.getters import get_user_pair_id
 
 
-def is_guild_id_in_table(table_name: str, guild_id: int) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
+async def is_guild_id_in_table(table_name: str, guild_id: int) -> bool:
     if (
-        cursor.execute(
+        await fetch_one(
             f"SELECT guild_id FROM {table_name} WHERE guild_id = {guild_id}"
-        ).fetchone()
+        )
         is None
     ):
-        cursor.close()
-        db.close()
         return False
-    else:
-        cursor.close()
-        db.close()
-        return True
+    return True
 
 
-def is_warn_id_in_table(
+async def is_warn_id_in_table(
     table_name: str, warn_id: int, guild_id: int, user_id: int
 ) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
     if (
-        cursor.execute(
+        await fetch_one(
             f"SELECT warn_id FROM {table_name} WHERE warn_id = {warn_id} "
             f"AND guild_id = {guild_id} AND user_id = {user_id}"
-        ).fetchone()
+        )
         is None
     ):
-        cursor.close()
-        db.close()
         return False
-    else:
-        cursor.close()
-        db.close()
-        return True
+    return True
 
 
 def is_locale_valid(locale: str) -> bool:
@@ -51,23 +37,16 @@ def is_locale_valid(locale: str) -> bool:
         return False
 
 
-def is_user_in_table(table_name, guild_id, user_id) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
+async def is_user_in_table(table_name, guild_id, user_id) -> bool:
     if (
-        cursor.execute(
+        await fetch_one(
             f"SELECT user_id FROM {table_name} WHERE guild_id = {guild_id} "
             f"AND user_id = {user_id}"
-        ).fetchone()
+        )
         is None
     ):
-        cursor.close()
-        db.close()
         return False
-    else:
-        cursor.close()
-        db.close()
-        return True
+    return True
 
 
 def is_str_or_emoji(symbol) -> bool:
@@ -77,54 +56,44 @@ def is_str_or_emoji(symbol) -> bool:
         return False
 
 
-def is_married(guild_id, user_id) -> bool:
-    pair_id = get_user_pair_id(guild_id, user_id)
-    if pair_id == 0:
-        return False
-    else:
-        return True
+async def is_married(guild_id, user_id) -> bool:
+    # pair_id = await get_user_pair_id(guild_id, user_id)
+    # if pair_id == 0:
+    #     return False
+    # return True
+    return await get_user_pair_id(guild_id, user_id) != 0
 
-
-def is_role_in_shop(guild_id, role_id) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
+async def is_role_in_shop(guild_id, role_id) -> bool:
     if (
-        cursor.execute(
+        await fetch_one(
             f"SELECT role_id FROM shop WHERE guild_id = {guild_id} "
             f"AND role_id = {role_id}"
-        ).fetchone()
+        )
         is None
     ):
         return False
-    else:
-        return True
+    return True
 
 
-def is_role_in_income(guild_id, role_id) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
+async def is_role_in_income(guild_id, role_id) -> bool:
     if (
-        cursor.execute(
+        await fetch_one(
             f"SELECT role_id FROM roles_money WHERE guild_id = {guild_id} "
             f"AND role_id = {role_id}"
-        ).fetchone()
+        )
         is None
     ):
         return False
-    else:
-        return True
+    return True
 
 
-def is_channel_in_config(guild_id, channel_id) -> bool:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
+async def is_channel_in_config(guild_id, channel_id) -> bool:
     if (
-        cursor.execute(
+        await fetch_one(
             f"SELECT channel_id FROM money_channels_config WHERE guild_id = {guild_id} "
             f"AND channel_id = {channel_id}"
-        ).fetchone()
+        )
         is None
     ):
         return False
-    else:
-        return True
+    return True

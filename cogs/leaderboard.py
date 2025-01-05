@@ -1,18 +1,13 @@
-import sqlite3
-from config import settings
-
 import nextcord
-from nextcord.ext import commands
 from nextcord import Interaction, Permissions
-from core.embeds import construct_top_embed
-from core.money.getters import get_guild_currency_symbol
+from nextcord.ext import commands
+
+from config import settings
 from core.leaderboards.getters import custom_top_embed
 from core.locales.getters import (
-    get_msg_from_locale_by_key,
     get_localized_name,
     get_localized_description,
 )
-from core.utils import format_seconds_to_hhmmss
 
 DEFAULT_BOT_COLOR = settings["default_color"]
 

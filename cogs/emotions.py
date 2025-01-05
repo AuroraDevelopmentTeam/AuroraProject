@@ -73,11 +73,11 @@ class Emotions(commands.Cog):
                     money,
                 )
             )
-        update_emotions_cost(interaction.guild.id, money)
+        await update_emotions_cost(interaction.guild.id, money)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"emotion_config_{interaction.application_command.name}"
         )
-        currency_symbol = get_guild_currency_symbol(interaction.guild.id)
+        currency_symbol = await get_guild_currency_symbol(interaction.guild.id)
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         await interaction.response.send_message(
             embed=construct_basic_embed(
@@ -96,7 +96,7 @@ class Emotions(commands.Cog):
                                  )
     async def __emotion_config_enable_paid_emotions(self, interaction: Interaction,
                                                     enabled: Optional[bool] = SlashOption(required=True)):
-        update_emotions_for_money_state(interaction.guild.id, enabled)
+        await update_emotions_for_money_state(interaction.guild.id, enabled)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"emotion_config_{interaction.application_command.name}"
         )
@@ -166,15 +166,15 @@ class Emotions(commands.Cog):
                 )
             )
         try:
-            is_free = is_emotion_free(interaction.guild.id)
-            emotions_cost = get_emotions_cost(interaction.guild.id)
+            is_free = await is_emotion_free(interaction.guild.id)
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
         except TypeError:
             guilds = [interaction.guild]
-            write_in_emotions_cost_standart_values(guilds)
+            await write_in_emotions_cost_standart_values(guilds)
             return await interaction.response.send_message('Попробуйте ещё раз')
-        if is_emotion_free(interaction.guild.id) is False:
-            emotions_cost = get_emotions_cost(interaction.guild.id)
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if await is_emotion_free(interaction.guild.id) is False:
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < emotions_cost:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 return await interaction.response.send_message(
@@ -187,8 +187,8 @@ class Emotions(commands.Cog):
                     )
                 )
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
-        embed = create_emotion_embed(
+                await update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
+        embed = await create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
             "positive",
@@ -235,15 +235,15 @@ class Emotions(commands.Cog):
                 )
             )
         try:
-            is_free = is_emotion_free(interaction.guild.id)
-            emotions_cost = get_emotions_cost(interaction.guild.id)
+            is_free = await is_emotion_free(interaction.guild.id)
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
         except TypeError:
             guilds = [interaction.guild]
-            write_in_emotions_cost_standart_values(guilds)
+            await write_in_emotions_cost_standart_values(guilds)
             return await interaction.response.send_message('Попробуйте ещё раз')
-        if is_emotion_free(interaction.guild.id) is False:
-            emotions_cost = get_emotions_cost(interaction.guild.id)
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if await is_emotion_free(interaction.guild.id) is False:
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < emotions_cost:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 return await interaction.response.send_message(
@@ -256,8 +256,8 @@ class Emotions(commands.Cog):
                     )
                 )
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
-        embed = create_emotion_embed(
+                await update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
+        embed = await create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
             "positive",
@@ -288,15 +288,15 @@ class Emotions(commands.Cog):
             ),
     ):
         try:
-            is_free = is_emotion_free(interaction.guild.id)
-            emotions_cost = get_emotions_cost(interaction.guild.id)
+            is_free = await is_emotion_free(interaction.guild.id)
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
         except TypeError:
             guilds = [interaction.guild]
-            write_in_emotions_cost_standart_values(guilds)
+            await write_in_emotions_cost_standart_values(guilds)
             return await interaction.response.send_message('Попробуйте ещё раз')
-        if is_emotion_free(interaction.guild.id) is False:
-            emotions_cost = get_emotions_cost(interaction.guild.id)
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if await is_emotion_free(interaction.guild.id) is False:
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < emotions_cost:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 return await interaction.response.send_message(
@@ -309,8 +309,8 @@ class Emotions(commands.Cog):
                     )
                 )
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
-        embed = create_emotion_embed(
+                await update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
+        embed = await create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
             "neutral",
@@ -340,15 +340,15 @@ class Emotions(commands.Cog):
             ),
     ):
         try:
-            is_free = is_emotion_free(interaction.guild.id)
-            emotions_cost = get_emotions_cost(interaction.guild.id)
+            is_free = await is_emotion_free(interaction.guild.id)
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
         except TypeError:
             guilds = [interaction.guild]
-            write_in_emotions_cost_standart_values(guilds)
+            await write_in_emotions_cost_standart_values(guilds)
             return await interaction.response.send_message('Попробуйте ещё раз')
-        if is_emotion_free(interaction.guild.id) is False:
-            emotions_cost = get_emotions_cost(interaction.guild.id)
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if await is_emotion_free(interaction.guild.id) is False:
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < emotions_cost:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 return await interaction.response.send_message(
@@ -361,8 +361,8 @@ class Emotions(commands.Cog):
                     )
                 )
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
-        embed = create_emotion_embed(
+                await update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
+        embed = await create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
             "neutral",
@@ -408,15 +408,15 @@ class Emotions(commands.Cog):
                 )
             )
         try:
-            is_free = is_emotion_free(interaction.guild.id)
-            emotions_cost = get_emotions_cost(interaction.guild.id)
+            is_free = await is_emotion_free(interaction.guild.id)
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
         except TypeError:
             guilds = [interaction.guild]
-            write_in_emotions_cost_standart_values(guilds)
+            await write_in_emotions_cost_standart_values(guilds)
             return await interaction.response.send_message('Попробуйте ещё раз')
-        if is_emotion_free(interaction.guild.id) is False:
-            emotions_cost = get_emotions_cost(interaction.guild.id)
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if await is_emotion_free(interaction.guild.id) is False:
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < emotions_cost:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 return await interaction.response.send_message(
@@ -429,8 +429,8 @@ class Emotions(commands.Cog):
                     )
                 )
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
-        embed = create_emotion_embed(
+                await update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
+        embed = await create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
             "angry",
@@ -461,15 +461,15 @@ class Emotions(commands.Cog):
             ),
     ):
         try:
-            is_free = is_emotion_free(interaction.guild.id)
-            emotions_cost = get_emotions_cost(interaction.guild.id)
+            is_free = await is_emotion_free(interaction.guild.id)
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
         except TypeError:
             guilds = [interaction.guild]
-            write_in_emotions_cost_standart_values(guilds)
+            await write_in_emotions_cost_standart_values(guilds)
             return await interaction.response.send_message('Попробуйте ещё раз')
-        if is_emotion_free(interaction.guild.id) is False:
-            emotions_cost = get_emotions_cost(interaction.guild.id)
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if await is_emotion_free(interaction.guild.id) is False:
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < emotions_cost:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 return await interaction.response.send_message(
@@ -482,8 +482,8 @@ class Emotions(commands.Cog):
                     )
                 )
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
-        embed = create_emotion_embed(
+                await update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
+        embed = await create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
             "sad",
@@ -529,15 +529,15 @@ class Emotions(commands.Cog):
                 )
             )
         try:
-            is_free = is_emotion_free(interaction.guild.id)
-            emotions_cost = get_emotions_cost(interaction.guild.id)
+            is_free = await is_emotion_free(interaction.guild.id)
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
         except TypeError:
             guilds = [interaction.guild]
-            write_in_emotions_cost_standart_values(guilds)
+            await write_in_emotions_cost_standart_values(guilds)
             return await interaction.response.send_message('Попробуйте ещё раз')
-        if is_emotion_free(interaction.guild.id) is False:
-            emotions_cost = get_emotions_cost(interaction.guild.id)
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if await is_emotion_free(interaction.guild.id) is False:
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < emotions_cost:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 return await interaction.response.send_message(
@@ -550,8 +550,8 @@ class Emotions(commands.Cog):
                     )
                 )
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
-        embed = create_emotion_embed(
+                await update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
+        embed = await create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
             "blush",
@@ -598,15 +598,15 @@ class Emotions(commands.Cog):
                 )
             )
         try:
-            is_free = is_emotion_free(interaction.guild.id)
-            emotions_cost = get_emotions_cost(interaction.guild.id)
+            is_free = await is_emotion_free(interaction.guild.id)
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
         except TypeError:
             guilds = [interaction.guild]
-            write_in_emotions_cost_standart_values(guilds)
+            await write_in_emotions_cost_standart_values(guilds)
             return await interaction.response.send_message('Попробуйте ещё раз')
-        if is_emotion_free(interaction.guild.id) is False:
-            emotions_cost = get_emotions_cost(interaction.guild.id)
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if await is_emotion_free(interaction.guild.id) is False:
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < emotions_cost:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 return await interaction.response.send_message(
@@ -619,8 +619,8 @@ class Emotions(commands.Cog):
                     )
                 )
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
-        embed = create_emotion_embed(
+                await update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
+        embed = await create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
             "blush",
@@ -667,15 +667,15 @@ class Emotions(commands.Cog):
                 )
             )
         try:
-            is_free = is_emotion_free(interaction.guild.id)
-            emotions_cost = get_emotions_cost(interaction.guild.id)
+            is_free = await is_emotion_free(interaction.guild.id)
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
         except TypeError:
             guilds = [interaction.guild]
-            write_in_emotions_cost_standart_values(guilds)
+            await write_in_emotions_cost_standart_values(guilds)
             return await interaction.response.send_message('Попробуйте ещё раз')
-        if is_emotion_free(interaction.guild.id) is False:
-            emotions_cost = get_emotions_cost(interaction.guild.id)
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if await is_emotion_free(interaction.guild.id) is False:
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < emotions_cost:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 return await interaction.response.send_message(
@@ -688,8 +688,8 @@ class Emotions(commands.Cog):
                     )
                 )
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
-        embed = create_emotion_embed(
+                await update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
+        embed = await create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
             "friends",
@@ -736,15 +736,15 @@ class Emotions(commands.Cog):
                 )
             )
         try:
-            is_free = is_emotion_free(interaction.guild.id)
-            emotions_cost = get_emotions_cost(interaction.guild.id)
+            is_free = await is_emotion_free(interaction.guild.id)
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
         except TypeError:
             guilds = [interaction.guild]
-            write_in_emotions_cost_standart_values(guilds)
+            await write_in_emotions_cost_standart_values(guilds)
             return await interaction.response.send_message('Попробуйте ещё раз')
-        if is_emotion_free(interaction.guild.id) is False:
-            emotions_cost = get_emotions_cost(interaction.guild.id)
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if await is_emotion_free(interaction.guild.id) is False:
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < emotions_cost:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 return await interaction.response.send_message(
@@ -757,8 +757,8 @@ class Emotions(commands.Cog):
                     )
                 )
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
-        embed = create_emotion_embed(
+                await update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
+        embed = await create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
             "positive",
@@ -805,15 +805,15 @@ class Emotions(commands.Cog):
                 )
             )
         try:
-            is_free = is_emotion_free(interaction.guild.id)
-            emotions_cost = get_emotions_cost(interaction.guild.id)
+            is_free = await is_emotion_free(interaction.guild.id)
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
         except TypeError:
             guilds = [interaction.guild]
-            write_in_emotions_cost_standart_values(guilds)
+            await write_in_emotions_cost_standart_values(guilds)
             return await interaction.response.send_message('Попробуйте ещё раз')
-        if is_emotion_free(interaction.guild.id) is False:
-            emotions_cost = get_emotions_cost(interaction.guild.id)
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if await is_emotion_free(interaction.guild.id) is False:
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < emotions_cost:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 return await interaction.response.send_message(
@@ -826,8 +826,8 @@ class Emotions(commands.Cog):
                     )
                 )
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
-        embed = create_emotion_embed(
+                await update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
+        embed = await create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
             "blush",
@@ -858,15 +858,15 @@ class Emotions(commands.Cog):
             ),
     ):
         try:
-            is_free = is_emotion_free(interaction.guild.id)
-            emotions_cost = get_emotions_cost(interaction.guild.id)
+            is_free = await is_emotion_free(interaction.guild.id)
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
         except TypeError:
             guilds = [interaction.guild]
-            write_in_emotions_cost_standart_values(guilds)
+            await write_in_emotions_cost_standart_values(guilds)
             return await interaction.response.send_message('Попробуйте ещё раз')
-        if is_emotion_free(interaction.guild.id) is False:
-            emotions_cost = get_emotions_cost(interaction.guild.id)
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if await is_emotion_free(interaction.guild.id) is False:
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < emotions_cost:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 return await interaction.response.send_message(
@@ -879,8 +879,8 @@ class Emotions(commands.Cog):
                     )
                 )
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
-        embed = create_emotion_embed(
+                await update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
+        embed = await create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
             "neutral",
@@ -910,15 +910,15 @@ class Emotions(commands.Cog):
             ),
     ):
         try:
-            is_free = is_emotion_free(interaction.guild.id)
-            emotions_cost = get_emotions_cost(interaction.guild.id)
+            is_free = await is_emotion_free(interaction.guild.id)
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
         except TypeError:
             guilds = [interaction.guild]
-            write_in_emotions_cost_standart_values(guilds)
+            await write_in_emotions_cost_standart_values(guilds)
             return await interaction.response.send_message('Попробуйте ещё раз')
-        if is_emotion_free(interaction.guild.id) is False:
-            emotions_cost = get_emotions_cost(interaction.guild.id)
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if await is_emotion_free(interaction.guild.id) is False:
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < emotions_cost:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 return await interaction.response.send_message(
@@ -931,8 +931,8 @@ class Emotions(commands.Cog):
                     )
                 )
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
-        embed = create_emotion_embed(
+                await update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
+        embed = await create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
             "positive",
@@ -962,15 +962,15 @@ class Emotions(commands.Cog):
             ),
     ):
         try:
-            is_free = is_emotion_free(interaction.guild.id)
-            emotions_cost = get_emotions_cost(interaction.guild.id)
+            is_free = await is_emotion_free(interaction.guild.id)
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
         except TypeError:
             guilds = [interaction.guild]
-            write_in_emotions_cost_standart_values(guilds)
+            await write_in_emotions_cost_standart_values(guilds)
             return await interaction.response.send_message('Попробуйте ещё раз')
-        if is_emotion_free(interaction.guild.id) is False:
-            emotions_cost = get_emotions_cost(interaction.guild.id)
-            balance = get_user_balance(interaction.guild.id, interaction.user.id)
+        if await is_emotion_free(interaction.guild.id) is False:
+            emotions_cost = await get_emotions_cost(interaction.guild.id)
+            balance = await get_user_balance(interaction.guild.id, interaction.user.id)
             if balance < emotions_cost:
                 msg = get_msg_from_locale_by_key(interaction.guild.id, "on_balance")
                 return await interaction.response.send_message(
@@ -983,8 +983,8 @@ class Emotions(commands.Cog):
                     )
                 )
             else:
-                update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
-        embed = create_emotion_embed(
+                await update_user_balance(interaction.guild.id, interaction.user.id, -emotions_cost)
+        embed = await create_emotion_embed(
             interaction.guild.id,
             interaction.application_command.name,
             "blush",

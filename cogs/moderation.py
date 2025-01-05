@@ -342,12 +342,12 @@ class Moderation(commands.Cog):
                 )
             if reason is None:
                 reason = " — "
-            write_new_warn(interaction.guild.id, user.id, reason)
+            await write_new_warn(interaction.guild.id, user.id, reason)
             requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, interaction.application_command.name
             )
-            warns = parse_warns_of_user(interaction.guild.id, user.id)
+            warns = await parse_warns_of_user(interaction.guild.id, user.id)
             await interaction.followup.send(
                 embed=construct_basic_embed(
                     interaction.application_command.name,
@@ -360,7 +360,7 @@ class Moderation(commands.Cog):
             if (len(warns)) == 3:
                 for warn in warns:
                     warn_id = warn[0]
-                    remove_warn_from_table(warn_id, interaction.guild.id, user.id)
+                    await remove_warn_from_table(warn_id, interaction.guild.id, user.id)
                 await user.edit(
                     timeout=nextcord.utils.utcnow() + datetime.timedelta(seconds=3600),
                     reason=reason,
@@ -407,7 +407,7 @@ class Moderation(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        warns = parse_warns_of_user(interaction.guild.id, user.id)
+        warns = await parse_warns_of_user(interaction.guild.id, user.id)
         if len(warns) == 0:
             embed = nextcord.Embed(
                 title="error",
@@ -417,8 +417,8 @@ class Moderation(commands.Cog):
                 color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
-        if is_warn_id_in_table("warns", warn_id, interaction.guild.id, user.id) is True:
-            remove_warn_from_table(warn_id, interaction.guild.id, user.id)
+        if await is_warn_id_in_table("warns", warn_id, interaction.guild.id, user.id) is True:
+            await remove_warn_from_table(warn_id, interaction.guild.id, user.id)
             requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
             message = get_msg_from_locale_by_key(
                 interaction.guild.id, interaction.application_command.name
@@ -463,7 +463,7 @@ class Moderation(commands.Cog):
                 )
             )
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
-        warns = parse_warns_of_user(interaction.guild.id, user.id)
+        warns = await parse_warns_of_user(interaction.guild.id, user.id)
         await interaction.followup.send(
             embed=construct_top_embed(
                 f"{interaction.application_command.name} - {user}",
@@ -496,7 +496,7 @@ class Moderation(commands.Cog):
                 color=DEFAULT_BOT_COLOR,
             )
             return await interaction.response.send_message(embed=embed)
-        update_warn_reason(interaction.guild.id, warn_id, new_warn_reason)
+        await update_warn_reason(interaction.guild.id, warn_id, new_warn_reason)
         message = get_msg_from_locale_by_key(
             interaction.guild.id, f"{interaction.application_command.name}"
         )
@@ -529,7 +529,7 @@ class Moderation(commands.Cog):
                     self.client.user.avatar.url,
                 )
             )
-        warns = parse_warns_of_user(interaction.guild.id, user.id)
+        warns = await parse_warns_of_user(interaction.guild.id, user.id)
         if len(warns) == 0:
             embed = nextcord.Embed(
                 title="error",
@@ -541,7 +541,7 @@ class Moderation(commands.Cog):
             return await interaction.response.send_message(embed=embed)
         for warn in warns:
             warn_id = warn[0]
-            remove_warn_from_table(warn_id, interaction.guild.id, user.id)
+            await remove_warn_from_table(warn_id, interaction.guild.id, user.id)
         requested = get_msg_from_locale_by_key(interaction.guild.id, "requested_by")
         message = get_msg_from_locale_by_key(
             interaction.guild.id, interaction.application_command.name

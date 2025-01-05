@@ -1,37 +1,19 @@
-import sqlite3
+from core.db_utils import execute_update
 
 
-def update_ticket_category(guild_id: int, ticket_category: int) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
+async def update_ticket_category(guild_id: int, ticket_category: int) -> None:
     sql = "UPDATE tickets_config SET ticket_category = ? WHERE guild_id = ?"
     values = (ticket_category, guild_id)
-    cursor.execute(sql, values)
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    await execute_update(sql, values)
 
 
-def update_ticket_archive(guild_id: int, ticket_archive: int) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
+async def update_ticket_archive(guild_id: int, ticket_archive: int) -> None:
     sql = "UPDATE tickets_config SET ticket_archive = ? WHERE guild_id = ?"
     values = (ticket_archive, guild_id)
-    cursor.execute(sql, values)
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    await execute_update(sql, values)
 
 
-def update_ticket_support(guild_id: int, ticket_support: int) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
+async def update_ticket_support(guild_id: int, ticket_support: int) -> None:
     sql = "UPDATE tickets_config SET ticket_support = ? WHERE guild_id = ?"
     values = (ticket_support, guild_id)
-    cursor.execute(sql, values)
-    db.commit()
-    cursor.close()
-    db.close()
-    return
+    await execute_update(sql, values)

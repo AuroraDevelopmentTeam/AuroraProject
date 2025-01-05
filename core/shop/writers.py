@@ -1,59 +1,38 @@
-import sqlite3
 import nextcord
 import datetime
 from core.checkers import is_guild_id_in_table
+from core.db_utils import execute_update
 
 
-def write_role_in_shop(guild_id: int, role: nextcord.Role, cost: int) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
-    sql = "INSERT INTO shop(guild_id, role_id, cost) VALUES (?, ?, ?)"
+async def write_role_in_shop(guild_id: int, role: nextcord.Role, cost: int) -> None:
+    sql = "INSERT INTO shop(guild_id, role_id, cost) VALUES (%s, %s, %s)"
     val = (guild_id, role.id, cost)
-    cursor.execute(sql, val)
-    db.commit()
-    cursor.close()
-    db.close()
+    await execute_update(sql, val)
 
 
-def delete_role_from_shop(guild_id: int, role: nextcord.Role) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
+async def delete_role_from_shop(guild_id: int, role: nextcord.Role) -> None:
     sql = f"DELETE FROM shop WHERE role_id = {role.id} AND guild_id = {guild_id}"
-    cursor.execute(sql)
-    db.commit()
-    cursor.close()
-    db.close()
+    await execute_update(sql)
 
 
-def write_role_in_custom_shop(
+async def write_role_in_custom_shop(
     guild_id: int, role: nextcord.Role, cost: int, owner_id: int
 ) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
     now = int(datetime.datetime.now().timestamp())
     sql = "INSERT INTO custom_shop(guild_id, role_id, cost, owner_id, created, expiration_date, bought) \
-          VALUES (?, ?, ?, ?, ?, ?, ?)"
+          VALUES (%s, %s, %s, %s, %s, %s, %s)"
     val = (guild_id, role.id, cost, owner_id, now, now + 2592000, 0)
-    cursor.execute(sql, val)
-    db.commit()
-    cursor.close()
-    db.close()
+    await execute_update(sql, val)
 
 
-def write_in_custom_shop_config_standart_values(
+async def write_in_custom_shop_config_standart_values(
     guilds: list
 ) -> None:
-    db = sqlite3.connect("./databases/main.sqlite")
-    cursor = db.cursor()
     for guild in guilds:
-        if is_guild_id_in_table("custom_shop_config", guild.id) is False:
+        if await is_guild_id_in_table("custom_shop_config", guild.id) is False:
             sql = (
                 "INSERT INTO custom_shop_config (guild_id, enabled, role_create_cost) VALUES ("
-                "?, ?) "
+                "%s, %s) "
             )
             val = (guild.id, True, 0)
-            cursor.execute(sql, val)
-            db.commit()
-    cursor.close()
-    db.close()
-    return
+            await execute_update(sql, val)
