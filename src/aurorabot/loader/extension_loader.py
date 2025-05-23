@@ -2,13 +2,14 @@ import logging
 from pathlib import Path
 import importlib
 import pkgutil
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 
-from aurorabot.bot import AuroraBot
+if TYPE_CHECKING:
+    from aurorabot.bot import AuroraBot
 
 
 class ExtensionLoader:
-    def __init__(self, bot: AuroraBot, logger: logging.Logger):
+    def __init__(self, bot: 'AuroraBot', logger: logging.Logger):
         self.bot = bot
         self.logger = logger
         self.base_path = Path(__file__).parent.parent
