@@ -243,3 +243,4 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 oldbot_dont_code_here
+config/settings.yaml
