@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  bot:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+    depends_on:
+      - redis
+    volumes:
+      - ../src:/app/src
+      - ../config:/app/config
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+volumes:
+  redis_data:

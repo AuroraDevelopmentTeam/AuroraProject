@@ -1,0 +1,20 @@
+locale_name: "English"
+
+common:
+  error:
+    command_not_found: "Command not found."
+    missing_permissions: "You don't have permission to use this command."
+    missing_argument: "Missing required argument: {argument}"
+    generic_error: "An error occurred while processing the command."
+
+commands:
+  ping:
+    title: "🏓 Pong!"
+    bot_latency: "Bot Latency"
+    api_latency: "API Latency"
+    milliseconds: "{value}ms"
+
+events:
+  ready:
+    bot_ready: "Bot is ready! Logged in as {bot_name}"
+    connected_to_guild: "Connected to guild: {guild_name} (ID: {guild_id})" 

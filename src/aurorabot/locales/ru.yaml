@@ -1,0 +1,20 @@
+locale_name: "Русский"
+
+common:
+  error:
+    command_not_found: "Команда не найдена."
+    missing_permissions: "У вас нет прав для использования этой команды."
+    missing_argument: "Отсутствует обязательный аргумент: {argument}"
+    generic_error: "Произошла ошибка при выполнении команды."
+
+commands:
+  ping:
+    title: "🏓 Понг!"
+    bot_latency: "Задержка бота"
+    api_latency: "Задержка API"
+    milliseconds: "{value}мс"
+
+events:
+  ready:
+    bot_ready: "Бот готов! Выполнен вход как {bot_name}"
+    connected_to_guild: "Подключено к серверу: {guild_name} (ID: {guild_id})" 

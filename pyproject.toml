@@ -1,0 +1,81 @@
+[project]
+name = "aurorabot"
+version = "2.0.0"
+description = "A modern Discord bot with clean architecture"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+dependencies = [
+    "nextcord==3.1.0",
+    "python-dotenv>=1.0.0",
+    "PyYAML>=6.0.1",
+    "pydantic>=2.6.1",
+    "python-i18n>=0.3.9",
+    "redis>=5.0.1",
+    "aiohttp>=3.9.1",
+    "pillow>=10.2.0",
+    "psutil",
+]
+requires-python = ">=3.9"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+
+[tool.ruff]
+# Enable pycodestyle, Pyflakes, and import sorting
+select = ["E", "F", "I", "N", "W", "B", "C4", "UP", "ANN", "S", "A", "COM", "TCH", "RUF"]
+ignore = ["ANN101", "ANN102", "ANN401"]
+
+# Allow autofix for all enabled rules (when `--fix` is used)
+fixable = ["ALL"]
+unfixable = []
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+# Same as Black.
+line-length = 100
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Assume Python 3.9
+target-version = "py39"
+
+[tool.ruff.isort]
+known-first-party = ["aurorabot"]
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/*" = ["S101"]
