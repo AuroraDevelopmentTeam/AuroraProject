@@ -25,5 +25,9 @@ class Ready(commands.Cog):
         )
 
 
-async def setup(bot: commands.Bot) -> None:
-    await bot.add_cog(Ready(bot))
+async def setup(bot: commands.Bot) -> Ready:
+    """Установка кога."""
+    bot.logger.info("Загрузка кога Ready...")
+    cog = Ready(bot)
+    bot.logger.info("Ког Ready успешно загружен")
+    return cog

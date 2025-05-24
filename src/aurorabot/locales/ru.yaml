@@ -5,16 +5,87 @@ common:
     command_not_found: "Команда не найдена."
     missing_permissions: "У вас нет прав для использования этой команды."
     missing_argument: "Отсутствует обязательный аргумент: {argument}"
-    generic_error: "Произошла ошибка при выполнении команды."
+    generic_error: "Произошла ошибка при обработке команды."
+    timeout: "Время выполнения команды истекло."
+    validation: "Ошибка валидации: {error}"
+    execution: "Ошибка выполнения команды: {error}"
+    unknown: "Произошла неизвестная ошибка."
+  yes: "Да"
+  no: "Нет"
+  requested_by: "Запросил {user}"
 
 commands:
   ping:
-    title: "🏓 Понг!"
+    name: "пинг"
+    description: "Проверить задержку бота"
+    title: "Задержка бота"
     bot_latency: "Задержка бота"
-    api_latency: "Задержка API"
     milliseconds: "{value}мс"
+
+  user:
+    name: "пользователь"
+    description: "Показать информацию о пользователе"
+    title: "Информация о пользователе: {name}"
+    no_joined_at: "Недоступно"
+    no_nickname: "Отсутствует"
+    no_activity: "Отсутствует"
+    status:
+      online: "В сети"
+      offline: "Не в сети"
+      idle: "Не активен"
+      dnd: "Не беспокоить"
+    fields:
+      id: "ID"
+      created_at: "Создан"
+      joined_at: "Присоединился"
+      top_role: "Высшая роль"
+      bot: "Бот"
+      nickname: "Никнейм"
+      status: "Статус"
+      activity: "Активность"
+      roles: "Роли"
+
+  server:
+    name: "сервер"
+    description: "Показать информацию о сервере"
+    title: "Информация о сервере: {name}"
+    boost_level: "Уровень {level}"
+    verification:
+      none: "Отсутствует"
+      low: "Низкий"
+      medium: "Средний"
+      high: "Высокий"
+      highest: "Самый высокий"
+    content_filter:
+      disabled: "Отключен"
+      no_role: "Без роли"
+      all_members: "Все участники"
+    mfa:
+      "0": "Отсутствует"
+      "1": "Повышенный"
+    fields:
+      name: "Название"
+      id: "ID"
+      owner: "Владелец"
+      created_at: "Создан"
+      members: "Участники"
+      boost_level: "Уровень буста"
+      boost_count: "Количество бустов"
+      channels: "Каналы"
+      roles: "Роли"
+      emojis: "Эмодзи"
+      verification: "Уровень верификации"
+      content_filter: "Фильтр контента"
+      mfa: "Уровень MFA"
 
 events:
   ready:
-    bot_ready: "Бот готов! Выполнен вход как {bot_name}"
-    connected_to_guild: "Подключено к серверу: {guild_name} (ID: {guild_id})" 
+    bot_ready: "Бот готов! Вход выполнен как {bot_name}"
+    connected_to_guild: "Подключен к серверу: {guild_name} (ID: {guild_id})"
+    commands_synced: "Команды успешно синхронизированы"
+    commands_sync_failed: "Ошибка синхронизации команд: {error}"
+
+  command:
+    used: "Команда {command} использована пользователем {user}"
+    success: "Команда {command} успешно выполнена для пользователя {user}"
+    error: "Ошибка выполнения команды {command}: {error}" 

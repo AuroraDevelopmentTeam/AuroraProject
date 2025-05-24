@@ -2,7 +2,7 @@ import asyncio
 import sys
 from pathlib import Path
 
-# Добавление директории src в путь Python
+# Add src directory to Python path
 src_path = str(Path(__file__).parent.parent)
 if src_path not in sys.path:
     sys.path.append(src_path)
@@ -10,14 +10,11 @@ if src_path not in sys.path:
 from aurorabot.bot import AuroraBot
 
 
-async def main():
-    """Основная точка входа для бота."""
+def main():
+    """Main entry point for the bot."""
     bot = AuroraBot()
-    try:
-        await bot.start(bot.config.bot_config["token"])
-    except KeyboardInterrupt:
-        await bot.close()
+    bot.run_bot()
 
 
 if __name__ == "__main__":
-    asyncio.run(main()) 
+    main() 

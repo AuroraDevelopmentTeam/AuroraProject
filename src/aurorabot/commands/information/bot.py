@@ -1,18 +1,28 @@
 import psutil
 import nextcord
 from nextcord.ext import commands
-from typing import List, Any
+from typing import Dict, Any
 from aurorabot.core.base.information import BaseInformationCommand
-from aurorabot.core.embeds.builder import EmbedBuilder
-from aurorabot.core.embeds.fields import FieldManager
+from aurorabot.core.services.embed_service import EmbedService
 
 
 class BotCommand(BaseInformationCommand):
+    """Command for displaying bot information."""
+    
     def __init__(self, bot: commands.Bot):
         super().__init__(bot)
 
-    async def gather_information(self, **kwargs) -> dict:
+    @nextcord.slash_command(
+        name="about",
+        description="Display information about the bot"
+    )
+    async def about(self, interaction: nextcord.Interaction) -> None:
+        """Display information about the bot."""
+        await self.execute(interaction)
+
+    async def gather_information(self, **kwargs) -> Dict[str, Any]:
         """Gather bot information."""
+        guild = kwargs.get('guild', self.bot.guilds[0])
         return {
             'name': self.bot.user.name,
             'avatar': self.bot.user.avatar.url,
@@ -22,7 +32,7 @@ class BotCommand(BaseInformationCommand):
             'cpu_usage': psutil.cpu_percent(),
             'memory_usage': psutil.virtual_memory().percent,
             'memory_available': round((psutil.virtual_memory().available * 100 / psutil.virtual_memory().total), 1),
-            'shard_id': kwargs.get('guild', self.bot.guilds[0]).shard_id,
+            'shard_id': guild.shard_id,
             'status': self.bot.status,
             'created_at': self.bot.user.created_at,
             'python_version': 'Python 3.10.4',
@@ -30,9 +40,9 @@ class BotCommand(BaseInformationCommand):
             'github': 'https://github.com/AuroraDevelopmentTeam'
         }
 
-    async def create_embed(self, ctx: commands.Context, **kwargs) -> nextcord.Embed:
+    async def create_embed(self, interaction: nextcord.Interaction, **kwargs) -> nextcord.Embed:
         """Create the bot information embed."""
-        info = await self.gather_information(guild=ctx.guild)
+        info = await self.gather_information(guild=interaction.guild)
         
         fields = {
             "Users": f"{info['user_count']} 🧍",
@@ -49,20 +59,20 @@ class BotCommand(BaseInformationCommand):
             "GitHub": info['github']
         }
         
-        embed = (
-            EmbedBuilder(f"{info['name']}:", color=nextcord.Color.blue())
-            .with_thumbnail(info['avatar'])
-            .with_footer(f"Requested by {ctx.author}", ctx.author.display_avatar)
-            .build()
+        embed = self.embed_service.create_embed(
+            title=f"{info['name']}:",
+            color=nextcord.Color.blue(),
+            thumbnail=info['avatar'],
+            footer_text=f"Requested by {interaction.user}",
+            footer_icon=interaction.user.display_avatar.url
         )
         
-        return FieldManager.add_fields(embed, fields)
-
-    @commands.command(name="about")
-    async def about(self, ctx: commands.Context) -> None:
-        """Display information about the bot."""
-        await self.send_embed(ctx)
+        return self.embed_service.add_fields(embed, fields)
 
 
-async def setup(bot: commands.Bot) -> None:
-    await bot.add_cog(BotCommand(bot)) 
+async def setup(bot: commands.Bot) -> BotCommand:
+    """Установка кога."""
+    bot.logger.info("Загрузка кога BotCommand...")
+    cog = BotCommand(bot)
+    bot.logger.info("Ког BotCommand успешно загружен")
+    return cog 

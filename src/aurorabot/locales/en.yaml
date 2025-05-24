@@ -6,15 +6,86 @@ common:
     missing_permissions: "You don't have permission to use this command."
     missing_argument: "Missing required argument: {argument}"
     generic_error: "An error occurred while processing the command."
+    timeout: "Command timed out."
+    validation: "Validation error: {error}"
+    execution: "Command execution error: {error}"
+    unknown: "An unknown error occurred."
+  yes: "Yes"
+  no: "No"
+  requested_by: "Requested by {user}"
 
 commands:
   ping:
-    title: "🏓 Pong!"
+    name: "ping"
+    description: "Check bot latency"
+    title: "Bot Latency"
     bot_latency: "Bot Latency"
-    api_latency: "API Latency"
     milliseconds: "{value}ms"
+
+  user:
+    name: "user"
+    description: "Display information about a user"
+    title: "User Information: {name}"
+    no_joined_at: "Not available"
+    no_nickname: "None"
+    no_activity: "None"
+    status:
+      online: "Online"
+      offline: "Offline"
+      idle: "Idle"
+      dnd: "Do Not Disturb"
+    fields:
+      id: "ID"
+      created_at: "Created At"
+      joined_at: "Joined At"
+      top_role: "Top Role"
+      bot: "Bot"
+      nickname: "Nickname"
+      status: "Status"
+      activity: "Activity"
+      roles: "Roles"
+
+  server:
+    name: "server"
+    description: "Display information about the server"
+    title: "Server Information: {name}"
+    boost_level: "Level {level}"
+    verification:
+      none: "None"
+      low: "Low"
+      medium: "Medium"
+      high: "High"
+      highest: "Highest"
+    content_filter:
+      disabled: "Disabled"
+      no_role: "No Role"
+      all_members: "All Members"
+    mfa:
+      "0": "None"
+      "1": "Elevated"
+    fields:
+      name: "Name"
+      id: "ID"
+      owner: "Owner"
+      created_at: "Created At"
+      members: "Members"
+      boost_level: "Boost Level"
+      boost_count: "Boost Count"
+      channels: "Channels"
+      roles: "Roles"
+      emojis: "Emojis"
+      verification: "Verification Level"
+      content_filter: "Content Filter"
+      mfa: "MFA Level"
 
 events:
   ready:
     bot_ready: "Bot is ready! Logged in as {bot_name}"
-    connected_to_guild: "Connected to guild: {guild_name} (ID: {guild_id})" 
+    connected_to_guild: "Connected to guild: {guild_name} (ID: {guild_id})"
+    commands_synced: "Commands successfully synchronized"
+    commands_sync_failed: "Error synchronizing commands: {error}"
+
+  command:
+    used: "Command {command} used by user {user}"
+    success: "Command {command} successfully executed for user {user}"
+    error: "Error executing command {command}: {error}" 

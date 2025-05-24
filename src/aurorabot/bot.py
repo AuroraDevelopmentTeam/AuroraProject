@@ -1,72 +1,120 @@
 from typing import Optional
 import nextcord
 from nextcord.ext import commands
-from aurorabot.config.config import Config
-from aurorabot.loader.extension_loader import ExtensionLoader
+from aurorabot.core.services.logger_service import LoggerService
+from aurorabot.core.services.config_service import ConfigService
+from aurorabot.core.services.embed_service import EmbedService
+from aurorabot.core.services.error_handler_service import ErrorHandlerService
+from aurorabot.core.services.locale_service import LocaleService
 
 
 class AuroraBot(commands.Bot):
+    """Main bot class."""
+    
     def __init__(self):
-        # Писать комментарии это хорошо, поэтому
-        # Загрузка конфигурации
-        self.config = Config()
+        # Initialize logger first
+        self.logger = LoggerService().get_logger()
         
-        # Интенты ботяры, QUESTION: это все которые нам нужны?
+        # Initialize other services
+        self.config = ConfigService().load_config()
+        self.embed_service = EmbedService()
+        self.error_handler = ErrorHandlerService(self.logger)
+        self.locale_service = LocaleService(self.logger)
+        
+        # Initialize bot with intents
         intents = nextcord.Intents.default()
-        intent_mapping = {
-            "GUILDS": "guilds",
-            "GUILD_MESSAGES": "guild_messages",
-            "GUILD_MEMBERS": "members",
-            "MESSAGE_CONTENT": "message_content",
-            "GUILD_PRESENCES": "presences",
-            "GUILD_VOICE_STATES": "voice_states"
-        }
+        intents.message_content = True
+        intents.members = True
         
-        for intent in self.config.bot_config["intents"]:
-            if intent in intent_mapping:
-                setattr(intents, intent_mapping[intent], True)
-            else:
-                self.config.logger.warning(f"Неизвестный интент: {intent}")
-
-        # Инициализация бота
+        # Get application ID from config
+        application_id = self.config.get("bot.application_id")
+        if not application_id:
+            self.logger.error("Application ID not found in configuration")
+            raise ValueError("Application ID is required for slash commands")
+            
+        self.logger.info(f"Using application ID: {application_id}")
+        
+        # Set intents from config
+        config_intents = self.config.get("bot.intents", [])
+        for intent in config_intents:
+            if hasattr(intents, intent.lower()):
+                setattr(intents, intent.lower(), True)
+                self.logger.info(f"Enabled intent: {intent}")
+        
         super().__init__(
-            command_prefix=self.config.bot_config["prefix"],
+            command_prefix=self.config.get("bot.prefix", "!"),
             intents=intents,
-            case_insensitive=True,
-            help_command=None  # Мы реализуем свою команду помощи
+            help_command=None,
+            application_id=int(application_id)
         )
-
-        self.logger = self.config.logger
-        self.logger.info("AuroraBot инициализирован")
-
-    async def setup_hook(self) -> None:
-        """Инициализация компонентов бота и загрузка расширений."""
-        self.logger.info("Настройка компонентов бота...")
         
-        # Инициализация загрузчика расширений
-        loader = ExtensionLoader(self, self.logger)
+        self.logger.info("Bot initialized")
         
-        # Загрузка всех когов и событий
-        await loader.load_extensions()
-        await loader.load_events()
+    async def on_ready(self):
+        """Called when the bot is ready."""
+        self.logger.info(f"Logged in as {self.user.name}#{self.user.discriminator} (ID: {self.user.id})")
         
-        self.logger.info("Настройка бота завершена")
-
-    async def on_ready(self) -> None:
-        """Вызывается, когда бот готов к работе."""
-        self.logger.info(f"Вошли как {self.user} (ID: {self.user.id})")
-        await self.change_presence(
-            activity=nextcord.Game(name=f"{self.config.bot_config['prefix']}help | v{self.config.bot_config['version']}")
+        # Load extensions
+        from aurorabot.loader.extension_loader import ExtensionLoader
+        extension_loader = ExtensionLoader(self)
+        
+        # Load commands
+        await extension_loader.load_extensions()
+        
+        # Load events
+        await extension_loader.load_events()
+        
+        # Set bot presence
+        activity = nextcord.Activity(
+            type=nextcord.ActivityType.watching,
+            name="for commands"
         )
-
-    async def on_command_error(self, ctx: commands.Context, error: Exception) -> None: # Это надо будет вынести в отдельный блок
-        """Глобальный обработчик ошибок команд."""
+        await self.change_presence(activity=activity)
+        
+        self.logger.info("Bot is ready")
+        
+    async def on_command_error(self, ctx, error):
+        """Handle command errors."""
         if isinstance(error, commands.CommandNotFound):
             return
-        elif isinstance(error, commands.MissingPermissions):
-            await ctx.send("У вас нет прав для использования этой команды.")
-        elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"Отсутствует обязательный аргумент: {error.param.name}")
+            
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("You don't have permission to use this command.")
+            return
+            
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(f"Missing required argument: {error.param.name}")
+            return
+            
+        self.logger.error(f"Command error: {error}", exc_info=True)
+        await ctx.send("An error occurred while processing the command.")
+
+    async def on_application_command_error(
+        self,
+        interaction: nextcord.Interaction,
+        error: Exception
+    ) -> None:
+        """Handle slash command errors."""
+        self.logger.error(f"Ошибка команды: {error}", exc_info=True)
+        
+        if isinstance(error, nextcord.errors.InteractionResponded):
+            await interaction.followup.send(
+                self.locale_service.get_text("common.error.timeout"),
+                ephemeral=True
+            )
         else:
-            self.logger.error(f"Ошибка команды: {error}", exc_info=True)
-            await ctx.send("Произошла ошибка при обработке команды.")
+            await self.error_handler.handle_error(interaction, error)
+
+    async def on_application_command(self, interaction: nextcord.Interaction) -> None:
+        """Called when a slash command is used."""
+        self.logger.info(f"Использована команда {interaction.application_command.name} пользователем {interaction.user}")
+
+    def run_bot(self):
+        """Run the bot."""
+        token = self.config.get("bot.token")
+        
+        if not token:
+            self.logger.error("Bot token not found in configuration")
+            return
+            
+        self.run(token, reconnect=True)
